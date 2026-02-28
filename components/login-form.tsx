@@ -76,9 +76,6 @@ export function LoginForm({
         Login
       </Typography>
       <Card color="body">
-        <Typography variant="body-2" className="text-fractal-text-placeholder mb-3">
-          Enter your email and password to login
-        </Typography>
 
         <form onSubmit={handleLogin}>
           <div className="flex flex-col gap-3">

@@ -57,9 +57,6 @@ export function SignUpForm({
         Sign up
       </Typography>
       <Card color="body">
-        <Typography variant="body-2" className="text-fractal-text-placeholder mb-3">
-          Create a new account
-        </Typography>
 
         <form onSubmit={handleSignUp}>
           <div className="flex flex-col gap-3">
