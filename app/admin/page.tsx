@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Typography, Paper } from "@snowball-tech/fractal";
 import {
   AreaChart,
@@ -67,6 +67,19 @@ const breakdownData = [
 ];
 
 export default function DashboardPage() {
+  const [genderDistributionData, setGenderDistributionData] = useState(initialGenderDistribution);
+
+  useEffect(() => {
+    fetch("/api/gender-distribution")
+      .then((res) => res.json())
+      .then((json) => {
+        if (json.success && Array.isArray(json.distribution)) {
+          setGenderDistributionData(json.distribution);
+        }
+      })
+      .catch((err) => console.error("fetch gender distribution error", err));
+  }, []);
+
   return (
     // 1. Added h-full to the root container
     <div className="max-w-[1400px] w-full h-full flex flex-col">

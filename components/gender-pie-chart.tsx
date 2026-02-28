@@ -2,7 +2,14 @@
 
 import { PieChart, Pie, Cell, Legend, Tooltip, ResponsiveContainer } from "recharts";
 
-const COLORS = ["#FF6B9D", "#4A90E2", "#F5A623", "#7ED321", "#BD10E0"];
+// use Fractal decorative/brand tokens via CSS variables so colors adapt to theme
+const COLORS = [
+  "var(--color-decorative-blue-70)",
+  "var(--color-decorative-pink-70)",
+  "var(--color-decorative-yellow-70)",
+  "var(--color-decorative-purple-70)",
+  "var(--color-brand-primary)"
+];
 
 interface GenderData {
   name: string;
@@ -31,9 +38,13 @@ export function GenderPieChart({ data }: GenderPieChartProps) {
             cx="50%"
             cy="50%"
             labelLine={false}
-            label={({ name, value, percent }) =>
-              `${name}: ${value} (${(percent * 100).toFixed(0)}%)`
-            }
+            label={(props: any) => {
+              const name = props.name ?? "";
+              const value = props.value ?? 0;
+              const percent = props.percent ?? 0;
+              const pct = (percent * 100).toFixed(0);
+              return `${name}: ${value} (${pct}%)`;
+            }}
             outerRadius={80}
             fill="#8884d8"
             dataKey="value"
@@ -46,11 +57,15 @@ export function GenderPieChart({ data }: GenderPieChartProps) {
             ))}
           </Pie>
           <Tooltip
-            formatter={(value: number) => `${value}`}
+            formatter={(value: number | string | undefined) => `${value ?? 0}`}
             contentStyle={{
-              backgroundColor: "#fff",
-              border: "2px solid #000",
+              backgroundColor: "var(--color-bg-body-white)",
+              border: "2px solid var(--color-border-default)",
               borderRadius: "8px",
+              color: "var(--color-text-default)"
+            }}
+            labelStyle={{
+              color: "var(--color-text-default)"
             }}
           />
           <Legend />
