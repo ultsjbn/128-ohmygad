@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Typography, Paper } from "@snowball-tech/fractal";
 // pls refer to this documentation: https://fractal.snowball.xyz/
 // for charts, https://recharts.org/
@@ -30,7 +30,8 @@ const eventAttendanceData = [
   { month: "Feb", attendees: 140 },
 ];
 
-const genderDistributionData = [
+// we'll override this with real values after fetching
+const initialGenderDistribution = [
   { name: "Female", value: 65 },
   { name: "Male", value: 30 },
   { name: "Non-binary/Other", value: 5 },
@@ -50,6 +51,19 @@ const breakdownData = [
 ];
 
 export default function DashboardPage() {
+  const [genderDistributionData, setGenderDistributionData] = useState(initialGenderDistribution);
+
+  useEffect(() => {
+    fetch("/api/gender-distribution")
+      .then((res) => res.json())
+      .then((json) => {
+        if (json.success && Array.isArray(json.distribution)) {
+          setGenderDistributionData(json.distribution);
+        }
+      })
+      .catch((err) => console.error("fetch gender distribution error", err));
+  }, []);
+
   return (
     <div className="max-w-[1400px] w-full flex flex-col">
       
