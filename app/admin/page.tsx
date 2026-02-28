@@ -194,9 +194,9 @@ export default function DashboardPage() {
               <Typography variant="heading-2" className="text-right tracking-tighter">24</Typography>
             </Paper>
             <Paper elevation="bordered" title="Onboarded Users" titleVariant="body-1-median" className="bg-fractal-decorative-yellow-50 h-full flex flex-col justify-between">
-              <Typography variant="heading-2" className="text-right tracking-tighter">
-              {userStats.percent}%
-            </Typography>
+                <Typography variant="heading-2" className="text-right tracking-tighter">
+                  {userStats.onboarded}
+                </Typography>
             </Paper>
           </div>
 
