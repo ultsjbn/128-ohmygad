@@ -126,6 +126,7 @@ export function LoginForm({
               variant="primary"
               fullWidth
               disabled={isLoading}
+              className="[&]:text-fractal-base-white [&]:border-2 [&]:border-fractal-border-default [&:hover]:text-fractal-base-black [&:hover]:border-2 [&:hover]:border-fractal-border-default"
             />
           </div>
 

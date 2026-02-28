@@ -23,6 +23,7 @@ export default function Page() {
                   label="Go to Login"
                   variant="primary"
                   fullWidth
+                  className="[&]:text-fractal-base-white [&]:border-2 [&]:border-fractal-border-default [&:hover]:text-fractal-base-black [&:hover]:border-2 [&:hover]:border-fractal-border-default"
                 />
               </Link>
             </div>
