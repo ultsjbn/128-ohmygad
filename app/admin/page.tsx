@@ -30,13 +30,23 @@ const eventAttendanceData = [
   { month: "Feb", attendees: 140 },
 ];
 
-// we'll override this with real values after fetching
+// placeholder initial distribution, overridden by API fetch later
 const initialGenderDistribution = [
   { name: "Female", value: 65 },
   { name: "Male", value: 30 },
   { name: "Non-binary/Other", value: 5 },
 ];
-const genderColors = ["#F49CE1", "#A7F3D0", "#FEF08A"];
+
+// use Fractal decorative token shades for chart colors, rotate if more categories than tokens
+const baseColors = [
+  "var(--color-decorative-pink-70)",
+  "var(--color-decorative-blue-70)",
+  "var(--color-decorative-yellow-70)",
+  "var(--color-decorative-purple-70)",
+  "var(--color-brand-primary)"
+];
+const genderColors = (genderDistributionData: any[]) =>
+  genderDistributionData.map((_, i) => baseColors[i % baseColors.length]);
 
 const roleDistributionData = [
   { role: "Student", count: 210 },
@@ -154,7 +164,10 @@ export default function DashboardPage() {
                     strokeWidth={3}
                   >
                     {genderDistributionData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={genderColors[index % genderColors.length]} />
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={genderColors(genderDistributionData)[index]}
+                      />
                     ))}
                   </Pie>
                   <Tooltip contentStyle={{ border: '3px solid black', borderRadius: '8px', backgroundColor: '#fff', boxShadow: '2px 2px 0px 0px rgba(0,0,0,1)' }} />
