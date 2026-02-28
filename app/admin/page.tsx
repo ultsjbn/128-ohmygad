@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Typography, Paper } from "@snowball-tech/fractal";
 import {
   AreaChart,
@@ -28,13 +28,13 @@ const eventAttendanceData = [
   { month: "Feb", attendees: 140 },
 ];
 
-const sexAtBirthData = [
+const initialSexAtBirthData = [
   { name: "Male", value: 45 },
   { name: "Female", value: 50 },
   { name: "Intersex", value: 5 },
 ];
 
-const genderIdentityData = [
+const initialGenderIdentityData = [
   { name: "Man", value: 42 },
   { name: "Woman", value: 48 },
   { name: "Non-binary", value: 7 },
@@ -54,19 +54,109 @@ const genderIdentityColors = [
   "var(--color-decorative-purple-70)"
 ];
 
-const roleDistributionData = [
+const initialRoleDistributionData = [
   { role: "Student", count: 210 },
   { role: "Faculty", count: 15 },
   { role: "Admin", count: 5 },
 ];
 
-const breakdownData = [
+// colors for each role bar
+const roleColors = [
+  "var(--color-decorative-blue-70)",
+  "var(--color-decorative-green-70)",
+  "var(--color-decorative-purple-70)",
+  "var(--color-decorative-yellow-70)",
+];
+
+const initialBreakdownData = [
   { category: "CS", value: 110 },
   { category: "CAC", value: 65 },
   { category: "CSS", value: 55 },
 ];
 
+// colors for each college bar, will cycle if more categories
+const collegeColors = [
+  "var(--color-decorative-purple-70)",
+  "var(--color-decorative-blue-70)",
+  "var(--color-decorative-green-70)",
+  "var(--color-decorative-yellow-70)",
+  "var(--color-decorative-pink-70)"
+];
+
 export default function DashboardPage() {
+  const [sexAtBirthData, setSexAtBirthData] = useState(initialSexAtBirthData);
+  const [genderIdentityData, setGenderIdentityData] = useState(initialGenderIdentityData);
+  const [roleDistributionData, setRoleDistributionData] = useState(initialRoleDistributionData);
+  const [breakdownData, setBreakdownData] = useState(initialBreakdownData);
+  const [userStats, setUserStats] = useState<{total: number; onboarded: number; percent: number}>({ total: 0, onboarded: 0, percent: 0 });
+  const [gadEventsCount, setGadEventsCount] = useState<number>(0);
+
+  useEffect(() => {
+    // Fetch sex at birth data
+    fetch("/api/sex-at-birth")
+      .then((res) => res.json())
+      .then((json) => {
+        if (json.success && Array.isArray(json.distribution) && json.distribution.length > 0) {
+          setSexAtBirthData(json.distribution);
+        }
+      })
+      .catch((err) => console.error("fetch sex at birth error", err));
+
+    // Fetch gender identity data
+    fetch("/api/gender-distribution")
+      .then((res) => res.json())
+      .then((json) => {
+        if (json.success && Array.isArray(json.distribution) && json.distribution.length > 0) {
+          setGenderIdentityData(json.distribution);
+        }
+      })
+      .catch((err) => console.error("fetch gender distribution error", err));
+
+    // Fetch users by role data
+    fetch("/api/users-by-role")
+      .then((res) => res.json())
+      .then((json) => {
+        if (json.success && Array.isArray(json.distribution) && json.distribution.length > 0) {
+          setRoleDistributionData(json.distribution);
+        }
+      })
+      .catch((err) => console.error("fetch users by role error", err));
+
+    // Fetch college distribution data
+    fetch("/api/college-distribution")
+      .then((res) => res.json())
+      .then((json) => {
+        if (json.success && Array.isArray(json.distribution) && json.distribution.length > 0) {
+          setBreakdownData(json.distribution);
+        }
+      })
+      .catch((err) => console.error("fetch college distribution error", err));
+
+    // Fetch user stats
+    fetch("/api/user-stats")
+      .then((res) => res.json())
+      .then((json) => {
+        if (json.success) {
+          setUserStats({
+            total: json.total || 0,
+            onboarded: json.onboarded || 0,
+            percent: json.percent || 0,
+          });
+        }
+      })
+      .catch((err) => console.error("fetch user stats error", err));
+
+    // Fetch total GAD events count
+    fetch("/api/gad-events-count")
+      .then((res) => res.json())
+      .then((json) => {
+        if (json && json.success && typeof json.count === "number") {
+          setGadEventsCount(json.count);
+        }
+      })
+      .catch((err) => console.error("fetch gad events count error", err));
+  }, []);
+
   return (
     <div className="max-w-[1400px] w-full h-full flex flex-col">
       
@@ -82,7 +172,7 @@ export default function DashboardPage() {
         </div>
         <div className="flex flex-col items-center">
           <Typography variant="body-1-median">Total Users</Typography>
-          <Typography variant="heading-1" className="text-4xl tracking-tighter">842</Typography>
+          <Typography variant="heading-1" className="text-4xl tracking-tighter">{userStats.total}</Typography>
         </div>
       </div>
 
@@ -112,10 +202,12 @@ export default function DashboardPage() {
           {/* Bottom Row - Purple and Yellow Cards */}
           <div className="grid grid-cols-2 gap-4 shrink-0 h-[110px]">
             <Paper elevation="bordered" title="Total GAD Events" titleVariant="body-1-median" className="bg-fractal-decorative-purple-90 h-full flex flex-col justify-between">
-              <Typography variant="heading-2" className="text-right tracking-tighter">24</Typography>
+              <Typography variant="heading-2" className="text-right tracking-tighter">{gadEventsCount}</Typography>
             </Paper>
             <Paper elevation="bordered" title="Onboarded Users" titleVariant="body-1-median" className="bg-fractal-decorative-yellow-50 h-full flex flex-col justify-between">
-              <Typography variant="heading-2" className="text-right tracking-tighter">84%</Typography>
+                <Typography variant="heading-2" className="text-right tracking-tighter">
+                  {userStats.onboarded}
+                </Typography>
             </Paper>
           </div>
 
@@ -124,7 +216,7 @@ export default function DashboardPage() {
         {/* COLUMN 3: Sex and Gender Distribution */}
         <div className="flex flex-col gap-4 lg:col-span-1 h-full min-h-0">
           {/* Sex at Birth Distribution */}
-          <Paper elevation="elevated" title="Sex at Birth Distribution" titleVariant="body-1-median" className="flex-1 flex flex-col min-h-0">
+          <Paper elevation="elevated" title="Sex at Birth" titleVariant="body-1-median" className="flex-1 flex flex-col min-h-0">
             <div className="flex-1 w-full min-h-0 pt-2">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
@@ -150,7 +242,7 @@ export default function DashboardPage() {
           </Paper>
           
           {/* Gender Identity Distribution */}
-          <Paper elevation="elevated" title="Gender Identity Distribution" titleVariant="body-1-median" className="flex-1 flex flex-col min-h-0">
+          <Paper elevation="elevated" title="Gender Identity" titleVariant="body-1-median" className="flex-1 flex flex-col min-h-0">
             <div className="flex-1 w-full min-h-0 pt-2">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
@@ -182,27 +274,41 @@ export default function DashboardPage() {
           <Paper elevation="elevated" title="Users by Role" titleVariant="body-1-median" className="flex-1 flex flex-col min-h-0">
             <div className="flex-1 w-full min-h-0 pt-2">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={roleDistributionData} layout="vertical" margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
+                <BarChart data={roleDistributionData} layout="vertical" margin={{ top: 0, right: 0, left: 20, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" horizontal={false} opacity={0.2} />
                   <XAxis type="number" hide />
-                  <YAxis dataKey="role" type="category" stroke="#000" fontSize={12} tickLine={false} axisLine={false} />
+                  <YAxis dataKey="role" type="category" stroke="#000" fontSize={11} tickLine={false} axisLine={false} />
                   <Tooltip cursor={{ fill: 'rgba(0,0,0,0.05)' }} contentStyle={{ border: '3px solid black', borderRadius: '8px', boxShadow: '2px 2px 0px 0px rgba(0,0,0,1)' }} />
-                  <Bar dataKey="count" fill="#F49CE1" stroke="#000" strokeWidth={2} radius={[0, 4, 4, 0]} barSize={24} />
+                  <Bar dataKey="count" stroke="#000" strokeWidth={2} radius={[0, 4, 4, 0]} barSize={24}>
+                    {roleDistributionData.map((entry, idx) => (
+                      <Cell
+                        key={`cell-role-${idx}`}
+                        fill={roleColors[idx % roleColors.length]}
+                      />
+                    ))}
+                  </Bar>
                 </BarChart>
               </ResponsiveContainer>
             </div>
           </Paper>
           
           {/* Tall Card */}
-          <Paper elevation="elevated" title="Breakdown of Users per College" titleVariant="body-1-median" className="flex-1 flex flex-col min-h-0">
+          <Paper elevation="elevated" title="Users per College" titleVariant="body-1-median" className="flex-1 flex flex-col min-h-0">
             <div className="flex-1 w-full min-h-0 pt-2">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={breakdownData} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
+                <BarChart data={breakdownData} margin={{ top: 0, right: 10, left: 10, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} opacity={0.2} />
                   <XAxis dataKey="category" stroke="#000" fontSize={12} tickLine={false} axisLine={false} />
                   <YAxis hide />
                   <Tooltip cursor={{ fill: 'rgba(0,0,0,0.05)' }} contentStyle={{ border: '3px solid black', borderRadius: '8px', boxShadow: '2px 2px 0px 0px rgba(0,0,0,1)' }} />
-                  <Bar dataKey="value" fill="#93C5FD" stroke="#000" strokeWidth={2} radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="value" stroke="#000" strokeWidth={2} radius={[4, 4, 0, 0]} >
+                    {breakdownData.map((entry, idx) => (
+                      <Cell
+                        key={`cell-col-${idx}`}
+                        fill={collegeColors[idx % collegeColors.length]}
+                      />
+                    ))}
+                  </Bar>
                 </BarChart>
               </ResponsiveContainer>
             </div>
