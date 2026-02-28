@@ -88,6 +88,7 @@ export default function DashboardPage() {
   const [genderIdentityData, setGenderIdentityData] = useState(initialGenderIdentityData);
   const [roleDistributionData, setRoleDistributionData] = useState(initialRoleDistributionData);
   const [breakdownData, setBreakdownData] = useState(initialBreakdownData);
+  const [userStats, setUserStats] = useState<{total: number; onboarded: number; percent: number}>({ total: 0, onboarded: 0, percent: 0 });
 
   useEffect(() => {
     // Fetch sex at birth data
@@ -129,6 +130,20 @@ export default function DashboardPage() {
         }
       })
       .catch((err) => console.error("fetch college distribution error", err));
+
+    // Fetch user stats
+    fetch("/api/user-stats")
+      .then((res) => res.json())
+      .then((json) => {
+        if (json.success) {
+          setUserStats({
+            total: json.total || 0,
+            onboarded: json.onboarded || 0,
+            percent: json.percent || 0,
+          });
+        }
+      })
+      .catch((err) => console.error("fetch user stats error", err));
   }, []);
 
   return (
@@ -179,7 +194,9 @@ export default function DashboardPage() {
               <Typography variant="heading-2" className="text-right tracking-tighter">24</Typography>
             </Paper>
             <Paper elevation="bordered" title="Onboarded Users" titleVariant="body-1-median" className="bg-fractal-decorative-yellow-50 h-full flex flex-col justify-between">
-              <Typography variant="heading-2" className="text-right tracking-tighter">84%</Typography>
+              <Typography variant="heading-2" className="text-right tracking-tighter">
+              {userStats.percent}%
+            </Typography>
             </Paper>
           </div>
 
