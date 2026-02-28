@@ -7,7 +7,9 @@ export async function GET() {
     const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
     const supabase = createAdminClient(url, key || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
 
-    const { data, error } = await supabase.from("course").select("id,title,description,schedule,instructor_id,status,semester,created_at,updated_at");
+    const { data, error } = await supabase
+      .from("course")
+      .select("id,code,title,description,schedule,instructor_id,status,semester,college,created_at,updated_at");
     if (error) {
       console.error("Error fetching courses:", error);
       return NextResponse.json({ success: false, error: error.message }, { status: 500 });
@@ -23,7 +25,16 @@ export async function GET() {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { title, description = "", schedule = null, instructor_id = null, status = "active", semester = "" } = body;
+    const {
+      code = "",
+      title,
+      description = "",
+      schedule = null,
+      instructor_id = null,
+      status = "active",
+      semester = "",
+      college = "",
+    } = body;
 
     console.log("[POST /api/courses] Received body:", body);
 
@@ -38,8 +49,11 @@ export async function POST(req: Request) {
 
     const supabase = createAdminClient(url, key || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
 
-    console.log("[POST /api/courses] Inserting course:", { title, description, schedule, instructor_id, status, semester });
-    const { data, error } = await supabase.from("course").insert([{ title, description, schedule, instructor_id, status, semester }]).select();
+    console.log("[POST /api/courses] Inserting course:", { code, title, description, schedule, instructor_id, status, semester, college });
+    const { data, error } = await supabase
+      .from("course")
+      .insert([{ code, title, description, schedule, instructor_id, status, semester, college }])
+      .select();
     
     if (error) {
       console.error("[POST /api/courses] Error inserting course:", error);
