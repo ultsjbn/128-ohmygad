@@ -172,7 +172,7 @@ export default function DashboardPage() {
         </div>
         <div className="flex flex-col items-center">
           <Typography variant="body-1-median">Total Users</Typography>
-          <Typography variant="heading-1" className="text-4xl tracking-tighter">842</Typography>
+          <Typography variant="heading-1" className="text-4xl tracking-tighter">{userStats.total}</Typography>
         </div>
       </div>
 
