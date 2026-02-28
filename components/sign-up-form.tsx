@@ -36,10 +36,10 @@ export function SignUpForm({
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/student/dashboard`,
+          emailRedirectTo: `${window.location.origin}/auth/onboarding`,  // redirect to onboarding after email confirm
           data: {
-            full_name,
-          }
+            full_name,  // passed to trigger via raw_user_meta_data
+          },
         },
       });
       if (error) throw error;
