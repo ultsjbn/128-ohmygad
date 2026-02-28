@@ -123,7 +123,7 @@ export function LoginForm({
             <Button
               type="submit"
               label={isLoading ? "Logging in..." : "Login"}
-              variant="display"
+              variant="primary"
               fullWidth
               disabled={isLoading}
             />

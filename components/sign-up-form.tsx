@@ -114,7 +114,7 @@ export function SignUpForm({
             <Button
               type="submit"
               label={isLoading ? "Creating an account..." : "Sign up"}
-              variant="display"
+              variant="primary"
               fullWidth
               disabled={isLoading}
             />
