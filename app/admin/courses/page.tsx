@@ -6,12 +6,14 @@ import { Search, Users, Plus, Edit2, Trash2, Save, X } from "lucide-react";
 
 type Course = {
   id: string;
+  code?: string;
   title: string;
   description?: string;
   schedule?: string;
   instructor_id?: string;
   status?: string;
   semester?: string;
+  college?: string;
   created_at?: string;
   updated_at?: string;
 };
@@ -19,7 +21,7 @@ type Course = {
 export default function CoursesPage() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [showAdd, setShowAdd] = useState(false);
-  const [newCourse, setNewCourse] = useState({ title: "", description: "", schedule: "", instructor_id: "", status: "active", semester: "" });
+  const [newCourse, setNewCourse] = useState<Partial<Course>>({ code: "", title: "", description: "", schedule: "", instructor_id: "", status: "active", semester: "", college: "" });
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editFields, setEditFields] = useState<Partial<Course>>({});
   const [loading, setLoading] = useState(true);
@@ -59,7 +61,7 @@ export default function CoursesPage() {
       if (json.success && json.course) {
         console.log("[addCourse] Course inserted:", json.course);
         setCourses((s) => [json.course, ...s]);
-        setNewCourse({ title: "", description: "", schedule: "", instructor_id: "", status: "active", semester: "" });
+        setNewCourse({ code: "", title: "", description: "", schedule: "", instructor_id: "", status: "active", semester: "", college: "" });
         setShowAdd(false);
       } else {
         console.warn("[addCourse] API error:", json.error);
@@ -111,7 +113,7 @@ export default function CoursesPage() {
   }
 
   const filtered = courses.filter((c) =>
-    `${c.code} ${c.title} ${c.college}`.toLowerCase().includes(search.toLowerCase())
+    `${c.code || ""} ${c.title} ${c.college || ""}`.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
@@ -137,11 +139,37 @@ export default function CoursesPage() {
         </div>
 
         {showAdd && (
-          <div className="flex items-end gap-2 pb-2">
-            <InputText value={newCourse.title} onChange={(e: any) => setNewCourse({ ...newCourse, title: e.target.value })} placeholder="Title" />
-            <InputText value={newCourse.description || ""} onChange={(e: any) => setNewCourse({ ...newCourse, description: e.target.value })} placeholder="Description" />
-            <InputText value={newCourse.schedule || ""} onChange={(e: any) => setNewCourse({ ...newCourse, schedule: e.target.value })} placeholder="Schedule" />
-            <InputText value={newCourse.semester || ""} onChange={(e: any) => setNewCourse({ ...newCourse, semester: e.target.value })} placeholder="Semester" />
+          <div className="flex flex-wrap items-end gap-2 pb-2">
+            <InputText
+              value={newCourse.code || ""}
+              onChange={(e: any) => setNewCourse({ ...newCourse, code: e.target.value })}
+              placeholder="Code"
+            />
+            <InputText
+              value={newCourse.title}
+              onChange={(e: any) => setNewCourse({ ...newCourse, title: e.target.value })}
+              placeholder="Title"
+            />
+            <InputText
+              value={newCourse.description || ""}
+              onChange={(e: any) => setNewCourse({ ...newCourse, description: e.target.value })}
+              placeholder="Description"
+            />
+            <InputText
+              value={newCourse.schedule || ""}
+              onChange={(e: any) => setNewCourse({ ...newCourse, schedule: e.target.value })}
+              placeholder="Schedule"
+            />
+            <InputText
+              value={newCourse.semester || ""}
+              onChange={(e: any) => setNewCourse({ ...newCourse, semester: e.target.value })}
+              placeholder="Semester"
+            />
+            <InputText
+              value={newCourse.college || ""}
+              onChange={(e: any) => setNewCourse({ ...newCourse, college: e.target.value })}
+              placeholder="College"
+            />
             <Button variant="default" size="sm" onClick={addCourse}>
               <Plus className="size-4" />
               Create
@@ -166,12 +194,22 @@ export default function CoursesPage() {
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     {isEditing ? (
-                      <InputText
-                        value={editFields.title ?? course.title}
-                        onChange={(e: any) => setEditFields({ ...editFields, title: e.target.value })}
-                      />
+                      <>
+                        <InputText
+                          value={editFields.code ?? course.code ?? ""}
+                          onChange={(e: any) => setEditFields({ ...editFields, code: e.target.value })}
+                          placeholder="Code"
+                        />
+                        <InputText
+                          value={editFields.title ?? course.title}
+                          onChange={(e: any) => setEditFields({ ...editFields, title: e.target.value })}
+                          placeholder="Title"
+                        />
+                      </>
                     ) : (
-                      <Typography variant="body-1-median">{course.title}</Typography>
+                      <Typography variant="body-1-median">
+                        {course.code ? `${course.code}: ${course.title}` : course.title}
+                      </Typography>
                     )}
                   </div>
                   <span className="px-2 py-0.5 text-xs font-median border-2 border-fractal-border-default rounded-fractal-xs bg-fractal-base-grey-90">
@@ -206,6 +244,11 @@ export default function CoursesPage() {
                         onChange={(e: any) => setEditFields({ ...editFields, semester: e.target.value })}
                         placeholder="Semester"
                       />
+                      <InputText
+                        value={editFields.college ?? course.college ?? ""}
+                        onChange={(e: any) => setEditFields({ ...editFields, college: e.target.value })}
+                        placeholder="College"
+                      />
                     </>
                   ) : (
                     <>
@@ -218,6 +261,11 @@ export default function CoursesPage() {
                       <Typography variant="body-2" className="text-fractal-text-placeholder">
                         <strong>Semester:</strong> {course.semester || "—"}
                       </Typography>
+                      {course.college && (
+                        <Typography variant="body-2" className="text-fractal-text-placeholder">
+                          <strong>College:</strong> {course.college}
+                        </Typography>
+                      )}
                     </>
                   )}
                 </div>
