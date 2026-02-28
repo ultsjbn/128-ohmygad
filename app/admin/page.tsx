@@ -1,9 +1,11 @@
 import { Card, Typography, Paper } from "@snowball-tech/fractal";
 import { GenderPieChart } from "@/components/gender-pie-chart";
+import { getGenderDistribution } from "@/lib/actions/gender";
 // import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"; 
 // import { cookies } from "next/headers";
 
 export default async function DashboardPage() {
+  const genderData = await getGenderDistribution();
   // const supabase = createServerComponentClient({ cookies });
   // const { data: { session } } = await supabase.auth.getSession();
 
@@ -42,7 +44,7 @@ export default async function DashboardPage() {
         <div className="col-span-1 flex flex-col gap-6">
           <Card className="flex-1 bg-white p-6 border-[3px] border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] min-h-[250px]">
             <Typography variant="heading-3">Gender<br/>Distribution Pie Chart</Typography>
-            <GenderPieChart />
+            <GenderPieChart data={genderData.length > 0 ? genderData : undefined} />
           </Card>
           <Card className="flex-1 bg-white p-6 border-[3px] border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] min-h-[200px]">
             <Typography variant="heading-3">Total Analytics</Typography>
