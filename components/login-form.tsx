@@ -57,7 +57,6 @@ const handleLogin = async (e: React.FormEvent) => {
       throw new Error("No profile found for this account. Please contact the administrator.");
     }
 
-    // ← this was missing in your debug version
     switch (profile.role) {
       case "admin":
         router.push("/admin");
@@ -132,8 +131,6 @@ const handleLogin = async (e: React.FormEvent) => {
 
             </div>
 
-            {/* Only show sign-up link for students.
-                Admins and faculty are pre-created by the administrator. */}
             <div className="mt-4 text-center text-sm">
               Don&apos;t have an account?{" "}
               <Link
