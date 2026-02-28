@@ -135,7 +135,7 @@ export default function DashboardPage() {
           {/* Tall Card */}
           <Paper 
             elevation="elevated" 
-            title="Sex and Gender Distribution Pie Chart" 
+            title="Gender Distribution Pie Chart" 
             titleVariant="body-1-median"
             className="h-[320px] flex flex-col"
           >
