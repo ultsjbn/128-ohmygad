@@ -7,15 +7,23 @@ export async function GET() {
     const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
     const supabase = createAdminClient(url, key || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
 
-    const { data, error } = await supabase
-      .from("course")
-      .select("id,code,title,description,schedule,instructor_id,status,semester,college,created_at,updated_at");
+    // use wildcard select so we don't need to know exact casing of end_time column
+    const { data, error } = await supabase.from("course").select("*");
     if (error) {
       console.error("Error fetching courses:", error);
       return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     }
 
-    return NextResponse.json({ success: true, courses: data || [] });
+    // normalize column name for end_time if the DB uses weird casing
+    const courses = (data || []).map((row: any) => {
+      if (row.End_time && !row.end_time) {
+        row.end_time = row.End_time;
+        delete row.End_time;
+      }
+      return row;
+    });
+
+    return NextResponse.json({ success: true, courses });
   } catch (err) {
     console.error("Unhandled error in courses GET:", err);
     return NextResponse.json({ success: false, error: String(err) }, { status: 500 });
@@ -25,16 +33,8 @@ export async function GET() {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const {
-      code = "",
-      title,
-      description = "",
-      schedule = null,
-      instructor_id = null,
-      status = "active",
-      semester = "",
-      college = "",
-    } = body;
+    // the course table may have End_time instead of end_time depending on how it was created
+    const { title, description = "", start_time = null, end_time = null, instructor_id = null, status = "active", semester = "" } = body;
 
     console.log("[POST /api/courses] Received body:", body);
 
@@ -49,11 +49,14 @@ export async function POST(req: Request) {
 
     const supabase = createAdminClient(url, key || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
 
-    console.log("[POST /api/courses] Inserting course:", { code, title, description, schedule, instructor_id, status, semester, college });
-    const { data, error } = await supabase
-      .from("course")
-      .insert([{ code, title, description, schedule, instructor_id, status, semester, college }])
-      .select();
+    console.log("[POST /api/courses] Inserting course:", { title, description, start_time, end_time, instructor_id, status, semester });
+    // when inserting, supply both potential column names for safety
+    const insertObj: any = { title, description, start_time, instructor_id, status, semester };
+    if (end_time !== null) {
+      insertObj.end_time = end_time;
+      insertObj.End_time = end_time;
+    }
+    const { data, error } = await supabase.from("course").insert([insertObj]).select();
     
     if (error) {
       console.error("[POST /api/courses] Error inserting course:", error);

@@ -4,7 +4,12 @@ import { createClient as createAdminClient } from "@supabase/supabase-js";
 export async function PATCH(req: Request, { params }: { params: { id: string } }) {
   try {
     const id = params.id;
-    const body = await req.json();
+    let body = await req.json();
+
+    // if body uses end_time but the DB column is End_time, prepare both
+    if (body.end_time !== undefined && body.End_time === undefined) {
+      body.End_time = body.end_time;
+    }
 
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
     const key = process.env.SUPABASE_SERVICE_ROLE_KEY;

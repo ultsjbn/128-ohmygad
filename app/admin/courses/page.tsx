@@ -6,14 +6,13 @@ import { Search, Users, Plus, Edit2, Trash2, Save, X } from "lucide-react";
 
 type Course = {
   id: string;
-  code?: string;
   title: string;
   description?: string;
-  schedule?: string;
+  start_time?: string;
+  end_time?: string;
   instructor_id?: string;
   status?: string;
   semester?: string;
-  college?: string;
   created_at?: string;
   updated_at?: string;
 };
@@ -21,7 +20,7 @@ type Course = {
 export default function CoursesPage() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [showAdd, setShowAdd] = useState(false);
-  const [newCourse, setNewCourse] = useState<Partial<Course>>({ code: "", title: "", description: "", schedule: "", instructor_id: "", status: "active", semester: "", college: "" });
+  const [newCourse, setNewCourse] = useState({ title: "", description: "", start_time: "", end_time: "", instructor_id: "", status: "active", semester: "" });
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editFields, setEditFields] = useState<Partial<Course>>({});
   const [loading, setLoading] = useState(true);
@@ -61,7 +60,7 @@ export default function CoursesPage() {
       if (json.success && json.course) {
         console.log("[addCourse] Course inserted:", json.course);
         setCourses((s) => [json.course, ...s]);
-        setNewCourse({ code: "", title: "", description: "", schedule: "", instructor_id: "", status: "active", semester: "", college: "" });
+        setNewCourse({ title: "", description: "", start_time: "", end_time: "", instructor_id: "", status: "active", semester: "" });
         setShowAdd(false);
       } else {
         console.warn("[addCourse] API error:", json.error);
@@ -113,7 +112,9 @@ export default function CoursesPage() {
   }
 
   const filtered = courses.filter((c) =>
-    `${c.code || ""} ${c.title} ${c.college || ""}`.toLowerCase().includes(search.toLowerCase())
+    `${c.title} ${c.start_time || ""} ${c.end_time || ""}`
+      .toLowerCase()
+      .includes(search.toLowerCase())
   );
 
   return (
@@ -131,7 +132,7 @@ export default function CoursesPage() {
             />
           </div>
           <div className="ml-auto">
-            <Button variant="default" size="sm" onClick={() => setShowAdd((s) => !s)}>
+            <Button variant={"default" as any} size={"sm" as any} onClick={() => setShowAdd((s) => !s)}>
               <Plus className="size-4" />
               {showAdd ? "Close" : "Add Course"}
             </Button>
@@ -140,37 +141,12 @@ export default function CoursesPage() {
 
         {showAdd && (
           <div className="flex flex-wrap items-end gap-2 pb-2">
-            <InputText
-              value={newCourse.code || ""}
-              onChange={(e: any) => setNewCourse({ ...newCourse, code: e.target.value })}
-              placeholder="Code"
-            />
-            <InputText
-              value={newCourse.title}
-              onChange={(e: any) => setNewCourse({ ...newCourse, title: e.target.value })}
-              placeholder="Title"
-            />
-            <InputText
-              value={newCourse.description || ""}
-              onChange={(e: any) => setNewCourse({ ...newCourse, description: e.target.value })}
-              placeholder="Description"
-            />
-            <InputText
-              value={newCourse.schedule || ""}
-              onChange={(e: any) => setNewCourse({ ...newCourse, schedule: e.target.value })}
-              placeholder="Schedule"
-            />
-            <InputText
-              value={newCourse.semester || ""}
-              onChange={(e: any) => setNewCourse({ ...newCourse, semester: e.target.value })}
-              placeholder="Semester"
-            />
-            <InputText
-              value={newCourse.college || ""}
-              onChange={(e: any) => setNewCourse({ ...newCourse, college: e.target.value })}
-              placeholder="College"
-            />
-            <Button variant="default" size="sm" onClick={addCourse}>
+            <InputText value={newCourse.title} onChange={(e: any) => setNewCourse({ ...newCourse, title: e.target.value })} placeholder="Title" />
+            <InputText value={newCourse.description || ""} onChange={(e: any) => setNewCourse({ ...newCourse, description: e.target.value })} placeholder="Description" />
+            <InputText type="time" value={newCourse.start_time || ""} onChange={(e: any) => setNewCourse({ ...newCourse, start_time: e.target.value })} placeholder="Start time" />
+            <InputText type="time" value={newCourse.end_time || ""} onChange={(e: any) => setNewCourse({ ...newCourse, end_time: e.target.value })} placeholder="End time" />
+            <InputText value={newCourse.semester || ""} onChange={(e: any) => setNewCourse({ ...newCourse, semester: e.target.value })} placeholder="Semester" />
+            <Button variant={"default" as any} size={"sm" as any} onClick={addCourse}>
               <Plus className="size-4" />
               Create
             </Button>
@@ -194,22 +170,12 @@ export default function CoursesPage() {
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     {isEditing ? (
-                      <>
-                        <InputText
-                          value={editFields.code ?? course.code ?? ""}
-                          onChange={(e: any) => setEditFields({ ...editFields, code: e.target.value })}
-                          placeholder="Code"
-                        />
-                        <InputText
-                          value={editFields.title ?? course.title}
-                          onChange={(e: any) => setEditFields({ ...editFields, title: e.target.value })}
-                          placeholder="Title"
-                        />
-                      </>
+                      <InputText
+                        value={editFields.title ?? course.title}
+                        onChange={(e: any) => setEditFields({ ...editFields, title: e.target.value })}
+                      />
                     ) : (
-                      <Typography variant="body-1-median">
-                        {course.code ? `${course.code}: ${course.title}` : course.title}
-                      </Typography>
+                      <Typography variant="body-1-median">{course.title}</Typography>
                     )}
                   </div>
                   <span className="px-2 py-0.5 text-xs font-median border-2 border-fractal-border-default rounded-fractal-xs bg-fractal-base-grey-90">
@@ -235,19 +201,19 @@ export default function CoursesPage() {
                         placeholder="Description"
                       />
                       <InputText
-                        value={editFields.schedule ?? course.schedule ?? ""}
-                        onChange={(e: any) => setEditFields({ ...editFields, schedule: e.target.value })}
-                        placeholder="Schedule"
+                        value={editFields.start_time ?? course.start_time ?? ""}
+                        onChange={(e: any) => setEditFields({ ...editFields, start_time: e.target.value })}
+                        placeholder="Start time"
+                      />
+                      <InputText
+                        value={editFields.end_time ?? course.end_time ?? ""}
+                        onChange={(e: any) => setEditFields({ ...editFields, end_time: e.target.value })}
+                        placeholder="End time"
                       />
                       <InputText
                         value={editFields.semester ?? course.semester ?? ""}
                         onChange={(e: any) => setEditFields({ ...editFields, semester: e.target.value })}
                         placeholder="Semester"
-                      />
-                      <InputText
-                        value={editFields.college ?? course.college ?? ""}
-                        onChange={(e: any) => setEditFields({ ...editFields, college: e.target.value })}
-                        placeholder="College"
                       />
                     </>
                   ) : (
@@ -256,16 +222,14 @@ export default function CoursesPage() {
                         {course.description || "—"}
                       </Typography>
                       <Typography variant="body-2" className="text-fractal-text-placeholder">
-                        <strong>Schedule:</strong> {course.schedule || "—"}
+                        <strong>Start:</strong> {course.start_time || "—"}
+                      </Typography>
+                      <Typography variant="body-2" className="text-fractal-text-placeholder">
+                        <strong>End:</strong> {course.end_time || "—"}
                       </Typography>
                       <Typography variant="body-2" className="text-fractal-text-placeholder">
                         <strong>Semester:</strong> {course.semester || "—"}
                       </Typography>
-                      {course.college && (
-                        <Typography variant="body-2" className="text-fractal-text-placeholder">
-                          <strong>College:</strong> {course.college}
-                        </Typography>
-                      )}
                     </>
                   )}
                 </div>
@@ -275,8 +239,8 @@ export default function CoursesPage() {
                   {isEditing ? (
                     <>
                       <Button
-                        variant="default"
-                        size="sm"
+                        variant={"default" as any}
+                        size={"sm" as any}
                         onClick={() => updateCourse(course.id)}
                         className="flex items-center gap-1"
                       >
@@ -284,8 +248,8 @@ export default function CoursesPage() {
                         Save
                       </Button>
                       <Button
-                        variant="ghost"
-                        size="sm"
+                        variant={"ghost" as any}
+                        size={"sm" as any}
                         onClick={() => {
                           setEditingId(null);
                           setEditFields({});
@@ -299,8 +263,8 @@ export default function CoursesPage() {
                   ) : (
                     <>
                       <Button
-                        variant="secondary"
-                        size="sm"
+                        variant={"secondary" as any}
+                        size={"sm" as any}
                         onClick={() => {
                           setEditingId(course.id);
                           setEditFields(course);
@@ -311,8 +275,8 @@ export default function CoursesPage() {
                         Edit
                       </Button>
                       <Button
-                        variant="ghost"
-                        size="sm"
+                        variant={"ghost" as any}
+                        size={"sm" as any}
                         onClick={() => deleteCourse(course.id)}
                         className="flex items-center gap-1"
                       >
