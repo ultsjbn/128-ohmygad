@@ -2,7 +2,8 @@
 
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
-import { Card, InputText, Button, Typography } from "@snowball-tech/fractal";
+import { Typography } from "./typography";
+import { Card, InputText, Button } from "@snowball-tech/fractal";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";

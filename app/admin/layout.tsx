@@ -7,7 +7,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     <div className="flex flex-col h-screen w-full bg-fractal-bg-body-default font-sans text-fractal-text-default overflow-hidden">
 
       {/* TOP HEADER */}
-      <div className="@container w-full bg-fractal-brand-primary border-b-2 border-fractal-border-default shrink-0">
+      <div className="@container w-full bg-fractal-brand-primary shrink-0">
         <Header
           className="bg-transparent"
           left={

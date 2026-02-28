@@ -29,6 +29,6 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts"
-  ],
+, "components/card/card.constants.js"  ],
   "exclude": ["node_modules"]
 }
