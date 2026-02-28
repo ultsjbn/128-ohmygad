@@ -14,8 +14,10 @@
     "@radix-ui/react-slot": "^1.2.2",
     "@snowball-tech/design-tokens": "^17.1.4",
     "@snowball-tech/fractal": "^24.3.0",
-    "@supabase/ssr": "latest",
-    "@supabase/supabase-js": "latest",
+    "@supabase/auth-helpers-nextjs": "^0.15.0",
+    "@supabase/auth-helpers-react": "^0.15.0",
+    "@supabase/ssr": "^0.8.0",
+    "@supabase/supabase-js": "^2.98.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.511.0",
@@ -24,6 +26,7 @@
     "react": "^19.0.0",
     "react-day-picker": "^9.14.0",
     "react-dom": "^19.0.0",
+    "recharts": "^3.7.0",
     "tailwind-merge": "^3.3.0"
   },
   "devDependencies": {

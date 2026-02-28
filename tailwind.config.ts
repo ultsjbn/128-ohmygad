@@ -1,30 +1,31 @@
 import type { Config } from "tailwindcss";
 
-export default {
+const config = {
   darkMode: ["class"],
   content: [
-    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
-    "./components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./app/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/**/*.{js,ts,jsx,tsx,mdx}",
+    './pages/**/*.{ts,tsx}',
+    './components/**/*.{ts,tsx}',
+    './app/**/*.{ts,tsx}',
+    './src/**/*.{ts,tsx}',
+    './node_modules/@snowball-tech/fractal/**/*.{js,ts,jsx,tsx,mjs,cjs}', 
   ],
+  prefix: "",
   theme: {
-    extend: {
-      fontFamily: {
-      sans: ["PolySans", "sans-serif"],
-      polysans: ["PolySans", "sans-serif"],
+    container: {
+      center: true,
+      padding: "2rem",
+      screens: {
+        "2xl": "1400px",
       },
+    },
+    extend: {
       colors: {
+        // --- SHADCN UI TOKENS ---
+        border: "hsl(var(--border))",
+        input: "hsl(var(--input))",
+        ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
-        card: {
-          DEFAULT: "hsl(var(--card))",
-          foreground: "hsl(var(--card-foreground))",
-        },
-        popover: {
-          DEFAULT: "hsl(var(--popover))",
-          foreground: "hsl(var(--popover-foreground))",
-        },
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
@@ -32,6 +33,10 @@ export default {
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
           foreground: "hsl(var(--secondary-foreground))",
+        },
+        destructive: {
+          DEFAULT: "hsl(var(--destructive))",
+          foreground: "hsl(var(--destructive-foreground))",
         },
         muted: {
           DEFAULT: "hsl(var(--muted))",
@@ -41,27 +46,205 @@ export default {
           DEFAULT: "hsl(var(--accent))",
           foreground: "hsl(var(--accent-foreground))",
         },
-        destructive: {
-          DEFAULT: "hsl(var(--destructive))",
-          foreground: "hsl(var(--destructive-foreground))",
+        popover: {
+          DEFAULT: "hsl(var(--popover))",
+          foreground: "hsl(var(--popover-foreground))",
         },
-        border: "hsl(var(--border))",
-        input: "hsl(var(--input))",
-        ring: "hsl(var(--ring))",
-        chart: {
-          "1": "hsl(var(--chart-1))",
-          "2": "hsl(var(--chart-2))",
-          "3": "hsl(var(--chart-3))",
-          "4": "hsl(var(--chart-4))",
-          "5": "hsl(var(--chart-5))",
+        card: {
+          DEFAULT: "hsl(var(--card))",
+          foreground: "hsl(var(--card-foreground))",
+        },
+        
+        // --- FRACTAL DESIGN SYSTEM TOKENS ---
+        fractal: {
+          bg: {
+            'body-black': 'var(--color-background-body-black)',
+            'body-dark': 'var(--color-background-body-dark)',
+            'body-default': 'var(--color-background-body-default)',
+            'body-light': 'var(--color-background-body-light)',
+            'body-primary': 'var(--color-background-body-primary)',
+            'body-secondary': 'var(--color-background-body-secondary)',
+            'body-white': 'var(--color-background-body-white)',
+            'disabled': 'var(--color-background-disabled)',
+          },
+          base: {
+            black: 'var(--color-base-black)',
+            'grey-30': 'var(--color-base-grey-30)',
+            'grey-50': 'var(--color-base-grey-50)',
+            'grey-70': 'var(--color-base-grey-70)',
+            'grey-90': 'var(--color-base-grey-90)',
+            white: 'var(--color-base-white)',
+            transparent: 'var(--color-base-transparent)',
+          },
+          border: {
+            dark: 'var(--color-border-dark)',
+            default: 'var(--color-border-default)',
+            disabled: 'var(--color-border-disabled)',
+            light: 'var(--color-border-light)',
+            primary: 'var(--color-border-primary)',
+            'primary-dark': 'var(--color-border-primary-dark)',
+            'primary-light': 'var(--color-border-primary-light)',
+            secondary: 'var(--color-border-secondary)',
+            'secondary-dark': 'var(--color-border-secondary-dark)',
+            'secondary-light': 'var(--color-border-secondary-light)',
+          },
+          brand: {
+            'body-dark': 'var(--color-brand-body-dark)',
+            'body-light': 'var(--color-brand-body-light)',
+            highlight: 'var(--color-brand-highlight)',
+            primary: 'var(--color-brand-primary)',
+            'primary-dark': 'var(--color-brand-primary-dark)',
+            'primary-light': 'var(--color-brand-primary-light)',
+            secondary: 'var(--color-brand-secondary)',
+            'secondary-dark': 'var(--color-brand-secondary-dark)',
+            'secondary-light': 'var(--color-brand-secondary-light)',
+            separator: 'var(--color-brand-separator)',
+          },
+          decorative: {
+            'blue-50': 'var(--color-decorative-blue-50)',
+            'blue-70': 'var(--color-decorative-blue-70)',
+            'blue-90': 'var(--color-decorative-blue-90)',
+            'green-50': 'var(--color-decorative-green-50)',
+            'green-70': 'var(--color-decorative-green-70)',
+            'green-90': 'var(--color-decorative-green-90)',
+            'pink-70': 'var(--color-decorative-pink-70)',
+            'pink-90': 'var(--color-decorative-pink-90)',
+            'purple-50': 'var(--color-decorative-purple-50)',
+            'purple-70': 'var(--color-decorative-purple-70)',
+            'purple-90': 'var(--color-decorative-purple-90)',
+            'yellow-50': 'var(--color-decorative-yellow-50)',
+            'yellow-70': 'var(--color-decorative-yellow-70)',
+            'yellow-90': 'var(--color-decorative-yellow-90)',
+          },
+          feedback: {
+            'danger-50': 'var(--color-feedback-danger-50)',
+            'danger-90': 'var(--color-feedback-danger-90)',
+            'error-50': 'var(--color-feedback-error-50)',
+            'error-90': 'var(--color-feedback-error-90)',
+            'success-50': 'var(--color-feedback-success-50)',
+            'success-90': 'var(--color-feedback-success-90)',
+            'warning-50': 'var(--color-feedback-warning-50)',
+            'warning-90': 'var(--color-feedback-warning-90)',
+          },
+          icon: {
+            dark: 'var(--color-icon-dark)',
+            default: 'var(--color-icon-default)',
+            light: 'var(--color-icon-light)',
+            primary: 'var(--color-icon-primary)',
+            'primary-dark': 'var(--color-icon-primary-dark)',
+            'primary-light': 'var(--color-icon-primary-light)',
+            secondary: 'var(--color-icon-secondary)',
+            'secondary-dark': 'var(--color-icon-secondary-dark)',
+            'secondary-light': 'var(--color-icon-secondary-light)',
+            disabled: 'var(--color-icon-disabled)',
+            error: 'var(--color-icon-error)',
+            success: 'var(--color-icon-success)',
+            warning: 'var(--color-icon-warning)',
+          },
+          text: {
+            dark: 'var(--color-text-dark)',
+            default: 'var(--color-text-default)',
+            light: 'var(--color-text-light)',
+            primary: 'var(--color-text-primary)',
+            'primary-dark': 'var(--color-text-primary-dark)',
+            'primary-light': 'var(--color-text-primary-light)',
+            secondary: 'var(--color-text-secondary)',
+            'secondary-dark': 'var(--color-text-secondary-dark)',
+            'secondary-light': 'var(--color-text-secondary-light)',
+            disabled: 'var(--color-text-disabled)',
+            placeholder: 'var(--color-text-placeholder)',
+            error: 'var(--color-text-error)',
+            success: 'var(--color-text-success)',
+            warning: 'var(--color-text-warning)',
+          },
+          stroke: {
+            separator: 'var(--color-stroke-separator)',
+          }
         },
       },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+        // Fractal Radii
+        none: 'var(--size-radius-0)',
+        xs: 'var(--size-radius-xs)',
+        s: 'var(--size-radius-s)',
+        m: 'var(--size-radius-m)',
+        full: 'var(--size-radius-rounded)',
+      },
+      borderWidth: {
+        1: 'var(--size-border-1)',
+        2: 'var(--size-border-2)',
+      },
+      spacing: {
+        // Fractal Spacing (Pixels)
+        0: 'var(--size-spacing-0)',
+        1: 'var(--size-spacing-1)',
+        2: 'var(--size-spacing-2)',
+        3: 'var(--size-spacing-3)',
+        4: 'var(--size-spacing-4)',
+        5: 'var(--size-spacing-5)',
+        6: 'var(--size-spacing-6)',
+        7: 'var(--size-spacing-7)',
+        8: 'var(--size-spacing-8)',
+        9: 'var(--size-spacing-9)',
+        10: 'var(--size-spacing-10)',
+        11: 'var(--size-spacing-11)',
+        12: 'var(--size-spacing-12)',
+        13: 'var(--size-spacing-13)',
+        14: 'var(--size-spacing-14)',
+        15: 'var(--size-spacing-15)',
+        16: 'var(--size-spacing-16)',
+        17: 'var(--size-spacing-17)',
+        18: 'var(--size-spacing-18)',
+        19: 'var(--size-spacing-19)',
+        20: 'var(--size-spacing-20)',
+        px: 'var(--size-spacing-px)',
+        quarter: 'var(--size-spacing-quarter)',
+        half: 'var(--size-spacing-half)',
+      },
+      boxShadow: {
+        // Fractal Brutalist Shadows
+        none: 'var(--shadow-none)',
+        'brutal-1': 'var(--shadow-brutal-1)',
+        'brutal-2': 'var(--shadow-brutal-2)',
+        'brutal-1-dark': 'var(--shadow-brutal-1-dark)',
+        'brutal-1-light': 'var(--shadow-brutal-1-light)',
+        'brutal-1-primary': 'var(--shadow-brutal-1-primary)',
+        'brutal-1-secondary': 'var(--shadow-brutal-1-secondary)',
+        'brutal-2-dark': 'var(--shadow-brutal-2-dark)',
+        'brutal-2-light': 'var(--shadow-brutal-2-light)',
+        'brutal-2-primary': 'var(--shadow-brutal-2-primary)',
+        'brutal-2-secondary': 'var(--shadow-brutal-2-secondary)',
+      },
+      fontFamily: {
+        // Automatically applied as the default sans-serif font
+        sans: ['var(--font-family-normal)'], 
+        wide: ['var(--font-family-wide)'],
+      },
+      fontWeight: {
+        standard: 'var(--font-weight-standard)',
+        median: 'var(--font-weight-median)',
+        bold: 'var(--font-weight-bold)',
+      },
+      keyframes: {
+        "accordion-down": {
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
+        },
+        "accordion-up": {
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
+        },
+      },
+      animation: {
+        "accordion-down": "accordion-down 0.2s ease-out",
+        "accordion-up": "accordion-up 0.2s ease-out",
       },
     },
   },
   plugins: [require("tailwindcss-animate")],
 } satisfies Config;
+
+export default config;

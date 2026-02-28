@@ -94,7 +94,7 @@
 	font-weight: 600;
 	src:
 		url("/fonts/PolySans Median Wide Italic.woff") format("woff"),
-		url("/fonts/PolySans Median Wide Italic.woff") format("woff2");
+		url("/fonts/PolySans Median Wide Italic.woff2") format("woff2");
 	font-display: swap;
 }
 
@@ -114,6 +114,6 @@
 	font-weight: 800;
 	src:
 		url("/fonts/PolySans Bulky Wide Italic.woff") format("woff"),
-		url("/fonts/PolySans Bulky Wide Italic.woff") format("woff2");
+		url("/fonts/PolySans Bulky Wide Italic.woff2") format("woff2");
 	font-display: swap;
 }
