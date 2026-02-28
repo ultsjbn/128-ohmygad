@@ -7,7 +7,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     <div className="flex flex-col h-screen w-full bg-fractal-bg-body-default font-sans text-fractal-text-default overflow-hidden">
 
       {/* TOP HEADER */}
-      <div className="@container w-full bg-fractal-brand-primary border-b-2 border-fractal-border-default">
+      <div className="@container w-full bg-fractal-brand-primary border-b-2 border-fractal-border-default shrink-0">
         <Header
           className="bg-transparent"
           left={
@@ -29,7 +29,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <AdminSidebar />
 
         {/* MAIN PAGE CONTENT */}
-        <main className="flex-1 p-4 overflow-y-auto">
+        <main className="flex-1 p-4 overflow-y-auto min-w-0">
           {children}
         </main>
       </div>

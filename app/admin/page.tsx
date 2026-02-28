@@ -164,7 +164,7 @@ export default function DashboardPage() {
       {/* HEADER SECTION WITH TOTAL USERS */}
       <div className="mb-4 shrink-0 flex items-end justify-between">
         <div>
-          <Typography variant="body-1">
+          <Typography variant="heading-3">
             Welcome,
           </Typography>
           <Typography variant="heading-1" className="tracking-tighter leading-none font-median">
