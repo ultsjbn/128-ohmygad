@@ -57,9 +57,6 @@ export function SignUpForm({
         Sign up
       </Typography>
       <Card color="body">
-        <Typography variant="body-2" className="text-fractal-text-placeholder mb-3">
-          Create a new account
-        </Typography>
 
         <form onSubmit={handleSignUp}>
           <div className="flex flex-col gap-3">
@@ -72,6 +69,7 @@ export function SignUpForm({
               fullWidth
               value={full_name}
               onChange={(_e, newValue) => setFullName(newValue)}
+              className="[&_input:focus]:!border-fractal-border-primary [&_input:focus]:!shadow-brutal-1-primary"
             />
 
             <InputText
@@ -83,6 +81,7 @@ export function SignUpForm({
               fullWidth
               value={email}
               onChange={(_e, newValue) => setEmail(newValue)}
+              className="[&_input:focus]:!border-fractal-border-primary [&_input:focus]:!shadow-brutal-1-primary"
             />
 
             <InputText
@@ -93,6 +92,7 @@ export function SignUpForm({
               fullWidth
               value={password}
               onChange={(_e, newValue) => setPassword(newValue)}
+              className="[&_input:focus]:!border-fractal-border-primary [&_input:focus]:!shadow-brutal-1-primary"
             />
 
             <InputText
@@ -103,6 +103,7 @@ export function SignUpForm({
               fullWidth
               value={repeatPassword}
               onChange={(_e, newValue) => setRepeatPassword(newValue)}
+              className="[&_input:focus]:!border-fractal-border-primary [&_input:focus]:!shadow-brutal-1-primary"
             />
 
             {error && (
@@ -114,9 +115,10 @@ export function SignUpForm({
             <Button
               type="submit"
               label={isLoading ? "Creating an account..." : "Sign up"}
-              variant="display"
+              variant="primary"
               fullWidth
               disabled={isLoading}
+              className="[&]:text-fractal-base-white [&]:border-2 [&]:border-fractal-border-default [&:hover]:text-fractal-base-black [&:hover]:border-2 [&:hover]:border-fractal-border-default"
             />
           </div>
 

@@ -76,9 +76,6 @@ export function LoginForm({
         Login
       </Typography>
       <Card color="body">
-        <Typography variant="body-2" className="text-fractal-text-placeholder mb-3">
-          Enter your email and password to login
-        </Typography>
 
         <form onSubmit={handleLogin}>
           <div className="flex flex-col gap-3">
@@ -92,6 +89,7 @@ export function LoginForm({
               fullWidth
               value={email}
               onChange={(_e, newValue) => setEmail(newValue)}
+              className="[&_input:focus]:!border-fractal-border-primary [&_input:focus]:!shadow-brutal-1-primary"
             />
 
             <div className="flex flex-col gap-half">
@@ -111,6 +109,7 @@ export function LoginForm({
                 fullWidth
                 value={password}
                 onChange={(_e, newValue) => setPassword(newValue)}
+                className="[&_input:focus]:!border-fractal-border-primary [&_input:focus]:!shadow-brutal-1-primary"
               />
             </div>
 
@@ -123,9 +122,10 @@ export function LoginForm({
             <Button
               type="submit"
               label={isLoading ? "Logging in..." : "Login"}
-              variant="display"
+              variant="primary"
               fullWidth
               disabled={isLoading}
+              className="[&]:text-fractal-base-white [&]:border-2 [&]:border-fractal-border-default [&:hover]:text-fractal-base-black [&:hover]:border-2 [&:hover]:border-fractal-border-default"
             />
           </div>
 
