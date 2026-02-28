@@ -1,0 +1,119 @@
+@font-face {
+	font-family: "PolySans";
+	font-style: normal;
+	font-weight: 400;
+	src:
+		url("/fonts/PolySans Neutral.woff") format("woff"),
+		url("/fonts/PolySans Neutral.woff2") format("woff2");
+	font-display: swap;
+}
+
+@font-face {	
+	font-family: "PolySans";
+	font-style: italic;
+	font-weight: 400;
+	src:
+		url("/fonts/PolySans Neutral Italic.woff") format("woff"),
+		url("/fonts/PolySans Neutral Italic.woff2") format("woff2");
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "PolySans";
+	font-style: normal;
+	font-weight: 600;
+	src:
+		url("/fonts/PolySans Median.woff") format("woff"),
+		url("/fonts/PolySans Median.woff2") format("woff2");
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "PolySans";
+	font-style: italic;
+	font-weight: 600;
+	src:
+		url("/fonts/PolySans Median Italic.woff") format("woff"),
+		url("/fonts/PolySans Median Italic.woff2") format("woff2");
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "PolySans";
+	font-style: normal;
+	font-weight: 800;
+	src:
+		url("/fonts/PolySans Bulky.woff") format("woff"),
+		url("/fonts/PolySans Bulky.woff2") format("woff2");
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "PolySans";
+	font-style: italic;
+	font-weight: 800;
+	src:
+		url("/fonts/PolySans Bulky Italic.woff") format("woff"),
+		url("/fonts/PolySans Bulky Italic.woff2") format("woff2");
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "PolySansWide";
+	font-style: normal;
+	font-weight: 400;
+	src:
+		url("/fonts/PolySans Neutral Wide.woff") format("woff"),
+		url("/fonts/PolySans Neutral Wide.woff2") format("woff2");
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "PolySansWide";
+	font-style: italic;
+	font-weight: 400;
+	src:
+		url("/fonts/PolySans Neutral Wide Italic.woff") format("woff"),
+		url("/fonts/PolySans Neutral Wide Italic.woff2") format("woff2");
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "PolySansWide";
+	font-style: normal;
+	font-weight: 600;
+	src:
+		url("/fonts/PolySans Median Wide.woff") format("woff"),
+		url("/fonts/PolySans Median Wide.woff2") format("woff2");
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "PolySansWide";
+	font-style: italic;
+	font-weight: 600;
+	src:
+		url("/fonts/PolySans Median Wide Italic.woff") format("woff"),
+		url("/fonts/PolySans Median Wide Italic.woff") format("woff2");
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "PolySansWide";
+	font-style: normal;
+	font-weight: 800;
+	src:
+		url("/fonts/PolySans Bulky Wide.woff") format("woff"),
+		url("/fonts/PolySans Bulky Wide.woff2") format("woff2");
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "PolySansWide";
+	font-style: italic;
+	font-weight: 800;
+	src:
+		url("/fonts/PolySans Bulky Wide Italic.woff") format("woff"),
+		url("/fonts/PolySans Bulky Wide Italic.woff") format("woff2");
+	font-display: swap;
+}
