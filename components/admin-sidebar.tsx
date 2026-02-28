@@ -46,10 +46,10 @@ export default function AdminSidebar() {
               <Link
                 key={href}
                 href={href}
-                className={`flex items-center gap-1 p-1 rounded-s font-median transition-all
+                className={`flex items-center gap-3 p-2 rounded-s font-median transition-all duration-100
                   ${active
                     ? "bg-fractal-bg-body-white border-2 border-fractal-border-default shadow-brutal-1 text-fractal-text-default"
-                    : "border-2 border-transparent hover:bg-fractal-base-grey-90 text-fractal-text-placeholder hover:text-fractal-text-default"
+                    : "border-2 border-transparent text-fractal-text-placeholder hover:bg-fractal-bg-body-white hover:border-fractal-border-default hover:shadow-brutal-1 hover:text-fractal-text-default hover:opacity-70"
                   }`}
               >
                 <Icon size={20} className={active ? "text-fractal-text-default" : "text-fractal-text-placeholder"} />
