@@ -89,6 +89,7 @@ export default function DashboardPage() {
   const [roleDistributionData, setRoleDistributionData] = useState(initialRoleDistributionData);
   const [breakdownData, setBreakdownData] = useState(initialBreakdownData);
   const [userStats, setUserStats] = useState<{total: number; onboarded: number; percent: number}>({ total: 0, onboarded: 0, percent: 0 });
+  const [gadEventsCount, setGadEventsCount] = useState<number>(0);
 
   useEffect(() => {
     // Fetch sex at birth data
@@ -144,6 +145,16 @@ export default function DashboardPage() {
         }
       })
       .catch((err) => console.error("fetch user stats error", err));
+
+    // Fetch total GAD events count
+    fetch("/api/gad-events-count")
+      .then((res) => res.json())
+      .then((json) => {
+        if (json && json.success && typeof json.count === "number") {
+          setGadEventsCount(json.count);
+        }
+      })
+      .catch((err) => console.error("fetch gad events count error", err));
   }, []);
 
   return (
@@ -191,7 +202,7 @@ export default function DashboardPage() {
           {/* Bottom Row - Purple and Yellow Cards */}
           <div className="grid grid-cols-2 gap-4 shrink-0 h-[110px]">
             <Paper elevation="bordered" title="Total GAD Events" titleVariant="body-1-median" className="bg-fractal-decorative-purple-90 h-full flex flex-col justify-between">
-              <Typography variant="heading-2" className="text-right tracking-tighter">24</Typography>
+              <Typography variant="heading-2" className="text-right tracking-tighter">{gadEventsCount}</Typography>
             </Paper>
             <Paper elevation="bordered" title="Onboarded Users" titleVariant="body-1-median" className="bg-fractal-decorative-yellow-50 h-full flex flex-col justify-between">
                 <Typography variant="heading-2" className="text-right tracking-tighter">
