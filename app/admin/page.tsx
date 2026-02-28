@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Typography, Paper } from "@snowball-tech/fractal";
+import { Paper } from "@snowball-tech/fractal";
+import { Typography } from '@/components/typography';
 import {
   AreaChart,
   Area,
@@ -180,7 +181,7 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 flex-1 min-h-0">
         
         {/* COLUMN 1 & 2: Event Analytics Container */}
-        <Paper elevation="elevated" title="Event Analytics" titleVariant="heading-2" className="lg:col-span-2 flex flex-col gap-4 h-full min-h-0">
+        <Paper elevation="elevated" title="Event Analytics" titleVariant="heading-2" className="lg:col-span-2 flex flex-col gap-4 h-full min-h-0 pb-3">
           
           {/* Top Wide Card - Light Blue */}
           <Paper elevation="bordered" title="Attendance Over Time" titleVariant="body-1-median" className="bg-fractal-decorative-blue-90 flex-1 flex flex-col min-h-0 mb-3">

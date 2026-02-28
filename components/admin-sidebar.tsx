@@ -1,6 +1,6 @@
 "use client";
 
-import { Typography } from "@snowball-tech/fractal";
+import { Typography } from '@/components/typography';
 import { LayoutDashboard, Calendar, Users, BookOpen, ClipboardList, ChevronsLeft } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -22,10 +22,10 @@ export default function AdminSidebar() {
   }
 
   return (
-    <aside className="w-[260px] flex flex-col justify-between border-r-2 border-fractal-border-default bg-fractal-bg-body-default">
+    <aside className="w-[260px] flex flex-col justify-items-center border-r-2 border-fractal-border-default bg-fractal-bg-body-default">
       <div>
         {/* LOGO SECTION */}
-        <div className="flex flex-col items-center justify-center p-6 gap-3 mb-2">
+        <div className="flex flex-col items-center justify-center p-2 gap-1 mb-2 mt-2">
           <Image
             src="/kasarian_logo.jpg"
             alt="UPB Kasarian Gender Studies Program Logo"
@@ -36,6 +36,7 @@ export default function AdminSidebar() {
           <Typography variant="heading-3" className="font-wide font-bold tracking-tighter">
             OhMyGAD!
           </Typography>
+          <Typography variant="caption-median" className='text-center'>Event Management Platform for UPB Kasarian Gender Studies Program</Typography>
         </div>
 
         {/* Navigation */}
@@ -61,8 +62,8 @@ export default function AdminSidebar() {
       </div>
 
       {/* Collapse Button */}
-      <div className="p-3 flex justify-end">
-        <button className="p-2 hover:bg-fractal-base-grey-90 rounded-s transition-colors">
+      <div className="p-1 flex justify-end">
+        <button className="p-1 hover:bg-fractal-base-grey-90 rounded-s transition-colors">
           <ChevronsLeft size={24} />
         </button>
       </div>
