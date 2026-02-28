@@ -84,7 +84,7 @@ const Paper = forwardRef<HTMLDivElement, PaperProps>(
         {/* Header / Title Area */}
         {(title || collapsible) && (
           <div
-            className={`flex items-center justify-between px-4 py-3 shrink-0 ${
+            className={`flex items-center justify-between px-3 py-3 shrink-0 ${
               collapsible ? 'cursor-pointer select-none hover:bg-black/5 transition-colors' : ''
             }`}
             onClick={collapsible ? handleToggle : undefined}

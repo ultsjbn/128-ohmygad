@@ -1,7 +1,9 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Paper } from "@snowball-tech/fractal";
+//import { Paper } from "@snowball-tech/fractal";
+import { Paper } from "@/components/paper";
+import { Card } from "@/components/card";
 import { Typography } from '@/components/typography';
 import {
   AreaChart,
@@ -181,16 +183,16 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 flex-1 min-h-0">
         
         {/* COLUMN 1 & 2: Event Analytics Container */}
-        <Paper elevation="elevated" title="Event Analytics" titleVariant="heading-2" className="lg:col-span-2 flex flex-col gap-4 h-full min-h-0 pb-3">
+        <Paper elevation="elevated" title="Event Analytics" titleVariant="heading-4" className="lg:col-span-2 flex flex-col gap-1 h-full">
           
           {/* Top Wide Card - Light Blue */}
-          <Paper elevation="bordered" title="Attendance Over Time" titleVariant="body-1-median" className="bg-fractal-decorative-blue-90 flex-1 flex flex-col min-h-0 mb-3">
-            <div className="flex-1 w-full min-h-0 pt-2">
+          <Card color="blue" title="Attendance Over Time" style={{ height: '480px' }} className="flex flex-col mb-2">
+            <div className="flex-1 w-full pt-2 min-h-0">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={eventAttendanceData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <AreaChart data={eventAttendanceData} margin={{ top: 3, right: 5, left: -30, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#000" opacity={0.1} />
-                  <XAxis dataKey="month" stroke="#000" fontSize={12} tickLine={false} axisLine={false} />
-                  <YAxis stroke="#000" fontSize={12} tickLine={false} axisLine={false} />
+                  <XAxis dataKey="month" stroke="#000" fontSize={10} tickLine={false} axisLine={false} />
+                  <YAxis stroke="#000" fontSize={10} tickLine={false} axisLine={false} />
                   <Tooltip 
                     contentStyle={{ border: '3px solid black', borderRadius: '8px', boxShadow: '2px 2px 0px 0px rgba(0,0,0,1)', backgroundColor: '#fff' }}
                   />
@@ -198,18 +200,18 @@ export default function DashboardPage() {
                 </AreaChart>
               </ResponsiveContainer>
             </div>
-          </Paper>
+          </Card>
 
           {/* Bottom Row - Purple and Yellow Cards */}
           <div className="grid grid-cols-2 gap-4 shrink-0 h-[110px]">
-            <Paper elevation="bordered" title="Total GAD Events" titleVariant="body-1-median" className="bg-fractal-decorative-purple-90 h-full flex flex-col justify-between">
+            <Card color="purple" title="Total GAD Events" className="h-full flex flex-col justify-between">
               <Typography variant="heading-2" className="text-right tracking-tighter">{gadEventsCount}</Typography>
-            </Paper>
-            <Paper elevation="bordered" title="Onboarded Users" titleVariant="body-1-median" className="bg-fractal-decorative-yellow-50 h-full flex flex-col justify-between">
+            </Card>
+            <Card color="yellow" title="Total GAD Events" className="h-full flex flex-col justify-between">
                 <Typography variant="heading-2" className="text-right tracking-tighter">
                   {userStats.onboarded}
                 </Typography>
-            </Paper>
+            </Card>
           </div>
 
         </Paper>
@@ -218,7 +220,7 @@ export default function DashboardPage() {
         <div className="flex flex-col gap-4 lg:col-span-1 h-full min-h-0">
           {/* Sex at Birth Distribution */}
           <Paper elevation="elevated" title="Sex at Birth" titleVariant="body-1-median" className="flex-1 flex flex-col min-h-0">
-            <div className="flex-1 w-full min-h-0 pt-2">
+            <div className="flex-1 w-full min-h-0">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
@@ -244,7 +246,7 @@ export default function DashboardPage() {
           
           {/* Gender Identity Distribution */}
           <Paper elevation="elevated" title="Gender Identity" titleVariant="body-1-median" className="flex-1 flex flex-col min-h-0">
-            <div className="flex-1 w-full min-h-0 pt-2">
+            <div className="flex-1 w-full min-h-0">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
