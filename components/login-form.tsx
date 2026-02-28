@@ -92,6 +92,7 @@ export function LoginForm({
               fullWidth
               value={email}
               onChange={(_e, newValue) => setEmail(newValue)}
+              className="[&_input:focus]:!border-fractal-border-primary [&_input:focus]:!shadow-brutal-1-primary"
             />
 
             <div className="flex flex-col gap-half">
@@ -111,6 +112,7 @@ export function LoginForm({
                 fullWidth
                 value={password}
                 onChange={(_e, newValue) => setPassword(newValue)}
+                className="[&_input:focus]:!border-fractal-border-primary [&_input:focus]:!shadow-brutal-1-primary"
               />
             </div>
 

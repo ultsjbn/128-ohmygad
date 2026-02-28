@@ -72,6 +72,7 @@ export function SignUpForm({
               fullWidth
               value={full_name}
               onChange={(_e, newValue) => setFullName(newValue)}
+              className="[&_input:focus]:!border-fractal-border-primary [&_input:focus]:!shadow-brutal-1-primary"
             />
 
             <InputText
@@ -83,6 +84,7 @@ export function SignUpForm({
               fullWidth
               value={email}
               onChange={(_e, newValue) => setEmail(newValue)}
+              className="[&_input:focus]:!border-fractal-border-primary [&_input:focus]:!shadow-brutal-1-primary"
             />
 
             <InputText
@@ -93,6 +95,7 @@ export function SignUpForm({
               fullWidth
               value={password}
               onChange={(_e, newValue) => setPassword(newValue)}
+              className="[&_input:focus]:!border-fractal-border-primary [&_input:focus]:!shadow-brutal-1-primary"
             />
 
             <InputText
@@ -103,6 +106,7 @@ export function SignUpForm({
               fullWidth
               value={repeatPassword}
               onChange={(_e, newValue) => setRepeatPassword(newValue)}
+              className="[&_input:focus]:!border-fractal-border-primary [&_input:focus]:!shadow-brutal-1-primary"
             />
 
             {error && (
