@@ -25,7 +25,8 @@ export async function GET() {
 
     const counts: { [key: string]: number } = {};
     data.forEach((row: { gender_identity: string | null }) => {
-      const g = row.gender_identity || "Not specified";
+      let g = row.gender_identity || "Not specified";
+      g = g.toUpperCase();
       counts[g] = (counts[g] || 0) + 1;
     });
 

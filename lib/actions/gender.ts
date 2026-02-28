@@ -40,7 +40,8 @@ export async function getGenderDistribution(): Promise<GenderCount[]> {
     const genderCounts: { [key: string]: number } = {};
 
     data.forEach((profile: { gender_identity: string | null }) => {
-      const gender = profile.gender_identity || "Not specified";
+      let gender = profile.gender_identity || "Not specified";
+      gender = gender.toUpperCase();
       genderCounts[gender] = (genderCounts[gender] || 0) + 1;
     });
 
