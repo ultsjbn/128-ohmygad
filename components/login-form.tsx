@@ -2,16 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Card, InputText, Button, Typography } from "@snowball-tech/fractal";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -26,123 +17,130 @@ export function LoginForm({
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
-const handleLogin = async (e: React.FormEvent) => {
-  e.preventDefault();
-  const supabase = createClient();
-  setIsLoading(true);
-  setError(null);
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const supabase = createClient();
+    setIsLoading(true);
+    setError(null);
 
-  try {
-    const { data: authData, error: authError } =
-      await supabase.auth.signInWithPassword({ email, password });
+    try {
+      const { data: authData, error: authError } =
+        await supabase.auth.signInWithPassword({ email, password });
 
-    console.log("Auth data:", authData);
-    console.log("Auth error:", authError);
+      console.log("Auth data:", authData);
+      console.log("Auth error:", authError);
 
-    if (authError) throw authError;
+      if (authError) throw authError;
 
-    console.log("User ID:", authData.user.id);
+      console.log("User ID:", authData.user.id);
 
-    const { data: profile, error: profileError } = await supabase
-      .from("profile")
-      .select("role")
-      .eq("id", authData.user.id)
-      .single();
+      const { data: profile, error: profileError } = await supabase
+        .from("profile")
+        .select("role")
+        .eq("id", authData.user.id)
+        .single();
 
-    console.log("Profile data:", profile);
-    console.log("Profile error:", profileError);
+      console.log("Profile data:", profile);
+      console.log("Profile error:", profileError);
 
-    if (profileError || !profile) {
-      await supabase.auth.signOut();
-      throw new Error("No profile found for this account. Please contact the administrator.");
-    }
-
-    switch (profile.role) {
-      case "admin":
-        router.push("/admin");
-        break;
-      case "faculty":
-        router.push("/faculty/dashboard");
-        break;
-      case "student":
-        router.push("/student/dashboard");
-        break;
-      default:
+      if (profileError || !profile) {
         await supabase.auth.signOut();
-        throw new Error("Your account role is not recognized. Please contact the administrator.");
-    }
+        throw new Error("No profile found for this account. Please contact the administrator.");
+      }
 
-  } catch (error: unknown) {
-    setError(error instanceof Error ? error.message : "An error occurred");
-  } finally {
-    setIsLoading(false);
-  }
-};
+      switch (profile.role) {
+        case "admin":
+          router.push("/admin");
+          break;
+        case "faculty":
+          router.push("/faculty/dashboard");
+          break;
+        case "student":
+          router.push("/student/dashboard");
+          break;
+        default:
+          await supabase.auth.signOut();
+          throw new Error("Your account role is not recognized. Please contact the administrator.");
+      }
+
+    } catch (error: unknown) {
+      setError(error instanceof Error ? error.message : "An error occurred");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-2xl">Login</CardTitle>
-          <CardDescription>
-            Enter your email and password to login
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleLogin}>
-            <div className="flex flex-col gap-6">
+    <div className={cn("flex flex-col gap-3 font-sans border-2 border-fractal-border-default rounded-m shadow-brutal-2 p-4 bg-fractal-bg-body-white", className)} {...props}>
+      <Typography variant="heading-2" className="font-wide font-bold text-fractal-text-default">
+        Login
+      </Typography>
+      <Card color="body">
+        <Typography variant="body-2" className="text-fractal-text-placeholder mb-3">
+          Enter your email and password to login
+        </Typography>
 
-              <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="m@example.com"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
+        <form onSubmit={handleLogin}>
+          <div className="flex flex-col gap-3">
+
+            <InputText
+              id="email"
+              label="Email"
+              type="email"
+              placeholder="m@example.com"
+              required
+              fullWidth
+              value={email}
+              onChange={(_e, newValue) => setEmail(newValue)}
+            />
+
+            <div className="flex flex-col gap-half">
+              <div className="flex items-center justify-between">
+                <Typography variant="body-2-median" element="label">Password</Typography>
+                <Link
+                  href="/auth/forgot-password"
+                  className="text-sm underline-offset-4 hover:underline text-fractal-text-placeholder"
+                >
+                  Forgot your password?
+                </Link>
               </div>
-
-              <div className="grid gap-2">
-                <div className="flex items-center">
-                  <Label htmlFor="password">Password</Label>
-                  <Link
-                    href="/auth/forgot-password"
-                    className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
-                  >
-                    Forgot your password?
-                  </Link>
-                </div>
-                <Input
-                  id="password"
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-              </div>
-
-              {error && <p className="text-sm text-red-500">{error}</p>}
-
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Logging in..." : "Login"}
-              </Button>
-
+              <InputText
+                id="password"
+                type="password"
+                required
+                fullWidth
+                value={password}
+                onChange={(_e, newValue) => setPassword(newValue)}
+              />
             </div>
 
-            <div className="mt-4 text-center text-sm">
+            {error && (
+              <Typography variant="body-2" className="text-fractal-feedback-error-50">
+                {error}
+              </Typography>
+            )}
+
+            <Button
+              type="submit"
+              label={isLoading ? "Logging in..." : "Login"}
+              variant="display"
+              fullWidth
+              disabled={isLoading}
+            />
+          </div>
+
+          <div className="mt-3 text-center">
+            <Typography variant="body-2">
               Don&apos;t have an account?{" "}
               <Link
                 href="/auth/sign-up"
-                className="underline underline-offset-4"
+                className="underline underline-offset-4 text-fractal-brand-primary font-median"
               >
                 Sign up
               </Link>
-            </div>
-
-          </form>
-        </CardContent>
+            </Typography>
+          </div>
+        </form>
       </Card>
     </div>
   );

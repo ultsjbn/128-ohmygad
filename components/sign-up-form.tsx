@@ -2,16 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Card, InputText, Button, Typography } from "@snowball-tech/fractal";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -61,73 +52,83 @@ export function SignUpForm({
   };
 
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-2xl">Sign up</CardTitle>
-          <CardDescription>Create a new account</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSignUp}>
-            <div className="flex flex-col gap-6">
-                <div className="grid gap-2">
-                  <Label htmlFor="full_name">Full Name</Label>
-                <Input
-                  id="full_name"
-                  type="text"
-                  required
-                  value={full_name}
-                  onChange={(e) => setFullName(e.target.value)}
-                />
-                </div>
-              <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="m@example.com"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </div>
-              <div className="grid gap-2">
-                <div className="flex items-center">
-                  <Label htmlFor="password">Password</Label>
-                </div>
-                <Input
-                  id="password"
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-              </div>
-              <div className="grid gap-2">
-                <div className="flex items-center">
-                  <Label htmlFor="repeat-password">Repeat Password</Label>
-                </div>
-                <Input
-                  id="repeat-password"
-                  type="password"
-                  required
-                  value={repeatPassword}
-                  onChange={(e) => setRepeatPassword(e.target.value)}
-                />
-              </div>
-              {error && <p className="text-sm text-red-500">{error}</p>}
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Creating an account..." : "Sign up"}
-              </Button>
-            </div>
-            <div className="mt-4 text-center text-sm">
+    <div className={cn("flex flex-col gap-3 font-sans border-2 border-fractal-border-default rounded-m shadow-brutal-2 p-4 bg-fractal-bg-body-white", className)} {...props}>
+      <Typography variant="heading-2" className="font-wide font-bold text-fractal-text-default">
+        Sign up
+      </Typography>
+      <Card color="body">
+        <Typography variant="body-2" className="text-fractal-text-placeholder mb-3">
+          Create a new account
+        </Typography>
+
+        <form onSubmit={handleSignUp}>
+          <div className="flex flex-col gap-3">
+
+            <InputText
+              id="full_name"
+              label="Full Name"
+              type="text"
+              required
+              fullWidth
+              value={full_name}
+              onChange={(_e, newValue) => setFullName(newValue)}
+            />
+
+            <InputText
+              id="email"
+              label="Email"
+              type="email"
+              placeholder="m@example.com"
+              required
+              fullWidth
+              value={email}
+              onChange={(_e, newValue) => setEmail(newValue)}
+            />
+
+            <InputText
+              id="password"
+              label="Password"
+              type="password"
+              required
+              fullWidth
+              value={password}
+              onChange={(_e, newValue) => setPassword(newValue)}
+            />
+
+            <InputText
+              id="repeat-password"
+              label="Repeat Password"
+              type="password"
+              required
+              fullWidth
+              value={repeatPassword}
+              onChange={(_e, newValue) => setRepeatPassword(newValue)}
+            />
+
+            {error && (
+              <Typography variant="body-2" className="text-fractal-feedback-error-50">
+                {error}
+              </Typography>
+            )}
+
+            <Button
+              type="submit"
+              label={isLoading ? "Creating an account..." : "Sign up"}
+              variant="display"
+              fullWidth
+              disabled={isLoading}
+            />
+          </div>
+
+          <div className="mt-3 text-center">
+            <Typography variant="body-2">
               Already have an account?{" "}
-              <Link href="/auth/login" className="underline underline-offset-4">
+              <Link href="/auth/login" className="underline underline-offset-4 text-fractal-brand-primary font-median">
                 Login
               </Link>
-            </div>
-          </form>
-        </CardContent>
+            </Typography>
+          </div>
+        </form>
       </Card>
     </div>
   );
