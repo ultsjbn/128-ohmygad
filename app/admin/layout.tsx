@@ -1,8 +1,9 @@
 "use client";
 
 import { Header, Avatar, InputText, Typography } from "@snowball-tech/fractal";
-import { LayoutDashboard, Calendar, Users, BookOpen, ClipboardList, ChevronsLeft, ChevronDown } from "lucide-react";
+import {LayoutDashboard, Calendar, Users, BookOpen, ClipboardList, ChevronsLeft, ChevronDown } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -11,11 +12,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       {/* TOP HEADER */}
       <div className="@container w-full bg-fractal-brand-primary border-b-2 border-fractal-border-default">
         <Header className="bg-transparent"
-          /* LEFT: Logo area */
           left={
-            <div className="flex items-center gap-2 font-wide font-bold text-2xl tracking-tighter pr-8">
-              <span className="text-xl">⚪</span>
-              OhMyGAD!
+            <div className="flex items-center gap-2">
+              <InputText defaultValue="Search" />
             </div>
           }
           /* RIGHT: User Profile */
@@ -25,12 +24,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <ChevronDown size={16} className="ml-1" />
             </div>
           }
-        >
-          {/* CHILDREN (MIDDLE): Search Bar pero wala pa massearch */}
-          <div className="flex items-center gap-2">
-            <InputText defaultValue="Search" />
-          </div>
-          
+        > 
         </Header>
       </div>
 
@@ -40,19 +34,26 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         {/* SIDEBAR */}
         <aside className="w-[260px] flex flex-col justify-between border-r-2 border-fractal-border-default bg-fractal-bg-body-default">
           <div>
-            <div>
-              <Typography variant="body-1-median">Logo for Kasarian here ???</Typography>
+            {/* LOGO SECTION */}
+            <div className="flex flex-col items-center justify-center p-6 gap-3 mb-2">
+              <Image 
+                src="/kasarian_logo.jpg"
+                alt="UPB Kasarian Gender Studies Program Logo" 
+                width={80} 
+                height={80} 
+                className="rounded-full object-cover border-2 border-fractal-border-default shadow-brutal-1"
+              />
+              <Typography variant="heading-3" className="font-wide font-bold tracking-tighter">
+                OhMyGAD!
+              </Typography>
             </div>
 
-            {/* Sidebar links */}
+            {/* Navigation */}
             <nav className="flex flex-col gap-1 p-1 font-median">
-              {/* ACTIVE LINK */}
               <Link href="/admin" className="flex items-center gap-3 p-2 bg-fractal-bg-body-white hover:bg-fractal-decorative-yellow-90 border-2 border-fractal-border-default rounded-s shadow-brutal-1 transition-colors">
                 <LayoutDashboard size={20} />
                 Dashboard
               </Link>
-              
-              {/* INACTIVE LINKS */}
               <Link href="/admin/events" className="flex items-center gap-3 p-2 hover:bg-fractal-base-grey-90 rounded-s transition-colors">
                 <Calendar size={20} />
                 Event Management
