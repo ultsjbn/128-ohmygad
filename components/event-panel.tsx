@@ -15,7 +15,7 @@ const eventsData: Event[] = [
     date: "February 27, 2026",
     title: "Event Title",
     location: "Location, UPB",
-    time: "9:00 AM - 12:OO PM",
+    time: "9:00 AM - 12:00 PM",
     status: "Status",
   },
   {
@@ -23,78 +23,76 @@ const eventsData: Event[] = [
     date: "March 6, 2026",
     title: "Event Title",
     location: "Location, UPB",
-    time: "9:00 AM - 12:OO PM",
+    time: "9:00 AM - 12:00 PM",
+    status: "Status",
+  },
+  {
+    id: "3",
+    date: "March 15, 2026",
+    title: "Event Title",
+    location: "UPB Main Hall",
+    time: "1:00 PM - 4:00 PM",
     status: "Status",
   },
 ];
 
 export const EventPanel = (): JSX.Element => {
   return (
-    <div className="flex flex-col w-[913px] h-[632px] items-start gap-[var(--primitives-size-spacing-4)] pt-[var(--primitives-size-spacing-3)] pr-[var(--primitives-size-spacing-2)] pb-[var(--primitives-size-spacing-3)] pl-[var(--primitives-size-spacing-2)] relative bg-primitives-color-brand-body-light rounded-[var(--primitives-size-radius-m)] border border-solid border-primitives-color-brand-secondary shadow-brutal-shadow-1">
-      <div className="flex items-center gap-5 pr-[var(--primitives-size-spacing-2)] pl-[var(--primitives-size-spacing-2)] py-0 relative self-stretch w-full flex-[0_0_auto]">
 
-        <button className="all-[unset] box-border inline-flex h-12 items-center justify-center gap-[var(--primitives-size-spacing-2)] pt-[var(--primitives-size-spacing-1)] pr-[var(--primitives-size-spacing-3)] pb-[var(--primitives-size-spacing-1)] pl-[var(--primitives-size-spacing-3)] relative flex-[0_0_auto] bg-primitives-color-brand-primary rounded-[var(--primitives-size-radius-rounded)]">
-          <span className="relative w-fit font-body-body-1-median font-[number:var(--body-body-1-median-font-weight)] text-primitives-color-brand-secondary text-[length:var(--body-body-1-median-font-size)] text-center tracking-[var(--body-body-1-median-letter-spacing)] leading-[var(--body-body-1-median-line-height)] whitespace-nowrap [font-style:var(--body-body-1-median-font-style)]">
+    <div className="flex flex-col gap-6 h-full font-clash">
+      
+      {/* HEADER*/}
+      <div className="flex justify-between items-center shrink-0 pt-2">
+        <h1 className="text-4xl font-black tracking-tight text-black">Events</h1>
+        
+        <div className="flex gap-2">
+          <button className="h-10 px-6 bg-[#FF90E8] text-black border-2 border-black rounded-full font-bold text-sm shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-transform hover:scale-105 active:translate-y-0.5">
             Upcoming
-          </span>
-        </button>
-
-        <button className="all-[unset] box-border inline-flex h-12 items-center justify-center gap-[var(--primitives-size-spacing-2)] pt-[var(--primitives-size-spacing-1)] pr-[var(--primitives-size-spacing-3)] pb-[var(--primitives-size-spacing-1)] pl-[var(--primitives-size-spacing-3)] relative flex-[0_0_auto] bg-primitives-color-brand-secondary rounded-[var(--primitives-size-radius-rounded)]">
-          <span className="relative w-fit font-body-body-1-median font-[number:var(--body-body-1-median-font-weight)] text-white text-[length:var(--body-body-1-median-font-size)] text-center tracking-[var(--body-body-1-median-letter-spacing)] leading-[var(--body-body-1-median-line-height)] whitespace-nowrap [font-style:var(--body-body-1-median-font-style)]">
+          </button>
+          <button className="h-10 px-6 bg-black text-white rounded-full font-bold text-sm transition-transform hover:scale-105">
             Past
-          </span>
-        </button>
+          </button>
+        </div>
       </div>
 
-      {eventsData.map((event) => (
-        <article
-          key={event.id}
-          className="items-start gap-[var(--primitives-size-spacing-4)] self-stretch w-full flex-[0_0_auto] flex relative"
-        >
-          <div className="w-[235px] flex items-center gap-[15px] px-[5px] py-0 relative">
-            <Calendar className="!relative !w-6 !h-6" />
-            <time className="relative flex items-center w-fit font-body-body-1-regular font-[number:var(--body-body-1-regular-font-weight)] text-black text-[length:var(--body-body-1-regular-font-size)] tracking-[var(--body-body-1-regular-letter-spacing)] leading-[var(--body-body-1-regular-line-height)] whitespace-nowrap [font-style:var(--body-body-1-regular-font-style)]">
-              {event.date}
-            </time>
-          </div>
+      {/* SCROLLABLE LIST*/}
+      <div className="flex flex-col gap-8 overflow-y-auto pr-4 pb-24 pt-4 custom-scrollbar ">
+        {eventsData.map((event) => (
+          <div key={event.id} className="flex flex-col xl:flex-row items-start gap-4">
+            
+            {/* DATE LABEL*/}
+            <div className="flex items-center gap-2 pt-2 min-w-[160px] shrink-0">
+              <Calendar size={18} strokeWidth={2.5} className="text-black" />
+              <span className="text-sm font-bold">{event.date}</span>
+            </div>
 
-          <div className="flex-col w-[600px] h-[226px] items-center justify-center gap-4 pt-[var(--primitives-size-spacing-2)] pr-[var(--primitives-size-spacing-3)] pb-[var(--primitives-size-spacing-2)] pl-[var(--primitives-size-spacing-3)] bg-primitives-color-decorative-purple-90 rounded-[var(--primitives-size-radius-m)] border border-solid border-primitives-color-brand-secondary flex relative">
-            <div className="flex h-[188px] items-center relative self-stretch w-full">
-              <div className="relative w-[313px] h-[184px]">
-                <div className="flex w-[313px] items-start gap-10 absolute top-0 left-0">
-                  <h2 className="items-center flex-1 h-12 mt-[-1.00px] font-heading-h4 font-[number:var(--heading-h4-font-weight)] text-black text-[length:var(--heading-h4-font-size)] tracking-[var(--heading-h4-letter-spacing)] leading-[var(--heading-h4-line-height)] flex relative [font-style:var(--heading-h4-font-style)]">
-                    {event.title}
-                  </h2>
+            {/* EVENT CARD*/}
+            <div className="flex-1 w-full flex flex-col md:flex-row justify-between gap-6 p-5 rounded-[24px] border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[5px_5px_0px_0px_rgba(0,0,0,1)] bg-fractal-decorative-purple-90">
+              
+              <div className="flex flex-col gap-4">
+                <h2 className="text-xl font-black leading-tight">{event.title}</h2>
+
+                <div className="flex flex-col gap-2 text-sm font-medium">
+                  <div className="flex items-center gap-3">
+                    <MapPin size={16} strokeWidth={2.5} />
+                    <span>{event.location}</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Clock4 size={16} strokeWidth={2.5} />
+                    <span>{event.time}</span>
+                  </div>
                 </div>
 
-                <div className="flex flex-col w-[313px] h-[120px] items-start justify-center gap-[15px] absolute top-16 left-0">
-                  <div className="self-stretch w-full flex-[0_0_auto] mt-[-3.00px] flex items-center gap-[15px] px-[5px] py-0 relative">
-                    <MapPin className="!relative !w-6 !h-6" />
-                    <address className="relative flex items-center w-fit font-body-body-1-regular font-[number:var(--body-body-1-regular-font-weight)] text-black text-[length:var(--body-body-1-regular-font-size)] tracking-[var(--body-body-1-regular-letter-spacing)] leading-[var(--body-body-1-regular-line-height)] whitespace-nowrap [font-style:var(--body-body-1-regular-font-style)] not-italic">
-                      {event.location}
-                    </address>
-                  </div>
-
-                  <div className="w-[257px] flex-[0_0_auto] flex items-center gap-[15px] px-[5px] py-0 relative">
-                    <Clock4 className="!relative !w-6 !h-6" />
-                    <time className="relative flex items-center w-fit font-body-body-1-regular font-[number:var(--body-body-1-regular-font-weight)] text-black text-[length:var(--body-body-1-regular-font-size)] tracking-[var(--body-body-1-regular-letter-spacing)] leading-[var(--body-body-1-regular-line-height)] whitespace-nowrap [font-style:var(--body-body-1-regular-font-style)]">
-                      {event.time}
-                    </time>
-                  </div>
-
-                  <button className="all-[unset] box-border inline-flex h-12 items-center justify-center gap-[var(--primitives-size-spacing-2)] pt-[var(--primitives-size-spacing-1)] pr-[var(--primitives-size-spacing-3)] pb-[var(--primitives-size-spacing-1)] pl-[var(--primitives-size-spacing-3)] relative mb-[-3.00px] bg-primitives-color-base-white rounded-[var(--primitives-size-radius-rounded)] border border-solid border-black">
-                    <span className="relative w-fit font-body-body-1-median font-[number:var(--body-body-1-median-font-weight)] text-primitives-color-brand-secondary text-[length:var(--body-body-1-median-font-size)] text-center tracking-[var(--body-body-1-median-letter-spacing)] leading-[var(--body-body-1-median-line-height)] whitespace-nowrap [font-style:var(--body-body-1-median-font-style)]">
-                      {event.status}
-                    </span>
-                  </button>
-                </div>
+                <button className="w-fit h-9 px-6 bg-white border-2 border-black rounded-full font-bold text-xs shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:bg-gray-100 active:translate-y-0.5 transition-all">
+                  {event.status}
+                </button>
               </div>
-
-              <div className="relative w-[239px] h-[184px] bg-white border border-solid border-black" />
+              
+              <div className="w-full md:w-48 h-48 bg-gray-50 border-2 border-black rounded-xl shrink-0" />
             </div>
           </div>
-        </article>
-      ))}
+        ))}
+      </div>
     </div>
   );
 };
