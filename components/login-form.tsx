@@ -38,7 +38,7 @@ export function LoginForm({
 
       const { data: profile, error: profileError } = await supabase
         .from("profile")
-        .select("role")
+        .select("role, is_onboarded")
         .eq("id", authData.user.id)
         .single();
 
@@ -48,6 +48,11 @@ export function LoginForm({
       if (profileError || !profile) {
         await supabase.auth.signOut();
         throw new Error("No profile found for this account. Please contact the administrator.");
+      }
+
+      if (!profile.is_onboarded) {
+        router.push("/auth/onboarding");
+        return;
       }
 
       switch (profile.role) {

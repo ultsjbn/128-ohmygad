@@ -20,25 +20,54 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export function OnboardingForm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
+  const [role, setRole] = useState<string | null>(null);
+  const [isLoadingRole, setIsLoadingRole] = useState(true);
+
+  // Shared fields (all roles)
   const [display_name, setDisplayName] = useState("");
-  const [student_num, setStudentNum] = useState("");
-  const [year_level, setYearLevel] = useState("");
-  const [college, setCollege] = useState("");
-  const [program, setProgram] = useState("");
   const [contact_num, setContactNum] = useState("");
   const [address, setAddress] = useState("");
   const [pronouns, setPronouns] = useState("");
   const [sex_at_birth, setSexAtBirth] = useState("");
   const [gender_identity, setGenderIdentity] = useState("");
+  const [college, setCollege] = useState("");
+  const [program, setProgram] = useState("");
+
+  // Student-only fields
+  const [student_num, setStudentNum] = useState("");
+  const [year_level, setYearLevel] = useState("");
+
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+
+  // Fetch role on mount so we know which fields to show
+  useEffect(() => {
+    const fetchRole = async () => {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        router.push("/auth/login");
+        return;
+      }
+      const { data: profile } = await supabase
+        .from("profile")
+        .select("role")
+        .eq("id", user.id)
+        .single();
+
+      setRole(profile?.role ?? null);
+      setIsLoadingRole(false);
+    };
+
+    fetchRole();
+  }, [router]);
 
   const handleOnboarding = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,31 +76,47 @@ export function OnboardingForm({
     setError(null);
 
     try {
-      // Get the current logged-in user
       const { data: { user }, error: userError } = await supabase.auth.getUser();
       if (userError || !user) throw new Error("No active session found. Please log in again.");
 
-      // Update the profile row created by the trigger
+      // Build update payload — student fields only included if role is student
+      const updatePayload: Record<string, unknown> = {
+        display_name: display_name || null,
+        contact_num: contact_num || null,
+        address: address || null,
+        pronouns: pronouns || null,
+        sex_at_birth,
+        gender_identity: gender_identity || null,
+        college,
+        program: program || null,
+        is_onboarded: true,
+      };
+
+      if (role === "student") {
+        updatePayload.student_num = student_num || null;
+        updatePayload.year_level = year_level || null;
+      }
+
       const { error: profileError } = await supabase
         .from("profile")
-        .update({
-          display_name: display_name || null,
-          student_num: student_num || null,
-          year_level: year_level || null,
-          college,
-          program: program || null,
-          contact_num: contact_num || null,
-          address: address || null,
-          pronouns: pronouns || null,
-          sex_at_birth,
-          gender_identity: gender_identity || null,
-          is_onboarded: true,   // mark onboarding as complete, 
-        })
+        .update(updatePayload)
         .eq("id", user.id);
 
       if (profileError) throw profileError;
 
-      router.push("/student/dashboard");
+      // Redirect based on role after onboarding
+      switch (role) {
+        case "admin":
+          router.push("/admin");
+          break;
+        case "faculty":
+          router.push("/faculty");
+          break;
+        case "student":
+        default:
+          router.push("/student/dashboard");
+          break;
+      }
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : "An error occurred");
     } finally {
@@ -79,21 +124,31 @@ export function OnboardingForm({
     }
   };
 
+  // Show loading state while fetching role
+  if (isLoadingRole) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <p className="text-sm text-muted-foreground">Loading...</p>
+      </div>
+    );
+  }
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader>
           <CardTitle className="text-2xl">Complete Your Profile</CardTitle>
           <CardDescription>
-            Fill in your details to finish setting up your account.
+            {role === "student" && "Fill in your details to finish setting up your student account."}
+            {role === "faculty" && "Fill in your details to finish setting up your faculty account."}
+            {role === "admin" && "Fill in your details to finish setting up your admin account."}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleOnboarding}>
             <div className="flex flex-col gap-6">
 
-
-              {/* Display Name */}
+              {/* Display Name — all roles */}
               <div className="grid gap-2">
                 <Label htmlFor="display_name">
                   Display Name <span className="text-muted-foreground text-xs">(optional)</span>
@@ -107,38 +162,44 @@ export function OnboardingForm({
                 />
               </div>
 
-              {/* Student number */}
-              <div className="grid gap-2">
-                <Label htmlFor="student_num">Student Number</Label>
-                <Input
-                  id="student_num"
-                  type="text"
-                  placeholder="2021-12345"
-                  value={student_num}
-                  onChange={(e) => setStudentNum(e.target.value)}
-                />
-              </div>
+              {/* Student Number — students only */}
+              {role === "student" && (
+                <div className="grid gap-2">
+                  <Label htmlFor="student_num">Student Number</Label>
+                  <Input
+                    id="student_num"
+                    type="text"
+                    placeholder="2021-12345"
+                    value={student_num}
+                    onChange={(e) => setStudentNum(e.target.value)}
+                  />
+                </div>
+              )}
 
-              {/* Year Level */}
-              <div className="grid gap-2">
-                <Label htmlFor="year_level">Year Level</Label>
-                <Select onValueChange={setYearLevel}>
-                  <SelectTrigger id="year_level">
-                    <SelectValue placeholder="Select year level" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="1st Year">1st Year</SelectItem>
-                    <SelectItem value="2nd Year">2nd Year</SelectItem>
-                    <SelectItem value="3rd Year">3rd Year</SelectItem>
-                    <SelectItem value="4th Year">4th Year</SelectItem>
-                    <SelectItem value="5th Year">5th Year</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+              {/* Year Level — students only */}
+              {role === "student" && (
+                <div className="grid gap-2">
+                  <Label htmlFor="year_level">Year Level</Label>
+                  <Select onValueChange={setYearLevel}>
+                    <SelectTrigger id="year_level">
+                      <SelectValue placeholder="Select year level" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1st Year">1st Year</SelectItem>
+                      <SelectItem value="2nd Year">2nd Year</SelectItem>
+                      <SelectItem value="3rd Year">3rd Year</SelectItem>
+                      <SelectItem value="4th Year">4th Year</SelectItem>
+                      <SelectItem value="5th Year">5th Year</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
 
-              {/* College */}
+              {/* College — all roles */}
               <div className="grid gap-2">
-                <Label htmlFor="college">College <span className="text-red-500">*</span></Label>
+                <Label htmlFor="college">
+                  College <span className="text-red-500">*</span>
+                </Label>
                 <Select onValueChange={setCollege} required>
                   <SelectTrigger id="college">
                     <SelectValue placeholder="Select college" />
@@ -151,7 +212,8 @@ export function OnboardingForm({
                 </Select>
               </div>
 
-              {/* Program */}
+              {/* Program — students only */}
+              {role === "student" && (
               <div className="grid gap-2">
                 <Label htmlFor="program">
                   Program <span className="text-muted-foreground text-xs">(optional)</span>
@@ -163,9 +225,10 @@ export function OnboardingForm({
                   value={program}
                   onChange={(e) => setProgram(e.target.value)}
                 />
-              </div>
+              </div> 
+              )}
 
-              {/* Contact number */}
+              {/* Contact Number — all roles */}
               <div className="grid gap-2">
                 <Label htmlFor="contact_num">
                   Contact Number <span className="text-muted-foreground text-xs">(optional)</span>
@@ -179,7 +242,7 @@ export function OnboardingForm({
                 />
               </div>
 
-              {/* Address */}
+              {/* Address — all roles */}
               <div className="grid gap-2">
                 <Label htmlFor="address">
                   Address <span className="text-muted-foreground text-xs">(optional)</span>
@@ -193,7 +256,7 @@ export function OnboardingForm({
                 />
               </div>
 
-              {/* Pronouns */}
+              {/* Pronouns — all roles */}
               <div className="grid gap-2">
                 <Label htmlFor="pronouns">
                   Pronouns <span className="text-muted-foreground text-xs">(optional)</span>
@@ -207,7 +270,7 @@ export function OnboardingForm({
                 />
               </div>
 
-              {/* Sex at birth */}
+              {/* Sex at Birth — all roles */}
               <div className="grid gap-2">
                 <Label htmlFor="sex_at_birth">
                   Sex at Birth <span className="text-red-500">*</span>
@@ -224,7 +287,7 @@ export function OnboardingForm({
                 </Select>
               </div>
 
-              {/* Gender identity */}
+              {/* Gender Identity — all roles */}
               <div className="grid gap-2">
                 <Label htmlFor="gender_identity">
                   Gender Identity <span className="text-muted-foreground text-xs">(optional)</span>
