@@ -195,22 +195,24 @@ export function OnboardingForm({
                 </div>
               )}
 
-              {/* College — all roles */}
-              <div className="grid gap-2">
-                <Label htmlFor="college">
-                  College <span className="text-red-500">*</span>
-                </Label>
-                <Select onValueChange={setCollege} required>
-                  <SelectTrigger id="college">
-                    <SelectValue placeholder="Select college" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="CAS">College of Science (CS)</SelectItem>
-                    <SelectItem value="CAC">College of Arts and Communications (CAC)</SelectItem>
-                    <SelectItem value="CSSP">College of Social Sciences (CSS)</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+              {/* College — students only */}
+              {role === "student" && (
+                <div className="grid gap-2">
+                  <Label htmlFor="college">
+                    College <span className="text-red-500">*</span>
+                  </Label>
+                  <Select onValueChange={setCollege} required>
+                    <SelectTrigger id="college">
+                      <SelectValue placeholder="Select college" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="CAS">College of Science (CS)</SelectItem>
+                      <SelectItem value="CAC">College of Arts and Communications (CAC)</SelectItem>
+                      <SelectItem value="CSSP">College of Social Sciences (CSS)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
 
               {/* Program — students only */}
               {role === "student" && (
