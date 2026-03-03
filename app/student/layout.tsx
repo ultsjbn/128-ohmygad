@@ -1,8 +1,8 @@
 import { Header, Avatar, InputText } from "@snowball-tech/fractal";
 import { ChevronDown } from "lucide-react";
-import AdminSidebar from "@/components/admin-sidebar";
+import StudentSidebar from "@/components/student-sidebar";
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+export default function StudentLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex flex-col h-screen w-full bg-fractal-bg-body-default font-sans text-fractal-text-default overflow-hidden">
 
@@ -26,7 +26,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
       {/* BOTTOM SECTION: Sidebar + Main Content */}
       <div className="flex flex-1 overflow-hidden">
-        <AdminSidebar />
+        <StudentSidebar />
 
         {/* MAIN PAGE CONTENT */}
         <main className="flex-1 p-4 overflow-y-auto min-w-0">

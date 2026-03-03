@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from "react";
 import { EventPanel } from "@/components/event-panel";
 import { Paper } from "@/components/paper";
-import { Card } from "@/components/card";
 import { Typography } from '@/components/typography';
 
 export default function DashboardPage() {
@@ -17,7 +16,7 @@ export default function DashboardPage() {
             Welcome,
           </Typography>
           <Typography variant="heading-1" className="tracking-tighter leading-none font-median">
-            Faculty Name Yipee
+            Student Name Yipee
           </Typography>
         </div>
       </div>
