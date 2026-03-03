@@ -2,23 +2,8 @@
 
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { InputText, Button, Select, SelectItem } from "@snowball-tech/fractal";
+import { Typography } from "./typography";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 
@@ -128,199 +113,187 @@ export function OnboardingForm({
   if (isLoadingRole) {
     return (
       <div className="flex items-center justify-center p-8">
-        <p className="text-sm text-muted-foreground">Loading...</p>
+        <Typography variant="body-2" className="text-fractal-text-placeholder">Loading...</Typography>
       </div>
     );
   }
 
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-2xl">Complete Your Profile</CardTitle>
-          <CardDescription>
-            {role === "student" && "Fill in your details to finish setting up your student account."}
-            {role === "faculty" && "Fill in your details to finish setting up your faculty account."}
-            {role === "admin" && "Fill in your details to finish setting up your admin account."}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleOnboarding}>
-            <div className="flex flex-col gap-6">
+    <div className={cn("flex flex-col gap-3 font-sans border-2 border-fractal-border-default rounded-m shadow-brutal-2 p-4 bg-fractal-bg-body-white", className)} {...props}>
+      <Typography variant="heading-2" className="font-wide font-bold text-fractal-text-default">
+        Complete Your Profile
+      </Typography>
+      <Typography variant="body-2" className="text-fractal-text-placeholder">
+        {role === "student" && "Fill in your details to finish setting up your student account."}
+        {role === "faculty" && "Fill in your details to finish setting up your faculty account."}
+        {role === "admin" && "Fill in your details to finish setting up your admin account."}
+      </Typography>
 
-              {/* Display Name — all roles */}
-              <div className="grid gap-2">
-                <Label htmlFor="display_name">
-                  Display Name <span className="text-muted-foreground text-xs">(optional)</span>
-                </Label>
-                <Input
-                  id="display_name"
-                  type="text"
-                  placeholder="How you want to be called"
-                  value={display_name}
-                  onChange={(e) => setDisplayName(e.target.value)}
-                />
-              </div>
+      <form onSubmit={handleOnboarding}>
+        <div className="flex flex-col gap-3">
 
-              {/* Student Number — students only */}
-              {role === "student" && (
-                <div className="grid gap-2">
-                  <Label htmlFor="student_num">Student Number</Label>
-                  <Input
-                    id="student_num"
-                    type="text"
-                    placeholder="2021-12345"
-                    value={student_num}
-                    onChange={(e) => setStudentNum(e.target.value)}
-                  />
-                </div>
-              )}
+          {/* Display Name — all roles */}
+          <InputText
+            id="display_name"
+            label="Display Name (optional)"
+            type="text"
+            placeholder="How you want to be called"
+            fullWidth
+            value={display_name}
+            onChange={(_e, newValue) => setDisplayName(newValue)}
+            className="[&_input:focus]:!border-fractal-border-primary [&_input:focus]:!shadow-brutal-1-primary"
+          />
 
-              {/* Year Level — students only */}
-              {role === "student" && (
-                <div className="grid gap-2">
-                  <Label htmlFor="year_level">Year Level</Label>
-                  <Select onValueChange={setYearLevel}>
-                    <SelectTrigger id="year_level">
-                      <SelectValue placeholder="Select year level" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="1st Year">1st Year</SelectItem>
-                      <SelectItem value="2nd Year">2nd Year</SelectItem>
-                      <SelectItem value="3rd Year">3rd Year</SelectItem>
-                      <SelectItem value="4th Year">4th Year</SelectItem>
-                      <SelectItem value="5th Year">5th Year</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
+          {/* Student Number — students only */}
+          {role === "student" && (
+            <InputText
+              id="student_num"
+              label="Student Number"
+              type="text"
+              placeholder="2021-12345"
+              fullWidth
+              value={student_num}
+              onChange={(_e, newValue) => setStudentNum(newValue)}
+              className="[&_input:focus]:!border-fractal-border-primary [&_input:focus]:!shadow-brutal-1-primary"
+            />
+          )}
 
-              {/* College — students only */}
-              {role === "student" && (
-                <div className="grid gap-2">
-                  <Label htmlFor="college">
-                    College <span className="text-red-500">*</span>
-                  </Label>
-                  <Select onValueChange={setCollege} required>
-                    <SelectTrigger id="college">
-                      <SelectValue placeholder="Select college" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="CAS">College of Science (CS)</SelectItem>
-                      <SelectItem value="CAC">College of Arts and Communications (CAC)</SelectItem>
-                      <SelectItem value="CSSP">College of Social Sciences (CSS)</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
+          {/* Year Level — students only */}
+          {role === "student" && (
+            <Select
+              id="year_level"
+              label="Year Level"
+              placeholder="Select year level"
+              fullWidth
+              onSelect={(value) => setYearLevel(value)}
+              dropdown={{ className: "!text-black" }}
+            >
+              <SelectItem value="1st Year" label="1st Year" />
+              <SelectItem value="2nd Year" label="2nd Year" />
+              <SelectItem value="3rd Year" label="3rd Year" />
+              <SelectItem value="4th Year" label="4th Year" />
+              <SelectItem value="5th Year" label="5th Year" />
+            </Select>
+          )}
 
-              {/* Program — students only */}
-              {role === "student" && (
-              <div className="grid gap-2">
-                <Label htmlFor="program">
-                  Program <span className="text-muted-foreground text-xs">(optional)</span>
-                </Label>
-                <Input
-                  id="program"
-                  type="text"
-                  placeholder="e.g. BS Computer Science"
-                  value={program}
-                  onChange={(e) => setProgram(e.target.value)}
-                />
-              </div> 
-              )}
+          {/* College — students only */}
+          {role === "student" && (
+            <Select
+              id="college"
+              label="College *"
+              placeholder="Select college"
+              fullWidth
+              required
+              onSelect={(value) => setCollege(value)}
+              dropdown={{ className: "!text-black" }}
+            >
+              <SelectItem value="CAS" label="College of Science (CS)" />
+              <SelectItem value="CAC" label="College of Arts and Communications (CAC)" />
+              <SelectItem value="CSSP" label="College of Social Sciences (CSS)" />
+            </Select>
+          )}
 
-              {/* Contact Number — all roles */}
-              <div className="grid gap-2">
-                <Label htmlFor="contact_num">
-                  Contact Number <span className="text-muted-foreground text-xs">(optional)</span>
-                </Label>
-                <Input
-                  id="contact_num"
-                  type="text"
-                  placeholder="09XX XXX XXXX"
-                  value={contact_num}
-                  onChange={(e) => setContactNum(e.target.value)}
-                />
-              </div>
+          {/* Program — students only */}
+          {role === "student" && (
+            <InputText
+              id="program"
+              label="Program (optional)"
+              type="text"
+              placeholder="e.g. BS Computer Science"
+              fullWidth
+              value={program}
+              onChange={(_e, newValue) => setProgram(newValue)}
+              className="[&_input:focus]:!border-fractal-border-primary [&_input:focus]:!shadow-brutal-1-primary"
+            />
+          )}
 
-              {/* Address — all roles */}
-              <div className="grid gap-2">
-                <Label htmlFor="address">
-                  Address <span className="text-muted-foreground text-xs">(optional)</span>
-                </Label>
-                <Input
-                  id="address"
-                  type="text"
-                  placeholder="Baguio City"
-                  value={address}
-                  onChange={(e) => setAddress(e.target.value)}
-                />
-              </div>
+          {/* Contact Number — all roles */}
+          <InputText
+            id="contact_num"
+            label="Contact Number (optional)"
+            type="text"
+            placeholder="09XX XXX XXXX"
+            fullWidth
+            value={contact_num}
+            onChange={(_e, newValue) => setContactNum(newValue)}
+            className="[&_input:focus]:!border-fractal-border-primary [&_input:focus]:!shadow-brutal-1-primary"
+          />
 
-              {/* Pronouns — all roles */}
-              <div className="grid gap-2">
-                <Label htmlFor="pronouns">
-                  Pronouns <span className="text-muted-foreground text-xs">(optional)</span>
-                </Label>
-                <Input
-                  id="pronouns"
-                  type="text"
-                  placeholder="e.g. she/her, he/him, they/them"
-                  value={pronouns}
-                  onChange={(e) => setPronouns(e.target.value)}
-                />
-              </div>
+          {/* Address — all roles */}
+          <InputText
+            id="address"
+            label="Address (optional)"
+            type="text"
+            placeholder="Baguio City"
+            fullWidth
+            value={address}
+            onChange={(_e, newValue) => setAddress(newValue)}
+            className="[&_input:focus]:!border-fractal-border-primary [&_input:focus]:!shadow-brutal-1-primary"
+          />
 
-              {/* Sex at Birth — all roles */}
-              <div className="grid gap-2">
-                <Label htmlFor="sex_at_birth">
-                  Sex at Birth <span className="text-red-500">*</span>
-                </Label>
-                <Select onValueChange={setSexAtBirth} required>
-                  <SelectTrigger id="sex_at_birth">
-                    <SelectValue placeholder="Select sex at birth" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Male">Male</SelectItem>
-                    <SelectItem value="Female">Female</SelectItem>
-                    <SelectItem value="Intersex">Intersex</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+          {/* Pronouns — all roles */}
+          <InputText
+            id="pronouns"
+            label="Pronouns (optional)"
+            type="text"
+            placeholder="e.g. she/her, he/him, they/them"
+            fullWidth
+            value={pronouns}
+            onChange={(_e, newValue) => setPronouns(newValue)}
+            className="[&_input:focus]:!border-fractal-border-primary [&_input:focus]:!shadow-brutal-1-primary"
+          />
 
-              {/* Gender Identity — all roles */}
-              <div className="grid gap-2">
-                <Label htmlFor="gender_identity">
-                  Gender Identity <span className="text-muted-foreground text-xs">(optional)</span>
-                </Label>
-                <Select onValueChange={setGenderIdentity}>
-                  <SelectTrigger id="gender_identity">
-                    <SelectValue placeholder="Select gender identity" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Man">Man</SelectItem>
-                    <SelectItem value="Woman">Woman</SelectItem>
-                    <SelectItem value="Non-binary">Non-binary</SelectItem>
-                    <SelectItem value="Genderqueer">Genderqueer</SelectItem>
-                    <SelectItem value="Genderfluid">Genderfluid</SelectItem>
-                    <SelectItem value="Agender">Agender</SelectItem>
-                    <SelectItem value="Prefer not to say">Prefer not to say</SelectItem>
-                    <SelectItem value="Self-describe">Prefer to self-describe</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+          {/* Sex at Birth — all roles */}
+          <Select
+            id="sex_at_birth"
+            label="Sex at Birth *"
+            placeholder="Select sex at birth"
+            fullWidth
+            required
+            onSelect={(value) => setSexAtBirth(value)}
+            dropdown={{ className: "!text-black" }}
+          >
+            <SelectItem value="Male" label="Male" />
+            <SelectItem value="Female" label="Female" />
+            <SelectItem value="Intersex" label="Intersex" />
+          </Select>
 
-              {error && <p className="text-sm text-red-500">{error}</p>}
+          {/* Gender Identity — all roles */}
+          <Select
+            id="gender_identity"
+            label="Gender Identity (optional)"
+            placeholder="Select gender identity"
+            fullWidth
+            onSelect={(value) => setGenderIdentity(value)}
+            dropdown={{ className: "!text-black" }}
+          >
+            <SelectItem value="Man" label="Man" />
+            <SelectItem value="Woman" label="Woman" />
+            <SelectItem value="Non-binary" label="Non-binary" />
+            <SelectItem value="Genderqueer" label="Genderqueer" />
+            <SelectItem value="Genderfluid" label="Genderfluid" />
+            <SelectItem value="Agender" label="Agender" />
+            <SelectItem value="Prefer not to say" label="Prefer not to say" />
+            <SelectItem value="Self-describe" label="Prefer to self-describe" />
+          </Select>
 
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Saving..." : "Complete Profile"}
-              </Button>
+          {error && (
+            <Typography variant="body-2" className="text-fractal-feedback-error-50">
+              {error}
+            </Typography>
+          )}
 
-            </div>
-          </form>
-        </CardContent>
-      </Card>
+          <Button
+            type="submit"
+            label={isLoading ? "Saving..." : "Complete Profile"}
+            variant="primary"
+            fullWidth
+            disabled={isLoading}
+            className="[&]:text-fractal-base-white [&]:border-2 [&]:border-fractal-border-default [&:hover]:text-fractal-base-black [&:hover]:border-2 [&:hover]:border-fractal-border-default"
+          />
+
+        </div>
+      </form>
     </div>
   );
 }

@@ -60,7 +60,7 @@ export function LoginForm({
           router.push("/admin");
           break;
         case "faculty":
-          router.push("/faculty/dashboard");
+          router.push("/faculty");
           break;
         case "student":
           router.push("/student/dashboard");
