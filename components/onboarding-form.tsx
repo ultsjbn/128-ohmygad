@@ -166,6 +166,7 @@ export function OnboardingForm({
               placeholder="Select year level"
               fullWidth
               onSelect={(value) => setYearLevel(value)}
+              dropdown={{ className: "!text-black" }}
             >
               <SelectItem value="1st Year" label="1st Year" />
               <SelectItem value="2nd Year" label="2nd Year" />
@@ -184,6 +185,7 @@ export function OnboardingForm({
               fullWidth
               required
               onSelect={(value) => setCollege(value)}
+              dropdown={{ className: "!text-black" }}
             >
               <SelectItem value="CAS" label="College of Science (CS)" />
               <SelectItem value="CAC" label="College of Arts and Communications (CAC)" />
@@ -249,6 +251,7 @@ export function OnboardingForm({
             fullWidth
             required
             onSelect={(value) => setSexAtBirth(value)}
+            dropdown={{ className: "!text-black" }}
           >
             <SelectItem value="Male" label="Male" />
             <SelectItem value="Female" label="Female" />
@@ -262,6 +265,7 @@ export function OnboardingForm({
             placeholder="Select gender identity"
             fullWidth
             onSelect={(value) => setGenderIdentity(value)}
+            dropdown={{ className: "!text-black" }}
           >
             <SelectItem value="Man" label="Man" />
             <SelectItem value="Woman" label="Woman" />
