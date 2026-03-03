@@ -5,6 +5,7 @@ export interface Profile {
   full_name: string | null;
   email: string | null;
   role: UserRole | null;
+  gso_attended: number;
 }
 
 export type SortField = "full_name" | "email" | "role" ;

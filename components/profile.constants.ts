@@ -18,11 +18,11 @@ export const ROLE_STYLES: Record<string, string> = {
 export const ROLE_STYLE_FALLBACK =
   "bg-fractal-bg-body-light text-fractal-text-dark border border-fractal-border-dark";
 
-export const PER_PAGE = 10;
+export const PER_PAGE = 5; // 5 muna para di masikip
 
 export const TABLE_COLUMNS = [
   { key: "full_name" as const, label: "Name" },
   { key: "role" as const, label: "Role" },
   { key: "email" as const, label: "Email" },
-  { key: "created_at" as const, label: "Joined" },
+  { key: "gso_attended" as const, label: "GSOs Attended" },
 ];

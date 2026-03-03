@@ -1,4 +1,4 @@
-import { ArrowDownUp, MoreHorizontal } from "lucide-react";
+import { ArrowDownUp, Ellipsis } from "lucide-react";
 import type { Profile, SortState } from "@/app/admin/users/profile.types";
 import { TABLE_COLUMNS } from "./profile.constants";
 import { UserAvatar } from "./user-avatar";
@@ -46,9 +46,10 @@ export function UserTable({ profiles, sort, onSort }: UserTableProps) {
           {profiles.map((profile, i) => (
             <tr
               key={profile.id}
-              className={`border-b border-fractal-border-light last:border-0 hover:bg-fractal-bg-body-light transition-colors ${i % 2 !== 0 ? "bg-fractal-bg-body-light/40" : ""}`}
+              className={`border-b border-fractal-border-light last:border-0 hover:bg-fractal-decorative-purple-90 transition-colors ${i % 2 !== 0 ? "bg-fractal-bg-body-light/40" : ""}`}
             >
-              <td className="px-5 py-3.5">
+              {/* ---------- Avatar and Name ---------- */}
+              <td className="px-5 py-2">
                 <div className="flex items-center gap-3">
                   <UserAvatar name={profile.full_name} />
                   <div className="flex flex-col min-w-0">
@@ -61,15 +62,21 @@ export function UserTable({ profiles, sort, onSort }: UserTableProps) {
                   </div>
                 </div>
               </td>
-              <td className="px-5 py-3.5">
+              {/* ---------- Role Badge ---------- */}
+              <td className="px-5 py-2 items-center">
                 <RoleBadge role={profile.role} />
               </td>
-              <td className="px-5 py-3.5 text-fractal-text-default">
+              {/* ---------- Email ---------- */}
+              <td className="px-5 py-2 text-fractal-text-default">
                 {profile.email ?? "—"}
               </td>
-              <td className="px-5 py-3.5 text-right">
+              {/* ---------- GSOs attended ---------- */}
+              <td className="px-5 py-2 text-fractal-text-default">
+                {profile.gso_attended ?? "—"}
+              </td>
+              <td className="px-5 py-2">
                 <button className="p-1.5 rounded-full text-fractal-text-light hover:bg-fractal-bg-body-light hover:text-fractal-text-default transition-colors">
-                  <MoreHorizontal size={16} />
+                  <Ellipsis size={20} className="text-fractal-icon-primary" />
                 </button>
               </td>
             </tr>

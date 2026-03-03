@@ -39,11 +39,11 @@ export function TableSection({
     return <EmptyState type="empty" message="No users found." />;
 
   return (
-    <div className="flex flex-col gap-4 pt-4">
+    <div className="flex flex-col gap-1 pt-1">
       <div className="rounded-2xl border-2 border-fractal-border-default bg-fractal-bg-body-white shadow-brutal-1 overflow-hidden">
         <UserTable profiles={profiles} sort={sort} onSort={onSort} />
       </div>
-      <div className="flex items-center justify-between px-1 text-sm text-fractal-text-light">
+      <div className="flex items-center justify-between px-1 text-sm text-fractal-base-grey-30">
         <span>
           Showing {rangeStart}–{rangeEnd} of {filtered.length} users
         </span>
