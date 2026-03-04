@@ -256,6 +256,7 @@ export function OnboardingForm({
             <SelectItem value="Male" label="Male" />
             <SelectItem value="Female" label="Female" />
             <SelectItem value="Intersex" label="Intersex" />
+            <SelectItem value="Prefer not to say" label="Prefer not to say" />
           </Select>
 
           {/* Gender Identity — all roles */}
