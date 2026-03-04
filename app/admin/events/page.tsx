@@ -3,10 +3,9 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { Paper } from "@snowball-tech/fractal";
+import { Loader, Paper } from "@snowball-tech/fractal";
 import { InputText } from "@snowball-tech/fractal";
 import { Plus, Pencil, Trash2, Search, ArrowUpDown, SlidersHorizontal, X, ChevronUp, ChevronDown } from "lucide-react";
-import { Input } from "@/components/ui/input";
 import type { EventFormData } from "@/components/admin/event-form";
 import { Button } from "@/components/button";
 import { Typography } from "@/components/typography";
@@ -193,12 +192,7 @@ export default function EventsPage() {
       <Paper elevation="elevated" className="overflow-hidden p-0">
         {isLoading ? (
           <div className="p-8 text-center">
-            <Typography
-              variant="body-1"
-              className="text-fractal-text-placeholder"
-            >
-              Loading events...
-            </Typography>
+            <Loader size="xl"/>
           </div>
         ) : filtered.length === 0 ? (
           <div className="p-8 text-center">
