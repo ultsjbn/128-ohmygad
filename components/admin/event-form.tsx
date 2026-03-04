@@ -52,7 +52,7 @@ export default function EventForm({ initialData, mode }: EventFormProps) {
   const [registration_open, setRegistrationOpen] = useState(initialData?.registration_open?.slice(0, 16) ?? "");
   const [registration_close, setRegistrationClose] = useState(initialData?.registration_close?.slice(0, 16) ?? "");
   const [category, setCategory] = useState(initialData?.category ?? "");
-  const [status, setStatus] = useState(initialData?.status ?? "draft");
+  const [status, setStatus] = useState(initialData?.status ?? "");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -105,7 +105,7 @@ export default function EventForm({ initialData, mode }: EventFormProps) {
           <Paper elevation="elevated" className="flex flex-col gap-4 p-4">
             <Typography variant="body-1-median">Basic Information</Typography>
 
-            <div className="grid gap-2">
+            <div className="grid gap-2 pt-4">
               <Label htmlFor="title">Title <span className="text-fractal-brand-primary">*</span></Label>
               <Input
                 id="title"
@@ -117,7 +117,7 @@ export default function EventForm({ initialData, mode }: EventFormProps) {
               />
             </div>
 
-            <div className="grid gap-2">
+            <div className="grid gap-2 pt-3">
               <Label htmlFor="description">Description</Label>
               <Textarea
                 id="description"
@@ -125,10 +125,12 @@ export default function EventForm({ initialData, mode }: EventFormProps) {
                 rows={4}
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
+                // className="!bg-fractal-decorative-purple-90 !text-fractal-text-on-color !border-2 !border-fractal-border-default"
+                className="!bg-white"
               />
             </div>
 
-            <div className="grid gap-2">
+            <div className="grid gap-2 pt-3">
               <Label htmlFor="location">Location <span className="text-fractal-brand-primary">*</span></Label>
               <Input
                 id="location"
@@ -140,7 +142,7 @@ export default function EventForm({ initialData, mode }: EventFormProps) {
               />
             </div>
 
-            <div className="grid gap-2">
+            <div className="grid gap-2 pt-3">
               <Label htmlFor="capacity">Capacity <span className="text-fractal-brand-primary">*</span></Label>
               <Input
                 id="capacity"
@@ -152,10 +154,12 @@ export default function EventForm({ initialData, mode }: EventFormProps) {
               />
             </div>
 
-            <div className="grid gap-2">
+            <div className="grid gap-2 pt-3">
               <Label htmlFor="category">Category <span className="text-fractal-brand-primary">*</span></Label>
               <Select onValueChange={setCategory} defaultValue={category} required>
-                <SelectTrigger id="category">
+                <SelectTrigger id="category" 
+                // className="!bg-fractal-decorative-purple-90 !text-black !border-2 !border-fractal-border-default"
+                className="!bg-white">
                   <SelectValue placeholder="Select category" />
                 </SelectTrigger>
                 <SelectContent>
@@ -166,10 +170,12 @@ export default function EventForm({ initialData, mode }: EventFormProps) {
               </Select>
             </div>
 
-            <div className="grid gap-2">
+            <div className="grid gap-2 pt-3">
               <Label htmlFor="status">Status <span className="text-fractal-brand-primary">*</span></Label>
               <Select onValueChange={setStatus} defaultValue={status}>
-                <SelectTrigger id="status">
+                <SelectTrigger id="status"
+                // className="!bg-fractal-decorative-purple-90 !text-black !border-2 !border-fractal-border-default"
+                className="!bg-white">
                   <SelectValue placeholder="Select status" />
                 </SelectTrigger>
                 <SelectContent>
@@ -187,7 +193,7 @@ export default function EventForm({ initialData, mode }: EventFormProps) {
           <Paper elevation="elevated" className="flex flex-col gap-4">
             <Typography variant="body-1-median">Event Schedule</Typography>
 
-            <div className="grid gap-2">
+            <div className="grid gap-2 pt-4">
               <Label htmlFor="start_date">Start Date & Time <span className="text-fractal-brand-primary">*</span></Label>
               <Input
                 id="start_date"
@@ -199,7 +205,7 @@ export default function EventForm({ initialData, mode }: EventFormProps) {
               />
             </div>
 
-            <div className="grid gap-2">
+            <div className="grid gap-2 pt-3">
               <Label htmlFor="end_date">End Date & Time</Label>
               <Input
                 id="end_date"
@@ -210,7 +216,7 @@ export default function EventForm({ initialData, mode }: EventFormProps) {
               />
             </div>
 
-            <div className="grid gap-2">
+            <div className="grid gap-2 pt-3">
               <Label htmlFor="registration_open">Registration Opens <span className="text-fractal-brand-primary">*</span></Label>
               <Input
                 id="registration_open"
@@ -222,7 +228,7 @@ export default function EventForm({ initialData, mode }: EventFormProps) {
               />
             </div>
 
-            <div className="grid gap-2">
+            <div className="grid gap-2 pt-3">
               <Label htmlFor="registration_close">Registration Closes <span className="text-fractal-brand-primary">*</span></Label>
               <Input
                 id="registration_close"
@@ -246,12 +252,19 @@ export default function EventForm({ initialData, mode }: EventFormProps) {
           <div className="flex gap-3 justify-end">
             <Button
               type="button"
+              size="sm"
+              variant="outline"
               onClick={() => router.push("/admin/events")}
-              disabled={isLoading}
+              className="!border-2 !border-fractal-border-default !bg-fractal-bg-body-white hover:!bg-fractal-base-black"
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={isLoading}>
+
+            <Button
+              type="submit"
+              size="sm"
+              className="!bg-fractal-decorative-purple-90 !text-fractal-text-on-color hover:!bg-fractal-decorative-purple-70 !border-2 !border-fractal-border-default"
+            >
               {isLoading
                 ? mode === "create" ? "Creating..." : "Saving..."
                 : mode === "create" ? "Create Event" : "Save Changes"
