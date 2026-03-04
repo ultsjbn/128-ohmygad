@@ -3,7 +3,7 @@ import EventForm from "@/components/admin/event-form";
 
 export default function CreateEventPage() {
   return (
-    <div className="max-w-[1400px] w-full flex flex-col gap-6">
+    <div className="mx-auto h-full flex flex-col gap-6">
       <EventForm mode="create" />
     </div>
   );

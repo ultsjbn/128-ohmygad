@@ -60,7 +60,7 @@ export default function EditEventPage() {
   }
 
   return (
-    <div className="max-w-[1400px] w-full flex flex-col gap-6">
+    <div className="mx-auto h-full flex flex-col gap-6">
       <EventForm mode="edit" initialData={event} />
     </div>
   );
