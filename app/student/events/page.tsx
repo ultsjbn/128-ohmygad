@@ -11,16 +11,21 @@ export default function EventsPage() {
     const [events, setEvents] = useState<EventFormData[]>([]);
     const [search, setSearch] = useState("");
     const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         async function fetchEvents() {
             const supabase = createClient();
             const { data, error } = await supabase
                 .from("event")
-                .select("id, title, description, category, status, start_date, end_date, capacity, location")
+                .select("id, title, description, category, status, start_date, end_date, capacity, location, registration_open, registration_close")
                 .order("start_date", { ascending: false });
 
-            if (!error && data) {
+            if (error) {
+                console.error("[student/events] Supabase error:", error);
+                setError(error.message);
+            } else if (data) {
+                console.log("[student/events] Fetched", data.length, "events");
                 setEvents(data);
             }
             setIsLoading(false);
@@ -51,7 +56,13 @@ export default function EventsPage() {
 
                 {isLoading && <Typography variant="body-2">Loading events...</Typography>}
 
-                {!isLoading && filtered.length === 0 && (
+                {error && (
+                    <Typography variant="body-2" className="text-red-600">
+                        Error loading events: {error}
+                    </Typography>
+                )}
+
+                {!isLoading && !error && filtered.length === 0 && (
                     <Typography variant="body-2" className="text-fractal-text-placeholder">
                         {search ? "No events match your search." : "No events available."}
                     </Typography>
