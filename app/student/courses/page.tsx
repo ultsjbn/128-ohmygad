@@ -46,70 +46,8 @@ export default function CoursesPage() {
     }
   }
 
-  async function addCourse() {
-    try {
-      console.log("[addCourse] Sending:", newCourse);
-      const res = await fetch("/api/courses", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newCourse),
-      });
-      const json = await res.json();
-      console.log("[addCourse] Response:", json);
-      
-      if (json.success && json.course) {
-        console.log("[addCourse] Course inserted:", json.course);
-        setCourses((s) => [json.course, ...s]);
-        setNewCourse({ title: "", description: "", start_time: "", end_time: "", instructor_id: "", status: "active", semester: "" });
-        setShowAdd(false);
-      } else {
-        console.warn("[addCourse] API error:", json.error);
-      }
-    } catch (err) {
-      console.error("[addCourse] Failed:", err);
-    }
-  }
 
-  async function updateCourse(id: string) {
-    try {
-      console.log("[updateCourse] Updating course", id, "with:", editFields);
-      const res = await fetch(`/api/courses/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(editFields),
-      });
-      const json = await res.json();
-      console.log("[updateCourse] Response:", json);
 
-      if (json.success && json.course) {
-        setCourses((s) => s.map((c) => (c.id === id ? json.course : c)));
-        setEditingId(null);
-        setEditFields({});
-      } else {
-        console.warn("[updateCourse] API error:", json.error);
-      }
-    } catch (err) {
-      console.error("[updateCourse] Failed:", err);
-    }
-  }
-
-  async function deleteCourse(id: string) {
-    if (!confirm("Delete this course?")) return;
-    try {
-      console.log("[deleteCourse] Deleting course", id);
-      const res = await fetch(`/api/courses/${id}`, { method: "DELETE" });
-      const json = await res.json();
-      console.log("[deleteCourse] Response:", json);
-
-      if (json.success) {
-        setCourses((s) => s.filter((c) => c.id !== id));
-      } else {
-        console.warn("[deleteCourse] API error:", json.error);
-      }
-    } catch (err) {
-      console.error("[deleteCourse] Failed:", err);
-    }
-  }
 
   const filtered = courses.filter((c) =>
     `${c.title} ${c.start_time || ""} ${c.end_time || ""}`
@@ -131,30 +69,9 @@ export default function CoursesPage() {
               className="flex-1 bg-transparent outline-none text-sm font-sans"
             />
           </div>
-          <div className="ml-auto">
-            <Button variant={"default" as any} size={"sm" as any} onClick={() => setShowAdd((s) => !s)}>
-              <Plus className="size-4" />
-              {showAdd ? "Close" : "Add Course"}
-            </Button>
-          </div>
         </div>
 
-        {showAdd && (
-          <div className="flex flex-wrap items-end gap-2 pb-2">
-            <InputText value={newCourse.title} onChange={(e: any) => setNewCourse({ ...newCourse, title: e.target.value })} placeholder="Title" />
-            <InputText value={newCourse.description || ""} onChange={(e: any) => setNewCourse({ ...newCourse, description: e.target.value })} placeholder="Description" />
-            <InputText type="time" value={newCourse.start_time || ""} onChange={(e: any) => setNewCourse({ ...newCourse, start_time: e.target.value })} placeholder="Start time" />
-            <InputText type="time" value={newCourse.end_time || ""} onChange={(e: any) => setNewCourse({ ...newCourse, end_time: e.target.value })} placeholder="End time" />
-            <InputText value={newCourse.semester || ""} onChange={(e: any) => setNewCourse({ ...newCourse, semester: e.target.value })} placeholder="Semester" />
-            <Button variant={"default" as any} size={"sm" as any} onClick={addCourse}>
-              <Plus className="size-4" />
-              Create
-            </Button>
-          </div>
-        )}
-
         {loading && <Typography variant="body-2">Loading courses...</Typography>}
-
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {filtered.map((course) => {
             const isEditing = editingId === course.id;
@@ -291,7 +208,6 @@ export default function CoursesPage() {
           })}
         </div>
       </Paper>
-
     </div>
   );
 }

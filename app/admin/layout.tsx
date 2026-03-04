@@ -29,7 +29,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <AdminSidebar />
 
         {/* MAIN PAGE CONTENT */}
-        <main className="flex-1 p-4 overflow-y-auto min-w-0">
+        <main className="flex-1 p-4 overflow-y-auto min-w-0 place-content-center">
           {children}
         </main>
       </div>
