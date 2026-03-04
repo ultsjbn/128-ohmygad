@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Paper } from "@snowball-tech/fractal";
-import { Plus, Pencil, Trash2, Search } from "lucide-react";
+import { InputText } from "@snowball-tech/fractal";
+import { Plus, Pencil, Trash2, Search, ArrowUpDown, SlidersHorizontal } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import type { EventFormData } from "@/components/admin/event-form";
 import { Button } from "@/components/button";
@@ -68,26 +69,22 @@ export default function EventsPage() {
   };
 
   return (
-    <div className="max-w-[1400px] w-full flex flex-col gap-6">
+    <div className="mx-auto h-full flex flex-col gap-6">
 
-<div className="flex items-center gap-3">
-  <div className="relative flex-1">
-    <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-fractal-text-placeholder" />
-    <Input
-      placeholder="Search by title, category, or location..."
-      className="pl-9"
-      value={search}
-      onChange={(e) => setSearch(e.target.value)}
-    />
-  </div>
-  <Button
-    onClick={() => router.push("/admin/events/create")}
-    className="flex items-center gap-2 shrink-0 border-2 border-fractal-border-default rounded-s shadow-brutal-1 bg-fractal-brand-primary"
-  >
-    <Plus size={16} />
-    Create Event
-  </Button>
-</div>
+      <div className="flex flex-col gap-1">
+        <Typography variant="heading-2">Events Management</Typography>
+      </div>
+
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <InputText placeholder="Search by title, category, or location..." fullWidth prefix={<Search size={18} />} />
+
+        <div className="flex items-center gap-2 shrink-0">
+          <Button label="Sort" variant="display" icon={<ArrowUpDown size={18} />} iconPosition="left" onClick={() => { }} />
+          <Button label="Filter" variant="display" icon={<SlidersHorizontal size={18} />} iconPosition="left" onClick={() => { }} />
+          <Button label="Add User" variant="primary-dark" icon={<Plus size={18} />} iconPosition="left" onClick={() => router.push("/admin/events/create")} />
+        </div>
+
+      </div>
 
       {/* Table */}
       <Paper elevation="elevated" className="overflow-hidden p-0">
