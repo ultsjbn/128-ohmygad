@@ -19,6 +19,11 @@ interface SortState {
   direction: SortDirection;
 }
 
+interface FilterState {
+  status: string[];
+  category: string[];
+}
+
 export default function EventsPage() {
   const router = useRouter();
   const [events, setEvents] = useState<EventFormData[]>([]);
@@ -29,6 +34,26 @@ export default function EventsPage() {
   const [modalContent, setModalContent] = useState<{ label: string; text: string } | null>(null);
   const [sort, setSort] = useState<SortState>({ field: "start_date", direction: "desc" });
   const [showSortMenu, setShowSortMenu] = useState(false);
+  const [showFilterMenu, setShowFilterMenu] = useState(false);
+  const [filters, setFilters] = useState<FilterState>({
+    status: [],
+    category: [],
+  });
+
+  
+  // next fix: case sensitivity of database inputs, pero ganto muna
+  const statuses = Array.from(
+    new Set(
+      events
+        .map((e) => e.status?.toLowerCase().trim())
+        .filter(Boolean)
+    )
+  );
+  const categories = Array.from(new Set(events.map((e) => e.category).filter(Boolean)));
+
+  const hasActiveFilters =
+    filters.status.length > 0 ||
+    filters.category.length > 0;
 
   const getEvents = async () => {
     const supabase = createClient();
@@ -48,20 +73,33 @@ export default function EventsPage() {
     getEvents();
   }, []);
 
-  // Search filter
+  // Search, filters, and sorting
   useEffect(() => {
     const q = search.toLowerCase();
-    let filtered = events.filter(
+    let result = events;
+
+    // Text search
+    result = result.filter(
       (e) =>
         e.title.toLowerCase().includes(q) ||
         e.category?.toLowerCase().includes(q) ||
         e.location?.toLowerCase().includes(q)
     );
 
-    // Apply sorting
-    filtered = sortEvents(filtered, sort);
-    setFiltered(filtered);
-  }, [search, events, sort]);
+    // Status filter
+    if (filters.status.length > 0) {
+      result = result.filter((e) => filters.status.includes(e.status));
+    }
+
+    // Category filter
+    if (filters.category.length > 0) {
+      result = result.filter((e) => filters.category.includes(e.category));
+    }
+
+    // Sorting
+    result = sortEvents(result, sort);
+    setFiltered(result);
+  }, [search, events, sort, filters]);
 
   const sortEvents = (eventsToSort: EventFormData[], sortState: SortState): EventFormData[] => {
     const { field, direction } = sortState;
@@ -71,12 +109,10 @@ export default function EventsPage() {
       let aVal: any = a[field as keyof EventFormData];
       let bVal: any = b[field as keyof EventFormData];
 
-      // Handle null/undefined values
       if (aVal == null && bVal == null) return 0;
       if (aVal == null) return direction === "asc" ? 1 : -1;
       if (bVal == null) return direction === "asc" ? -1 : 1;
 
-      // Handle dates
       if (field === "start_date") {
         aVal = new Date(aVal).getTime();
         bVal = new Date(bVal).getTime();
@@ -102,6 +138,23 @@ export default function EventsPage() {
       direction: prev.field === field && prev.direction === "asc" ? "desc" : "asc",
     }));
     setShowSortMenu(false);
+  };
+
+  const toggleFilter = (type: "status" | "category", value: string) => {
+    setFilters((prev) => ({
+      ...prev,
+      [type]: prev[type].includes(value)
+        ? prev[type].filter((v) => v !== value)
+        : [...prev[type], value],
+    }));
+  };
+
+  const clearFilters = () => {
+    setFilters({
+      status: [],
+      category: [],
+    });
+    setSearch("");
   };
 
   const handleDelete = async (id: string, title: string) => {
@@ -136,6 +189,7 @@ export default function EventsPage() {
     { label: "Location", field: "location" },
   ];
 
+
   return (
     <div className="mx-auto h-full flex flex-col gap-6">
 
@@ -144,7 +198,13 @@ export default function EventsPage() {
       </div>
 
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-        <InputText placeholder="Search by title, category, or location..." fullWidth prefix={<Search size={18} />} onChange={(e) => setSearch(e.target.value)} />
+        <InputText 
+          placeholder="Search by title, category, or location..." 
+          fullWidth 
+          prefix={<Search size={18} />} 
+          onChange={(e) => setSearch(e.target.value)} 
+          value={search}
+        />
 
         <div className="flex items-center gap-2 shrink-0 relative">
           {/* Sort Button with Dropdown Menu */}
@@ -180,13 +240,84 @@ export default function EventsPage() {
             )}
           </div>
 
-          <Button label="Filter" variant="display" icon={<SlidersHorizontal size={18} />} iconPosition="left" onClick={() => { }} />
-          <Button label="Add Event" variant="primary-dark" icon={<Plus size={18} />} iconPosition="left" onClick={() => router.push("/admin/events/create")} />
+          {/* Filter */}
+          <div className="relative">
+            <Button 
+              label="Filter"
+              variant={hasActiveFilters ? "primary-dark" : "display"}
+              icon={<SlidersHorizontal size={18} />} 
+              iconPosition="left" 
+              onClick={() => setShowFilterMenu(!showFilterMenu)}
+              className="whitespace-nowrap"
+            />
+            
+            {showFilterMenu && (
+              <div className="absolute top-full right-0 mt-2 bg-white border-2 border-fractal-border-default rounded-s shadow-brutal-1 z-40 min-w-[240px] max-h-96 overflow-y-auto">
+
+                {/* Status Filter */}
+                {statuses.length > 0 && (
+                  <div className="border-b border-fractal-border-default p-3">
+                    <Typography variant="body-2-median" className="mb-2 block">
+                      Status
+                    </Typography>
+                    {statuses.map((status) => (
+                      <label
+                        key={status}
+                        className="flex items-center gap-2 px-2 py-1.5 cursor-pointer hover:bg-fractal-base-grey-90 rounded transition-colors"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={filters.status.includes(status)}
+                          onChange={() => toggleFilter("status", status)}
+                          className="w-4 h-4"
+                        />
+                        <Typography variant="body-2" className="capitalize">
+                          {status}
+                        </Typography>
+                      </label>
+                    ))}
+                  </div>
+                )}
+
+                {/* Category */}
+                {categories.length > 0 && (
+                  <div className="border-b border-fractal-border-default p-3">
+                    <Typography variant="body-2-median" className="mb-2 block">
+                      Category
+                    </Typography>
+                    {categories.map((category) => (
+                      <label
+                        key={category}
+                        className="flex items-center gap-2 px-2 py-1.5 cursor-pointer hover:bg-fractal-base-grey-90 rounded transition-colors"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={filters.category.includes(category)}
+                          onChange={() => toggleFilter("category", category)}
+                          className="w-4 h-4"
+                        />
+                        <Typography variant="body-2">{category}</Typography>
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          <Button 
+            label="Add Event" 
+            variant="primary-dark" 
+            icon={<Plus size={18} />} 
+            iconPosition="left" 
+            onClick={() => router.push("/admin/events/create")} 
+          />
         </div>
 
       </div>
 
-      {/* Table */}
+
+
       <Paper elevation="elevated" className="overflow-hidden p-0">
         {isLoading ? (
           <div className="p-8 text-center">
@@ -203,7 +334,9 @@ export default function EventsPage() {
               variant="body-1"
               className="text-fractal-text-placeholder"
             >
-              {search
+              {hasActiveFilters
+                ? "No events match your filters."
+                : search
                 ? "No events match your search."
                 : "No events yet. Create one to get started."}
             </Typography>
