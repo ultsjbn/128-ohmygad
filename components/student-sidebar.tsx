@@ -8,7 +8,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 
 const navItems = [
-  { href: "/student", label: "Dashboard", icon: LayoutDashboard, exact: true },
+  { href: "/student/dashboard", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { href: "/student/courses", label: "Courses", icon: BookOpen, exact: false },
   { href: "/student/surveys", label: "Surveys", icon: ClipboardList, exact: false },
 ];

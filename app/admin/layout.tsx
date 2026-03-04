@@ -1,6 +1,19 @@
+import { Suspense } from 'react';
+import { redirect } from 'next/navigation';
 import { Header, Avatar, InputText } from "@snowball-tech/fractal";
 import { ChevronDown } from "lucide-react";
 import AdminSidebar from "@/components/admin-sidebar";
+import { getCurrentUserWithRole } from "@/lib/auth/get-current-user";
+
+async function AdminAuthGuard({ children }: { children: React.ReactNode }) {
+  const result = await getCurrentUserWithRole();
+
+  if (result.error === 'unauthenticated') redirect('/auth?redirectTo=/admin');
+  if (result.error === 'no_profile' || result.error === 'invalid_role') redirect('/auth/setup');
+  if (result.user.role !== 'admin') redirect('/');
+
+  return <>{children}</>;
+}
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -14,7 +27,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <div className="flex items-center gap-2">
               <InputText placeholder="Search" />
             </div>
-          } 
+          }
           right={
             <div className="flex items-center gap-2 cursor-pointer">
               <Avatar size="s" />
@@ -30,7 +43,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
         {/* MAIN PAGE CONTENT */}
         <main className="flex-1 p-4 overflow-y-auto min-w-0 place-content-center">
-          {children}
+          <Suspense fallback={<div>Loading...</div>}>
+            <AdminAuthGuard>
+              {children}
+            </AdminAuthGuard>
+          </Suspense>
         </main>
       </div>
 
