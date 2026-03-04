@@ -10,6 +10,8 @@ import { Input } from "@/components/ui/input";
 import type { EventFormData } from "@/components/admin/event-form";
 import { Button } from "@/components/button";
 import { Typography } from "@/components/typography";
+import { Pagination } from "@/components/pagination";
+import { paginate, totalPages, PER_PAGE } from "./event.utils";
 
 type SortField = "title" | "category" | "status" | "start_date" | "capacity" | "location";
 type SortDirection = "asc" | "desc";
@@ -29,6 +31,7 @@ export default function EventsPage() {
   const [modalContent, setModalContent] = useState<{ label: string; text: string } | null>(null);
   const [sort, setSort] = useState<SortState>({ field: "start_date", direction: "desc" });
   const [showSortMenu, setShowSortMenu] = useState(false);
+  const [page, setPage] = useState(1);
 
   const getEvents = async () => {
     const supabase = createClient();
@@ -61,6 +64,7 @@ export default function EventsPage() {
     // Apply sorting
     filtered = sortEvents(filtered, sort);
     setFiltered(filtered);
+    setPage(1);
   }, [search, events, sort]);
 
   const sortEvents = (eventsToSort: EventFormData[], sortState: SortState): EventFormData[] => {
@@ -149,24 +153,23 @@ export default function EventsPage() {
         <div className="flex items-center gap-2 shrink-0 relative">
           {/* Sort Button with Dropdown Menu */}
           <div className="relative">
-            <Button 
+            <Button
               label={`Sort${sort.field !== "start_date" ? ": " + sortOptions.find(o => o.field === sort.field)?.label : ""}`}
-              variant="display" 
-              icon={<ArrowUpDown size={18} />} 
-              iconPosition="left" 
+              variant="display"
+              icon={<ArrowUpDown size={18} />}
+              iconPosition="left"
               onClick={() => setShowSortMenu(!showSortMenu)}
               className="whitespace-nowrap"
             />
-            
+
             {showSortMenu && (
               <div className="absolute top-full right-0 mt-2 bg-white border-2 border-fractal-border-default rounded-s shadow-brutal-1 z-40 min-w-[180px]">
                 {sortOptions.map((option) => (
                   <button
                     key={option.field}
                     onClick={() => handleSort(option.field)}
-                    className={`w-full text-left px-4 py-2 text-sm font-median hover:bg-fractal-base-grey-90 transition-colors flex items-center justify-between ${
-                      sort.field === option.field ? "bg-fractal-base-grey-90" : ""
-                    }`}
+                    className={`w-full text-left px-4 py-2 text-sm font-median hover:bg-fractal-base-grey-90 transition-colors flex items-center justify-between ${sort.field === option.field ? "bg-fractal-base-grey-90" : ""
+                      }`}
                   >
                     <span>{option.label}</span>
                     {sort.field === option.field && (
@@ -209,149 +212,158 @@ export default function EventsPage() {
             </Typography>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="border-b-2 border-fractal-border-default bg-fractal-base-grey-90 sticky top-0">
-                <tr>
-                  <th 
-                    className="text-left p-3 font-median cursor-pointer hover:bg-fractal-base-grey-80 transition-colors"
-                    onClick={() => handleSort("title")}
-                    title="Click to sort"
+          <table className="w-full text-sm">
+            <thead className="border-b-2 border-fractal-border-default bg-fractal-base-grey-90 sticky top-0">
+              <tr>
+                <th
+                  className="text-left p-3 font-median cursor-pointer hover:bg-fractal-base-grey-80 transition-colors"
+                  onClick={() => handleSort("title")}
+                  title="Click to sort"
+                >
+                  <div className="flex items-center gap-1">
+                    Title
+                    {getSortIndicator("title")}
+                  </div>
+                </th>
+                <th
+                  className="text-left p-3 font-median cursor-pointer hover:bg-fractal-base-grey-80 transition-colors"
+                  onClick={() => handleSort("category")}
+                  title="Click to sort"
+                >
+                  <div className="flex items-center gap-1">
+                    Category
+                    {getSortIndicator("category")}
+                  </div>
+                </th>
+                <th
+                  className="text-left p-3 font-median cursor-pointer hover:bg-fractal-base-grey-80 transition-colors"
+                  onClick={() => handleSort("status")}
+                  title="Click to sort"
+                >
+                  <div className="flex items-center gap-1">
+                    Status
+                    {getSortIndicator("status")}
+                  </div>
+                </th>
+                <th
+                  className="text-left p-3 font-median cursor-pointer hover:bg-fractal-base-grey-80 transition-colors"
+                  onClick={() => handleSort("start_date")}
+                  title="Click to sort"
+                >
+                  <div className="flex items-center gap-1">
+                    Date
+                    {getSortIndicator("start_date")}
+                  </div>
+                </th>
+                <th
+                  className="text-left p-3 font-median cursor-pointer hover:bg-fractal-base-grey-80 transition-colors"
+                  onClick={() => handleSort("capacity")}
+                  title="Click to sort"
+                >
+                  <div className="flex items-center gap-1">
+                    Capacity
+                    {getSortIndicator("capacity")}
+                  </div>
+                </th>
+                <th
+                  className="text-left p-3 font-median cursor-pointer hover:bg-fractal-base-grey-80 transition-colors"
+                  onClick={() => handleSort("location")}
+                  title="Click to sort"
+                >
+                  <div className="flex items-center gap-1">
+                    Location
+                    {getSortIndicator("location")}
+                  </div>
+                </th>
+                <th className="text-right p-3 font-median">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {paginate(filtered, page, PER_PAGE).map((event, i) => (
+                <tr
+                  key={event.id}
+                  className={`border-b border-fractal-border-default hover:bg-fractal-base-grey-90 transition-colors ${i % 2 === 0
+                    ? "bg-fractal-bg-body-white"
+                    : "bg-fractal-bg-body-default"
+                    }`}
+                >
+                  <td
+                    className="p-3 font-median max-w-[200px] truncate cursor-pointer hover:underline"
+                    onClick={() => setModalContent({ label: "Title", text: event.title })}
+                    title="Click to view full title"
                   >
-                    <div className="flex items-center gap-1">
-                      Title
-                      {getSortIndicator("title")}
-                    </div>
-                  </th>
-                  <th 
-                    className="text-left p-3 font-median cursor-pointer hover:bg-fractal-base-grey-80 transition-colors"
-                    onClick={() => handleSort("category")}
-                    title="Click to sort"
+                    {event.title}
+                  </td>
+                  <td className="p-3">
+                    <span
+                      className={`px-2 py-0.5 rounded-s text-xs font-median border-2 border-fractal-border-default bg-fractal-base-grey-90`}
+                    >
+                      {event.category}
+                    </span>
+                  </td>
+                  <td className="p-3">
+                    <span
+                      className={`px-2 py-0.5 rounded-s text-xs font-median capitalize border border-fractal-border-default`}
+                    >
+                      {event.status}
+                    </span>
+                  </td>
+                  <td className="p-3 text-fractal-text-placeholder whitespace-nowrap">
+                    {event.start_date
+                      ? new Date(event.start_date).toLocaleDateString("en-PH", {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                      })
+                      : "—"}
+                  </td>
+                  <td className="p-3">{event.capacity}</td>
+                  <td
+                    className="p-3 text-fractal-text-placeholder max-w-[150px] truncate cursor-pointer hover:underline"
+                    onClick={() => setModalContent({ label: "Location", text: event.location || "—" })}
+                    title="Click to view full location"
                   >
-                    <div className="flex items-center gap-1">
-                      Category
-                      {getSortIndicator("category")}
+                    {event.location}
+                  </td>
+                  <td className="p-3">
+                    <div className="flex gap-2 justify-end">
+                      <button
+                        onClick={() =>
+                          router.push(`/admin/events/${event.id}/edit`)
+                        }
+                        className="p-2 hover:bg-fractal-decorative-yellow-90 border-2 border-fractal-border-default rounded-s shadow-brutal-1 transition-colors"
+                        title="Edit event"
+                      >
+                        <Pencil size={14} />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(event.id!, event.title)}
+                        disabled={deletingId === event.id}
+                        className="p-2 hover:bg-fractal-decorative-yellow-90 border-2 border-fractal-border-default rounded-s shadow-brutal-1 transition-colors disabled:opacity-50"
+                        title="Delete event"
+                      >
+                        <Trash2 size={14} />
+                      </button>
                     </div>
-                  </th>
-                  <th 
-                    className="text-left p-3 font-median cursor-pointer hover:bg-fractal-base-grey-80 transition-colors"
-                    onClick={() => handleSort("status")}
-                    title="Click to sort"
-                  >
-                    <div className="flex items-center gap-1">
-                      Status
-                      {getSortIndicator("status")}
-                    </div>
-                  </th>
-                  <th 
-                    className="text-left p-3 font-median cursor-pointer hover:bg-fractal-base-grey-80 transition-colors"
-                    onClick={() => handleSort("start_date")}
-                    title="Click to sort"
-                  >
-                    <div className="flex items-center gap-1">
-                      Date
-                      {getSortIndicator("start_date")}
-                    </div>
-                  </th>
-                  <th 
-                    className="text-left p-3 font-median cursor-pointer hover:bg-fractal-base-grey-80 transition-colors"
-                    onClick={() => handleSort("capacity")}
-                    title="Click to sort"
-                  >
-                    <div className="flex items-center gap-1">
-                      Capacity
-                      {getSortIndicator("capacity")}
-                    </div>
-                  </th>
-                  <th 
-                    className="text-left p-3 font-median cursor-pointer hover:bg-fractal-base-grey-80 transition-colors"
-                    onClick={() => handleSort("location")}
-                    title="Click to sort"
-                  >
-                    <div className="flex items-center gap-1">
-                      Location
-                      {getSortIndicator("location")}
-                    </div>
-                  </th>
-                  <th className="text-right p-3 font-median">Actions</th>
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {filtered.map((event, i) => (
-                  <tr
-                    key={event.id}
-                    className={`border-b border-fractal-border-default hover:bg-fractal-base-grey-90 transition-colors ${i % 2 === 0
-                      ? "bg-fractal-bg-body-white"
-                      : "bg-fractal-bg-body-default"
-                      }`}
-                  >
-                    <td
-                      className="p-3 font-median max-w-[200px] truncate cursor-pointer hover:underline"
-                      onClick={() => setModalContent({ label: "Title", text: event.title })}
-                      title="Click to view full title"
-                    >
-                      {event.title}
-                    </td>
-                    <td className="p-3">
-                      <span
-                        className={`px-2 py-0.5 rounded-s text-xs font-median border-2 border-fractal-border-default bg-fractal-base-grey-90`}
-                      >
-                        {event.category}
-                      </span>
-                    </td>
-                    <td className="p-3">
-                      <span
-                        className={`px-2 py-0.5 rounded-s text-xs font-median capitalize border border-fractal-border-default`}
-                      >
-                        {event.status}
-                      </span>
-                    </td>
-                    <td className="p-3 text-fractal-text-placeholder whitespace-nowrap">
-                      {event.start_date
-                        ? new Date(event.start_date).toLocaleDateString("en-PH", {
-                          month: "short",
-                          day: "numeric",
-                          year: "numeric",
-                        })
-                        : "—"}
-                    </td>
-                    <td className="p-3">{event.capacity}</td>
-                    <td
-                      className="p-3 text-fractal-text-placeholder max-w-[150px] truncate cursor-pointer hover:underline"
-                      onClick={() => setModalContent({ label: "Location", text: event.location || "—" })}
-                      title="Click to view full location"
-                    >
-                      {event.location}
-                    </td>
-                    <td className="p-3">
-                      <div className="flex gap-2 justify-end">
-                        <button
-                          onClick={() =>
-                            router.push(`/admin/events/${event.id}/edit`)
-                          }
-                          className="p-2 hover:bg-fractal-decorative-yellow-90 border-2 border-fractal-border-default rounded-s shadow-brutal-1 transition-colors"
-                          title="Edit event"
-                        >
-                          <Pencil size={14} />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(event.id!, event.title)}
-                          disabled={deletingId === event.id}
-                          className="p-2 hover:bg-fractal-decorative-yellow-90 border-2 border-fractal-border-default rounded-s shadow-brutal-1 transition-colors disabled:opacity-50"
-                          title="Delete event"
-                        >
-                          <Trash2 size={14} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+              ))}
+            </tbody>
+          </table>
         )}
       </Paper>
 
+      {/* Pagination */}
+      {!isLoading && filtered.length > 0 && (
+        <div className="flex items-center justify-between px-1 text-sm text-fractal-base-grey-30">
+          <span>
+            Showing {Math.min((page - 1) * PER_PAGE + 1, filtered.length)}–{Math.min(page * PER_PAGE, filtered.length)} of {filtered.length} events
+          </span>
+          <Pagination page={page} total={totalPages(filtered.length, PER_PAGE)} onChange={setPage} />
+        </div>
+      )}
+
+      {/* Detail Modal */}
       {modalContent && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 transition-opacity"
