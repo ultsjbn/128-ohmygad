@@ -178,29 +178,7 @@ export default function CoursesPage() {
                       </Button>
                     </>
                   ) : (
-                    <>
-                      <Button
-                        variant={"secondary" as any}
-                        size={"sm" as any}
-                        onClick={() => {
-                          setEditingId(course.id);
-                          setEditFields(course);
-                        }}
-                        className="flex items-center gap-1"
-                      >
-                        <Edit2 className="size-3" />
-                        Edit
-                      </Button>
-                      <Button
-                        variant={"ghost" as any}
-                        size={"sm" as any}
-                        onClick={() => deleteCourse(course.id)}
-                        className="flex items-center gap-1"
-                      >
-                        <Trash2 className="size-3" />
-                        Delete
-                      </Button>
-                    </>
+                    <>                    </>
                   )}
                 </div>
               </div>
