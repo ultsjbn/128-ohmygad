@@ -119,7 +119,7 @@ export default function EventForm({ initialData, mode }: EventFormProps) {
 
             <div className="grid gap-2 pt-3">
               <Label htmlFor="description">Description</Label>
-              <Textarea 
+              <Textarea
                 id="description"
                 placeholder="Describe the event..."
                 rows={4}
@@ -201,6 +201,7 @@ export default function EventForm({ initialData, mode }: EventFormProps) {
                 required
                 value={start_date}
                 onChange={(e) => setStartDate(e.target.value)}
+                className="bg-white text-black [color-scheme:light]"
               />
             </div>
 
@@ -211,6 +212,7 @@ export default function EventForm({ initialData, mode }: EventFormProps) {
                 type="datetime-local"
                 value={end_date}
                 onChange={(e) => setEndDate(e.target.value)}
+                className="bg-white text-black [color-scheme:light]"
               />
             </div>
 
@@ -222,6 +224,7 @@ export default function EventForm({ initialData, mode }: EventFormProps) {
                 required
                 value={registration_open}
                 onChange={(e) => setRegistrationOpen(e.target.value)}
+                className="bg-white text-black [color-scheme:light]"
               />
             </div>
 
@@ -233,6 +236,7 @@ export default function EventForm({ initialData, mode }: EventFormProps) {
                 required
                 value={registration_close}
                 onChange={(e) => setRegistrationClose(e.target.value)}
+                className="bg-white text-black [color-scheme:light]"
               />
             </div>
           </Paper>
