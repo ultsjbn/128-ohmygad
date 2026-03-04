@@ -62,6 +62,7 @@ export default function CourseForm({ initialData, mode }: CourseFormProps) {
       updated_at: new Date().toISOString(),
     };
 
+    
     console.log("Payload being sent:", payload);
 
       try {

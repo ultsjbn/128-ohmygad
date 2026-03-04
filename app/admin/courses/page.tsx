@@ -1,8 +1,14 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Typography, Paper, Button, InputText } from "@snowball-tech/fractal";
-import { Search, Users, Plus, Edit2, Trash2, Save, X } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
+import { Input } from "@/components/ui/input";
+import type { CourseFormData } from "@/components/admin/course-form";
+import { Paper, InputText } from "@snowball-tech/fractal";
+import { Button } from "@/components/button";
+import { Typography } from "@/components/typography";
+import { Search, Users, Plus, Edit2, Trash2, Save, X, Pencil} from "lucide-react";
 
 type Course = {
   id: string;
@@ -46,29 +52,13 @@ export default function CoursesPage() {
     }
   }
 
-  async function addCourse() {
-    try {
-      console.log("[addCourse] Sending:", newCourse);
-      const res = await fetch("/api/courses", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newCourse),
-      });
-      const json = await res.json();
-      console.log("[addCourse] Response:", json);
-
-      if (json.success && json.course) {
-        console.log("[addCourse] Course inserted:", json.course);
-        setCourses((s) => [json.course, ...s]);
-        setNewCourse({ title: "", description: "", start_time: "", end_time: "", instructor_id: "", status: "active", semester: "" });
-        setShowAdd(false);
-      } else {
-        console.warn("[addCourse] API error:", json.error);
-      }
-    } catch (err) {
-      console.error("[addCourse] Failed:", err);
-    }
-  }
+ <Button
+    onClick={() => router.push("/admin/courses/create")}
+    className="flex items-center gap-2 shrink-0 border-2 border-fractal-border-default rounded-s shadow-brutal-1 bg-fractal-brand-primary"
+  >
+    <Plus size={16} />
+    Add Course
+  </Button>
 
   async function updateCourse(id: string) {
     try {
@@ -110,6 +100,8 @@ export default function CoursesPage() {
       console.error("[deleteCourse] Failed:", err);
     }
   }
+
+
 
   const filtered = courses.filter((c) =>
     `${c.title} ${c.start_time || ""} ${c.end_time || ""}`
