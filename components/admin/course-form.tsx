@@ -34,7 +34,7 @@ type CourseFormProps = {
 const SEMESTERS = ["1st", "2nd", "Mid-Year"];
 const STATUSES = ["Open", "Closed"];
 
-export default function EventForm({ initialData, mode }: CourseFormProps) {
+export default function CourseForm({ initialData, mode }: CourseFormProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -44,7 +44,7 @@ export default function EventForm({ initialData, mode }: CourseFormProps) {
   const [start_time, setStartTime] = useState(initialData?.start_time?.slice(0, 16) ?? "");
   const [end_time, setEndTime] = useState(initialData?.end_time?.slice(0, 16) ?? "");
   const [semester, setSemester] = useState(initialData?.semester ?? "");
-  const [status, setStatus] = useState(initialData?.status ?? "draft");
+  const [status, setStatus] = useState(initialData?.status ?? "Open");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,8 +55,8 @@ export default function EventForm({ initialData, mode }: CourseFormProps) {
     const payload = {
       title,
       description,
-      start_time,
-      end_time,
+      start_time: start_time ? new Date(start_time).toISOString() : null,
+      end_time: end_time ? new Date(end_time).toISOString() : null,
       semester,
       status,
       updated_at: new Date().toISOString(),
@@ -86,7 +86,7 @@ export default function EventForm({ initialData, mode }: CourseFormProps) {
 
    return (
     <form onSubmit={handleSubmit}>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6"></div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
        {/* LEFT COLUMN */}
         <div className="flex flex-col gap-4">
@@ -118,7 +118,7 @@ export default function EventForm({ initialData, mode }: CourseFormProps) {
 
             <div className="grid gap-2">
                             <Label htmlFor="category">Semester <span className="text-fractal-brand-primary">*</span></Label>
-                            <Select onValueChange={setSemester} defaultValue={semester} required>
+                            <Select value={semester} onValueChange={setSemester} required>
                             <SelectTrigger id="semester">
                                 <SelectValue placeholder="Select semester" />
                             </SelectTrigger>
@@ -132,7 +132,7 @@ export default function EventForm({ initialData, mode }: CourseFormProps) {
 
             <div className="grid gap-2">
                             <Label htmlFor="status">Status <span className="text-fractal-brand-primary">*</span></Label>
-                            <Select onValueChange={setStatus} defaultValue={status}>
+                            <Select value={status} onValueChange={setStatus}>
                             <SelectTrigger id="status">
                                 <SelectValue placeholder="Select status" />
                             </SelectTrigger>
@@ -194,12 +194,12 @@ export default function EventForm({ initialData, mode }: CourseFormProps) {
             <Button type="submit" disabled={isLoading}>
                 {isLoading
                     ? mode === "create" ? "Creating..." : "Saving..."
-                    : mode === "create" ? "Create Event" : "Save Changes"
+                    : mode === "create" ? "Create Course" : "Save Changes"
                 }
                 </Button>
      </div>
         </div>
-
+</div>
      
     </form>
   );
