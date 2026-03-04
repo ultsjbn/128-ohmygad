@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import { Search, SlidersHorizontal, ArrowUpDown, UserPlus } from "lucide-react";
 import { Button } from "@/components/button";
 import { InputText } from "@snowball-tech/fractal";
@@ -19,6 +20,7 @@ interface UsersClientProps {
 }
 
 export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) => {
+  const router = useRouter();
   const [page, setPage] = useState(1);
   const [activeTab, setActiveTab] = useState<TabKey>("all");
   const [sort, setSort] = useState<SortState>({ field: "created_at", direction: "desc" });
@@ -57,9 +59,9 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <InputText placeholder="Search by name, email or role..." fullWidth prefix={<Search size={18} />} />
         <div className="flex items-center gap-2 shrink-0">
-          <Button label="Sort" variant="display" icon={<ArrowUpDown size={18} />} iconPosition="left" onClick={() => {}} />
-          <Button label="Filter" variant="display" icon={<SlidersHorizontal size={18} />} iconPosition="left" onClick={() => {}} />
-          <Button label="Add User" variant="primary-dark" icon={<UserPlus size={18} />} iconPosition="left" onClick={() => {}} />
+          <Button label="Sort" variant="display" icon={<ArrowUpDown size={18} />} iconPosition="left" onClick={() => { }} />
+          <Button label="Filter" variant="display" icon={<SlidersHorizontal size={18} />} iconPosition="left" onClick={() => { }} />
+          <Button label="Add User" variant="primary-dark" icon={<UserPlus size={18} />} iconPosition="left" onClick={() => router.push("/admin/users/create")} />
         </div>
       </div>
 
