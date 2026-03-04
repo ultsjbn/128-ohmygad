@@ -87,7 +87,6 @@ export default function UserForm({
             <form onSubmit={handleSubmit}>
                 <div className="flex flex-col gap-3">
 
-                    {/* ── Account Information ── */}
                     <Typography variant="body-1-median" className="text-fractal-text-default pt-2">
                         Account Information
                     </Typography>

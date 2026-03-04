@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Paper } from "@snowball-tech/fractal";
-import { Plus, Pencil, Trash2, Search } from "lucide-react";
+import { Plus, Pencil, Trash2, Search, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import type { EventFormData } from "@/components/admin/event-form";
 import { Button } from "@/components/button";
@@ -17,13 +17,14 @@ export default function EventsPage() {
   const [search, setSearch] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [modalContent, setModalContent] = useState<{ label: string; text: string } | null>(null);
 
   const getEvents = async () => {
     const supabase = createClient();
     const { data, error } = await supabase
-    .from("event")
-    .select("id, title, description, category, status, start_date, end_date, capacity, location, registration_open, registration_close")
-    .order("start_date", { ascending: false });
+      .from("event")
+      .select("id, title, description, category, status, start_date, end_date, capacity, location, registration_open, registration_close")
+      .order("start_date", { ascending: false });
 
     if (!error && data) {
       setEvents(data);
@@ -70,24 +71,24 @@ export default function EventsPage() {
   return (
     <div className="max-w-[1400px] w-full flex flex-col gap-6">
 
-<div className="flex items-center gap-3">
-  <div className="relative flex-1">
-    <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-fractal-text-placeholder" />
-    <Input
-      placeholder="Search by title, category, or location..."
-      className="pl-9"
-      value={search}
-      onChange={(e) => setSearch(e.target.value)}
-    />
-  </div>
-  <Button
-    onClick={() => router.push("/admin/events/create")}
-    className="flex items-center gap-2 shrink-0 border-2 border-fractal-border-default rounded-s shadow-brutal-1 bg-fractal-brand-primary"
-  >
-    <Plus size={16} />
-    Create Event
-  </Button>
-</div>
+      <div className="flex items-center gap-3">
+        <div className="relative flex-1">
+          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-fractal-text-placeholder" />
+          <Input
+            placeholder="Search by title, category, or location..."
+            className="pl-9"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
+        <Button
+          onClick={() => router.push("/admin/events/create")}
+          className="flex items-center gap-2 shrink-0 border-2 border-fractal-border-default rounded-s shadow-brutal-1 bg-fractal-brand-primary"
+        >
+          <Plus size={16} />
+          Create Event
+        </Button>
+      </div>
 
       {/* Table */}
       <Paper elevation="elevated" className="overflow-hidden p-0">
@@ -128,13 +129,16 @@ export default function EventsPage() {
               {filtered.map((event, i) => (
                 <tr
                   key={event.id}
-                  className={`border-b border-fractal-border-default hover:bg-fractal-base-grey-90 transition-colors ${
-                    i % 2 === 0
+                  className={`border-b border-fractal-border-default hover:bg-fractal-base-grey-90 transition-colors ${i % 2 === 0
                       ? "bg-fractal-bg-body-white"
                       : "bg-fractal-bg-body-default"
-                  }`}
+                    }`}
                 >
-                  <td className="p-3 font-median max-w-[200px] truncate">
+                  <td
+                    className="p-3 font-median max-w-[200px] truncate cursor-pointer hover:underline"
+                    onClick={() => setModalContent({ label: "Title", text: event.title })}
+                    title="Click to view full title"
+                  >
                     {event.title}
                   </td>
                   <td className="p-3">
@@ -154,14 +158,18 @@ export default function EventsPage() {
                   <td className="p-3 text-fractal-text-placeholder whitespace-nowrap">
                     {event.start_date
                       ? new Date(event.start_date).toLocaleDateString("en-PH", {
-                          month: "short",
-                          day: "numeric",
-                          year: "numeric",
-                        })
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                      })
                       : "—"}
                   </td>
                   <td className="p-3">{event.capacity}</td>
-                  <td className="p-3 text-fractal-text-placeholder max-w-[150px] truncate">
+                  <td
+                    className="p-3 text-fractal-text-placeholder max-w-[150px] truncate cursor-pointer hover:underline"
+                    onClick={() => setModalContent({ label: "Location", text: event.location || "—" })}
+                    title="Click to view full location"
+                  >
                     {event.location}
                   </td>
                   <td className="p-3">
@@ -191,6 +199,33 @@ export default function EventsPage() {
           </table>
         )}
       </Paper>
+
+      {/* Detail Modal */}
+      {modalContent && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 transition-opacity"
+          onClick={() => setModalContent(null)}
+        >
+          <div
+            className="relative bg-white rounded-lg border-2 border-fractal-border-default shadow-brutal-1 p-6 max-w-lg w-[90%] mx-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setModalContent(null)}
+              className="absolute top-3 right-3 p-1 hover:bg-fractal-decorative-yellow-90 border-2 border-fractal-border-default rounded-s shadow-brutal-1 transition-colors"
+              title="Close"
+            >
+              <X size={16} />
+            </button>
+            <Typography variant="body-1-median" className="mb-3">
+              {modalContent.label}
+            </Typography>
+            <Typography variant="body-1" className="break-words whitespace-pre-wrap">
+              {modalContent.text}
+            </Typography>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
