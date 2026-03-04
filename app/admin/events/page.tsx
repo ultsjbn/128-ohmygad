@@ -5,11 +5,19 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Paper } from "@snowball-tech/fractal";
 import { InputText } from "@snowball-tech/fractal";
-import { Plus, Pencil, Trash2, Search, ArrowUpDown, SlidersHorizontal, X } from "lucide-react";
+import { Plus, Pencil, Trash2, Search, ArrowUpDown, SlidersHorizontal, X, ChevronUp, ChevronDown } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import type { EventFormData } from "@/components/admin/event-form";
 import { Button } from "@/components/button";
 import { Typography } from "@/components/typography";
+
+type SortField = "title" | "category" | "status" | "start_date" | "capacity" | "location";
+type SortDirection = "asc" | "desc";
+
+interface SortState {
+  field: SortField;
+  direction: SortDirection;
+}
 
 export default function EventsPage() {
   const router = useRouter();
@@ -19,6 +27,8 @@ export default function EventsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [modalContent, setModalContent] = useState<{ label: string; text: string } | null>(null);
+  const [sort, setSort] = useState<SortState>({ field: "start_date", direction: "desc" });
+  const [showSortMenu, setShowSortMenu] = useState(false);
 
   const getEvents = async () => {
     const supabase = createClient();
@@ -41,15 +51,58 @@ export default function EventsPage() {
   // Search filter
   useEffect(() => {
     const q = search.toLowerCase();
-    setFiltered(
-      events.filter(
-        (e) =>
-          e.title.toLowerCase().includes(q) ||
-          e.category?.toLowerCase().includes(q) ||
-          e.location?.toLowerCase().includes(q)
-      )
+    let filtered = events.filter(
+      (e) =>
+        e.title.toLowerCase().includes(q) ||
+        e.category?.toLowerCase().includes(q) ||
+        e.location?.toLowerCase().includes(q)
     );
-  }, [search, events]);
+
+    // Apply sorting
+    filtered = sortEvents(filtered, sort);
+    setFiltered(filtered);
+  }, [search, events, sort]);
+
+  const sortEvents = (eventsToSort: EventFormData[], sortState: SortState): EventFormData[] => {
+    const { field, direction } = sortState;
+    const sorted = [...eventsToSort];
+
+    sorted.sort((a, b) => {
+      let aVal: any = a[field as keyof EventFormData];
+      let bVal: any = b[field as keyof EventFormData];
+
+      // Handle null/undefined values
+      if (aVal == null && bVal == null) return 0;
+      if (aVal == null) return direction === "asc" ? 1 : -1;
+      if (bVal == null) return direction === "asc" ? -1 : 1;
+
+      // Handle dates
+      if (field === "start_date") {
+        aVal = new Date(aVal).getTime();
+        bVal = new Date(bVal).getTime();
+      }
+
+      // Handle string comparisons (case-insensitive)
+      if (typeof aVal === "string" && typeof bVal === "string") {
+        aVal = aVal.toLowerCase();
+        bVal = bVal.toLowerCase();
+      }
+
+      if (aVal < bVal) return direction === "asc" ? -1 : 1;
+      if (aVal > bVal) return direction === "asc" ? 1 : -1;
+      return 0;
+    });
+
+    return sorted;
+  };
+
+  const handleSort = (field: SortField) => {
+    setSort((prev) => ({
+      field,
+      direction: prev.field === field && prev.direction === "asc" ? "desc" : "asc",
+    }));
+    setShowSortMenu(false);
+  };
 
   const handleDelete = async (id: string, title: string) => {
     const confirmed = window.confirm(
@@ -69,6 +122,20 @@ export default function EventsPage() {
     setDeletingId(null);
   };
 
+  const getSortIndicator = (field: SortField) => {
+    if (sort.field !== field) return null;
+    return sort.direction === "asc" ? <ChevronUp size={16} /> : <ChevronDown size={16} />;
+  };
+
+  const sortOptions: { label: string; field: SortField }[] = [
+    { label: "Title", field: "title" },
+    { label: "Category", field: "category" },
+    { label: "Status", field: "status" },
+    { label: "Date", field: "start_date" },
+    { label: "Capacity", field: "capacity" },
+    { label: "Location", field: "location" },
+  ];
+
   return (
     <div className="mx-auto h-full flex flex-col gap-6">
 
@@ -77,12 +144,44 @@ export default function EventsPage() {
       </div>
 
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-        <InputText placeholder="Search by title, category, or location..." fullWidth prefix={<Search size={18} />} />
+        <InputText placeholder="Search by title, category, or location..." fullWidth prefix={<Search size={18} />} onChange={(e) => setSearch(e.target.value)} />
 
-        <div className="flex items-center gap-2 shrink-0">
-          <Button label="Sort" variant="display" icon={<ArrowUpDown size={18} />} iconPosition="left" onClick={() => { }} />
+        <div className="flex items-center gap-2 shrink-0 relative">
+          {/* Sort Button with Dropdown Menu */}
+          <div className="relative">
+            <Button 
+              label={`Sort${sort.field !== "start_date" ? ": " + sortOptions.find(o => o.field === sort.field)?.label : ""}`}
+              variant="display" 
+              icon={<ArrowUpDown size={18} />} 
+              iconPosition="left" 
+              onClick={() => setShowSortMenu(!showSortMenu)}
+              className="whitespace-nowrap"
+            />
+            
+            {showSortMenu && (
+              <div className="absolute top-full right-0 mt-2 bg-white border-2 border-fractal-border-default rounded-s shadow-brutal-1 z-40 min-w-[180px]">
+                {sortOptions.map((option) => (
+                  <button
+                    key={option.field}
+                    onClick={() => handleSort(option.field)}
+                    className={`w-full text-left px-4 py-2 text-sm font-median hover:bg-fractal-base-grey-90 transition-colors flex items-center justify-between ${
+                      sort.field === option.field ? "bg-fractal-base-grey-90" : ""
+                    }`}
+                  >
+                    <span>{option.label}</span>
+                    {sort.field === option.field && (
+                      <span className="ml-2">
+                        {sort.direction === "asc" ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                      </span>
+                    )}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
           <Button label="Filter" variant="display" icon={<SlidersHorizontal size={18} />} iconPosition="left" onClick={() => { }} />
-          <Button label="Add User" variant="primary-dark" icon={<Plus size={18} />} iconPosition="left" onClick={() => router.push("/admin/events/create")} />
+          <Button label="Add Event" variant="primary-dark" icon={<Plus size={18} />} iconPosition="left" onClick={() => router.push("/admin/events/create")} />
         </div>
 
       </div>
@@ -110,94 +209,149 @@ export default function EventsPage() {
             </Typography>
           </div>
         ) : (
-          <table className="w-full text-sm">
-            <thead className="border-b-2 border-fractal-border-default bg-fractal-base-grey-90">
-              <tr>
-                <th className="text-left p-3 font-median">Title</th>
-                <th className="text-left p-3 font-median">Category</th>
-                <th className="text-left p-3 font-median">Status</th>
-                <th className="text-left p-3 font-median">Date</th>
-                <th className="text-left p-3 font-median">Capacity</th>
-                <th className="text-left p-3 font-median">Location</th>
-                <th className="text-right p-3 font-median">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((event, i) => (
-                <tr
-                  key={event.id}
-                  className={`border-b border-fractal-border-default hover:bg-fractal-base-grey-90 transition-colors ${i % 2 === 0
-                    ? "bg-fractal-bg-body-white"
-                    : "bg-fractal-bg-body-default"
-                    }`}
-                >
-                  <td
-                    className="p-3 font-median max-w-[200px] truncate cursor-pointer hover:underline"
-                    onClick={() => setModalContent({ label: "Title", text: event.title })}
-                    title="Click to view full title"
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="border-b-2 border-fractal-border-default bg-fractal-base-grey-90 sticky top-0">
+                <tr>
+                  <th 
+                    className="text-left p-3 font-median cursor-pointer hover:bg-fractal-base-grey-80 transition-colors"
+                    onClick={() => handleSort("title")}
+                    title="Click to sort"
                   >
-                    {event.title}
-                  </td>
-                  <td className="p-3">
-                    <span
-                      className={`px-2 py-0.5 rounded-s text-xs font-median border-2 border-fractal-border-default bg-fractal-base-grey-90`}
-                    >
-                      {event.category}
-                    </span>
-                  </td>
-                  <td className="p-3">
-                    <span
-                      className={`px-2 py-0.5 rounded-s text-xs font-median capitalize border border-fractal-border-default`}
-                    >
-                      {event.status}
-                    </span>
-                  </td>
-                  <td className="p-3 text-fractal-text-placeholder whitespace-nowrap">
-                    {event.start_date
-                      ? new Date(event.start_date).toLocaleDateString("en-PH", {
-                        month: "short",
-                        day: "numeric",
-                        year: "numeric",
-                      })
-                      : "—"}
-                  </td>
-                  <td className="p-3">{event.capacity}</td>
-                  <td
-                    className="p-3 text-fractal-text-placeholder max-w-[150px] truncate cursor-pointer hover:underline"
-                    onClick={() => setModalContent({ label: "Location", text: event.location || "—" })}
-                    title="Click to view full location"
-                  >
-                    {event.location}
-                  </td>
-                  <td className="p-3">
-                    <div className="flex gap-2 justify-end">
-                      <button
-                        onClick={() =>
-                          router.push(`/admin/events/${event.id}/edit`)
-                        }
-                        className="p-2 hover:bg-fractal-decorative-yellow-90 border-2 border-fractal-border-default rounded-s shadow-brutal-1 transition-colors"
-                        title="Edit event"
-                      >
-                        <Pencil size={14} />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(event.id!, event.title)}
-                        disabled={deletingId === event.id}
-                        className="p-2 hover:bg-fractal-decorative-yellow-90 border-2 border-fractal-border-default rounded-s shadow-brutal-1 transition-colors"
-                        title="Delete event"
-                      >
-                        <Trash2 size={14} />
-                      </button>
+                    <div className="flex items-center gap-1">
+                      Title
+                      {getSortIndicator("title")}
                     </div>
-                  </td>
+                  </th>
+                  <th 
+                    className="text-left p-3 font-median cursor-pointer hover:bg-fractal-base-grey-80 transition-colors"
+                    onClick={() => handleSort("category")}
+                    title="Click to sort"
+                  >
+                    <div className="flex items-center gap-1">
+                      Category
+                      {getSortIndicator("category")}
+                    </div>
+                  </th>
+                  <th 
+                    className="text-left p-3 font-median cursor-pointer hover:bg-fractal-base-grey-80 transition-colors"
+                    onClick={() => handleSort("status")}
+                    title="Click to sort"
+                  >
+                    <div className="flex items-center gap-1">
+                      Status
+                      {getSortIndicator("status")}
+                    </div>
+                  </th>
+                  <th 
+                    className="text-left p-3 font-median cursor-pointer hover:bg-fractal-base-grey-80 transition-colors"
+                    onClick={() => handleSort("start_date")}
+                    title="Click to sort"
+                  >
+                    <div className="flex items-center gap-1">
+                      Date
+                      {getSortIndicator("start_date")}
+                    </div>
+                  </th>
+                  <th 
+                    className="text-left p-3 font-median cursor-pointer hover:bg-fractal-base-grey-80 transition-colors"
+                    onClick={() => handleSort("capacity")}
+                    title="Click to sort"
+                  >
+                    <div className="flex items-center gap-1">
+                      Capacity
+                      {getSortIndicator("capacity")}
+                    </div>
+                  </th>
+                  <th 
+                    className="text-left p-3 font-median cursor-pointer hover:bg-fractal-base-grey-80 transition-colors"
+                    onClick={() => handleSort("location")}
+                    title="Click to sort"
+                  >
+                    <div className="flex items-center gap-1">
+                      Location
+                      {getSortIndicator("location")}
+                    </div>
+                  </th>
+                  <th className="text-right p-3 font-median">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {filtered.map((event, i) => (
+                  <tr
+                    key={event.id}
+                    className={`border-b border-fractal-border-default hover:bg-fractal-base-grey-90 transition-colors ${i % 2 === 0
+                      ? "bg-fractal-bg-body-white"
+                      : "bg-fractal-bg-body-default"
+                      }`}
+                  >
+                    <td
+                      className="p-3 font-median max-w-[200px] truncate cursor-pointer hover:underline"
+                      onClick={() => setModalContent({ label: "Title", text: event.title })}
+                      title="Click to view full title"
+                    >
+                      {event.title}
+                    </td>
+                    <td className="p-3">
+                      <span
+                        className={`px-2 py-0.5 rounded-s text-xs font-median border-2 border-fractal-border-default bg-fractal-base-grey-90`}
+                      >
+                        {event.category}
+                      </span>
+                    </td>
+                    <td className="p-3">
+                      <span
+                        className={`px-2 py-0.5 rounded-s text-xs font-median capitalize border border-fractal-border-default`}
+                      >
+                        {event.status}
+                      </span>
+                    </td>
+                    <td className="p-3 text-fractal-text-placeholder whitespace-nowrap">
+                      {event.start_date
+                        ? new Date(event.start_date).toLocaleDateString("en-PH", {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        })
+                        : "—"}
+                    </td>
+                    <td className="p-3">{event.capacity}</td>
+                    <td
+                      className="p-3 text-fractal-text-placeholder max-w-[150px] truncate cursor-pointer hover:underline"
+                      onClick={() => setModalContent({ label: "Location", text: event.location || "—" })}
+                      title="Click to view full location"
+                    >
+                      {event.location}
+                    </td>
+                    <td className="p-3">
+                      <div className="flex gap-2 justify-end">
+                        <button
+                          onClick={() =>
+                            router.push(`/admin/events/${event.id}/edit`)
+                          }
+                          className="p-2 hover:bg-fractal-decorative-yellow-90 border-2 border-fractal-border-default rounded-s shadow-brutal-1 transition-colors"
+                          title="Edit event"
+                        >
+                          <Pencil size={14} />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(event.id!, event.title)}
+                          disabled={deletingId === event.id}
+                          className="p-2 hover:bg-fractal-decorative-yellow-90 border-2 border-fractal-border-default rounded-s shadow-brutal-1 transition-colors disabled:opacity-50"
+                          title="Delete event"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </Paper>
 
-      {/* Detail Modal */}
       {modalContent && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 transition-opacity"
