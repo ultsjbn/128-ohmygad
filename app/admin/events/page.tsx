@@ -67,26 +67,26 @@ export default function AdminEventsPage() {
   };
 
   return (
-    <div className="mx-auto h-full flex flex-col gap-6">
+    <div className="max-w-[1400px] w-full flex flex-col gap-6">
 
-      <div className="flex items-center gap-3">
-        <div className="relative flex-1">
-          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-fractal-text-placeholder" />
-          <Input
-            placeholder="Search by title, category, or location..."
-            className="pl-9"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-        </div>
-        <Button
-          onClick={() => router.push("/admin/events/create")}
-          className="flex items-center gap-2 shrink-0 border-2 border-fractal-border-default rounded-s shadow-brutal-1 bg-fractal-brand-primary"
-        >
-          <Plus size={16} />
-          Create Event
-        </Button>
-      </div>
+<div className="flex items-center gap-3">
+  <div className="relative flex-1">
+    <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-fractal-text-placeholder" />
+    <Input
+      placeholder="Search by title, category, or location..."
+      className="pl-9"
+      value={search}
+      onChange={(e) => setSearch(e.target.value)}
+    />
+  </div>
+  <Button
+    onClick={() => router.push("/admin/events/create")}
+    className="flex items-center gap-2 shrink-0 border-2 border-fractal-border-default rounded-s shadow-brutal-1 bg-fractal-brand-primary"
+  >
+    <Plus size={16} />
+    Create Event
+  </Button>
+</div>
 
       {/* Table */}
       <Paper elevation="elevated" className="overflow-hidden p-0">
