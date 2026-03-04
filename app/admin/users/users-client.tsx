@@ -11,7 +11,6 @@ import { sortProfiles, paginate, totalPages } from "./profile.utils";
 import { PER_PAGE } from "@/components/profile.constants";
 import { TableSection, type TableSectionProps } from "@/components/table-section";
 
-
 type TabKey = "all" | "admin" | "faculty" | "student";
 
 interface UsersClientProps {

@@ -3,13 +3,14 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { Typography, Paper } from "@snowball-tech/fractal";
+import { Paper } from "@snowball-tech/fractal";
 import { Plus, Pencil, Trash2, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import type { EventFormData } from "@/components/admin/event-form";
+import { Button } from "@/components/button";
+import { Typography } from "@/components/typography";
 
-export default function AdminEventsPage() {
+export default function EventsPage() {
   const router = useRouter();
   const [events, setEvents] = useState<EventFormData[]>([]);
   const [filtered, setFiltered] = useState<EventFormData[]>([]);
@@ -17,7 +18,7 @@ export default function AdminEventsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  const fetchEvents = async () => {
+  const getEvents = async () => {
     const supabase = createClient();
     const { data, error } = await supabase
     .from("event")
@@ -32,7 +33,7 @@ export default function AdminEventsPage() {
   };
 
   useEffect(() => {
-    fetchEvents();
+    getEvents();
   }, []);
 
   // Search filter
@@ -68,38 +69,48 @@ export default function AdminEventsPage() {
 
   return (
     <div className="w-1400px w-full flex flex-col gap-6">
-
-<div className="flex items-center gap-3">
-  <div className="relative flex-1">
-    <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-fractal-text-placeholder" />
-    <Input
-      placeholder="Search by title, category, or location..."
-      className="pl-9"
-      value={search}
-      onChange={(e) => setSearch(e.target.value)}
-    />
-  </div>
-  <Button
-    onClick={() => router.push("/admin/events/create")}
-    className="flex items-center gap-2 shrink-0 border-2 border-fractal-border-default rounded-s shadow-brutal-1 bg-fractal-brand-primary"
-  >
-    <Plus size={16} />
-    Create Event
-  </Button>
-</div>
+      <Typography variant="heading-2">Events Management</Typography>
+      <div className="flex items-center gap-3">
+        <div className="relative flex-1">
+          <Search
+            size={16}
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-fractal-text-placeholder"
+          />
+          <Input
+            placeholder="Search by title, category, or location..."
+            className="pl-9"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
+        <Button
+          variant="primary-dark"
+          label="Create"
+          icon={<Plus size={16} />}
+          onClick={() => router.push("/admin/events/create")}
+        ></Button>
+      </div>
 
       {/* Table */}
       <Paper elevation="elevated" className="overflow-hidden p-0">
         {isLoading ? (
           <div className="p-8 text-center">
-            <Typography variant="body-1" className="text-fractal-text-placeholder">
+            <Typography
+              variant="body-1"
+              className="text-fractal-text-placeholder"
+            >
               Loading events...
             </Typography>
           </div>
         ) : filtered.length === 0 ? (
           <div className="p-8 text-center">
-            <Typography variant="body-1" className="text-fractal-text-placeholder">
-              {search ? "No events match your search." : "No events yet. Create one to get started."}
+            <Typography
+              variant="body-1"
+              className="text-fractal-text-placeholder"
+            >
+              {search
+                ? "No events match your search."
+                : "No events yet. Create one to get started."}
             </Typography>
           </div>
         ) : (
@@ -120,17 +131,25 @@ export default function AdminEventsPage() {
                 <tr
                   key={event.id}
                   className={`border-b border-fractal-border-default hover:bg-fractal-base-grey-90 transition-colors ${
-                    i % 2 === 0 ? "bg-fractal-bg-body-white" : "bg-fractal-bg-body-default"
+                    i % 2 === 0
+                      ? "bg-fractal-bg-body-white"
+                      : "bg-fractal-bg-body-default"
                   }`}
                 >
-                  <td className="p-3 font-median max-w-[200px] truncate">{event.title}</td>
+                  <td className="p-3 font-median max-w-[200px] truncate">
+                    {event.title}
+                  </td>
                   <td className="p-3">
-                    <span className={`px-2 py-0.5 rounded-s text-xs font-median border-2 border-fractal-border-default bg-fractal-base-grey-90`}>
+                    <span
+                      className={`px-2 py-0.5 rounded-s text-xs font-median border-2 border-fractal-border-default bg-fractal-base-grey-90`}
+                    >
                       {event.category}
                     </span>
                   </td>
                   <td className="p-3">
-                    <span className={`px-2 py-0.5 rounded-s text-xs font-median capitalize border border-fractal-border-default`}>
+                    <span
+                      className={`px-2 py-0.5 rounded-s text-xs font-median capitalize border border-fractal-border-default`}
+                    >
                       {event.status}
                     </span>
                   </td>
@@ -150,7 +169,9 @@ export default function AdminEventsPage() {
                   <td className="p-3">
                     <div className="flex gap-2 justify-end">
                       <button
-                        onClick={() => router.push(`/admin/events/${event.id}/edit`)}
+                        onClick={() =>
+                          router.push(`/admin/events/${event.id}/edit`)
+                        }
                         className="p-2 hover:bg-fractal-decorative-yellow-90 border-2 border-fractal-border-default rounded-s shadow-brutal-1 transition-colors"
                         title="Edit event"
                       >
@@ -172,7 +193,6 @@ export default function AdminEventsPage() {
           </table>
         )}
       </Paper>
-
     </div>
   );
 }
