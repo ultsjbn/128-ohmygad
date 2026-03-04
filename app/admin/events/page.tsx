@@ -270,7 +270,7 @@ export default function EventsPage() {
                           type="checkbox"
                           checked={filters.status.includes(status)}
                           onChange={() => toggleFilter("status", status)}
-                          className="w-4 h-4"
+                          className="w-4 h-4 appearance-none border-2 border-fractal rounded-full bg-white checked:bg-fractal-brand-primary" // to do: update to fractal checkbox 
                         />
                         <Typography variant="body-2" className="capitalize">
                           {status}
@@ -295,7 +295,7 @@ export default function EventsPage() {
                           type="checkbox"
                           checked={filters.category.includes(category)}
                           onChange={() => toggleFilter("category", category)}
-                          className="w-4 h-4"
+                          className="w-4 h-4 appearance-none border-2 border-fractal rounded-full bg-white checked:bg-fractal-brand-primary" // to do: update to fractal checkbox 
                         />
                         <Typography variant="body-2">{category}</Typography>
                       </label>
