@@ -25,3 +25,11 @@ export type EventFormData = {
   semester: string;
   status: string;
 };
+
+type CourseFormProps = {
+  initialData?: EventFormData;
+  mode: "create" | "edit";
+};
+
+const SEMESTERS = ["1st", "2nd", "Mid-Year"];
+const STATUSES = ["Open", "Closed"];
