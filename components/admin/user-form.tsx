@@ -35,6 +35,17 @@ export default function UserForm({
     const [error, setError] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
 
+    const handleStudentNumChange = (_e: unknown, newValue: string) => {
+        // Strip everything except digits
+        const digits = newValue.replace(/\D/g, "").slice(0, 9);
+        // Auto-insert dash after the 4th digit
+        if (digits.length > 4) {
+            setStudentNum(`${digits.slice(0, 4)}-${digits.slice(4)}`);
+        } else {
+            setStudentNum(digits);
+        }
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
@@ -153,8 +164,9 @@ export default function UserForm({
                         type="text"
                         placeholder="e.g. 2021-12345"
                         fullWidth
+                        maxLength={10}
                         value={student_num}
-                        onChange={(_e, newValue) => setStudentNum(newValue)}
+                        onChange={handleStudentNumChange}
                         className="[&_input:focus]:!border-fractal-border-primary [&_input:focus]:!shadow-brutal-1-primary"
                     />
 
