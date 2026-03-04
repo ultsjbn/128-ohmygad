@@ -46,9 +46,6 @@ export default function CoursesPage() {
     }
   }
 
-
-
-
   const filtered = courses.filter((c) =>
     `${c.title} ${c.start_time || ""} ${c.end_time || ""}`
       .toLowerCase()
