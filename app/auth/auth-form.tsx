@@ -40,7 +40,7 @@ export default function AuthForm() {
     const destinations: Record<string, string> = {
       admin: '/admin',
       faculty: '/faculty',
-      student: '/student',
+      student: '/student/dashboard',
     };
 
     router.push(destinations[role] ?? '/auth/setup');
