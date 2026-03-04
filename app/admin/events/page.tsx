@@ -67,7 +67,7 @@ export default function AdminEventsPage() {
   };
 
   return (
-    <div className="max-w-[1400px] w-full flex flex-col gap-6">
+    <div className="w-1400px w-full flex flex-col gap-6">
 
 <div className="flex items-center gap-3">
   <div className="relative flex-1">
