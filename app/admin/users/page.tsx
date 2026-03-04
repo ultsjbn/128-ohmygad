@@ -3,6 +3,7 @@ import { connection } from "next/server";
 import { UsersClient } from "./users-client";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import type { Profile } from "./profile.types";
+import { Loader } from "@snowball-tech/fractal";
 
 async function getProfiles() {
   await connection();
@@ -23,8 +24,10 @@ export default function UsersPage() {
   return (
     <Suspense
       fallback={
-        <div className="p-6 text-sm text-fractal-base-grey-30">
-          Loading users...
+        <div className="flex p-6 text-sm text-fractal-base-grey-30 place-content-center">
+          <div className="justify-center items-center">
+            <Loader size="xl" />
+          </div>
         </div>
       }
     >

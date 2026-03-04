@@ -58,9 +58,9 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <InputText placeholder="Search by name, email or role..." fullWidth prefix={<Search size={18} />} />
         <div className="flex items-center gap-2 shrink-0">
-          <Button label="Sort" variant="secondary" icon={<ArrowUpDown size={14} />} iconPosition="left" onClick={() => {}} />
-          <Button label="Filter" variant="secondary" icon={<SlidersHorizontal size={14} />} iconPosition="left" onClick={() => {}} />
-          <Button label="Add User" variant="display" icon={<UserPlus size={14} />} iconPosition="left" onClick={() => {}} />
+          <Button label="Sort" variant="display" icon={<ArrowUpDown size={18} />} iconPosition="left" onClick={() => {}} />
+          <Button label="Filter" variant="display" icon={<SlidersHorizontal size={18} />} iconPosition="left" onClick={() => {}} />
+          <Button label="Add User" variant="primary-dark" icon={<UserPlus size={18} />} iconPosition="left" onClick={() => {}} />
         </div>
       </div>
 

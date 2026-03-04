@@ -6,7 +6,7 @@ import {
   CSSProperties,
 } from "react";
 
-export type ButtonVariant = "display" | "primary" | "secondary" | "text";
+export type ButtonVariant = "display" | "primary" | "secondary" | "text" | "display-dark" | "primary-dark";
 export type ButtonIconPosition = "left" | "right";
 export type ButtonIconOnlyOptions = boolean | "auto";
 export type ButtonType = "button" | "reset" | "submit";
