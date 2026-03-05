@@ -8,7 +8,8 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 
 const navItems = [
-  { href: "/student/dashboard", label: "Dashboard", icon: LayoutDashboard, exact: true },
+  { href: "/student", label: "Dashboard", icon: LayoutDashboard, exact: true },
+  { href: "/student/events", label: "Events", icon: Calendar, exact: false },
   { href: "/student/courses", label: "Courses", icon: BookOpen, exact: false },
   { href: "/student/surveys", label: "Surveys", icon: ClipboardList, exact: false },
 ];
@@ -62,7 +63,7 @@ export default function StudentSidebar() {
                 OhMyGAD!
               </Typography>
               <Typography variant="caption-median" className="text-center mt-1">
-                UPB Kasarian Gender Studies Program
+                UPB Kasarian Gender Studies Program Events Platform
               </Typography>
             </div>
           )}

@@ -46,9 +46,6 @@ export default function CoursesPage() {
     }
   }
 
-
-
-
   const filtered = courses.filter((c) =>
     `${c.title} ${c.start_time || ""} ${c.end_time || ""}`
       .toLowerCase()
@@ -56,10 +53,10 @@ export default function CoursesPage() {
   );
 
   return (
-    <div className="max-w-[1400px] w-full flex flex-col gap-6">
+    <div className="mx-auto h-full flex flex-col gap-6">
       {/* Course Cards */}
       <Paper elevation="bordered" title="All Courses" titleVariant="heading-2" className="flex flex-col gap-4">
-        <div className="flex items-center gap-2 w-full shadow-brutal-1 pb-4">
+        <div className="flex items-center gap-2 w-full pb-3 border-b border-fractal-base-grey-70">
           <div className="flex items-center gap-2 w-full max-w-sm">
             <Search size={16} className="text-fractal-text-placeholder" />
             <InputText
@@ -79,12 +76,12 @@ export default function CoursesPage() {
             return (
               <div
                 key={course.id}
-                className="flex flex-col gap-3 p-4 border-2 border-fractal-border-default rounded-s bg-white shadow-brutal-1 hover:shadow-none transition-all"
+                className="flex flex-col gap-2 border-2 border-fractal-border-default rounded-s bg-white hover:shadow-brutal-1 transition-all overflow-hidden"
               >
                 {/* Top accent bar */}
-                <div className="h-2 w-full rounded-fractal-xs border-2 border-fractal-border-default bg-fractal-decorative-blue-90" />
+                <div className="h-1.5 w-full bg-fractal-decorative-blue-70" />
 
-                <div className="flex items-start justify-between">
+                <div className="flex items-start justify-between px-4 pt-2">
                   <div className="flex-1">
                     {isEditing ? (
                       <InputText
@@ -109,7 +106,7 @@ export default function CoursesPage() {
                 </div>
 
                 {/* Description and details */}
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-1.5 px-4 pb-3">
                   {isEditing ? (
                     <>
                       <InputText
@@ -151,36 +148,6 @@ export default function CoursesPage() {
                   )}
                 </div>
 
-                {/* Actions */}
-                <div className="grid grid-cols-2 gap-2 pt-1">
-                  {isEditing ? (
-                    <>
-                      <Button
-                        variant={"default" as any}
-                        size={"sm" as any}
-                        onClick={() => updateCourse(course.id)}
-                        className="flex items-center gap-1"
-                      >
-                        <Save className="size-3" />
-                        Save
-                      </Button>
-                      <Button
-                        variant={"ghost" as any}
-                        size={"sm" as any}
-                        onClick={() => {
-                          setEditingId(null);
-                          setEditFields({});
-                        }}
-                        className="flex items-center gap-1"
-                      >
-                        <X className="size-3" />
-                        Cancel
-                      </Button>
-                    </>
-                  ) : (
-                    <>                    </>
-                  )}
-                </div>
               </div>
             );
           })}

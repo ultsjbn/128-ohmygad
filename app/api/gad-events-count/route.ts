@@ -14,13 +14,9 @@ export async function GET() {
 
     const supabase = createAdminClient(url, key || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
 
-    // Try to count rows that likely indicate a GAD-related event. This uses
-    // an OR filter to match common possible schema fields: category, type,
-    // or title containing 'GAD'. Adjust as needed for your events table.
     const { data, count, error } = await supabase
       .from("event")
-      .select("id", { count: "exact" })
-      .or("category.eq.GAD,type.eq.GAD,title.ilike.%GAD%");
+      .select("id", { count: "exact" });
 
     if (error) {
       console.error("Error fetching GAD events count:", error);

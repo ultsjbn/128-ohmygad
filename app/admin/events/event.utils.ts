@@ -1,4 +1,4 @@
-// wait pagination muna hahahah
+export const PER_PAGE = 5;
 
 export const paginate = <T>(items: T[], page: number, perPage: number): T[] =>
   items.slice((page - 1) * perPage, page * perPage);
