@@ -1,289 +1,224 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { Input } from "@/components/ui/input";
-import type { CourseFormData } from "@/components/admin/course-form";
+
 import { Paper, InputText } from "@snowball-tech/fractal";
+import { Search, Plus, Edit2, Trash2, Save, X, ArrowUpDown, ChevronUp, ChevronDown } from "lucide-react";
+
 import { Button } from "@/components/button";
 import { Typography } from "@/components/typography";
-import { Search, Users, Plus, Edit2, Trash2, Save, X, Pencil} from "lucide-react";
 
-type Course = {
-  id: string;
-  title: string;
-  description?: string;
-  start_time?: string;
-  end_time?: string;
-  instructor_id?: string;
-  status?: string;
-  semester?: string;
-  created_at?: string;
-  updated_at?: string;
-};
+import type { CourseFormData } from "@/components/admin/course-form";
+
+type SortField = "title" | "start_time" | "end_time" | "semester" | "status";
+type SortDirection = "asc" | "desc";
 
 export default function CoursesPage() {
-  const [courses, setCourses] = useState<Course[]>([]);
-  const [showAdd, setShowAdd] = useState(false);
-  const [newCourse, setNewCourse] = useState({ title: "", description: "", start_time: "", end_time: "", instructor_id: "", status: "active", semester: "" });
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [editFields, setEditFields] = useState<Partial<Course>>({});
-  const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
+  const router = useRouter();
 
-  // Fetch courses on load
+  const [courses, setCourses] = useState<CourseFormData[]>([]);
+  const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editFields, setEditFields] = useState<Partial<CourseFormData>>({});
+
+  const [sortField, setSortField] = useState<SortField>("title");
+  const [sortDir, setSortDir] = useState<SortDirection>("asc");
+
   useEffect(() => {
     fetchCourses();
   }, []);
 
   async function fetchCourses() {
-    try {
-      setLoading(true);
-      const res = await fetch("/api/courses");
-      const json = await res.json();
-      if (json.success && Array.isArray(json.courses)) {
-        setCourses(json.courses);
+    const supabase = createClient();
+
+    const { data } = await supabase
+      .from("course")
+      .select("id,title,description,start_time,end_time,semester,status")
+      .order("created_at", { ascending: false });
+
+    if (data) setCourses(data);
+    setLoading(false);
+  }
+
+  const filteredCourses = useMemo(() => {
+    const q = search.toLowerCase();
+
+    let result = courses.filter((c) =>
+      `${c.title} ${c.start_time ?? ""} ${c.end_time ?? ""}`
+        .toLowerCase()
+        .includes(q)
+    );
+
+    result.sort((a, b) => {
+      const aVal = a[sortField];
+      const bVal = b[sortField];
+
+      if (!aVal) return 1;
+      if (!bVal) return -1;
+
+      if (sortField.includes("time")) {
+        const aTime = new Date(aVal as string).getTime();
+        const bTime = new Date(bVal as string).getTime();
+        return sortDir === "asc" ? aTime - bTime : bTime - aTime;
       }
-    } catch (err) {
-      console.error("[fetchCourses] Error:", err);
-    } finally {
-      setLoading(false);
+
+      return sortDir === "asc"
+        ? String(aVal).localeCompare(String(bVal))
+        : String(bVal).localeCompare(String(aVal));
+    });
+
+    return result;
+  }, [courses, search, sortField, sortDir]);
+
+  function toggleSort(field: SortField) {
+    if (field === sortField) {
+      setSortDir(sortDir === "asc" ? "desc" : "asc");
+    } else {
+      setSortField(field);
+      setSortDir("asc");
     }
   }
 
- <Button
-    onClick={() => router.push("/admin/courses/create")}
-    className="flex items-center gap-2 shrink-0 border-2 border-fractal-border-default rounded-s shadow-brutal-1 bg-fractal-brand-primary"
-  >
-    <Plus size={16} />
-    Add Course
-  </Button>
-
   async function updateCourse(id: string) {
-    try {
-      console.log("[updateCourse] Updating course", id, "with:", editFields);
-      const res = await fetch(`/api/courses/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(editFields),
-      });
-      const json = await res.json();
-      console.log("[updateCourse] Response:", json);
+    const res = await fetch(`/api/courses/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(editFields),
+    });
 
-      if (json.success && json.course) {
-        setCourses((s) => s.map((c) => (c.id === id ? json.course : c)));
-        setEditingId(null);
-        setEditFields({});
-      } else {
-        console.warn("[updateCourse] API error:", json.error);
-      }
-    } catch (err) {
-      console.error("[updateCourse] Failed:", err);
+    const json = await res.json();
+
+    if (json.success) {
+      setCourses((c) => c.map((x) => (x.id === id ? json.course : x)));
+      setEditingId(null);
+      setEditFields({});
     }
   }
 
   async function deleteCourse(id: string) {
     if (!confirm("Delete this course?")) return;
-    try {
-      console.log("[deleteCourse] Deleting course", id);
-      const res = await fetch(`/api/courses/${id}`, { method: "DELETE" });
-      const json = await res.json();
-      console.log("[deleteCourse] Response:", json);
 
-      if (json.success) {
-        setCourses((s) => s.filter((c) => c.id !== id));
-      } else {
-        console.warn("[deleteCourse] API error:", json.error);
-      }
-    } catch (err) {
-      console.error("[deleteCourse] Failed:", err);
+    const res = await fetch(`/api/courses/${id}`, { method: "DELETE" });
+    const json = await res.json();
+
+    if (json.success) {
+      setCourses((c) => c.filter((x) => x.id !== id));
     }
   }
 
-
-
-  const filtered = courses.filter((c) =>
-    `${c.title} ${c.start_time || ""} ${c.end_time || ""}`
-      .toLowerCase()
-      .includes(search.toLowerCase())
-  );
+  if (loading) {
+    return <Typography>Loading courses...</Typography>;
+  }
 
   return (
-    <div className="max-w-[1400px] w-full flex flex-col gap-6">
-      {/* Course Cards */}
-      <Paper elevation="bordered" title="All Courses" titleVariant="heading-2" className="flex flex-col gap-4">
-        <div className="flex items-center gap-2 w-full pb-3 border-b border-fractal-base-grey-70">
-          <div className="flex items-center gap-2 w-full max-w-sm">
-            <Search size={16} className="text-fractal-text-placeholder" />
-            <InputText
-              value={search}
-              onChange={(e: any) => setSearch(e.target.value)}
-              placeholder="Search courses..."
-              className="flex-1 bg-transparent outline-none text-sm font-sans"
-            />
-          </div>
-          <div className="ml-auto">
-            <Button variant={"default" as any} size={"sm" as any} onClick={() => setShowAdd((s) => !s)}>
-              <Plus className="size-4" />
-              {showAdd ? "Close" : "Add Course"}
-            </Button>
-          </div>
-        </div>
+    <div className="mx-auto flex flex-col gap-6 max-w-[1400px]">
 
-        {showAdd && (
-          <div className="flex flex-wrap items-end gap-2 pb-2">
-            <InputText value={newCourse.title} onChange={(e: any) => setNewCourse({ ...newCourse, title: e.target.value })} placeholder="Title" />
-            <InputText value={newCourse.description || ""} onChange={(e: any) => setNewCourse({ ...newCourse, description: e.target.value })} placeholder="Description" />
-            <InputText type="time" value={newCourse.start_time || ""} onChange={(e: any) => setNewCourse({ ...newCourse, start_time: e.target.value })} placeholder="Start time" />
-            <InputText type="time" value={newCourse.end_time || ""} onChange={(e: any) => setNewCourse({ ...newCourse, end_time: e.target.value })} placeholder="End time" />
-            <InputText value={newCourse.semester || ""} onChange={(e: any) => setNewCourse({ ...newCourse, semester: e.target.value })} placeholder="Semester" />
-            <Button variant={"default" as any} size={"sm" as any} onClick={addCourse}>
-              <Plus className="size-4" />
-              Create
-            </Button>
-          </div>
-        )}
+      <Typography variant="heading-2">Courses</Typography>
 
-        {loading && <Typography variant="body-2">Loading courses...</Typography>}
+      {/* Search + Add */}
+      <div className="flex justify-between gap-3">
 
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
-          {filtered.map((course) => {
-            const isEditing = editingId === course.id;
+        <InputText
+          prefix={<Search size={18} />}
+          placeholder="Search courses..."
+          fullWidth
+          onChange={(e) => setSearch(e.target.value)}
+        />
+
+        <Button
+          label="Add Course"
+          icon={<Plus size={18} />}
+          onClick={() => router.push("/admin/courses/create")}
+        />
+      </div>
+
+      <Paper title="All Courses">
+
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+
+          {filteredCourses.map((course) => {
+            const editing = editingId === course.id;
 
             return (
               <div
                 key={course.id}
-                className="flex flex-col gap-2 border-2 border-fractal-border-default rounded-s bg-white hover:shadow-brutal-1 transition-all overflow-hidden"
+                className="border rounded p-4 flex flex-col gap-2"
               >
-                {/* Top accent bar */}
-                <div className="h-1.5 w-full bg-fractal-decorative-blue-70" />
+                {editing ? (
+                  <InputText
+                    value={editFields.title ?? course.title}
+                    onChange={(e: any) =>
+                      setEditFields({ ...editFields, title: e.target.value })
+                    }
+                  />
+                ) : (
+                  <Typography variant="body-1-median">
+                    {course.title}
+                  </Typography>
+                )}
 
-                <div className="flex items-start justify-between px-4 pt-2">
-                  <div className="flex-1">
-                    {isEditing ? (
-                      <InputText
-                        value={editFields.title ?? course.title}
-                        onChange={(e: any) => setEditFields({ ...editFields, title: e.target.value })}
-                      />
-                    ) : (
-                      <Typography variant="body-1-median">{course.title}</Typography>
-                    )}
-                  </div>
-                  <span className="px-2 py-0.5 text-xs font-median border border-fractal-base-grey-70 rounded-fractal-xs bg-fractal-base-grey-90">
-                    {isEditing ? (
-                      <InputText
-                        value={editFields.status ?? course.status ?? ""}
-                        onChange={(e: any) => setEditFields({ ...editFields, status: e.target.value })}
-                        className="w-16"
-                      />
-                    ) : (
-                      course.status || "—"
-                    )}
-                  </span>
-                </div>
+                {editing ? (
+                  <InputText
+                    value={editFields.description ?? course.description ?? ""}
+                    onChange={(e: any) =>
+                      setEditFields({
+                        ...editFields,
+                        description: e.target.value,
+                      })
+                    }
+                  />
+                ) : (
+                  <Typography variant="body-2">
+                    {course.description ?? "—"}
+                  </Typography>
+                )}
 
-                {/* Description and details */}
-                <div className="flex flex-col gap-1.5 px-4">
-                  {isEditing ? (
-                    <>
-                      <InputText
-                        value={editFields.description ?? course.description ?? ""}
-                        onChange={(e: any) => setEditFields({ ...editFields, description: e.target.value })}
-                        placeholder="Description"
-                      />
-                      <InputText
-                        value={editFields.start_time ?? course.start_time ?? ""}
-                        onChange={(e: any) => setEditFields({ ...editFields, start_time: e.target.value })}
-                        placeholder="Start time"
-                      />
-                      <InputText
-                        value={editFields.end_time ?? course.end_time ?? ""}
-                        onChange={(e: any) => setEditFields({ ...editFields, end_time: e.target.value })}
-                        placeholder="End time"
-                      />
-                      <InputText
-                        value={editFields.semester ?? course.semester ?? ""}
-                        onChange={(e: any) => setEditFields({ ...editFields, semester: e.target.value })}
-                        placeholder="Semester"
-                      />
-                    </>
-                  ) : (
-                    <>
-                      <Typography variant="body-2" className="text-fractal-text-placeholder">
-                        {course.description || "—"}
-                      </Typography>
-                      <Typography variant="body-2" className="text-fractal-text-placeholder">
-                        <strong>Start:</strong> {course.start_time || "—"}
-                      </Typography>
-                      <Typography variant="body-2" className="text-fractal-text-placeholder">
-                        <strong>End:</strong> {course.end_time || "—"}
-                      </Typography>
-                      <Typography variant="body-2" className="text-fractal-text-placeholder">
-                        <strong>Semester:</strong> {course.semester || "—"}
-                      </Typography>
-                    </>
-                  )}
-                </div>
+                <div className="flex gap-2 mt-auto">
 
-                {/* Actions */}
-                <div className="grid grid-cols-2 gap-2 px-4 pb-3 pt-1 mt-auto border-t border-fractal-base-grey-90">
-                  {isEditing ? (
+                  {editing ? (
                     <>
                       <Button
-                        variant={"default" as any}
-                        size={"sm" as any}
+                        label="Save"
+                        icon={<Save size={14} />}
                         onClick={() => updateCourse(course.id)}
-                        className="flex items-center gap-1"
-                      >
-                        <Save className="size-3" />
-                        Save
-                      </Button>
+                      />
                       <Button
-                        variant={"ghost" as any}
-                        size={"sm" as any}
+                        label="Cancel"
+                        icon={<X size={14} />}
                         onClick={() => {
                           setEditingId(null);
                           setEditFields({});
                         }}
-                        className="flex items-center gap-1"
-                      >
-                        <X className="size-3" />
-                        Cancel
-                      </Button>
+                      />
                     </>
                   ) : (
                     <>
                       <Button
-                        variant={"secondary" as any}
-                        size={"sm" as any}
+                        label="Edit"
+                        icon={<Edit2 size={14} />}
                         onClick={() => {
                           setEditingId(course.id);
                           setEditFields(course);
                         }}
-                        className="flex items-center gap-1"
-                      >
-                        <Edit2 className="size-3" />
-                        Edit
-                      </Button>
+                      />
                       <Button
-                        variant={"ghost" as any}
-                        size={"sm" as any}
+                        label="Delete"
+                        icon={<Trash2 size={14} />}
                         onClick={() => deleteCourse(course.id)}
-                        className="flex items-center gap-1"
-                      >
-                        <Trash2 className="size-3" />
-                        Delete
-                      </Button>
+                      />
                     </>
                   )}
+
                 </div>
               </div>
             );
           })}
         </div>
       </Paper>
-
     </div>
   );
 }
