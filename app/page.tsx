@@ -4,9 +4,9 @@ import { getCurrentUserWithRole } from '@/lib/auth/get-current-user';
 export default async function RootPage() {
   const result = await getCurrentUserWithRole();
 
-  if (result.error === 'unauthenticated') redirect('/auth');
-  if (result.error === 'no_profile' || result.error === 'invalid_role') redirect('/auth/setup');
-  if (!result.user) redirect('/auth');
+  if (result.error === 'unauthenticated') redirect('/auth/login');
+  if (result.error === 'no_profile' || result.error === 'invalid_role') redirect('/auth/onboarding');
+  if (!result.user) redirect('/auth/login');
 
   const { role } = result.user;
 
@@ -14,5 +14,5 @@ export default async function RootPage() {
   if (role === 'faculty') redirect('/faculty');
   if (role === 'student') redirect('/student');
 
-  redirect('/auth');
+  redirect('/auth/login');
 }
