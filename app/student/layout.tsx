@@ -1,9 +1,9 @@
 import { Suspense } from 'react';
 import { redirect } from 'next/navigation';
-import { Header, Avatar, InputText } from "@snowball-tech/fractal";
-import { ChevronDown } from "lucide-react";
+import { Header, Avatar, InputText } from "@snowball-tech/fractal"; 
 import StudentSidebar from "@/components/student-sidebar";
 import { getCurrentUserWithRole } from "@/lib/auth/get-current-user";
+import UserMenu from '@/components/user-menu';
 
 // this is from claude bcs i gave up
 async function StudentAuthGuard({ children }: { children: React.ReactNode }) {
@@ -30,8 +30,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
           }
           right={
             <div className="flex items-center gap-2 cursor-pointer">
-              <Avatar size="s" />
-              <ChevronDown size={16} className="ml-1" />
+              <UserMenu/>
             </div>
           }
         />

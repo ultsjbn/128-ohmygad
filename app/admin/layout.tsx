@@ -4,13 +4,15 @@ import { Header, Avatar, InputText } from "@snowball-tech/fractal";
 import { ChevronDown } from "lucide-react";
 import AdminSidebar from "@/components/admin-sidebar";
 import { getCurrentUserWithRole } from "@/lib/auth/get-current-user";
+import { Menu } from '@snowball-tech/fractal';
+import UserMenu from '@/components/user-menu';
 
 async function AdminAuthGuard({ children }: { children: React.ReactNode }) {
   const result = await getCurrentUserWithRole();
 
-  if (result.error === 'unauthenticated') redirect('/auth?redirectTo=/admin');
+  if (result.error === 'unauthenticated') redirect('/auth/login');
   if (result.error === 'no_profile' || result.error === 'invalid_role') redirect('/auth/setup');
-  if (result.user.role !== 'admin') redirect('/');
+  if (result.user.role !== 'admin') redirect('/auth/login');
 
   return <>{children}</>;
 }
@@ -30,8 +32,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           }
           right={
             <div className="flex items-center gap-2 cursor-pointer">
-              <Avatar size="s" />
-              <ChevronDown size={16} className="ml-1" />
+              <UserMenu/>
             </div>
           }
         />
