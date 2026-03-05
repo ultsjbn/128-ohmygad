@@ -123,9 +123,6 @@ export default function EventsPage() {
                   ))}
                 </div>
 
-                {/* Divider */}
-                <div className="border-t border-fractal-border-default" />
-
                 {/* Status filter */}
                 <div className="flex flex-col gap-1">
                   <Typography variant="body-2" className="font-median text-fractal-text-placeholder">
@@ -157,7 +154,6 @@ export default function EventsPage() {
         </div>
       </div>
 
-      {/* Active filter chips */}
       {(categoryFilter !== "All" || statusFilter !== "All") && (
         <div className="flex items-center gap-2 flex-wrap shrink-0">
           <Typography variant="body-2" className="text-fractal-text-placeholder">
@@ -250,12 +246,6 @@ export default function EventsPage() {
         )}
       </div>
 
-      {/* Count */}
-      {!isLoading && !error && (
-        <Typography variant="body-2" className="text-fractal-text-placeholder shrink-0">
-          Showing {filtered.length} of {events.length} events
-        </Typography>
-      )}
     </div>
   );
 }
