@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation';
 import { Header, Avatar, InputText } from "@snowball-tech/fractal";
 import FacultySidebar from "@/components/faculty-sidebar";
 import { getCurrentUserWithRole } from "@/lib/auth/get-current-user";
-import { ChevronDown } from 'lucide-react';
+import UserMenu from '@/components/user-menu';
 
 // this function is from claude idk how to solve the error but it finally works???
 async function FacultyAuthGuard({ children }: { children: React.ReactNode }) {
@@ -30,7 +30,9 @@ export default function FacultyLayout({ children }: { children: React.ReactNode 
             </div>
           }
           right={
-            <ChevronDown/>
+            <div className="flex items-center gap-2 cursor-pointer">
+              <UserMenu/>
+            </div>
           }
         />
       </div>
