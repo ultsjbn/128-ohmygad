@@ -10,7 +10,7 @@ export default function DashboardPage() {
   return (
     <div className="w-full h-full flex flex-col gap-6 mx-auto">
       
-      {/* HEADER SECTION WITH TOTAL USERS */}
+      {/* HEADER */}
       <div className="mb-4 shrink-0 flex items-end justify-between">
         <div>
           <Typography variant="heading-3">
