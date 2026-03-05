@@ -26,9 +26,9 @@ interface FilterState {
   semester: string[];
 }
 
-export default function EventsPage() {
+export default function CoursesPage() {
   const router = useRouter();
-  const [events, setCourses] = useState<CourseFormData[]>([]);
+  const [courses, setCourses] = useState<CourseFormData[]>([]);
   const [filtered, setFiltered] = useState<CourseFormData[]>([]);
   const [search, setSearch] = useState("");
   const [isLoading, setIsLoading] = useState(true);
@@ -46,12 +46,12 @@ export default function EventsPage() {
   // next fix: case sensitivity of database inputs, pero ganto muna
   const statuses = Array.from(
     new Set(
-      events
+      courses
         .map((e) => e.status?.toLowerCase().trim())
         .filter(Boolean)
     )
   );
-  const categories = Array.from(new Set(events.map((e) => e.semester).filter(Boolean)));
+  const categories = Array.from(new Set(courses.map((e) => e.semester).filter(Boolean)));
 
   const hasActiveFilters =
     filters.status.length > 0 ||
@@ -79,7 +79,7 @@ export default function EventsPage() {
   // Search, filters, and sorting
   useEffect(() => {
     const q = search.toLowerCase();
-    let result = events;
+    let result = courses;
 
     // Text search
     result = result.filter(
@@ -102,11 +102,11 @@ export default function EventsPage() {
     // Sorting
     result = sortCourses(result, sort);
     setFiltered(result);
-  }, [search, events, sort, filters]);
+  }, [search, courses, sort, filters]);
 
-  const sortCourses = (eventsToSort: CourseFormData[], sortState: SortState): CourseFormData[] => {
+  const sortCourses = (coursesToSort: CourseFormData[], sortState: SortState): CourseFormData[] => {
     const { field, direction } = sortState;
-    const sorted = [...eventsToSort];
+    const sorted = [...coursesToSort];
 
     sorted.sort((a, b) => {
       let aVal: any = a[field as keyof CourseFormData];
@@ -168,10 +168,10 @@ export default function EventsPage() {
 
     setDeletingId(id);
     const supabase = createClient();
-    const { error } = await supabase.from("event").delete().eq("id", id);
+    const { error } = await supabase.from("course").delete().eq("id", id);
 
     if (error) {
-      alert("Failed to delete event: " + error.message);
+      alert("Failed to delete course: " + error.message);
     } else {
       setCourses((prev) => prev.filter((e) => e.id !== id));
     }
@@ -200,7 +200,7 @@ export default function EventsPage() {
 
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <InputText 
-          placeholder="Search by title, semester, or time..." 
+          placeholder="Search by title, semester, or status..." 
           fullWidth 
           prefix={<Search size={18} />} 
           onChange={(e) => setSearch(e.target.value)} 
@@ -306,7 +306,7 @@ export default function EventsPage() {
           </div>
 
           <Button 
-            label="Add Event" 
+            label="Add Course" 
             variant="primary-dark" 
             icon={<Plus size={18} />} 
             iconPosition="left" 
