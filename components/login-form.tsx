@@ -63,7 +63,7 @@ export function LoginForm({
           router.push("/faculty");
           break;
         case "student":
-          router.push("/student/dashboard");
+          router.push("/student");
           break;
         default:
           await supabase.auth.signOut();
@@ -107,12 +107,6 @@ export function LoginForm({
             <div className="flex flex-col gap-half">
               <div className="flex items-center justify-between">
                 <Typography variant="body-2-median" element="label">Password</Typography>
-                <Link
-                  href="/auth/forgot-password"
-                  className="text-sm underline-offset-4 hover:underline text-fractal-text-placeholder"
-                >
-                  Forgot your password?
-                </Link>
               </div>
               <InputText
                 id="password"
@@ -123,6 +117,12 @@ export function LoginForm({
                 onChange={(_e, newValue) => setPassword(newValue)}
                 className="[&_input:focus]:!border-fractal-border-primary [&_input:focus]:!shadow-brutal-1-primary"
               />
+              <Link
+                  href="/auth/forgot-password"
+                  className="text-sm underline-offset-4 hover:underline text-fractal-text-placeholder text-right"
+                >
+                  Forgot your password?
+                </Link>
             </div>
 
             {error && (
