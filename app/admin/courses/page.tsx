@@ -2,11 +2,9 @@
 //code ni bea kasi nairita ako sobra
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
 import { Loader, Paper } from "@snowball-tech/fractal";
 import { InputText } from "@snowball-tech/fractal";
 import { Plus, Pencil, Trash2, Search, ArrowUpDown, SlidersHorizontal, X, ChevronUp, ChevronDown } from "lucide-react";
-import type { EventFormData } from "@/components/admin/event-form";
 import { Button } from "@/components/button";
 import { Typography } from "@/components/typography";
 import { Pagination } from "@/components/pagination";
@@ -42,7 +40,7 @@ export default function CoursesPage() {
     semester: [],
   });
 
-  
+
   // next fix: case sensitivity of database inputs, pero ganto muna
   const statuses = Array.from(
     new Set(
@@ -59,15 +57,15 @@ export default function CoursesPage() {
   const [page, setPage] = useState(1);
 
   const getCourses = async () => {
-    const supabase = createClient();
-    const { data, error } = await supabase
-      .from("course")
-      .select("id, title, description, start_time, end_time, status, semester")
-      .order("start_time", { ascending: false });
-
-    if (!error && data) {
-      setCourses(data);
-      setFiltered(data);
+    try {
+      const res = await fetch("/api/courses");
+      const json = await res.json();
+      if (json.success && Array.isArray(json.courses)) {
+        setCourses(json.courses);
+        setFiltered(json.courses);
+      }
+    } catch (err) {
+      console.error("Failed to fetch courses:", err);
     }
     setIsLoading(false);
   };
@@ -84,7 +82,7 @@ export default function CoursesPage() {
     // Text search
     result = result.filter(
       (e) =>
-        e.title.toLowerCase().includes(q) ||
+        e.title?.toLowerCase().includes(q) ||
         e.semester?.toLowerCase().includes(q) ||
         e.status?.toLowerCase().includes(q)
     );
@@ -167,13 +165,16 @@ export default function CoursesPage() {
     if (!confirmed) return;
 
     setDeletingId(id);
-    const supabase = createClient();
-    const { error } = await supabase.from("course").delete().eq("id", id);
-
-    if (error) {
-      alert("Failed to delete course: " + error.message);
-    } else {
-      setCourses((prev) => prev.filter((e) => e.id !== id));
+    try {
+      const res = await fetch(`/api/courses/${id}`, { method: "DELETE" });
+      const json = await res.json();
+      if (!json.success) {
+        alert("Failed to delete course: " + (json.error || "Unknown error"));
+      } else {
+        setCourses((prev) => prev.filter((e) => e.id !== id));
+      }
+    } catch (err) {
+      alert("Failed to delete course.");
     }
     setDeletingId(null);
   };
@@ -199,11 +200,11 @@ export default function CoursesPage() {
       </div>
 
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-        <InputText 
-          placeholder="Search by title, semester, or status..." 
-          fullWidth 
-          prefix={<Search size={18} />} 
-          onChange={(e) => setSearch(e.target.value)} 
+        <InputText
+          placeholder="Search by title, semester, or status..."
+          fullWidth
+          prefix={<Search size={18} />}
+          onChange={(e) => setSearch(e.target.value)}
           value={search}
         />
 
@@ -242,15 +243,15 @@ export default function CoursesPage() {
 
           {/* Filter */}
           <div className="relative">
-            <Button 
+            <Button
               label="Filter"
               variant={hasActiveFilters ? "primary-dark" : "display"}
-              icon={<SlidersHorizontal size={18} />} 
-              iconPosition="left" 
+              icon={<SlidersHorizontal size={18} />}
+              iconPosition="left"
               onClick={() => setShowFilterMenu(!showFilterMenu)}
               className="whitespace-nowrap"
             />
-            
+
             {showFilterMenu && (
               <div className="absolute top-full right-0 mt-2 bg-white border-2 border-fractal-border-default rounded-s shadow-brutal-1 z-40 min-w-[240px] max-h-96 overflow-y-auto">
 
@@ -305,12 +306,12 @@ export default function CoursesPage() {
             )}
           </div>
 
-          <Button 
-            label="Add Course" 
-            variant="primary-dark" 
-            icon={<Plus size={18} />} 
-            iconPosition="left" 
-            onClick={() => router.push("/admin/courses/create")} 
+          <Button
+            label="Add Course"
+            variant="primary-dark"
+            icon={<Plus size={18} />}
+            iconPosition="left"
+            onClick={() => router.push("/admin/courses/create")}
           />
         </div>
 
@@ -321,7 +322,7 @@ export default function CoursesPage() {
       <Paper elevation="elevated" className="overflow-hidden p-0">
         {isLoading ? (
           <div className="p-8 text-center">
-            <Loader size="xl"/>
+            <Loader size="xl" />
           </div>
         ) : filtered.length === 0 ? (
           <div className="p-8 text-center">
@@ -332,8 +333,8 @@ export default function CoursesPage() {
               {hasActiveFilters
                 ? "No courses match your filters."
                 : search
-                ? "No courses match your search."
-                : "No courses yet. Create one to get started."}
+                  ? "No courses match your search."
+                  : "No courses yet. Create one to get started."}
             </Typography>
           </div>
         ) : (
@@ -422,8 +423,8 @@ export default function CoursesPage() {
                       })
                       : "—"}
                   </td>
-                 
-          
+
+
                   <td className="p-3">
                     <div className="flex gap-2 justify-end">
                       <button

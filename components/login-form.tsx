@@ -63,7 +63,7 @@ export function LoginForm({
           router.push("/faculty");
           break;
         case "student":
-          router.push("/student/dashboard");
+          router.push("/student");
           break;
         default:
           await supabase.auth.signOut();
