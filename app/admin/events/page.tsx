@@ -12,18 +12,9 @@ import { Typography } from "@/components/typography";
 import { Pagination } from "@/components/pagination";
 import { paginate, totalPages, PER_PAGE } from "./event.utils";
 
-type SortField = "title" | "category" | "status" | "start_date" | "capacity" | "location";
-type SortDirection = "asc" | "desc";
-
-interface SortState {
-  field: SortField;
-  direction: SortDirection;
-}
-
-interface FilterState {
-  status: string[];
-  category: string[];
-}
+const CATEGORIES = ["All", "Orientation", "Forum", "Research", "Training", "Workshop"];
+const STATUSES = ["All", "upcoming", "past"];
+const SORT_OPTIONS = ["Newest", "Oldest"];
 
 export default function EventsPage() {
   const router = useRouter();
@@ -33,28 +24,11 @@ export default function EventsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [modalContent, setModalContent] = useState<{ label: string; text: string } | null>(null);
-  const [sort, setSort] = useState<SortState>({ field: "start_date", direction: "desc" });
+  const [sortOrder, setSortOrder] = useState("Newest");
   const [showSortMenu, setShowSortMenu] = useState(false);
   const [showFilterMenu, setShowFilterMenu] = useState(false);
-  const [filters, setFilters] = useState<FilterState>({
-    status: [],
-    category: [],
-  });
-
-  
-  // next fix: case sensitivity of database inputs, pero ganto muna
-  const statuses = Array.from(
-    new Set(
-      events
-        .map((e) => e.status?.toLowerCase().trim())
-        .filter(Boolean)
-    )
-  );
-  const categories = Array.from(new Set(events.map((e) => e.category).filter(Boolean)));
-
-  const hasActiveFilters =
-    filters.status.length > 0 ||
-    filters.category.length > 0;
+  const [categoryFilter, setCategoryFilter] = useState("All");
+  const [statusFilter, setStatusFilter] = useState("All");
   const [page, setPage] = useState(1);
 
   const getEvents = async () => {
@@ -75,7 +49,7 @@ export default function EventsPage() {
     getEvents();
   }, []);
 
-  // Search, filters, and sorting
+  // Apply search, filter, sort
   useEffect(() => {
     const q = search.toLowerCase();
     let result = events;
@@ -83,81 +57,30 @@ export default function EventsPage() {
     // Text search
     result = result.filter(
       (e) =>
-        e.title.toLowerCase().includes(q) ||
-        e.category?.toLowerCase().includes(q) ||
-        e.location?.toLowerCase().includes(q)
+        `${e.title} ${e.category || ""} ${e.location || ""}`
+          .toLowerCase()
+          .includes(q)
+    );
+
+    // Category filter
+    result = result.filter(
+      (e) => categoryFilter === "All" || e.category === categoryFilter
     );
 
     // Status filter
-    if (filters.status.length > 0) {
-      result = result.filter((e) => filters.status.includes(e.status));
-    }
-
-    // Category filter
-    if (filters.category.length > 0) {
-      result = result.filter((e) => filters.category.includes(e.category));
-    }
+    result = result.filter(
+      (e) => statusFilter === "All" || e.status === statusFilter
+    );
 
     // Sorting
-    result = sortEvents(result, sort);
+    result = result.sort((a, b) => {
+      const dateA = new Date(a.start_date ?? "").getTime();
+      const dateB = new Date(b.start_date ?? "").getTime();
+      return sortOrder === "Newest" ? dateB - dateA : dateA - dateB;
+    });
+
     setFiltered(result);
-  }, [search, events, sort, filters]);
-
-  const sortEvents = (eventsToSort: EventFormData[], sortState: SortState): EventFormData[] => {
-    const { field, direction } = sortState;
-    const sorted = [...eventsToSort];
-
-    sorted.sort((a, b) => {
-      let aVal: any = a[field as keyof EventFormData];
-      let bVal: any = b[field as keyof EventFormData];
-
-      if (aVal == null && bVal == null) return 0;
-      if (aVal == null) return direction === "asc" ? 1 : -1;
-      if (bVal == null) return direction === "asc" ? -1 : 1;
-
-      if (field === "start_date") {
-        aVal = new Date(aVal).getTime();
-        bVal = new Date(bVal).getTime();
-      }
-
-      // Handle string comparisons (case-insensitive)
-      if (typeof aVal === "string" && typeof bVal === "string") {
-        aVal = aVal.toLowerCase();
-        bVal = bVal.toLowerCase();
-      }
-
-      if (aVal < bVal) return direction === "asc" ? -1 : 1;
-      if (aVal > bVal) return direction === "asc" ? 1 : -1;
-      return 0;
-    });
-
-    return sorted;
-  };
-
-  const handleSort = (field: SortField) => {
-    setSort((prev) => ({
-      field,
-      direction: prev.field === field && prev.direction === "asc" ? "desc" : "asc",
-    }));
-    setShowSortMenu(false);
-  };
-
-  const toggleFilter = (type: "status" | "category", value: string) => {
-    setFilters((prev) => ({
-      ...prev,
-      [type]: prev[type].includes(value)
-        ? prev[type].filter((v) => v !== value)
-        : [...prev[type], value],
-    }));
-  };
-
-  const clearFilters = () => {
-    setFilters({
-      status: [],
-      category: [],
-    });
-    setSearch("");
-  };
+  }, [search, events, sortOrder, categoryFilter, statusFilter]);
 
   const handleDelete = async (id: string, title: string) => {
     const confirmed = window.confirm(
@@ -177,21 +100,6 @@ export default function EventsPage() {
     setDeletingId(null);
   };
 
-  const getSortIndicator = (field: SortField) => {
-    if (sort.field !== field) return null;
-    return sort.direction === "asc" ? <ChevronUp size={16} /> : <ChevronDown size={16} />;
-  };
-
-  const sortOptions: { label: string; field: SortField }[] = [
-    { label: "Title", field: "title" },
-    { label: "Category", field: "category" },
-    { label: "Status", field: "status" },
-    { label: "Date", field: "start_date" },
-    { label: "Capacity", field: "capacity" },
-    { label: "Location", field: "location" },
-  ];
-
-
   return (
     <div className="mx-auto h-full flex flex-col gap-6">
 
@@ -199,109 +107,98 @@ export default function EventsPage() {
         <Typography variant="heading-2">Events Management</Typography>
       </div>
 
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-        <InputText 
-          placeholder="Search by title, category, or location..." 
-          fullWidth 
-          prefix={<Search size={18} />} 
-          onChange={(e) => setSearch(e.target.value)} 
+      {/* Search + Sort + Filter row */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shrink-0">
+        <InputText
+          placeholder="Search by title, category, or location..."
+          fullWidth
+          prefix={<Search size={18} />}
+          onChange={(_e, value) => setSearch(value)}
           value={search}
         />
-
         <div className="flex items-center gap-2 shrink-0 relative">
-          {/* Sort Button with Dropdown Menu */}
+          {/* Sort button + dropdown */}
           <div className="relative">
             <Button
-              label={`Sort${sort.field !== "start_date" ? ": " + sortOptions.find(o => o.field === sort.field)?.label : ""}`}
+              label="Sort"
               variant="display"
               icon={<ArrowUpDown size={18} />}
               iconPosition="left"
-              onClick={() => setShowSortMenu(!showSortMenu)}
+              onClick={() => { setShowSortMenu((p) => !p); setShowFilterMenu(false); }}
               className="whitespace-nowrap"
             />
-
             {showSortMenu && (
-              <div className="absolute top-full right-0 mt-2 bg-white border-2 border-fractal-border-default rounded-s shadow-brutal-1 z-40 min-w-[180px]">
-                {sortOptions.map((option) => (
+              <div className="absolute right-0 top-full mt-1 z-10 bg-white border-2 border-fractal-border-default rounded-s shadow-brutal-2 min-w-[140px]">
+                {SORT_OPTIONS.map((opt) => (
                   <button
-                    key={option.field}
-                    onClick={() => handleSort(option.field)}
-                    className={`w-full text-left px-4 py-2 text-sm font-median hover:bg-fractal-base-grey-90 transition-colors flex items-center justify-between ${sort.field === option.field ? "bg-fractal-base-grey-90" : ""
-                      }`}
+                    key={opt}
+                    onClick={() => { setSortOrder(opt); setShowSortMenu(false); }}
+                    className={`w-full text-left px-4 py-2 text-sm hover:bg-fractal-base-grey-90 transition-colors ${
+                      sortOrder === opt ? "font-median bg-fractal-decorative-yellow-90" : ""
+                    }`}
                   >
-                    <span>{option.label}</span>
-                    {sort.field === option.field && (
-                      <span className="ml-2">
-                        {sort.direction === "asc" ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-                      </span>
-                    )}
+                    {opt}
                   </button>
                 ))}
               </div>
             )}
           </div>
 
-          {/* Filter */}
+          {/* Filter button + dropdown */}
           <div className="relative">
-            <Button 
+            <Button
               label="Filter"
-              variant={hasActiveFilters ? "primary-dark" : "display"}
-              icon={<SlidersHorizontal size={18} />} 
-              iconPosition="left" 
-              onClick={() => setShowFilterMenu(!showFilterMenu)}
+              variant="display"
+              icon={<SlidersHorizontal size={18} />}
+              iconPosition="left"
+              onClick={() => { setShowFilterMenu((p) => !p); setShowSortMenu(false); }}
               className="whitespace-nowrap"
             />
-            
             {showFilterMenu && (
-              <div className="absolute top-full right-0 mt-2 bg-white border-2 border-fractal-border-default rounded-s shadow-brutal-1 z-40 min-w-[240px] max-h-96 overflow-y-auto">
+              <div className="absolute right-0 top-full mt-1 z-10 bg-white border-2 border-fractal-border-default rounded-s shadow-brutal-2 min-w-[200px] p-3 flex flex-col gap-3">
+                {/* Category filter */}
+                <div className="flex flex-col gap-1">
+                  <Typography variant="body-2" className="font-median text-fractal-text-placeholder">
+                    Category
+                  </Typography>
+                  {CATEGORIES.map((cat) => (
+                    <button
+                      key={cat}
+                      onClick={() => setCategoryFilter(cat)}
+                      className={`text-left px-3 py-1.5 text-sm rounded-s hover:bg-fractal-base-grey-90 transition-colors ${
+                        categoryFilter === cat ? "font-median bg-fractal-decorative-yellow-90 border border-fractal-border-default" : ""
+                      }`}
+                    >
+                      {cat}
+                    </button>
+                  ))}
+                </div>
 
-                {/* Status Filter */}
-                {statuses.length > 0 && (
-                  <div className="border-b border-fractal-border-default p-3">
-                    <Typography variant="body-2-median" className="mb-2 block">
-                      Status
-                    </Typography>
-                    {statuses.map((status) => (
-                      <label
-                        key={status}
-                        className="flex items-center gap-2 px-2 py-1.5 cursor-pointer hover:bg-fractal-base-grey-90 rounded transition-colors"
-                      >
-                        <input
-                          type="checkbox"
-                          checked={filters.status.includes(status)}
-                          onChange={() => toggleFilter("status", status)}
-                          className="w-4 h-4 appearance-none border-2 border-fractal rounded-full bg-white checked:bg-fractal-brand-primary" // to do: update to fractal checkbox 
-                        />
-                        <Typography variant="body-2" className="capitalize">
-                          {status}
-                        </Typography>
-                      </label>
-                    ))}
-                  </div>
-                )}
+                {/* Status filter */}
+                <div className="flex flex-col gap-1">
+                  <Typography variant="body-2" className="font-median text-fractal-text-placeholder">
+                    Status
+                  </Typography>
+                  {STATUSES.map((s) => (
+                    <button
+                      key={s}
+                      onClick={() => setStatusFilter(s)}
+                      className={`text-left px-3 py-1.5 text-sm rounded-s capitalize hover:bg-fractal-base-grey-90 transition-colors ${
+                        statusFilter === s ? "font-median bg-fractal-decorative-yellow-90 border border-fractal-border-default" : ""
+                      }`}
+                    >
+                      {s}
+                    </button>
+                  ))}
+                </div>
 
-                {/* Category */}
-                {categories.length > 0 && (
-                  <div className="border-b border-fractal-border-default p-3">
-                    <Typography variant="body-2-median" className="mb-2 block">
-                      Category
-                    </Typography>
-                    {categories.map((category) => (
-                      <label
-                        key={category}
-                        className="flex items-center gap-2 px-2 py-1.5 cursor-pointer hover:bg-fractal-base-grey-90 rounded transition-colors"
-                      >
-                        <input
-                          type="checkbox"
-                          checked={filters.category.includes(category)}
-                          onChange={() => toggleFilter("category", category)}
-                          className="w-4 h-4 appearance-none border-2 border-fractal rounded-full bg-white checked:bg-fractal-brand-primary" // to do: update to fractal checkbox 
-                        />
-                        <Typography variant="body-2">{category}</Typography>
-                      </label>
-                    ))}
-                  </div>
-                )}
+                {/* Clear filters */}
+                <button
+                  onClick={() => { setCategoryFilter("All"); setStatusFilter("All"); setShowFilterMenu(false); }}
+                  className="text-xs text-fractal-text-placeholder underline text-left mt-1 hover:text-fractal-text-default transition-colors"
+                >
+                  Clear filters
+                </button>
               </div>
             )}
           </div>
@@ -312,14 +209,33 @@ export default function EventsPage() {
             icon={<Plus size={18} />} 
             iconPosition="left" 
             onClick={() => router.push("/admin/events/create")} 
+            className="whitespace-nowrap"
           />
         </div>
-
       </div>
 
+      {/* Applied filters display */}
+      {(categoryFilter !== "All" || statusFilter !== "All") && (
+        <div className="flex items-center gap-2 flex-wrap shrink-0">
+          <Typography variant="body-2" className="text-fractal-text-placeholder">
+            Filters:
+          </Typography>
+          {categoryFilter !== "All" && (
+            <span className="px-2 py-0.5 text-xs font-median border-2 border-fractal-border-default rounded-s bg-fractal-decorative-yellow-90 shadow-brutal-1 flex items-center gap-1">
+              {categoryFilter}
+              <button onClick={() => setCategoryFilter("All")} className="ml-1 hover:text-red-500">×</button>
+            </span>
+          )}
+          {statusFilter !== "All" && (
+            <span className="px-2 py-0.5 text-xs font-median border-2 border-fractal-border-default rounded-s bg-fractal-decorative-yellow-90 shadow-brutal-1 capitalize flex items-center gap-1">
+              {statusFilter}
+              <button onClick={() => setStatusFilter("All")} className="ml-1 hover:text-red-500">×</button>
+            </span>
+          )}
+        </div>
+      )}
 
-
-      <Paper elevation="elevated" className="overflow-hidden p-0">
+      <Paper elevation="elevated" className="overflow-auto p-0">
         {isLoading ? (
           <div className="p-8 text-center">
             <Loader size="xl"/>
@@ -330,77 +246,19 @@ export default function EventsPage() {
               variant="body-1"
               className="text-fractal-text-placeholder"
             >
-              {hasActiveFilters
-                ? "No events match your filters."
-                : search
-                ? "No events match your search."
-                : "No events yet. Create one to get started."}
+              {search ? "No events match your search." : "No events available."}
             </Typography>
           </div>
         ) : (
           <table className="w-full text-sm">
             <thead className="border-b-2 border-fractal-border-default bg-fractal-base-grey-90 sticky top-0">
               <tr>
-                <th
-                  className="text-left p-3 font-median cursor-pointer hover:bg-fractal-base-grey-80 transition-colors"
-                  onClick={() => handleSort("title")}
-                  title="Click to sort"
-                >
-                  <div className="flex items-center gap-1">
-                    Title
-                    {getSortIndicator("title")}
-                  </div>
-                </th>
-                <th
-                  className="text-left p-3 font-median cursor-pointer hover:bg-fractal-base-grey-80 transition-colors"
-                  onClick={() => handleSort("category")}
-                  title="Click to sort"
-                >
-                  <div className="flex items-center gap-1">
-                    Category
-                    {getSortIndicator("category")}
-                  </div>
-                </th>
-                <th
-                  className="text-left p-3 font-median cursor-pointer hover:bg-fractal-base-grey-80 transition-colors"
-                  onClick={() => handleSort("status")}
-                  title="Click to sort"
-                >
-                  <div className="flex items-center gap-1">
-                    Status
-                    {getSortIndicator("status")}
-                  </div>
-                </th>
-                <th
-                  className="text-left p-3 font-median cursor-pointer hover:bg-fractal-base-grey-80 transition-colors"
-                  onClick={() => handleSort("start_date")}
-                  title="Click to sort"
-                >
-                  <div className="flex items-center gap-1">
-                    Date
-                    {getSortIndicator("start_date")}
-                  </div>
-                </th>
-                <th
-                  className="text-left p-3 font-median cursor-pointer hover:bg-fractal-base-grey-80 transition-colors"
-                  onClick={() => handleSort("capacity")}
-                  title="Click to sort"
-                >
-                  <div className="flex items-center gap-1">
-                    Capacity
-                    {getSortIndicator("capacity")}
-                  </div>
-                </th>
-                <th
-                  className="text-left p-3 font-median cursor-pointer hover:bg-fractal-base-grey-80 transition-colors"
-                  onClick={() => handleSort("location")}
-                  title="Click to sort"
-                >
-                  <div className="flex items-center gap-1">
-                    Location
-                    {getSortIndicator("location")}
-                  </div>
-                </th>
+                <th className="text-left p-3 font-median">Title</th>
+                <th className="text-left p-3 font-median">Category</th>
+                <th className="text-left p-3 font-median">Status</th>
+                <th className="text-left p-3 font-median">Date</th>
+                <th className="text-left p-3 font-median">Capacity</th>
+                <th className="text-left p-3 font-median">Location</th>
                 <th className="text-right p-3 font-median">Actions</th>
               </tr>
             </thead>
@@ -421,16 +279,12 @@ export default function EventsPage() {
                     {event.title}
                   </td>
                   <td className="p-3">
-                    <span
-                      className={`px-2 py-0.5 rounded-s text-xs font-median border-2 border-fractal-border-default bg-fractal-base-grey-90`}
-                    >
+                    <span className="px-2 py-0.5 rounded-s text-xs font-median border-2 border-fractal-border-default bg-fractal-base-grey-90">
                       {event.category}
                     </span>
                   </td>
                   <td className="p-3">
-                    <span
-                      className={`px-2 py-0.5 rounded-s text-xs font-median capitalize border border-fractal-border-default`}
-                    >
+                    <span className="px-2 py-0.5 rounded-s text-xs font-median capitalize border border-fractal-border-default">
                       {event.status}
                     </span>
                   </td>
