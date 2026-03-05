@@ -5,6 +5,7 @@ import { ChevronDown } from "lucide-react";
 import AdminSidebar from "@/components/admin-sidebar";
 import { getCurrentUserWithRole } from "@/lib/auth/get-current-user";
 import { Menu } from '@snowball-tech/fractal';
+import UserMenu from '@/components/user-menu';
 
 async function AdminAuthGuard({ children }: { children: React.ReactNode }) {
   const result = await getCurrentUserWithRole();
@@ -31,8 +32,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           }
           right={
             <div className="flex items-center gap-2 cursor-pointer">
-              <Avatar size="s" />
-              <ChevronDown size={16} className="ml-1" />
+              <UserMenu/>
             </div>
           }
         />
