@@ -53,7 +53,7 @@ export default function CoursesPage() {
   );
 
   return (
-    <div className="max-w-[1400px] w-full flex flex-col gap-6">
+    <div className="mx-auto h-full flex flex-col gap-6">
       {/* Course Cards */}
       <Paper elevation="bordered" title="All Courses" titleVariant="heading-2" className="flex flex-col gap-4">
         <div className="flex items-center gap-2 w-full pb-3 border-b border-fractal-base-grey-70">
