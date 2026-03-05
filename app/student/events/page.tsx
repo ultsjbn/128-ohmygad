@@ -40,7 +40,7 @@ export default function EventsPage() {
     );
 
     return (
-        <div className="max-w-[1400px] w-full flex flex-col gap-6">
+        <div className="mx-auto h-full flex flex-col gap-6">
             <Paper elevation="bordered" title="Events" titleVariant="heading-2" className="flex flex-col gap-4">
                 <div className="flex items-center gap-2 w-full pb-3 border-b border-fractal-base-grey-70">
                     <div className="flex items-center gap-2 w-full max-w-sm">
