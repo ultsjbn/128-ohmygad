@@ -155,7 +155,7 @@ export default function CoursesPage() {
 
         {loading && <Typography variant="body-2">Loading courses...</Typography>}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 pt-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
           {filtered.map((course) => {
             const isEditing = editingId === course.id;
 
