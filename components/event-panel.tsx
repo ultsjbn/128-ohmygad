@@ -16,7 +16,7 @@ interface Event {
   image?: string;
 }
 
-// Format helpers
+// ─── format helpers ─────────────────────────────────────────────────────────────────
 
 const formatDate = (start: string): string =>
   new Date(start).toLocaleDateString("en-US", {
@@ -31,7 +31,7 @@ const formatTimeRange = (start: string, end: string): string => {
   return `${fmt(new Date(start))} - ${fmt(new Date(end))}`;
 };
 
-// Event panel
+// ─── Event Panel ─────────────────────────────────────────────────────────────
 
 export const EventPanel = (): JSX.Element => {
   const supabase = createClient();
@@ -53,6 +53,7 @@ export const EventPanel = (): JSX.Element => {
         return;
       }
 
+      // fetch events + current user's registration status
       const { data, error } = await supabase
         .from("event")
         .select(
@@ -63,14 +64,13 @@ export const EventPanel = (): JSX.Element => {
           start_date,
           end_date,
           banner,
-          status
-          `
+          event_registration (
+            status
+          )
+        `,
         )
-  .in("status", ["upcoming", "past"])
-  .order("start_date", { ascending: true });
-
-console.log("Events data:", data);
-console.log("Events error:", error);
+        .eq("event_registration.user_id", user.id)
+        .order("start_date", { ascending: true });
 
       if (error) {
         console.error("Failed to fetch events:", error.message);
@@ -84,6 +84,8 @@ console.log("Events error:", error);
         location: e.location,
         date: formatDate(e.start_date),
         time: formatTimeRange(e.start_date, e.end_date),
+        // event_registration will grab the first (user's) row
+        status: e.event_registration?.[0]?.status ?? null,
         image: e.banner ?? undefined,
       }));
 
