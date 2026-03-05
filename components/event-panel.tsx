@@ -64,7 +64,7 @@ export const EventPanel = (): JSX.Element => {
           start_date,
           end_date,
           banner,
-          event_registration (
+          event_registration!inner (
             status
           )
         `,
