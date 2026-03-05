@@ -41,7 +41,7 @@ export default function EventsPage() {
     category: [],
   });
 
-  
+
   // next fix: case sensitivity of database inputs, pero ganto muna
   const statuses = Array.from(
     new Set(
@@ -193,18 +193,18 @@ export default function EventsPage() {
 
 
   return (
-    <div className="mx-auto h-full flex flex-col gap-6">
+    <div className="mx-auto min-h-full flex flex-col gap-6">
 
       <div className="flex flex-col gap-1">
         <Typography variant="heading-2">Events Management</Typography>
       </div>
 
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-        <InputText 
-          placeholder="Search by title, category, or location..." 
-          fullWidth 
-          prefix={<Search size={18} />} 
-          onChange={(e) => setSearch(e.target.value)} 
+        <InputText
+          placeholder="Search by title, category, or location..."
+          fullWidth
+          prefix={<Search size={18} />}
+          onChange={(e) => setSearch(e.target.value)}
           value={search}
         />
 
@@ -216,7 +216,7 @@ export default function EventsPage() {
               variant="display"
               icon={<ArrowUpDown size={18} />}
               iconPosition="left"
-              onClick={() => setShowSortMenu(!showSortMenu)}
+              onClick={() => { setShowSortMenu(!showSortMenu); setShowFilterMenu(false); }}
               className="whitespace-nowrap"
             />
 
@@ -243,15 +243,15 @@ export default function EventsPage() {
 
           {/* Filter */}
           <div className="relative">
-            <Button 
+            <Button
               label="Filter"
               variant={hasActiveFilters ? "primary-dark" : "display"}
-              icon={<SlidersHorizontal size={18} />} 
-              iconPosition="left" 
-              onClick={() => setShowFilterMenu(!showFilterMenu)}
+              icon={<SlidersHorizontal size={18} />}
+              iconPosition="left"
+              onClick={() => { setShowFilterMenu(!showFilterMenu); setShowSortMenu(false); }}
               className="whitespace-nowrap"
             />
-            
+
             {showFilterMenu && (
               <div className="absolute top-full right-0 mt-2 bg-white border-2 border-fractal-border-default rounded-s shadow-brutal-1 z-40 min-w-[240px] max-h-96 overflow-y-auto">
 
@@ -306,12 +306,12 @@ export default function EventsPage() {
             )}
           </div>
 
-          <Button 
-            label="Add Event" 
-            variant="primary-dark" 
-            icon={<Plus size={18} />} 
-            iconPosition="left" 
-            onClick={() => router.push("/admin/events/create")} 
+          <Button
+            label="Add Event"
+            variant="primary-dark"
+            icon={<Plus size={18} />}
+            iconPosition="left"
+            onClick={() => router.push("/admin/events/create")}
           />
         </div>
 
@@ -322,7 +322,7 @@ export default function EventsPage() {
       <Paper elevation="elevated" className="overflow-hidden p-0">
         {isLoading ? (
           <div className="p-8 text-center">
-            <Loader size="xl"/>
+            <Loader size="xl" />
           </div>
         ) : filtered.length === 0 ? (
           <div className="p-8 text-center">
@@ -333,8 +333,8 @@ export default function EventsPage() {
               {hasActiveFilters
                 ? "No events match your filters."
                 : search
-                ? "No events match your search."
-                : "No events yet. Create one to get started."}
+                  ? "No events match your search."
+                  : "No events yet. Create one to get started."}
             </Typography>
           </div>
         ) : (
