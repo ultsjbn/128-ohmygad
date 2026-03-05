@@ -101,7 +101,7 @@ export default function EventsPage() {
   };
 
   return (
-    <div className="mx-auto h-full flex flex-col gap-6">
+    <div className="mx-auto min-h-full flex flex-col gap-6">
 
       <div className="flex flex-col gap-1">
         <Typography variant="heading-2">Events Management</Typography>
@@ -238,7 +238,7 @@ export default function EventsPage() {
       <Paper elevation="elevated" className="overflow-auto p-0">
         {isLoading ? (
           <div className="p-8 text-center">
-            <Loader size="xl"/>
+            <Loader size="xl" />
           </div>
         ) : filtered.length === 0 ? (
           <div className="p-8 text-center">
