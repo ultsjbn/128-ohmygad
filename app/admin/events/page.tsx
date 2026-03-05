@@ -193,7 +193,7 @@ export default function EventsPage() {
 
 
   return (
-    <div className="mx-auto h-full flex flex-col gap-6">
+    <div className="mx-auto min-h-full flex flex-col gap-6">
 
       <div className="flex flex-col gap-1">
         <Typography variant="heading-2">Events Management</Typography>

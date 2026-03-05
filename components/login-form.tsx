@@ -2,12 +2,12 @@
 
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
-//import { Card } from "./card";
 import { Card, InputText, Button } from "@snowball-tech/fractal";
 import { Typography } from "./typography";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import Image from "next/image";
 
 export function LoginForm({
   className,
@@ -78,15 +78,20 @@ export function LoginForm({
   };
 
   return (
-    <div className={cn("flex flex-col gap-3 font-sans border-2 border-fractal-border-default rounded-m shadow-brutal-2 p-4 bg-fractal-bg-body-white", className)} {...props}>
-      <Typography variant="heading-2" className="font-wide font-bold text-fractal-text-default">
+    <div className={cn("flex flex-col gap-4 font-sans border-2 border-fractal-border-default rounded-m shadow-brutal-2 p-4 bg-fractal-bg-body-white", className)} {...props}>
+      <Image
+        src="/kasarian_logo.jpg"
+        alt="UPB Kasarian Gender Studies Program Logo"
+        width={100}
+        height={100}
+        className="self-center rounded-full object-cover border-2 border-fractal-border-default transition-all duration-300"
+      />
+      <Typography variant="heading-2" className="font-wide font-bold text-fractal-text-default self-center">
         Login
       </Typography>
       <Card color="body">
-
         <form onSubmit={handleLogin}>
           <div className="flex flex-col gap-3">
-
             <InputText
               id="email"
               label="Email"

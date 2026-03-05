@@ -1,9 +1,9 @@
 import { Suspense } from 'react';
 import { redirect } from 'next/navigation';
 import { Header, Avatar, InputText } from "@snowball-tech/fractal";
-import { ChevronDown } from "lucide-react";
 import FacultySidebar from "@/components/faculty-sidebar";
 import { getCurrentUserWithRole } from "@/lib/auth/get-current-user";
+import UserMenu from '@/components/user-menu';
 
 // this function is from claude idk how to solve the error but it finally works???
 async function FacultyAuthGuard({ children }: { children: React.ReactNode }) {
@@ -31,8 +31,7 @@ export default function FacultyLayout({ children }: { children: React.ReactNode 
           }
           right={
             <div className="flex items-center gap-2 cursor-pointer">
-              <Avatar size="s" />
-              <ChevronDown size={16} className="ml-1" />
+              <UserMenu/>
             </div>
           }
         />
