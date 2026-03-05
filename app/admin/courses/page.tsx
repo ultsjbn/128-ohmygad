@@ -1,5 +1,5 @@
 "use client";
-
+//code ni bea kasi nairita ako sobra
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -11,8 +11,9 @@ import { Button } from "@/components/button";
 import { Typography } from "@/components/typography";
 import { Pagination } from "@/components/pagination";
 import { paginate, totalPages, PER_PAGE } from "./course.utils";
+import { CourseFormData } from "@/components/admin/course-form";
 
-type SortField = "title" | "category" | "status" | "start_date" | "capacity" | "location";
+type SortField = "title" | "semester" | "status" | "start_time";
 type SortDirection = "asc" | "desc";
 
 interface SortState {
@@ -22,23 +23,23 @@ interface SortState {
 
 interface FilterState {
   status: string[];
-  category: string[];
+  semester: string[];
 }
 
 export default function EventsPage() {
   const router = useRouter();
-  const [events, setEvents] = useState<EventFormData[]>([]);
-  const [filtered, setFiltered] = useState<EventFormData[]>([]);
+  const [events, setCourses] = useState<CourseFormData[]>([]);
+  const [filtered, setFiltered] = useState<CourseFormData[]>([]);
   const [search, setSearch] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [modalContent, setModalContent] = useState<{ label: string; text: string } | null>(null);
-  const [sort, setSort] = useState<SortState>({ field: "start_date", direction: "desc" });
+  const [sort, setSort] = useState<SortState>({ field: "start_time", direction: "desc" });
   const [showSortMenu, setShowSortMenu] = useState(false);
   const [showFilterMenu, setShowFilterMenu] = useState(false);
   const [filters, setFilters] = useState<FilterState>({
     status: [],
-    category: [],
+    semester: [],
   });
 
   
@@ -50,29 +51,29 @@ export default function EventsPage() {
         .filter(Boolean)
     )
   );
-  const categories = Array.from(new Set(events.map((e) => e.category).filter(Boolean)));
+  const categories = Array.from(new Set(events.map((e) => e.semester).filter(Boolean)));
 
   const hasActiveFilters =
     filters.status.length > 0 ||
-    filters.category.length > 0;
+    filters.semester.length > 0;
   const [page, setPage] = useState(1);
 
-  const getEvents = async () => {
+  const getCourses = async () => {
     const supabase = createClient();
     const { data, error } = await supabase
-      .from("event")
-      .select("id, title, description, category, status, start_date, end_date, capacity, location, registration_open, registration_close")
-      .order("start_date", { ascending: false });
+      .from("course")
+      .select("id, title, description, start_time, end_time, status, semester")
+      .order("start_time", { ascending: false });
 
     if (!error && data) {
-      setEvents(data);
+      setCourses(data);
       setFiltered(data);
     }
     setIsLoading(false);
   };
 
   useEffect(() => {
-    getEvents();
+    getCourses();
   }, []);
 
   // Search, filters, and sorting
@@ -84,8 +85,8 @@ export default function EventsPage() {
     result = result.filter(
       (e) =>
         e.title.toLowerCase().includes(q) ||
-        e.category?.toLowerCase().includes(q) ||
-        e.location?.toLowerCase().includes(q)
+        e.semester?.toLowerCase().includes(q) ||
+        e.status?.toLowerCase().includes(q)
     );
 
     // Status filter
@@ -93,29 +94,29 @@ export default function EventsPage() {
       result = result.filter((e) => filters.status.includes(e.status));
     }
 
-    // Category filter
-    if (filters.category.length > 0) {
-      result = result.filter((e) => filters.category.includes(e.category));
+    // Semester filter
+    if (filters.semester.length > 0) {
+      result = result.filter((e) => filters.semester.includes(e.semester));
     }
 
     // Sorting
-    result = sortEvents(result, sort);
+    result = sortCourses(result, sort);
     setFiltered(result);
   }, [search, events, sort, filters]);
 
-  const sortEvents = (eventsToSort: EventFormData[], sortState: SortState): EventFormData[] => {
+  const sortCourses = (eventsToSort: CourseFormData[], sortState: SortState): CourseFormData[] => {
     const { field, direction } = sortState;
     const sorted = [...eventsToSort];
 
     sorted.sort((a, b) => {
-      let aVal: any = a[field as keyof EventFormData];
-      let bVal: any = b[field as keyof EventFormData];
+      let aVal: any = a[field as keyof CourseFormData];
+      let bVal: any = b[field as keyof CourseFormData];
 
       if (aVal == null && bVal == null) return 0;
       if (aVal == null) return direction === "asc" ? 1 : -1;
       if (bVal == null) return direction === "asc" ? -1 : 1;
 
-      if (field === "start_date") {
+      if (field === "start_time") {
         aVal = new Date(aVal).getTime();
         bVal = new Date(bVal).getTime();
       }
@@ -142,7 +143,7 @@ export default function EventsPage() {
     setShowSortMenu(false);
   };
 
-  const toggleFilter = (type: "status" | "category", value: string) => {
+  const toggleFilter = (type: "status" | "semester", value: string) => {
     setFilters((prev) => ({
       ...prev,
       [type]: prev[type].includes(value)
@@ -154,7 +155,7 @@ export default function EventsPage() {
   const clearFilters = () => {
     setFilters({
       status: [],
-      category: [],
+      semester: [],
     });
     setSearch("");
   };
@@ -172,7 +173,7 @@ export default function EventsPage() {
     if (error) {
       alert("Failed to delete event: " + error.message);
     } else {
-      setEvents((prev) => prev.filter((e) => e.id !== id));
+      setCourses((prev) => prev.filter((e) => e.id !== id));
     }
     setDeletingId(null);
   };
@@ -184,11 +185,9 @@ export default function EventsPage() {
 
   const sortOptions: { label: string; field: SortField }[] = [
     { label: "Title", field: "title" },
-    { label: "Category", field: "category" },
+    { label: "Semester", field: "semester" },
     { label: "Status", field: "status" },
-    { label: "Date", field: "start_date" },
-    { label: "Capacity", field: "capacity" },
-    { label: "Location", field: "location" },
+    { label: "Time", field: "start_time" },
   ];
 
 
@@ -196,12 +195,12 @@ export default function EventsPage() {
     <div className="mx-auto h-full flex flex-col gap-6">
 
       <div className="flex flex-col gap-1">
-        <Typography variant="heading-2">Events Management</Typography>
+        <Typography variant="heading-2">Course Management</Typography>
       </div>
 
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <InputText 
-          placeholder="Search by title, category, or location..." 
+          placeholder="Search by title, semester, or time..." 
           fullWidth 
           prefix={<Search size={18} />} 
           onChange={(e) => setSearch(e.target.value)} 
@@ -212,7 +211,7 @@ export default function EventsPage() {
           {/* Sort Button with Dropdown Menu */}
           <div className="relative">
             <Button
-              label={`Sort${sort.field !== "start_date" ? ": " + sortOptions.find(o => o.field === sort.field)?.label : ""}`}
+              label={`Sort${sort.field !== "start_time" ? ": " + sortOptions.find(o => o.field === sort.field)?.label : ""}`}
               variant="display"
               icon={<ArrowUpDown size={18} />}
               iconPosition="left"
@@ -293,8 +292,8 @@ export default function EventsPage() {
                       >
                         <input
                           type="checkbox"
-                          checked={filters.category.includes(category)}
-                          onChange={() => toggleFilter("category", category)}
+                          checked={filters.semester.includes(category)}
+                          onChange={() => toggleFilter("semester", category)}
                           className="w-4 h-4 appearance-none border-2 border-fractal rounded-full bg-white checked:bg-fractal-brand-primary" // to do: update to fractal checkbox 
                         />
                         <Typography variant="body-2">{category}</Typography>
@@ -311,7 +310,7 @@ export default function EventsPage() {
             variant="primary-dark" 
             icon={<Plus size={18} />} 
             iconPosition="left" 
-            onClick={() => router.push("/admin/events/create")} 
+            onClick={() => router.push("/admin/courses/create")} 
           />
         </div>
 
@@ -331,10 +330,10 @@ export default function EventsPage() {
               className="text-fractal-text-placeholder"
             >
               {hasActiveFilters
-                ? "No events match your filters."
+                ? "No courses match your filters."
                 : search
-                ? "No events match your search."
-                : "No events yet. Create one to get started."}
+                ? "No courses match your search."
+                : "No courses yet. Create one to get started."}
             </Typography>
           </div>
         ) : (
@@ -353,12 +352,12 @@ export default function EventsPage() {
                 </th>
                 <th
                   className="text-left p-3 font-median cursor-pointer hover:bg-fractal-base-grey-80 transition-colors"
-                  onClick={() => handleSort("category")}
+                  onClick={() => handleSort("semester")}
                   title="Click to sort"
                 >
                   <div className="flex items-center gap-1">
                     Category
-                    {getSortIndicator("category")}
+                    {getSortIndicator("semester")}
                   </div>
                 </th>
                 <th
@@ -373,41 +372,21 @@ export default function EventsPage() {
                 </th>
                 <th
                   className="text-left p-3 font-median cursor-pointer hover:bg-fractal-base-grey-80 transition-colors"
-                  onClick={() => handleSort("start_date")}
+                  onClick={() => handleSort("start_time")}
                   title="Click to sort"
                 >
                   <div className="flex items-center gap-1">
                     Date
-                    {getSortIndicator("start_date")}
-                  </div>
-                </th>
-                <th
-                  className="text-left p-3 font-median cursor-pointer hover:bg-fractal-base-grey-80 transition-colors"
-                  onClick={() => handleSort("capacity")}
-                  title="Click to sort"
-                >
-                  <div className="flex items-center gap-1">
-                    Capacity
-                    {getSortIndicator("capacity")}
-                  </div>
-                </th>
-                <th
-                  className="text-left p-3 font-median cursor-pointer hover:bg-fractal-base-grey-80 transition-colors"
-                  onClick={() => handleSort("location")}
-                  title="Click to sort"
-                >
-                  <div className="flex items-center gap-1">
-                    Location
-                    {getSortIndicator("location")}
+                    {getSortIndicator("start_time")}
                   </div>
                 </th>
                 <th className="text-right p-3 font-median">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {paginate(filtered, page, PER_PAGE).map((event, i) => (
+              {paginate(filtered, page, PER_PAGE).map((course, i) => (
                 <tr
-                  key={event.id}
+                  key={course.id}
                   className={`border-b border-fractal-border-default hover:bg-fractal-base-grey-90 transition-colors ${i % 2 === 0
                     ? "bg-fractal-bg-body-white"
                     : "bg-fractal-bg-body-default"
@@ -415,58 +394,52 @@ export default function EventsPage() {
                 >
                   <td
                     className="p-3 font-median max-w-[200px] truncate cursor-pointer hover:underline"
-                    onClick={() => setModalContent({ label: "Title", text: event.title })}
+                    onClick={() => setModalContent({ label: "Title", text: course.title })}
                     title="Click to view full title"
                   >
-                    {event.title}
+                    {course.title}
                   </td>
                   <td className="p-3">
                     <span
                       className={`px-2 py-0.5 rounded-s text-xs font-median border-2 border-fractal-border-default bg-fractal-base-grey-90`}
                     >
-                      {event.category}
+                      {course.semester}
                     </span>
                   </td>
                   <td className="p-3">
                     <span
                       className={`px-2 py-0.5 rounded-s text-xs font-median capitalize border border-fractal-border-default`}
                     >
-                      {event.status}
+                      {course.status}
                     </span>
                   </td>
                   <td className="p-3 text-fractal-text-placeholder whitespace-nowrap">
-                    {event.start_date
-                      ? new Date(event.start_date).toLocaleDateString("en-PH", {
+                    {course.start_time
+                      ? new Date(course.start_time).toLocaleDateString("en-PH", {
                         month: "short",
                         day: "numeric",
                         year: "numeric",
                       })
                       : "—"}
                   </td>
-                  <td className="p-3">{event.capacity}</td>
-                  <td
-                    className="p-3 text-fractal-text-placeholder max-w-[150px] truncate cursor-pointer hover:underline"
-                    onClick={() => setModalContent({ label: "Location", text: event.location || "—" })}
-                    title="Click to view full location"
-                  >
-                    {event.location}
-                  </td>
+                 
+          
                   <td className="p-3">
                     <div className="flex gap-2 justify-end">
                       <button
                         onClick={() =>
-                          router.push(`/admin/events/${event.id}/edit`)
+                          router.push(`/admin/courses/${course.id}/edit`)
                         }
                         className="p-2 hover:bg-fractal-decorative-yellow-90 border-2 border-fractal-border-default rounded-s shadow-brutal-1 transition-colors"
-                        title="Edit event"
+                        title="Edit course"
                       >
                         <Pencil size={14} />
                       </button>
                       <button
-                        onClick={() => handleDelete(event.id!, event.title)}
-                        disabled={deletingId === event.id}
+                        onClick={() => handleDelete(course.id!, course.title)}
+                        disabled={deletingId === course.id}
                         className="p-2 hover:bg-fractal-decorative-yellow-90 border-2 border-fractal-border-default rounded-s shadow-brutal-1 transition-colors disabled:opacity-50"
-                        title="Delete event"
+                        title="Delete course"
                       >
                         <Trash2 size={14} />
                       </button>
@@ -483,7 +456,7 @@ export default function EventsPage() {
       {!isLoading && filtered.length > 0 && (
         <div className="flex items-center justify-between px-1 text-sm text-fractal-base-grey-30">
           <span>
-            Showing {Math.min((page - 1) * PER_PAGE + 1, filtered.length)}–{Math.min(page * PER_PAGE, filtered.length)} of {filtered.length} events
+            Showing {Math.min((page - 1) * PER_PAGE + 1, filtered.length)}–{Math.min(page * PER_PAGE, filtered.length)} of {filtered.length} courses
           </span>
           <Pagination page={page} total={totalPages(filtered.length, PER_PAGE)} onChange={setPage} />
         </div>
