@@ -255,7 +255,7 @@ export default function StudentProfilePage() {
             )}
             <div className="flex flex-wrap gap-2 mt-1">
               {profile.student_num && (
-                <span className="text-xs bg-fractal-brand-highlight text-fractal-base-black border-1 border-fractal-border-default rounded-full px-3 py-0.5 font-median shadow-brutal-1">
+                <span className="text-xs bg-fractal-decorative-purple-70 text-fractal-base-black border-1 border-fractal-decorative-purple-50 rounded-full px-3 py-0.5 font-median">
                   #{profile.student_num}
                 </span>
               )}

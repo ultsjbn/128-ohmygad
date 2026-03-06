@@ -247,7 +247,7 @@ export default function AdminProfilePage() {
               <p className="text-sm text-fractal-base-grey-30 truncate">@{profile.display_name}</p>
             )}
             <div className="flex flex-wrap gap-2 mt-1">
-              <span className="text-xs bg-fractal-brand-highlight text-fractal-base-black border-1 border-fractal-border-default rounded-full px-3 py-0.5 font-median shadow-brutal-1">
+              <span className="text-xs bg-fractal-decorative-pink-70 text-fractal-base-black border-1 border-fractal-border-primary rounded-full px-3 py-0.5 font-median">
                 Admin
               </span>
               {profile.college && (

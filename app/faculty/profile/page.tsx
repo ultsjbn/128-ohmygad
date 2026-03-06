@@ -248,7 +248,7 @@ export default function FacultyProfilePage() {
               <p className="text-sm text-fractal-base-grey-30 truncate">@{profile.display_name}</p>
             )}
             <div className="flex flex-wrap gap-2 mt-1">
-              <span className="text-xs bg-fractal-brand-highlight text-fractal-base-black border-1 border-fractal-border-default rounded-full px-3 py-0.5 font-median shadow-brutal-1">
+              <span className="text-xs bg-fractal-decorative-blue-70 text-fractal-base-black border-1 border-fractal-decorative-blue-50 rounded-full px-3 py-0.5 font-median">
                 Faculty
               </span>
               {profile.college && (
