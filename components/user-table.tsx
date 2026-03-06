@@ -1,11 +1,38 @@
-import { ArrowDownUp, Ellipsis, Pencil, Trash } from "lucide-react";
+"use client";
+
+import { ArrowDownUp, Pencil, Trash } from "lucide-react";
 import type { Profile, SortState } from "@/app/admin/users/profile.types";
 import { TABLE_COLUMNS } from "./profile.constants";
 import { UserAvatar } from "./user-avatar";
 import { RoleBadge } from "./role-badge";
-import {useState} from "react";
 import { useRouter } from "next/navigation";
 import { deleteUser } from "@/app/admin/users/action";
+import { Button } from "@snowball-tech/fractal";
+
+
+function EditButton({ userId }: { userId: string }) {
+  const router = useRouter();
+
+  const handleEdit = () => {
+    if (!userId) return;
+    router.push(`/admin/users/edit/${userId}`);
+  };
+
+  return (
+    <Button
+      type="button"
+      label=""
+      variant="secondary"
+      className="p-2"
+      onClick={handleEdit}
+      aria-label="Edit user"
+    >
+      <Pencil size={16} />
+    </Button>
+  );
+}
+
+export default EditButton;
 
 interface UserTableProps {
   profiles: Profile[];
@@ -13,24 +40,21 @@ interface UserTableProps {
   onSort: (f: SortState["field"]) => void;
 }
 
-
-
 export function UserTable({ profiles, sort, onSort }: UserTableProps) {
   const router = useRouter();
 
-//delete handler
-const handleDelete = async (id: string) => {
-  const confirmDelete = confirm("Are you sure you want to delete this user?");
-  if (!confirmDelete) return;
+  const handleDelete = async (id: string) => {
+    const confirmDelete = confirm("Are you sure you want to delete this user?");
+    if (!confirmDelete) return;
 
-  try {
-    await deleteUser(id);
-    router.refresh(); // refresh server data
-  } catch (err) {
-    console.error(err);
-    alert("Failed to delete user");
-  }
-};
+    try {
+      await deleteUser(id);
+      router.refresh();
+    } catch (err) {
+      console.error(err);
+      alert("Failed to delete user");
+    }
+  };
 
   return (
     <div className="overflow-x-auto">
@@ -67,9 +91,11 @@ const handleDelete = async (id: string) => {
           {profiles.map((profile, i) => (
             <tr
               key={profile.id}
-              className={`border-b border-fractal-border-light last:border-0 hover:bg-fractal-decorative-purple-90 transition-colors ${i % 2 !== 0 ? "bg-fractal-bg-body-light/40" : ""}`}
+              className={`border-b border-fractal-border-light last:border-0 hover:bg-fractal-decorative-purple-90 transition-colors ${
+                i % 2 !== 0 ? "bg-fractal-bg-body-light/40" : ""
+              }`}
             >
-              {/* ---------- Avatar and Name ---------- */}
+              {/* ---------- Avatar & Name ---------- */}
               <td className="px-5 py-2">
                 <div className="flex items-center gap-3">
                   <UserAvatar name={profile.full_name} />
@@ -83,42 +109,36 @@ const handleDelete = async (id: string) => {
                   </div>
                 </div>
               </td>
-              {/* ---------- Role Badge ---------- */}
+
+              {/* ---------- Role ---------- */}
               <td className="px-5 py-2 items-center">
                 <RoleBadge role={profile.role} />
               </td>
+
               {/* ---------- Email ---------- */}
-              <td className="px-5 py-2 text-fractal-text-default">
-                {profile.email ?? "—"}
-              </td>
+              <td className="px-5 py-2 text-fractal-text-default">{profile.email ?? "—"}</td>
+
               {/* ---------- GSOs attended ---------- */}
-              <td className="px-5 py-2 text-fractal-text-default">
-                {profile.gso_attended ?? "—"}
+              <td className="px-5 py-2 text-fractal-text-default">{profile.gso_attended ?? "—"}</td>
+
+              {/* ---------- Actions ---------- */}
+              <td className="px-5 py-2">
+                <div className="flex items-center justify-end gap-2">
+                  {/* Edit Button */}
+                  {profile.id && <EditButton userId={profile.id} />}
+
+                  {/* Delete Button */}
+                  {profile.id && (
+                    <button
+                      aria-label="Delete user"
+                      onClick={() => handleDelete(profile.id)}
+                      className="p-2 rounded text-red-600 hover:bg-red-50"
+                    >
+                      <Trash size={16} />
+                    </button>
+                  )}
+                </div>
               </td>
-
-<td className="px-5 py-2">
-  <div className="flex items-center justify-end gap-2">
-    
-    <button
-      onClick={() => router.push(`/admin/users/${profile.id}/edit`)}
-      className="flex items-center gap-1 px-2 py-1 text-xs rounded-md border border-fractal-border-light hover:bg-fractal-bg-body-light transition-colors"
-    >
-      <Pencil size={14} />
-      Edit
-    </button>
-
-<button
-  aria-label="Delete user"
-  onClick={() => handleDelete(profile.id)}
-  className="p-2 rounded text-red-600 hover:bg-red-50"
->
-  <Trash size={16} />
-</button>
-
-  </div>
-</td>
-
-
             </tr>
           ))}
         </tbody>
