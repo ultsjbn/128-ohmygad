@@ -395,8 +395,8 @@ export default function CoursesPage() {
                 >
                   <td
                     className="p-3 font-median max-w-[200px] truncate cursor-pointer hover:underline"
-                    onClick={() => setModalContent({ label: "Title", text: course.title })}
-                    title="Click to view full title"
+                    onClick={() => setModalContent({ label: course.title, text: course.description })}
+                    title="Click to view full title and course description"
                   >
                     {course.title}
                   </td>
