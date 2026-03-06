@@ -160,9 +160,9 @@ export default function UserForm({ className, initialData, ...props }: UserFormP
             <SelectItem value="5th Year" label="5th Year" />
           </Select>
           <Select id="college" label="College" fullWidth value={college} onSelect={(val) => setCollege(val)}>
-            <SelectItem value="CAS" label="College of Science (CAS)" />
+            <SelectItem value="CS" label="College of Science (CS)" />
             <SelectItem value="CAC" label="College of Arts and Communications (CAC)" />
-            <SelectItem value="CSSP" label="College of Social Sciences (CSSP)" />
+            <SelectItem value="CSS" label="College of Social Sciences (CSS)" />
           </Select>
           <InputText id="program" label="Program" fullWidth value={program} onChange={(_e, val) => setProgram(val)} />
           <InputText id="contact_num" label="Contact Number" fullWidth value={contact_num} onChange={(_e, val) => setContactNum(val)} />
