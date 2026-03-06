@@ -5,7 +5,7 @@ import { UserAvatar } from "./user-avatar";
 import { RoleBadge } from "./role-badge";
 import {useState} from "react";
 import { useRouter } from "next/navigation";
-
+import { deleteUser } from "@/app/admin/users/action";
 
 interface UserTableProps {
   profiles: Profile[];
@@ -13,8 +13,25 @@ interface UserTableProps {
   onSort: (f: SortState["field"]) => void;
 }
 
+
+
 export function UserTable({ profiles, sort, onSort }: UserTableProps) {
   const router = useRouter();
+
+//delete handler
+const handleDelete = async (id: string) => {
+  const confirmDelete = confirm("Are you sure you want to delete this user?");
+  if (!confirmDelete) return;
+
+  try {
+    await deleteUser(id);
+    router.refresh(); // refresh server data
+  } catch (err) {
+    console.error(err);
+    alert("Failed to delete user");
+  }
+};
+
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
@@ -90,12 +107,13 @@ export function UserTable({ profiles, sort, onSort }: UserTableProps) {
       Edit
     </button>
 
-    <button
-      className="flex items-center gap-1 px-2 py-1 text-xs rounded-md border border-red-300 text-red-600 hover:bg-red-50 transition-colors"
-    >
-      <Trash size={14} />
-      Delete
-    </button>
+<button
+  aria-label="Delete user"
+  onClick={() => handleDelete(profile.id)}
+  className="p-2 rounded text-red-600 hover:bg-red-50"
+>
+  <Trash size={16} />
+</button>
 
   </div>
 </td>
