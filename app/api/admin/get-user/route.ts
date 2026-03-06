@@ -1,46 +1,44 @@
-import { NextApiRequest, NextApiResponse } from "next";
+import { NextRequest, NextResponse } from "next/server";
+import { createServerClient } from "@supabase/ssr";
+import { cookies } from "next/headers";
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== "GET") {
-    return res.status(405).json({ error: "Method not allowed" });
+export async function GET(request: NextRequest) {
+  const { searchParams } = new URL(request.url);
+  const id = searchParams.get("id");
+
+  if (!id) {
+    return NextResponse.json({ error: "Missing user ID" }, { status: 400 });
   }
 
-  const { id } = req.query;
-
-  if (!id || typeof id !== "string") {
-    return res.status(400).json({ error: "Missing or invalid user ID" });
-  }
-
-  try {
-    const user = await prisma.user.findUnique({
-      where: { id },
-      select: {
-        id: true,
-        full_name: true,
-        email: true,
-        role: true,
-        display_name: true,
-        contact_num: true,
-        address: true,
-        pronouns: true,
-        sex_at_birth: true,
-        gender_identity: true,
-        college: true,
-        program: true,
-        student_num: true,
-        year_level: true,
-        gso_attended: true,
-        is_onboarded: true,
+  const cookieStore = await cookies();
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return cookieStore.getAll();
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) => {
+            cookieStore.set(name, value, options);
+          });
+        },
       },
-    });
-
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
     }
+  );
 
-    return res.status(200).json(user); // ✅ Must return JSON
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ error: "Server error" });
+  const { data: user, error } = await supabase
+    .from("profile")
+    .select(
+      "id, full_name, email, role, display_name, contact_num, address, pronouns, sex_at_birth, gender_identity, college, program, student_num, year_level, gso_attended, is_onboarded"
+    )
+    .eq("id", id)
+    .single();
+
+  if (error || !user) {
+    return NextResponse.json({ error: "User not found" }, { status: 404 });
   }
+
+  return NextResponse.json(user);
 }
