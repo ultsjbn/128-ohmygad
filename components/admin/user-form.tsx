@@ -92,6 +92,7 @@ export default function UserForm({ className, initialData, ...props }: UserFormP
         is_onboarded,
       };
 
+      if (isEdit) payload.id = initialData!.id;
       if (!isEdit || password) payload.password = password;
 
       const endpoint = isEdit
@@ -99,7 +100,7 @@ export default function UserForm({ className, initialData, ...props }: UserFormP
         : "/api/admin/create-user";
 
       const res = await fetch(endpoint, {
-        method: "POST",
+        method: isEdit ? "PATCH" : "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
