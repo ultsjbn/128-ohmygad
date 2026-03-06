@@ -1,8 +1,11 @@
-import { ArrowDownUp, Ellipsis } from "lucide-react";
+import { ArrowDownUp, Ellipsis, Pencil, Trash } from "lucide-react";
 import type { Profile, SortState } from "@/app/admin/users/profile.types";
 import { TABLE_COLUMNS } from "./profile.constants";
 import { UserAvatar } from "./user-avatar";
 import { RoleBadge } from "./role-badge";
+import {useState} from "react";
+import { useRouter } from "next/navigation";
+
 
 interface UserTableProps {
   profiles: Profile[];
@@ -11,6 +14,7 @@ interface UserTableProps {
 }
 
 export function UserTable({ profiles, sort, onSort }: UserTableProps) {
+  const router = useRouter();
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
@@ -74,11 +78,29 @@ export function UserTable({ profiles, sort, onSort }: UserTableProps) {
               <td className="px-5 py-2 text-fractal-text-default">
                 {profile.gso_attended ?? "—"}
               </td>
-              <td className="px-5 py-2">
-                <button className="p-1.5 rounded-full text-fractal-text-light hover:bg-fractal-bg-body-light hover:text-fractal-text-default transition-colors">
-                  <Ellipsis size={20} className="text-fractal-icon-primary" />
-                </button>
-              </td>
+
+<td className="px-5 py-2">
+  <div className="flex items-center justify-end gap-2">
+    
+    <button
+      onClick={() => router.push(`/admin/users/${profile.id}/edit`)}
+      className="flex items-center gap-1 px-2 py-1 text-xs rounded-md border border-fractal-border-light hover:bg-fractal-bg-body-light transition-colors"
+    >
+      <Pencil size={14} />
+      Edit
+    </button>
+
+    <button
+      className="flex items-center gap-1 px-2 py-1 text-xs rounded-md border border-red-300 text-red-600 hover:bg-red-50 transition-colors"
+    >
+      <Trash size={14} />
+      Delete
+    </button>
+
+  </div>
+</td>
+
+
             </tr>
           ))}
         </tbody>
