@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Typography, Paper, Button, InputText } from "@snowball-tech/fractal";
-import { Search, Users, Plus, Edit2, Trash2, Save, X } from "lucide-react";
+import { Typography, Paper, InputText } from "@snowball-tech/fractal";
+import { Search } from "lucide-react";
 
 type Course = {
   id: string;
