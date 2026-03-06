@@ -273,8 +273,8 @@ export default function EventsPage() {
                 >
                   <td
                     className="p-3 font-median max-w-[200px] truncate cursor-pointer hover:underline"
-                    onClick={() => setModalContent({ label: "Title", text: event.title })}
-                    title="Click to view full title"
+                    onClick={() => setModalContent({ label: event.title, text: event.description })}
+                    title="Click to view full title and event description"
                   >
                     {event.title}
                   </td>
