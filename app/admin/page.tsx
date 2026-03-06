@@ -207,7 +207,7 @@ export default function DashboardPage() {
             <Card color="purple" title="Total GAD Events" className="h-full flex flex-col justify-between">
               <Typography variant="heading-2" className="text-right tracking-tighter">{gadEventsCount}</Typography>
             </Card>
-            <Card color="yellow" title="Total GAD Events" className="h-full flex flex-col justify-between">
+            <Card color="yellow" title="Onboarded Users" className="h-full flex flex-col justify-between">
                 <Typography variant="heading-2" className="text-right tracking-tighter">
                   {userStats.onboarded}
                 </Typography>
