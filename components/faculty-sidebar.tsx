@@ -54,7 +54,7 @@ export default function FacultySidebar() {
             alt="UPB Kasarian Gender Studies Program Logo"
             width={isCollapsed ? 48 : 80} // collapsed, not
             height={isCollapsed ? 48 : 80}
-            className="rounded-full object-cover border-2 border-fractal-border-default shadow-brutal-1 transition-all duration-300"
+            className="rounded-full object-cover border-2 border-fractal-border-default shadow-soft-sm transition-all duration-300"
           />
           
           {!isCollapsed && (
@@ -81,8 +81,8 @@ export default function FacultySidebar() {
                 className={`flex items-center rounded-s font-median transition-all duration-100
                 ${isCollapsed ? "justify-center p-1.5" : "justify-start gap-2 py-1 px-2"}
                 ${active
-                  ? /* active, and not */ "bg-fractal-bg-body-white border-2 border-fractal-border-default shadow-brutal-1 text-fractal-text-default"
-                  : "border-2 border-transparent text-fractal-text-placeholder hover:bg-fractal-bg-body-white hover:border-fractal-border-default hover:shadow-brutal-1 hover:text-fractal-text-default hover:opacity-70"
+                  ? /* active, and not */ "bg-fractal-bg-body-white border-2 border-fractal-border-default shadow-soft-sm text-fractal-text-default"
+                  : "border-2 border-transparent text-fractal-text-placeholder hover:bg-fractal-bg-body-white hover:border-fractal-border-default hover:shadow-soft-sm hover:text-fractal-text-default hover:opacity-70"
                 }`}
               >
                 <Icon size={20} className={`shrink-0 ${active ? "text-fractal-text-default" : "text-fractal-text-placeholder"}`} />

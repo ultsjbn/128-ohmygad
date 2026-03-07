@@ -1,9 +1,9 @@
 "use server";
 
-import { supabaseAdmin } from "@/lib/supabase/admin";
+import { supabase } from "@/lib/supabase/server";
 
 export async function deleteUser(userId: string) {
-  const { error } = await supabaseAdmin
+  const { error } = await supabase
     .from("profile")
     .delete()
     .eq("id", userId);

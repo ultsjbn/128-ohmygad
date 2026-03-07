@@ -38,7 +38,7 @@ export function Pagination({ page, total, onChange }: PaginationProps) {
             onClick={() => onChange(p as number)}
             className={`w-5 h-5 rounded-full text-sm font-median border-2 transition-all ${
               page === p
-                ? "border-fractal-border-primary bg-fractal-brand-primary text-fractal-text-dark shadow-brutal-1"
+                ? "border-fractal-border-primary bg-fractal-brand-primary text-fractal-text-dark shadow-soft-sm"
                 : "border-fractal-border-default hover:bg-fractal-bg-body-light text-fractal-text-default"
             }`}
           >

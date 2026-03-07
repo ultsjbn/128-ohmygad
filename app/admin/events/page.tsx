@@ -128,7 +128,7 @@ export default function EventsPage() {
               className="whitespace-nowrap"
             />
             {showSortMenu && (
-              <div className="absolute right-0 top-full mt-1 z-10 bg-white border-2 border-fractal-border-default rounded-s shadow-brutal-2 min-w-[140px]">
+              <div className="absolute right-0 top-full mt-1 z-10 bg-white border-2 border-fractal-border-default rounded-s shadow-soft-md min-w-[140px]">
                 {SORT_OPTIONS.map((opt) => (
                   <button
                     key={opt}
@@ -155,7 +155,7 @@ export default function EventsPage() {
               className="whitespace-nowrap"
             />
             {showFilterMenu && (
-              <div className="absolute right-0 top-full mt-1 z-10 bg-white border-2 border-fractal-border-default rounded-s shadow-brutal-2 min-w-[200px] p-3 flex flex-col gap-3">
+              <div className="absolute right-0 top-full mt-1 z-10 bg-white border-2 border-fractal-border-default rounded-s shadow-soft-md min-w-[200px] p-3 flex flex-col gap-3">
                 {/* Category filter */}
                 <div className="flex flex-col gap-1">
                   <Typography variant="body-2" className="font-median text-fractal-text-placeholder">
@@ -221,13 +221,13 @@ export default function EventsPage() {
             Filters:
           </Typography>
           {categoryFilter !== "All" && (
-            <span className="px-2 py-0.5 text-xs font-median border-2 border-fractal-border-default rounded-s bg-fractal-decorative-yellow-90 shadow-brutal-1 flex items-center gap-1">
+            <span className="px-2 py-0.5 text-xs font-median border-2 border-fractal-border-default rounded-s bg-fractal-decorative-yellow-90 shadow-soft-sm flex items-center gap-1">
               {categoryFilter}
               <button onClick={() => setCategoryFilter("All")} className="ml-1 hover:text-red-500">×</button>
             </span>
           )}
           {statusFilter !== "All" && (
-            <span className="px-2 py-0.5 text-xs font-median border-2 border-fractal-border-default rounded-s bg-fractal-decorative-yellow-90 shadow-brutal-1 capitalize flex items-center gap-1">
+            <span className="px-2 py-0.5 text-xs font-median border-2 border-fractal-border-default rounded-s bg-fractal-decorative-yellow-90 shadow-soft-sm capitalize flex items-center gap-1">
               {statusFilter}
               <button onClick={() => setStatusFilter("All")} className="ml-1 hover:text-red-500">×</button>
             </span>
@@ -311,7 +311,7 @@ export default function EventsPage() {
                         onClick={() =>
                           router.push(`/admin/events/${event.id}/edit`)
                         }
-                        className="p-2 hover:bg-fractal-decorative-yellow-90 border-2 border-fractal-border-default rounded-s shadow-brutal-1 transition-colors"
+                        className="p-2 hover:bg-fractal-decorative-yellow-90 border-2 border-fractal-border-default rounded-s shadow-soft-sm transition-colors"
                         title="Edit event"
                       >
                         <Pencil size={14} />
@@ -319,7 +319,7 @@ export default function EventsPage() {
                       <button
                         onClick={() => handleDelete(event.id!, event.title)}
                         disabled={deletingId === event.id}
-                        className="p-2 hover:bg-fractal-decorative-yellow-90 border-2 border-fractal-border-default rounded-s shadow-brutal-1 transition-colors disabled:opacity-50"
+                        className="p-2 hover:bg-fractal-decorative-yellow-90 border-2 border-fractal-border-default rounded-s shadow-soft-sm transition-colors disabled:opacity-50"
                         title="Delete event"
                       >
                         <Trash2 size={14} />
@@ -350,12 +350,12 @@ export default function EventsPage() {
           onClick={() => setModalContent(null)}
         >
           <div
-            className="relative bg-white rounded-lg border-2 border-fractal-border-default shadow-brutal-1 p-6 max-w-lg w-[90%] mx-4"
+            className="relative bg-white rounded-lg border-2 border-fractal-border-default shadow-soft-sm p-6 max-w-lg w-[90%] mx-4"
             onClick={(e) => e.stopPropagation()}
           >
             <button
               onClick={() => setModalContent(null)}
-              className="absolute top-3 right-3 p-1 hover:bg-fractal-decorative-yellow-90 border-2 border-fractal-border-default rounded-s shadow-brutal-1 transition-colors"
+              className="absolute top-3 right-3 p-1 hover:bg-fractal-decorative-yellow-90 border-2 border-fractal-border-default rounded-s shadow-soft-sm transition-colors"
               title="Close"
             >
               <X size={16} />

@@ -48,10 +48,10 @@ const Button = forwardRef<
 
       switch (v) {
         case "display":
-          return "bg-fractal-brand-body-light text-fractal-text-dark border-2 border-fractal-border-default shadow-brutal-1 hover:-translate-y-[2px] hover:shadow-brutal-2 active:translate-y-[4px] active:shadow-none";
+          return "bg-fractal-brand-body-light text-fractal-text-dark border-2 border-fractal-border-default shadow-soft-sm hover:-translate-y-[2px] hover:shadow-soft-md active:translate-y-[4px] active:shadow-none";
 
         case "secondary":
-          return "bg-white text-fractal-text-default border-2 border-fractal-border-default shadow-brutal-1 hover:bg-fractal-base-grey-90 transition-all active:translate-y-[2px] active:shadow-none";
+          return "bg-white text-fractal-text-default border-2 border-fractal-border-default shadow-soft-sm hover:bg-fractal-base-grey-90 transition-all active:translate-y-[2px] active:shadow-none";
 
         case "text":
           return "bg-transparent border-transparent text-fractal-text-default hover:bg-fractal-base-grey-90 shadow-none hover:underline underline-offset-4";
@@ -61,7 +61,7 @@ const Button = forwardRef<
           return "bg-fractal-brand-body-dark text-fractal-text-light border-2 border-fractal-border-default hover:bg-fractal-bg-body-light hover:text-fractal-text-dark transition-colors active:border-fractal-border-primary active:bg-fractal-brand-primary active:text-fractal-text-dark active:shadow-none";
 
         case "display-dark":
-          return "bg-fractal-brand-body-light text-fractal-text-dark border-2 border-fractal-border-default shadow-brutal-1-dark hover:-translate-y-[2px] hover:shadow-brutal-2-primary active:translate-y-[4px] active:shadow-none";
+          return "bg-fractal-brand-body-light text-fractal-text-dark border-2 border-fractal-border-default shadow-soft-sm-dark hover:-translate-y-[2px] hover:shadow-soft-md-primary active:translate-y-[4px] active:shadow-none";
         
         case "primary-dark":
           return "bg-fractal-bg-body-primary text-fractal-text-dark border-2 border-fractal-border-primary hover:bg-fractal-bg-body-light hover:text-fractal-text-dark hover:border-2 hover:border-fractal-border-default transition-colors active:bg-fractal-brand-primary active:text-fractal-text-light active:shadow-none active:border-2 active:border-fractal-border-primary";

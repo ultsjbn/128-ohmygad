@@ -6,7 +6,7 @@ export default function Page() {
   return (
     <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10 bg-fractal-bg-body-default text-fractal-text-default font-sans">
       <div className="w-full max-w-sm">
-        <div className="flex flex-col gap-4 border-2 border-fractal-border-default rounded-m shadow-brutal-2 p-4 bg-fractal-bg-body-white">
+        <div className="flex flex-col gap-4 border-2 border-fractal-border-default rounded-m shadow-soft-md p-4 bg-fractal-bg-body-white">
           <Typography variant="heading-2">
             Thank you for signing up!
           </Typography>

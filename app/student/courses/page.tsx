@@ -76,7 +76,7 @@ export default function CoursesPage() {
             return (
               <div
                 key={course.id}
-                className="flex flex-col gap-2 border-2 border-fractal-border-default rounded-s bg-white hover:shadow-brutal-1 transition-all overflow-hidden"
+                className="flex flex-col gap-2 border-2 border-fractal-border-default rounded-s bg-white hover:shadow-soft-sm transition-all overflow-hidden"
               >
                 {/* Top accent bar */}
                 <div className="h-1.5 w-full bg-fractal-decorative-blue-70" />

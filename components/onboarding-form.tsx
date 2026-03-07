@@ -119,7 +119,7 @@ export function OnboardingForm({
   }
 
   return (
-    <div className={cn("flex flex-col gap-3 font-sans border-2 border-fractal-border-default rounded-m shadow-brutal-2 p-4 bg-fractal-bg-body-white", className)} {...props}>
+    <div className={cn("flex flex-col gap-3 font-sans border-2 border-fractal-border-default rounded-m shadow-soft-md p-4 bg-fractal-bg-body-white", className)} {...props}>
       <Typography variant="heading-2" className="font-wide font-bold text-fractal-text-default">
         Complete Your Profile
       </Typography>
@@ -141,7 +141,7 @@ export function OnboardingForm({
             fullWidth
             value={display_name}
             onChange={(_e, newValue) => setDisplayName(newValue)}
-            className="[&_input:focus]:!border-fractal-border-primary [&_input:focus]:!shadow-brutal-1-primary"
+            className="[&_input:focus]:!border-fractal-border-primary [&_input:focus]:!shadow-soft-sm-primary"
           />
 
           {/* Student Number — students only */}
@@ -154,7 +154,7 @@ export function OnboardingForm({
               fullWidth
               value={student_num}
               onChange={(_e, newValue) => setStudentNum(newValue)}
-              className="[&_input:focus]:!border-fractal-border-primary [&_input:focus]:!shadow-brutal-1-primary"
+              className="[&_input:focus]:!border-fractal-border-primary [&_input:focus]:!shadow-soft-sm-primary"
             />
           )}
 
@@ -203,7 +203,7 @@ export function OnboardingForm({
               fullWidth
               value={program}
               onChange={(_e, newValue) => setProgram(newValue)}
-              className="[&_input:focus]:!border-fractal-border-primary [&_input:focus]:!shadow-brutal-1-primary"
+              className="[&_input:focus]:!border-fractal-border-primary [&_input:focus]:!shadow-soft-sm-primary"
             />
           )}
 
@@ -216,7 +216,7 @@ export function OnboardingForm({
             fullWidth
             value={contact_num}
             onChange={(_e, newValue) => setContactNum(newValue)}
-            className="[&_input:focus]:!border-fractal-border-primary [&_input:focus]:!shadow-brutal-1-primary"
+            className="[&_input:focus]:!border-fractal-border-primary [&_input:focus]:!shadow-soft-sm-primary"
           />
 
           {/* Address — all roles */}
@@ -228,7 +228,7 @@ export function OnboardingForm({
             fullWidth
             value={address}
             onChange={(_e, newValue) => setAddress(newValue)}
-            className="[&_input:focus]:!border-fractal-border-primary [&_input:focus]:!shadow-brutal-1-primary"
+            className="[&_input:focus]:!border-fractal-border-primary [&_input:focus]:!shadow-soft-sm-primary"
           />
 
           {/* Pronouns — all roles */}
@@ -240,7 +240,7 @@ export function OnboardingForm({
             fullWidth
             value={pronouns}
             onChange={(_e, newValue) => setPronouns(newValue)}
-            className="[&_input:focus]:!border-fractal-border-primary [&_input:focus]:!shadow-brutal-1-primary"
+            className="[&_input:focus]:!border-fractal-border-primary [&_input:focus]:!shadow-soft-sm-primary"
           />
 
           {/* Sex at Birth — all roles */}

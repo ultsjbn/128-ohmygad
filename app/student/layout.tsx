@@ -25,7 +25,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
           className="bg-transparent"
           left={
             <div className="flex items-center gap-2">
-              <InputText placeholder="Search" />
+
             </div>
           }
           right={

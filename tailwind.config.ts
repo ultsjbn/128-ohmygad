@@ -166,7 +166,6 @@ const config = {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
-        // Fractal Radii
         none: 'var(--size-radius-0)',
         xs: 'var(--size-radius-xs)',
         s: 'var(--size-radius-s)',
@@ -178,7 +177,6 @@ const config = {
         2: 'var(--size-border-2)',
       },
       spacing: {
-        // Fractal Spacing (Pixels)
         0: 'var(--size-spacing-0)',
         1: 'var(--size-spacing-1)',
         2: 'var(--size-spacing-2)',
@@ -205,21 +203,12 @@ const config = {
         half: 'var(--size-spacing-half)',
       },
       boxShadow: {
-        // Fractal Brutalist Shadows
         none: 'var(--shadow-none)',
-        'brutal-1': 'var(--shadow-brutal-1)',
-        'brutal-2': 'var(--shadow-brutal-2)',
-        'brutal-1-dark': 'var(--shadow-brutal-1-dark)',
-        'brutal-1-light': 'var(--shadow-brutal-1-light)',
-        'brutal-1-primary': 'var(--shadow-brutal-1-primary)',
-        'brutal-1-secondary': 'var(--shadow-brutal-1-secondary)',
-        'brutal-2-dark': 'var(--shadow-brutal-2-dark)',
-        'brutal-2-light': 'var(--shadow-brutal-2-light)',
-        'brutal-2-primary': 'var(--shadow-brutal-2-primary)',
-        'brutal-2-secondary': 'var(--shadow-brutal-2-secondary)',
+        'soft-sm': 'var(--shadow-soft-sm)',
+        'soft-md': 'var(--shadow-soft-md)',
+        'soft-lg': 'var(--shadow-soft-lg)',
       },
       fontFamily: {
-        // Automatically applied as the default sans-serif font
         sans: ['var(--font-family-normal)'], 
         wide: ['var(--font-family-wide)'],
       },

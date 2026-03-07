@@ -221,7 +221,7 @@ export default function CoursesPage() {
             />
 
             {showSortMenu && (
-              <div className="absolute top-full right-0 mt-2 bg-white border-2 border-fractal-border-default rounded-s shadow-brutal-1 z-40 min-w-[180px]">
+              <div className="absolute top-full right-0 mt-2 bg-white border-2 border-fractal-border-default rounded-s shadow-soft-sm z-40 min-w-[180px]">
                 {sortOptions.map((option) => (
                   <button
                     key={option.field}
@@ -253,7 +253,7 @@ export default function CoursesPage() {
             />
 
             {showFilterMenu && (
-              <div className="absolute top-full right-0 mt-2 bg-white border-2 border-fractal-border-default rounded-s shadow-brutal-1 z-40 min-w-[240px] max-h-96 overflow-y-auto">
+              <div className="absolute top-full right-0 mt-2 bg-white border-2 border-fractal-border-default rounded-s shadow-soft-sm z-40 min-w-[240px] max-h-96 overflow-y-auto">
 
                 {/* Status Filter */}
                 {statuses.length > 0 && (
@@ -431,7 +431,7 @@ export default function CoursesPage() {
                         onClick={() =>
                           router.push(`/admin/courses/${course.id}/edit`)
                         }
-                        className="p-2 hover:bg-fractal-decorative-yellow-90 border-2 border-fractal-border-default rounded-s shadow-brutal-1 transition-colors"
+                        className="p-2 hover:bg-fractal-decorative-yellow-90 border-2 border-fractal-border-default rounded-s shadow-soft-sm transition-colors"
                         title="Edit course"
                       >
                         <Pencil size={14} />
@@ -439,7 +439,7 @@ export default function CoursesPage() {
                       <button
                         onClick={() => handleDelete(course.id!, course.title)}
                         disabled={deletingId === course.id}
-                        className="p-2 hover:bg-fractal-decorative-yellow-90 border-2 border-fractal-border-default rounded-s shadow-brutal-1 transition-colors disabled:opacity-50"
+                        className="p-2 hover:bg-fractal-decorative-yellow-90 border-2 border-fractal-border-default rounded-s shadow-soft-sm transition-colors disabled:opacity-50"
                         title="Delete course"
                       >
                         <Trash2 size={14} />
@@ -470,12 +470,12 @@ export default function CoursesPage() {
           onClick={() => setModalContent(null)}
         >
           <div
-            className="relative bg-white rounded-lg border-2 border-fractal-border-default shadow-brutal-1 p-6 max-w-lg w-[90%] mx-4"
+            className="relative bg-white rounded-lg border-2 border-fractal-border-default shadow-soft-sm p-6 max-w-lg w-[90%] mx-4"
             onClick={(e) => e.stopPropagation()}
           >
             <button
               onClick={() => setModalContent(null)}
-              className="absolute top-3 right-3 p-1 hover:bg-fractal-decorative-yellow-90 border-2 border-fractal-border-default rounded-s shadow-brutal-1 transition-colors"
+              className="absolute top-3 right-3 p-1 hover:bg-fractal-decorative-yellow-90 border-2 border-fractal-border-default rounded-s shadow-soft-sm transition-colors"
               title="Close"
             >
               <X size={16} />

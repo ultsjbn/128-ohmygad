@@ -121,7 +121,7 @@ export default function UserForm({ className, initialData, ...props }: UserFormP
   return (
     <div
       className={cn(
-        "flex flex-col gap-3 font-sans border-2 border-fractal-border-default rounded-m shadow-brutal-2 p-4 bg-fractal-bg-body-white",
+        "flex flex-col gap-3 font-sans border-2 border-fractal-border-default rounded-m shadow-soft-md p-4 bg-fractal-bg-body-white",
         className
       )}
       {...props}

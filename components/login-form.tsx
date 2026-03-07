@@ -78,7 +78,7 @@ export function LoginForm({
   };
 
   return (
-    <div className={cn("flex flex-col gap-4 font-sans border-2 border-fractal-border-default rounded-m shadow-brutal-2 p-4 bg-fractal-bg-body-white", className)} {...props}>
+    <div className={cn("flex flex-col gap-4 font-sans border-2 border-fractal-border-default rounded-m shadow-soft-md p-4 bg-fractal-bg-body-white", className)} {...props}>
       <Image
         src="/kasarian_logo.jpg"
         alt="UPB Kasarian Gender Studies Program Logo"
@@ -101,7 +101,7 @@ export function LoginForm({
               fullWidth
               value={email}
               onChange={(_e, newValue) => setEmail(newValue)}
-              className="[&_input:focus]:!border-fractal-border-primary [&_input:focus]:!shadow-brutal-1-primary"
+              className="[&_input:focus]:!border-fractal-border-primary [&_input:focus]:!shadow-soft-sm-primary"
             />
 
             <div className="flex flex-col gap-half">
@@ -115,7 +115,7 @@ export function LoginForm({
                 fullWidth
                 value={password}
                 onChange={(_e, newValue) => setPassword(newValue)}
-                className="[&_input:focus]:!border-fractal-border-primary [&_input:focus]:!shadow-brutal-1-primary"
+                className="[&_input:focus]:!border-fractal-border-primary [&_input:focus]:!shadow-soft-sm-primary"
               />
               <Link
                   href="/auth/forgot-password"

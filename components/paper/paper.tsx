@@ -58,10 +58,10 @@ const Paper = forwardRef<HTMLDivElement, PaperProps>(
           return 'border-2 border-fractal-border-default';
         case '2':
         case 'elevated':
-          return 'border-2 border-fractal-border-default shadow-brutal-1';
+          return 'border-2 border-fractal-border-default shadow-soft-sm';
         case '3':
         case 'higher':
-          return 'border-2 border-fractal-border-default shadow-brutal-2';
+          return 'border-2 border-fractal-border-default shadow-soft-md';
         case 'light':
           return 'border border-fractal-border-default opacity-80';
         default:

@@ -190,7 +190,7 @@ export default function AdminProfilePage() {
     <div className="min-h-screen bg-fractal-bg-body-default">
 
       {/* Top bar */}
-      <div className="bg-fractal-bg-body-white border-b border-fractal-border-default px-6 h-14 flex items-center justify-between sticky top-0 z-30">
+      <div className="px-6 h-14 flex items-center justify-between">
         <button
           onClick={() => router.back()}
           className="flex items-center gap-1 text-fractal-base-grey-30 hover:text-fractal-text-default text-sm font-median transition"
@@ -204,7 +204,7 @@ export default function AdminProfilePage() {
         <button
           onClick={handleSave}
           disabled={saving}
-          className="flex items-center gap-2 bg-fractal-brand-primary hover:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed text-fractal-base-black text-sm font-bold px-4 py-2 rounded-s border-1 border-fractal-border-default shadow-brutal-1 transition"
+          className="flex items-center gap-2 bg-fractal-brand-primary hover:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed text-fractal-base-black text-sm font-bold px-4 py-2 rounded-s border-1 border-fractal-border-default shadow-soft-sm transition"
         >
           {saving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
           {saving ? "Saving…" : "Save changes"}
@@ -214,7 +214,7 @@ export default function AdminProfilePage() {
       <div className="max-w-2xl mx-auto px-4 py-8 flex flex-col gap-5">
 
         {/* Identity card */}
-        <div className="bg-fractal-bg-body-white border-1 border-fractal-border-default rounded-m p-5 flex items-center gap-4 shadow-brutal-1">
+        <div className="bg-fractal-bg-body-white border-1 border-fractal-border-default rounded-m p-5 flex items-center gap-4 shadow-soft-sm">
           <div className="relative shrink-0">
             <div className="w-20 h-20 rounded-full bg-fractal-bg-body-primary flex items-center justify-center text-fractal-base-black text-2xl font-bold overflow-hidden border-1 border-fractal-border-default">
               {profile.avatar_url
@@ -260,14 +260,14 @@ export default function AdminProfilePage() {
         </div>
 
         {/* Tabs */}
-        <div className="flex bg-fractal-bg-body-white border-1 border-fractal-border-default rounded-m p-1 shadow-brutal-1">
+        <div className="flex bg-fractal-bg-body-white border-1 border-fractal-border-default rounded-m p-1 shadow-soft-sm">
           {tabs.map(({ key, label }) => (
             <button
               key={key}
               onClick={() => setTab(key)}
               className={`flex-1 py-2 text-sm font-median rounded-s transition ${
                 tab === key
-                  ? "bg-fractal-brand-primary text-fractal-base-black border-1 border-fractal-border-default shadow-brutal-1"
+                  ? "bg-fractal-brand-primary text-fractal-base-black border-1 border-fractal-border-default shadow-soft-sm"
                   : "text-fractal-base-grey-30 hover:bg-fractal-base-grey-90 hover:text-fractal-text-default"
               }`}
             >
@@ -277,7 +277,7 @@ export default function AdminProfilePage() {
         </div>
 
         {/* Form card */}
-        <div className="bg-fractal-bg-body-white border-1 border-fractal-border-default rounded-m p-6 shadow-brutal-1">
+        <div className="bg-fractal-bg-body-white border-1 border-fractal-border-default rounded-m p-6 shadow-soft-sm">
 
           {tab === "personal" && (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -405,7 +405,7 @@ export default function AdminProfilePage() {
       {/* Toast */}
       {toast && (
         <div
-          className={`fixed bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 px-5 py-3 rounded-full text-sm font-median border-1 border-fractal-border-default shadow-brutal-1 z-50 ${
+          className={`fixed bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 px-5 py-3 rounded-full text-sm font-median border-1 border-fractal-border-default shadow-soft-sm z-50 ${
             toast.type === "success"
               ? "bg-fractal-feedback-success-90 text-fractal-base-black"
               : "bg-fractal-feedback-error-90 text-fractal-base-black"

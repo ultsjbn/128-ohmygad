@@ -49,8 +49,8 @@ const Tab = forwardRef<HTMLButtonElement, TabProps>(
 
       if (variant === "plain") {
         return isActive
-          ? "bg-fractal-brand-primary text-fractal-text-dark border-2 border-fractal-border-default shadow-brutal-1 translate-y-[-2px]"
-          : "bg-white text-fractal-text-default border-2 border-transparent hover:border-fractal-border-default hover:bg-fractal-base-grey-90 hover:shadow-brutal-1 transition-all";
+          ? "bg-fractal-brand-primary text-fractal-text-dark border-2 border-fractal-border-default shadow-soft-sm translate-y-[-2px]"
+          : "bg-white text-fractal-text-default border-2 border-transparent hover:border-fractal-border-default hover:bg-fractal-base-grey-90 hover:shadow-soft-sm transition-all";
       }
 
       if (variant === "transparent") {

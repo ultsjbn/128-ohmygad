@@ -33,7 +33,7 @@ export default function RightPanel() {
       {/* GSOs */}
       <Paper
         elevation="elevated"
-        className="bg-fractal-decorative-purple-90 p-4 cursor-pointer hover:shadow-brutal-2 transition-all border-2 border-fractal-border-default flex-1"
+        className="bg-fractal-decorative-purple-90 p-4 cursor-pointer hover:shadow-soft-md transition-all border-2 border-fractal-border-default flex-1"
       >
         <Typography variant="body-1-median" className="text-fractal-text-placeholder mb-1">
           GSOs Attended
@@ -49,7 +49,7 @@ export default function RightPanel() {
       {/* Pending */}
       <Paper
         elevation="elevated"
-        className="bg-fractal-decorative-yellow-90 p-4 cursor-pointer hover:shadow-brutal-2 transition-all border-2 border-fractal-border-default flex-1"
+        className="bg-fractal-decorative-yellow-90 p-4 cursor-pointer hover:shadow-soft-md transition-all border-2 border-fractal-border-default flex-1"
       >
         <Typography variant="body-1-median" className="text-fractal-text-placeholder mb-1">
           Pending Surveys
