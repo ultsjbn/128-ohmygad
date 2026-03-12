@@ -1,18 +1,76 @@
-/*
-How to use this component?
-Three modes controlled by the mode prop:
-Prop -------------- Values
-mode                "date" "time" "datetime"
-value/onChange      ISO date string, "HH:MM", or ISO datetime
-minDate/maxDate     restrict selectable days
-required/error      validation display
+/* How to use this component?
+PROPS
+  label        string       - field label rendered above the trigger
+  mode         "date" | "time" | "datetime"                                         default "datetime"
+               Controls which panels are shown and what value is emitted.
+  placeholder  string       - trigger text when no value is set
+               Defaults: "Select date" / "Select time" / "Select date & time"
+  value        string       - controlled value
+               "date"     mode → ISO date string  e.g. "2025-03-15"
+               "time"     mode → "HH:MM"          e.g. "09:00"
+               "datetime" mode → ISO datetime     e.g. "2025-03-15T09:00:00.000Z"
+  onChange     (value: string) => void
+               emits the same format as described in value above.
+               emits "" when the field is cleared.
+  minDate      Date         - earliest selectable day (inclusive)
+  maxDate      Date         - latest selectable day (inclusive)
+  required     boolean      - shows a pink  after the label                         default false
+  error        string       - error message shown below the trigger
 
-Features:
-- full calendar grid
-- today highlight
-- disabled dates
-- AM/PM spinner with preset times (8 AM, 10 AM, 12 PM…)
-- datetime mode chains the two panels together
+
+MODE BEHAVIOR
+  "date"      Calendar panel only               - closes on day pick
+  "time"      Time panel only                   - confirms with button
+  "datetime"  Calendar first, then time panel   - confirms with button;
+            trigger shows two chips (date + time) when filled
+
+SAMPLE USAGE
+  import { DateTimePicker } from "@/components/ui";
+ 
+  // date only
+  const [date, setDate] = useState("");
+  <DateTimePicker
+    label="Event Date"
+    mode="date"
+    value={date}
+    onChange={setDate}
+    required
+  />
+ 
+  // time only
+  const [time, setTime] = useState("");
+  <DateTimePicker
+    label="Start Time"
+    mode="time"
+    value={time}
+    onChange={setTime}
+  />
+ 
+  // date & time (default mode)
+  const [dt, setDt] = useState("");
+  <DateTimePicker
+    label="Event Starts"
+    value={dt}
+    onChange={setDt}
+    error={errors.startDate}
+  />
+ 
+  // restrict selectable days to the next 30 days
+  <DateTimePicker
+    label="Available Date"
+    mode="date"
+    minDate={new Date()}
+    maxDate={new Date(Date.now() + 30  24  60  60  1000)}
+  />
+ 
+  // read the ISO value
+  <DateTimePicker
+    mode="datetime"
+    onChange={(iso) => {
+      const d = new Date(iso);
+      console.log(d.toLocaleString("en-PH")); // → "3/15/2025, 9:00:00 AM"
+    }}
+  />
 */
 
 
@@ -21,9 +79,9 @@ Features:
 import { useState, useRef, useEffect } from "react";
 import { Calendar, Clock, ChevronLeft, ChevronRight, X, Check } from "lucide-react";
 
-// ─────────────────────────────────────────────
+// 
 // HELPERS
-// ─────────────────────────────────────────────
+// 
 const MONTHS = [
   "January","February","March","April","May","June",
   "July","August","September","October","November","December",
@@ -34,9 +92,9 @@ function daysInMonth(y: number, m: number) { return new Date(y, m + 1, 0).getDat
 function firstDOW(y: number, m: number)    { return new Date(y, m, 1).getDay(); }
 function pad(n: number)                    { return String(n).padStart(2, "0"); }
 
-// ─────────────────────────────────────────────
+// 
 // TYPES
-// ─────────────────────────────────────────────
+// 
 export type DateTimeMode = "date" | "time" | "datetime";
 
 export interface DateTimePickerProps {
@@ -51,9 +109,9 @@ export interface DateTimePickerProps {
   error?:       string;
 }
 
-// ─────────────────────────────────────────────
+// 
 // SPINNER sub-component
-// ─────────────────────────────────────────────
+// 
 function Spinner({ value, onUp, onDn, format }: {
   value:  number;
   onUp:   () => void;
@@ -73,15 +131,15 @@ function Spinner({ value, onUp, onDn, format }: {
   );
 }
 
-// ─────────────────────────────────────────────
+// 
 // MAIN COMPONENT
-// ─────────────────────────────────────────────
+// 
 export function DateTimePicker({
   label, mode = "datetime", placeholder,
   value, onChange, minDate, maxDate, required, error,
 }: DateTimePickerProps) {
 
-  // ── parse incoming value ──
+  // parse incoming value 
   const parseValue = () => {
     if (!value) return { date: null as Date | null, hours: 12, minutes: 0, ampm: "AM" as "AM" | "PM" };
     if (mode === "time") {
@@ -115,7 +173,7 @@ export function DateTimePicker({
     return () => document.removeEventListener("mousedown", handler);
   }, [mode]);
 
-  // ── emit ──
+  // emit
   function emit(date: Date | null, h: number, m: number, ap: "AM" | "PM") {
     if (!onChange) return;
     let h24 = h % 12;
@@ -131,7 +189,7 @@ export function DateTimePicker({
     }
   }
 
-  // ── calendar nav ──
+  // calendar nav
   function prevMonth() {
     if (calMonth === 0) { setCalMonth(11); setCalYear(y => y - 1); }
     else setCalMonth(m => m - 1);
@@ -160,7 +218,7 @@ export function DateTimePicker({
     onChange?.("");
   }
 
-  // ── calendar grid ──
+  // calendar grid
   const totalDays = daysInMonth(calYear, calMonth);
   const cells: (number | null)[] = [
     ...Array(firstDOW(calYear, calMonth)).fill(null),
@@ -183,7 +241,7 @@ export function DateTimePicker({
     return t.getFullYear() === calYear && t.getMonth() === calMonth && t.getDate() === day;
   }
 
-  // ── display string ──
+  // display string
   const timeStr = `${pad(hours)}:${pad(minutes)} ${ampm}`;
   let displayVal = "";
   if (mode === "time") {
@@ -201,11 +259,11 @@ export function DateTimePicker({
       {label && (
         <label className="label">
           {label}
-          {required && <span style={{ color: "var(--soft-pink)", marginLeft: 3 }}>*</span>}
+          {required && <span style={{ color: "var(--soft-pink)", marginLeft: 3 }}></span>}
         </label>
       )}
 
-      {/* ── Trigger ── */}
+      {/* Trigger */}
       <div
         className={`dtp-trigger${open ? " focused" : ""}${error ? " errored" : ""}`}
         onClick={() => setOpen(o => !o)}
@@ -238,11 +296,11 @@ export function DateTimePicker({
 
       {error && <span className="hint hint-error" style={{ marginTop: 4, display: "block" }}>{error}</span>}
 
-      {/* ── Popover ── */}
+      {/* Popover */}
       {open && (
         <div className="dtp-popover">
 
-          {/* ══ CALENDAR PANEL ══ */}
+          {/* CALENDAR PANEL */}
           {panel === "cal" && (
             <>
               <div className="dtp-cal-nav">
@@ -290,7 +348,7 @@ export function DateTimePicker({
             </>
           )}
 
-          {/* ══ TIME PANEL ══ */}
+          {/* TIME PANEL */}
           {panel === "time" && (
             <div className="dtp-time-panel">
               {mode === "datetime" && (

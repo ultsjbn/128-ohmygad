@@ -1,3 +1,67 @@
+/*
+How to use this component?
+ PROPS
+  open      boolean       - controls visibility               (required)
+  onClose   () => void    - called when backdrop or × clicked (required)
+  title     string        - bold heading inside the modal
+  subtitle  string        - muted caption line below title
+  children  ReactNode     - modal body content               (required)
+  footer    ReactNode     - bottom action area (usually buttons)
+ 
+  BEHAVIOUR
+    renders nothing when open=false.
+    clicking the backdrop calls onClose.
+    clicking inside the modal does not propagate to the backdrop.
+    x button always calls onClose.
+ 
+  SAMPLE USAGE
+  // 1. Manage open state in the parent
+  const [open, setOpen] = useState(false);
+ 
+  // 2. Trigger button
+  <Button onClick={() => setOpen(true)}>Register</Button>
+ 
+  // 3. Modal with form body + footer buttons
+  <Modal
+    open={open}
+    onClose={() => setOpen(false)}
+    title="Register for Event"
+    subtitle="Gender Sensitivity Orientation · Mar 15, 2025"
+    footer={
+      <div style={{ display: "flex", gap: 10 }}>
+        <Button variant="ghost" style={{ flex: 1 }} onClick={() => setOpen(false)}>
+          Cancel
+        </Button>
+        <Button variant="primary" style={{ flex: 1 }} onClick={handleSubmit}>
+          Confirm
+        </Button>
+      </div>
+    }
+  >
+    <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+      <Input label="Full Name"  value={name}  onChange={e => setName(e.target.value)} />
+      <Input label="Student ID" value={sid}   onChange={e => setSid(e.target.value)} />
+      <Select label="College" options={collegeOptions} />
+    </div>
+  </Modal>
+ 
+  // Confirm-delete variant (no form just a warning)
+  <Modal
+    open={confirmOpen}
+    onClose={() => setConfirmOpen(false)}
+    title="Cancel Event?"
+    subtitle="This cannot be undone. All registrations will be removed."
+    footer={
+      <div style={{ display: "flex", gap: 10 }}>
+        <Button variant="ghost"   style={{ flex:1 }} onClick={() => setConfirmOpen(false)}>Keep Event</Button>
+        <Button variant="primary" style={{ flex:1, background:"var(--error)" }} onClick={deleteEvent}>Yes, Cancel</Button>
+      </div>
+    }
+  >
+    <Toast variant="warning" title="28 participants are already registered." />
+  </Modal>
+ */
+
 "use client";
 
 import React from "react";
@@ -36,9 +100,3 @@ export function Modal({ open, onClose, title, subtitle, children, footer }: Moda
     </div>
   );
 }
-
-/*
-How to use this component?
-
-
-*/
