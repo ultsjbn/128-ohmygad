@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
+import { submitFormData } from "@/lib/form-submit.utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -46,9 +46,9 @@ export default function CourseForm({ initialData, mode }: CourseFormProps) {
   const [semester, setSemester] = useState(initialData?.semester ?? "");
   const [status, setStatus] = useState(initialData?.status ?? "Open");
 
+  // Submit handler — uses shared submitFormData utility from lib/form-submit.utils
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const supabase = createClient();
     setIsLoading(true);
     setError(null);
 
@@ -62,27 +62,18 @@ export default function CourseForm({ initialData, mode }: CourseFormProps) {
       updated_at: new Date().toISOString(),
     };
 
-    
     console.log("Payload being sent:", payload);
 
-      try {
-      if (mode === "create") {
-        const { error } = await supabase.from("course").insert(payload);
-        if (error) throw error;
-      } else {
-        const { error } = await supabase
-          .from("course")
-          .update(payload)
-          .eq("id", initialData!.id);
-        if (error) throw error;
-      }
+    const result = await submitFormData("course", payload, mode, initialData?.id);
+
+    if (result.success) {
       router.push("/admin/courses");
       router.refresh();
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "An error occurred");
-    } finally {
-      setIsLoading(false);
+    } else {
+      setError(result.error || "An error occurred");
     }
+
+    setIsLoading(false);
   };
 
    return (

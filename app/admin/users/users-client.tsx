@@ -2,15 +2,15 @@
 
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { Search, SlidersHorizontal, ArrowUpDown, UserPlus } from "lucide-react";
+import { SlidersHorizontal, ArrowUpDown, UserPlus } from "lucide-react";
 import { Button } from "@/components/button";
-import { InputText } from "@snowball-tech/fractal";
 import { Typography } from "@/components/typography";
 import { Tabs, Tab, TabContent } from "@/components/tabs";
 import type { Profile, SortState } from "./profile.types";
 import { sortProfiles, paginate, totalPages } from "./profile.utils";
-import { PER_PAGE } from "@/components/profile.constants";
+import { PER_PAGE } from "@/lib/pagination.utils";
 import { TableSection, type TableSectionProps } from "@/components/table-section";
+import ListToolbar from "@/components/list-toolbar";
 
 type TabKey = "all" | "admin" | "faculty" | "student";
 
@@ -56,14 +56,16 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
         <p className="text-sm text-fractal-text-default">{initialProfiles.length} total users</p>
       </div>
 
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-        <InputText placeholder="Search by name, email or role..." fullWidth prefix={<Search size={18} />} />
-        <div className="flex items-center gap-2 shrink-0">
-          <Button label="Sort" variant="display" icon={<ArrowUpDown size={18} />} iconPosition="left" onClick={() => { }} />
-          <Button label="Filter" variant="display" icon={<SlidersHorizontal size={18} />} iconPosition="left" onClick={() => { }} />
-          <Button label="Add User" variant="primary-dark" icon={<UserPlus size={18} />} iconPosition="left" onClick={() => router.push("/admin/users/create")} />
-        </div>
-      </div>
+      {/* Search + Sort + Filter + Action — uses shared ListToolbar */}
+      <ListToolbar
+        searchPlaceholder="Search by name, email or role..."
+        searchValue=""
+        onSearchChange={() => {}}
+      >
+        <Button label="Sort" variant="display" icon={<ArrowUpDown size={18} />} iconPosition="left" onClick={() => { }} />
+        <Button label="Filter" variant="display" icon={<SlidersHorizontal size={18} />} iconPosition="left" onClick={() => { }} />
+        <Button label="Add User" variant="primary-dark" icon={<UserPlus size={18} />} iconPosition="left" onClick={() => router.push("/admin/users/create")} />
+      </ListToolbar>
 
       <Tabs defaultTab="all" variant="transparent" onTabChange={handleTabChange}
         tabs={<><Tab name="all" label="All Users" /><Tab name="student" label="Students" /><Tab name="faculty" label="Faculty" /><Tab name="admin" label="Admin" /></>}

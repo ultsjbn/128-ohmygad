@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
+import { submitFormData } from "@/lib/form-submit.utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -54,9 +54,9 @@ export default function EventForm({ initialData, mode }: EventFormProps) {
   const [category, setCategory] = useState(initialData?.category ?? "");
   const [status, setStatus] = useState(initialData?.status ?? "");
 
+  // Submit handler — uses shared submitFormData utility from lib/form-submit.utils
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const supabase = createClient();
     setIsLoading(true);
     setError(null);
 
@@ -76,24 +76,16 @@ export default function EventForm({ initialData, mode }: EventFormProps) {
 
     console.log("Payload being sent:", payload);
 
-    try {
-      if (mode === "create") {
-        const { error } = await supabase.from("event").insert(payload);
-        if (error) throw error;
-      } else {
-        const { error } = await supabase
-          .from("event")
-          .update(payload)
-          .eq("id", initialData!.id);
-        if (error) throw error;
-      }
+    const result = await submitFormData("event", payload, mode, initialData?.id);
+
+    if (result.success) {
       router.push("/admin/events");
       router.refresh();
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "An error occurred");
-    } finally {
-      setIsLoading(false);
+    } else {
+      setError(result.error || "An error occurred");
     }
+
+    setIsLoading(false);
   };
 
   return (
