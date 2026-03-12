@@ -3,13 +3,16 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Loader, Paper } from "@snowball-tech/fractal";
-import { InputText } from "@snowball-tech/fractal";
-import { Plus, Pencil, Trash2, Search, ArrowUpDown, SlidersHorizontal, X, ChevronUp, ChevronDown } from "lucide-react";
+import { Plus, ArrowUpDown, SlidersHorizontal, ChevronUp, ChevronDown } from "lucide-react";
 import { Button } from "@/components/button";
 import { Typography } from "@/components/typography";
 import { Pagination } from "@/components/pagination";
-import { paginate, totalPages, PER_PAGE } from "./course.utils";
+import { paginate, totalPages, PER_PAGE } from "@/lib/pagination.utils";
+import { sortItems } from "@/lib/sort.utils";
 import { CourseFormData } from "@/components/admin/course-form";
+import DetailModal from "@/components/detail-modal";
+import ListToolbar from "@/components/list-toolbar";
+import RowActions from "@/components/row-actions";
 
 type SortField = "title" | "semester" | "status" | "start_time";
 type SortDirection = "asc" | "desc";
@@ -97,41 +100,10 @@ export default function CoursesPage() {
       result = result.filter((e) => filters.semester.includes(e.semester));
     }
 
-    // Sorting
-    result = sortCourses(result, sort);
+    // Sorting — delegated to shared sortItems utility from lib/sort.utils
+    result = sortItems(result, sort.field as keyof CourseFormData, sort.direction, ["start_time"]);
     setFiltered(result);
   }, [search, courses, sort, filters]);
-
-  const sortCourses = (coursesToSort: CourseFormData[], sortState: SortState): CourseFormData[] => {
-    const { field, direction } = sortState;
-    const sorted = [...coursesToSort];
-
-    sorted.sort((a, b) => {
-      let aVal: any = a[field as keyof CourseFormData];
-      let bVal: any = b[field as keyof CourseFormData];
-
-      if (aVal == null && bVal == null) return 0;
-      if (aVal == null) return direction === "asc" ? 1 : -1;
-      if (bVal == null) return direction === "asc" ? -1 : 1;
-
-      if (field === "start_time") {
-        aVal = new Date(aVal).getTime();
-        bVal = new Date(bVal).getTime();
-      }
-
-      // Handle string comparisons (case-insensitive)
-      if (typeof aVal === "string" && typeof bVal === "string") {
-        aVal = aVal.toLowerCase();
-        bVal = bVal.toLowerCase();
-      }
-
-      if (aVal < bVal) return direction === "asc" ? -1 : 1;
-      if (aVal > bVal) return direction === "asc" ? 1 : -1;
-      return 0;
-    });
-
-    return sorted;
-  };
 
   const handleSort = (field: SortField) => {
     setSort((prev) => ({
@@ -199,123 +171,117 @@ export default function CoursesPage() {
         <Typography variant="heading-2">Course Management</Typography>
       </div>
 
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-        <InputText
-          placeholder="Search by title, semester, or status..."
-          fullWidth
-          prefix={<Search size={18} />}
-          onChange={(e) => setSearch(e.target.value)}
-          value={search}
-        />
-
-        <div className="flex items-center gap-2 shrink-0 relative">
-          {/* Sort Button with Dropdown Menu */}
-          <div className="relative">
-            <Button
-              label={`Sort${sort.field !== "start_time" ? ": " + sortOptions.find(o => o.field === sort.field)?.label : ""}`}
-              variant="display"
-              icon={<ArrowUpDown size={18} />}
-              iconPosition="left"
-              onClick={() => setShowSortMenu(!showSortMenu)}
-              className="whitespace-nowrap"
-            />
-
-            {showSortMenu && (
-              <div className="absolute top-full right-0 mt-2 bg-white border-2 border-fractal-border-default rounded-s shadow-brutal-1 z-40 min-w-[180px]">
-                {sortOptions.map((option) => (
-                  <button
-                    key={option.field}
-                    onClick={() => handleSort(option.field)}
-                    className={`w-full text-left px-4 py-2 text-sm font-median hover:bg-fractal-base-grey-90 transition-colors flex items-center justify-between ${sort.field === option.field ? "bg-fractal-base-grey-90" : ""
-                      }`}
-                  >
-                    <span>{option.label}</span>
-                    {sort.field === option.field && (
-                      <span className="ml-2">
-                        {sort.direction === "asc" ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-                      </span>
-                    )}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Filter */}
-          <div className="relative">
-            <Button
-              label="Filter"
-              variant={hasActiveFilters ? "primary-dark" : "display"}
-              icon={<SlidersHorizontal size={18} />}
-              iconPosition="left"
-              onClick={() => setShowFilterMenu(!showFilterMenu)}
-              className="whitespace-nowrap"
-            />
-
-            {showFilterMenu && (
-              <div className="absolute top-full right-0 mt-2 bg-white border-2 border-fractal-border-default rounded-s shadow-brutal-1 z-40 min-w-[240px] max-h-96 overflow-y-auto">
-
-                {/* Status Filter */}
-                {statuses.length > 0 && (
-                  <div className="border-b border-fractal-border-default p-3">
-                    <Typography variant="body-2-median" className="mb-2 block">
-                      Status
-                    </Typography>
-                    {statuses.map((status) => (
-                      <label
-                        key={status}
-                        className="flex items-center gap-2 px-2 py-1.5 cursor-pointer hover:bg-fractal-base-grey-90 rounded transition-colors"
-                      >
-                        <input
-                          type="checkbox"
-                          checked={filters.status.includes(status)}
-                          onChange={() => toggleFilter("status", status)}
-                          className="w-4 h-4 appearance-none border-2 border-fractal rounded-full bg-white checked:bg-fractal-brand-primary" // to do: update to fractal checkbox 
-                        />
-                        <Typography variant="body-2" className="capitalize">
-                          {status}
-                        </Typography>
-                      </label>
-                    ))}
-                  </div>
-                )}
-
-                {/* Category */}
-                {categories.length > 0 && (
-                  <div className="border-b border-fractal-border-default p-3">
-                    <Typography variant="body-2-median" className="mb-2 block">
-                      Category
-                    </Typography>
-                    {categories.map((category) => (
-                      <label
-                        key={category}
-                        className="flex items-center gap-2 px-2 py-1.5 cursor-pointer hover:bg-fractal-base-grey-90 rounded transition-colors"
-                      >
-                        <input
-                          type="checkbox"
-                          checked={filters.semester.includes(category)}
-                          onChange={() => toggleFilter("semester", category)}
-                          className="w-4 h-4 appearance-none border-2 border-fractal rounded-full bg-white checked:bg-fractal-brand-primary" // to do: update to fractal checkbox 
-                        />
-                        <Typography variant="body-2">{category}</Typography>
-                      </label>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-
+      {/* Search + Sort + Filter + Action — uses shared ListToolbar */}
+      <ListToolbar
+        searchPlaceholder="Search by title, semester, or status..."
+        searchValue={search}
+        onSearchChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)}
+      >
+        {/* Sort Button with Dropdown Menu */}
+        <div className="relative">
           <Button
-            label="Add Course"
-            variant="primary-dark"
-            icon={<Plus size={18} />}
+            label={`Sort${sort.field !== "start_time" ? ": " + sortOptions.find(o => o.field === sort.field)?.label : ""}`}
+            variant="display"
+            icon={<ArrowUpDown size={18} />}
             iconPosition="left"
-            onClick={() => router.push("/admin/courses/create")}
+            onClick={() => setShowSortMenu(!showSortMenu)}
+            className="whitespace-nowrap"
           />
+
+          {showSortMenu && (
+            <div className="absolute top-full right-0 mt-2 bg-white border-2 border-fractal-border-default rounded-s shadow-brutal-1 z-40 min-w-[180px]">
+              {sortOptions.map((option) => (
+                <button
+                  key={option.field}
+                  onClick={() => handleSort(option.field)}
+                  className={`w-full text-left px-4 py-2 text-sm font-median hover:bg-fractal-base-grey-90 transition-colors flex items-center justify-between ${sort.field === option.field ? "bg-fractal-base-grey-90" : ""
+                    }`}
+                >
+                  <span>{option.label}</span>
+                  {sort.field === option.field && (
+                    <span className="ml-2">
+                      {sort.direction === "asc" ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
-      </div>
+        {/* Filter */}
+        <div className="relative">
+          <Button
+            label="Filter"
+            variant={hasActiveFilters ? "primary-dark" : "display"}
+            icon={<SlidersHorizontal size={18} />}
+            iconPosition="left"
+            onClick={() => setShowFilterMenu(!showFilterMenu)}
+            className="whitespace-nowrap"
+          />
+
+          {showFilterMenu && (
+            <div className="absolute top-full right-0 mt-2 bg-white border-2 border-fractal-border-default rounded-s shadow-brutal-1 z-40 min-w-[240px] max-h-96 overflow-y-auto">
+
+              {/* Status Filter */}
+              {statuses.length > 0 && (
+                <div className="border-b border-fractal-border-default p-3">
+                  <Typography variant="body-2-median" className="mb-2 block">
+                    Status
+                  </Typography>
+                  {statuses.map((status) => (
+                    <label
+                      key={status}
+                      className="flex items-center gap-2 px-2 py-1.5 cursor-pointer hover:bg-fractal-base-grey-90 rounded transition-colors"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={filters.status.includes(status)}
+                        onChange={() => toggleFilter("status", status)}
+                        className="w-4 h-4 appearance-none border-2 border-fractal rounded-full bg-white checked:bg-fractal-brand-primary" // to do: update to fractal checkbox 
+                      />
+                      <Typography variant="body-2" className="capitalize">
+                        {status}
+                      </Typography>
+                    </label>
+                  ))}
+                </div>
+              )}
+
+              {/* Category */}
+              {categories.length > 0 && (
+                <div className="border-b border-fractal-border-default p-3">
+                  <Typography variant="body-2-median" className="mb-2 block">
+                    Category
+                  </Typography>
+                  {categories.map((category) => (
+                    <label
+                      key={category}
+                      className="flex items-center gap-2 px-2 py-1.5 cursor-pointer hover:bg-fractal-base-grey-90 rounded transition-colors"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={filters.semester.includes(category)}
+                        onChange={() => toggleFilter("semester", category)}
+                        className="w-4 h-4 appearance-none border-2 border-fractal rounded-full bg-white checked:bg-fractal-brand-primary" // to do: update to fractal checkbox 
+                      />
+                      <Typography variant="body-2">{category}</Typography>
+                    </label>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        <Button
+          label="Add Course"
+          variant="primary-dark"
+          icon={<Plus size={18} />}
+          iconPosition="left"
+          onClick={() => router.push("/admin/courses/create")}
+        />
+      </ListToolbar>
 
 
 
@@ -425,27 +391,14 @@ export default function CoursesPage() {
                   </td>
 
 
-                  <td className="p-3">
-                    <div className="flex gap-2 justify-end">
-                      <button
-                        onClick={() =>
-                          router.push(`/admin/courses/${course.id}/edit`)
-                        }
-                        className="p-2 hover:bg-fractal-decorative-yellow-90 border-2 border-fractal-border-default rounded-s shadow-brutal-1 transition-colors"
-                        title="Edit course"
-                      >
-                        <Pencil size={14} />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(course.id!, course.title)}
-                        disabled={deletingId === course.id}
-                        className="p-2 hover:bg-fractal-decorative-yellow-90 border-2 border-fractal-border-default rounded-s shadow-brutal-1 transition-colors disabled:opacity-50"
-                        title="Delete course"
-                      >
-                        <Trash2 size={14} />
-                      </button>
-                    </div>
-                  </td>
+                  {/* Row actions — uses shared RowActions component */}
+                  <RowActions
+                    editUrl={`/admin/courses/${course.id}/edit`}
+                    onDelete={() => handleDelete(course.id!, course.title)}
+                    isDeleting={deletingId === course.id}
+                    editTitle="Edit course"
+                    deleteTitle="Delete course"
+                  />
                 </tr>
               ))}
             </tbody>
@@ -463,31 +416,13 @@ export default function CoursesPage() {
         </div>
       )}
 
-      {/* Detail Modal */}
+      {/* Detail Modal — uses shared DetailModal component */}
       {modalContent && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 transition-opacity"
-          onClick={() => setModalContent(null)}
-        >
-          <div
-            className="relative bg-white rounded-lg border-2 border-fractal-border-default shadow-brutal-1 p-6 max-w-lg w-[90%] mx-4"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              onClick={() => setModalContent(null)}
-              className="absolute top-3 right-3 p-1 hover:bg-fractal-decorative-yellow-90 border-2 border-fractal-border-default rounded-s shadow-brutal-1 transition-colors"
-              title="Close"
-            >
-              <X size={16} />
-            </button>
-            <Typography variant="body-1-median" className="mb-3">
-              {modalContent.label}
-            </Typography>
-            <Typography variant="body-1" className="break-words whitespace-pre-wrap">
-              {modalContent.text}
-            </Typography>
-          </div>
-        </div>
+        <DetailModal
+          label={modalContent.label}
+          text={modalContent.text}
+          onClose={() => setModalContent(null)}
+        />
       )}
     </div>
   );

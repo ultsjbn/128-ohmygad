@@ -5,67 +5,15 @@ import { createBrowserClient } from "@supabase/ssr";
 import { useRouter } from "next/navigation";
 import {
   User, Mail, Phone, MapPin, Camera,
-  Save, Loader2, CheckCircle2, AlertCircle, ChevronLeft,
+  Save, Loader2, ChevronLeft,
   Heart, Building2, BookOpen, Users,
 } from "lucide-react";
+import type { Profile } from "./profile.types";
+import type { ToastState } from "@/components/toast";
+import { SEX_OPTIONS, PRONOUNS } from "./profile.constants";
+import { FormField, inputCls } from "@/components/form-field";
+import Toast from "@/components/toast";
 
-type Profile = {
-  id: string;
-  full_name: string;
-  display_name: string;
-  email: string;
-  contact_num: string;
-  address: string;
-  pronouns: string;
-  role: string;
-  program: string;
-  college: string;
-  sex_at_birth: string;
-  gender_identity: string;
-  gso_attended: number | null;
-  avatar_url?: string | null;
-};
-
-type ToastState = { type: "success" | "error"; message: string } | null;
-
-const SEX_OPTIONS = ["Male", "Female", "Intersex", "Prefer not to say"];
-const PRONOUNS = ["he/him", "she/her", "they/them", "he/they", "she/they", "any/all", "Prefer not to say"];
-
-function Field({
-  label,
-  icon,
-  children,
-}: {
-  label: string;
-  icon?: React.ReactNode;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="flex flex-col gap-2">
-      <label className="text-xs font-bold uppercase tracking-widest text-fractal-base-grey-30">
-        {label}
-      </label>
-      <div className="relative">
-        {icon && (
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-fractal-base-grey-50 pointer-events-none">
-            {icon}
-          </span>
-        )}
-        {children}
-      </div>
-    </div>
-  );
-}
-
-const inputCls = (hasIcon = true) =>
-  [
-    "w-full rounded-s border-1 border-fractal-border-default bg-fractal-bg-body-white",
-    hasIcon ? "pl-9" : "pl-3",
-    "pr-3 py-2 text-sm text-fractal-text-default placeholder:text-fractal-text-placeholder",
-    "focus:outline-none focus:border-fractal-brand-primary focus:ring-2 focus:ring-fractal-brand-highlight",
-    "disabled:bg-fractal-bg-disabled disabled:text-fractal-text-disabled disabled:border-fractal-border-disabled disabled:cursor-not-allowed",
-    "transition appearance-none",
-  ].join(" ");
 
 export default function AdminProfilePage() {
   const router = useRouter();
@@ -282,33 +230,33 @@ export default function AdminProfilePage() {
           {tab === "personal" && (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="sm:col-span-2">
-                <Field label="Full Name" icon={<User size={15} />}>
+                <FormField label="Full Name" icon={<User size={15} />}>
                   <input
                     className={inputCls()}
                     placeholder="e.g. Maria Santos"
                     value={profile.full_name}
                     onChange={set("full_name")}
                   />
-                </Field>
+                </FormField>
               </div>
 
-              <Field label="Display Name" icon={<User size={15} />}>
+              <FormField label="Display Name" icon={<User size={15} />}>
                 <input
                   className={inputCls()}
                   placeholder="e.g. Prof. Santos"
                   value={profile.display_name}
                   onChange={set("display_name")}
                 />
-              </Field>
+              </FormField>
 
-              <Field label="Pronouns" icon={<Heart size={15} />}>
+              <FormField label="Pronouns" icon={<Heart size={15} />}>
                 <select className={inputCls()} value={profile.pronouns} onChange={set("pronouns")}>
                   <option value="">Select pronouns</option>
                   {PRONOUNS.map((p) => <option key={p} value={p}>{p}</option>)}
                 </select>
-              </Field>
+              </FormField>
 
-              <Field label="Email Address" icon={<Mail size={15} />}>
+              <FormField label="Email Address" icon={<Mail size={15} />}>
                 <input
                   className={inputCls()}
                   type="email"
@@ -316,80 +264,80 @@ export default function AdminProfilePage() {
                   disabled
                   title="Email is managed through your account settings"
                 />
-              </Field>
+              </FormField>
 
-              <Field label="Contact Number" icon={<Phone size={15} />}>
+              <FormField label="Contact Number" icon={<Phone size={15} />}>
                 <input
                   className={inputCls()}
                   placeholder="e.g. 09XX XXX XXXX"
                   value={profile.contact_num}
                   onChange={set("contact_num")}
                 />
-              </Field>
+              </FormField>
 
               <div className="sm:col-span-2">
-                <Field label="Address" icon={<MapPin size={15} />}>
+                <FormField label="Address" icon={<MapPin size={15} />}>
                   <input
                     className={inputCls()}
                     placeholder="Street, Barangay, City, Province"
                     value={profile.address}
                     onChange={set("address")}
                   />
-                </Field>
+                  </FormField>
               </div>
             </div>
           )}
 
           {tab === "professional" && (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <Field label="Department / Program" icon={<BookOpen size={15} />}>
+              <FormField label="Department / Program" icon={<BookOpen size={15} />}>
                 <input
                   className={inputCls()}
                   placeholder="e.g. Computer Science"
                   value={profile.program}
                   onChange={set("program")}
                 />
-              </Field>
+              </FormField>
 
-              <Field label="College" icon={<Building2 size={15} />}>
+              <FormField label="College" icon={<Building2 size={15} />}>
                 <input
                   className={inputCls()}
                   placeholder="e.g. College of Engineering"
                   value={profile.college}
                   onChange={set("college")}
                 />
-              </Field>
+              </FormField>
 
               <div className="sm:col-span-2">
-                <Field label="GSOs Attended" icon={<Users size={15} />}>
+                <FormField label="GSOs Attended" icon={<Users size={15} />}>
                   <div className={`${inputCls()} flex items-center gap-2 bg-fractal-bg-disabled border-fractal-border-disabled cursor-not-allowed`}>
                     <span className="text-fractal-text-disabled text-sm">
                       {profile.gso_attended ?? 0}
                     </span>
                     <span className="text-fractal-text-disabled text-xs">gender sensitivity orientations attended</span>
                   </div>
-                </Field>
+                </FormField>
               </div>
             </div>
           )}
 
           {tab === "identity" && (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <Field label="Sex at Birth" icon={<User size={15} />}>
+              <FormField label="Sex at Birth" icon={<User size={15} />}>
                 <select className={inputCls()} value={profile.sex_at_birth} onChange={set("sex_at_birth")}>
                   <option value="">Select option</option>
                   {SEX_OPTIONS.map((s) => <option key={s} value={s}>{s}</option>)}
                 </select>
-              </Field>
+              </FormField>
 
-              <Field label="Gender Identity" icon={<Heart size={15} />}>
+              <FormField label="Gender Identity" icon={<Heart size={15} />}>
                 <input
                   className={inputCls()}
                   placeholder="e.g. Non-binary, Transgender…"
                   value={profile.gender_identity}
                   onChange={set("gender_identity")}
                 />
-              </Field>
+              </FormField>
 
               <div className="sm:col-span-2 pt-1">
                 <p className="text-xs text-fractal-base-grey-30 leading-relaxed">
@@ -402,21 +350,8 @@ export default function AdminProfilePage() {
         </div>
       </div>
 
-      {/* Toast */}
-      {toast && (
-        <div
-          className={`fixed bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 px-5 py-3 rounded-full text-sm font-median border-1 border-fractal-border-default shadow-brutal-1 z-50 ${
-            toast.type === "success"
-              ? "bg-fractal-feedback-success-90 text-fractal-base-black"
-              : "bg-fractal-feedback-error-90 text-fractal-base-black"
-          }`}
-        >
-          {toast.type === "success"
-            ? <CheckCircle2 size={15} className="text-fractal-icon-success" />
-            : <AlertCircle size={15} className="text-fractal-icon-error" />}
-          {toast.message}
-        </div>
-      )}
+      {/* Toast — uses shared Toast component */}
+      <Toast toast={toast} />
     </div>
   );
 }
