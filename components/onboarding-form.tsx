@@ -179,8 +179,7 @@ export function OnboardingForm({
 
       <div className="md:w-2/3 flex flex-col min-w-0">
         <form onSubmit={handleOnboarding} className="flex flex-col h-full w-full" autoComplete="off">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pb-4 min-w-0">
-            
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 pb-4 min-w-0">
             <div className="md:col-span-2">
               <Input
                 label="Full Name *"
@@ -191,6 +190,8 @@ export function OnboardingForm({
                 onChange={(e) => setFullName(e.target.value)}
                 autoComplete="off"
               />
+            </div>
+            <div className="md: col-span-2">
               <Input
                 label="Display Name (optional)"
                 placeholder="How you want to be called"
