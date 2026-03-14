@@ -21,7 +21,7 @@ export default function SignUpSuccessPage() {
             {/* Typography */}
             <h2 className="heading-lg mb-2">Thank you for signing up!</h2>
             <p className="body text-[var(--gray)] mb-6 px-4">
-              You&apos;ve successfully signed up. Please check your email to confirm your account before signing in.
+              Please check your email to confirm your account.
             </p>
             
             {/* Action Button */}
