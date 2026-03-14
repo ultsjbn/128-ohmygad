@@ -539,6 +539,18 @@ body {
   transition: var(--transition);
 }
 
+.auth-card {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: 36px;
+  transition: var(--transition);
+}
+
+.auth-card:hover {
+  box-shadow: var(--shadow-float);
+}
+
 .card:hover {
   box-shadow: var(--shadow-float);
 }
@@ -655,7 +667,7 @@ body {
 }
 
 /* ------------------------------------------------------------------─
-   CREDIT / PARTICIPANT CARD
+  PARTICIPANT CARD
 ------------------------------------------------------------------─ */
 .credit-card {
   border-radius: var(--radius-xl);
@@ -766,6 +778,17 @@ body {
 
 .hint-error {
   color: var(--error);
+}
+
+/* override browser autofill background */
+.input:-webkit-autofill,
+.input:-webkit-autofill:hover,
+.input:-webkit-autofill:focus,
+.input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 9999px var(--periwinkle-light) inset !important;
+  -webkit-text-fill-color: var(--primary-dark) !important;
+  border-color: var(--periwinkle) !important;
+  transition: background-color 5000s ease-in-out 0s;
 }
 
 /* ------------------------------------------------------------------─

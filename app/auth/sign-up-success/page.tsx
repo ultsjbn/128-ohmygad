@@ -1,33 +1,35 @@
-import { Card, Button } from "@snowball-tech/fractal";
-import { Typography } from "@/components/typography";
 import Link from "next/link";
+import { MailCheck } from "lucide-react";
 
-export default function Page() {
+export default function SignUpSuccessPage() {
   return (
-    <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10 bg-fractal-bg-body-default text-fractal-text-default font-sans">
-      <div className="w-full max-w-sm">
-        <div className="flex flex-col gap-4 border-2 border-fractal-border-default rounded-m shadow-brutal-2 p-4 bg-fractal-bg-body-white">
-          <Typography variant="heading-2">
-            Thank you for signing up!
-          </Typography>
-          <Card color="body" className="gap-4">
-            <Typography variant="body-1">
-              You&apos;ve successfully signed up. Please check your email to
-              confirm your account before signing in.
-            </Typography>
-            <div className="mt-3">
-              <Link href="/auth/login">
-                <Button
-                  label="Go to Login"
-                  variant="primary"
-                  fullWidth
-                  className="[&]:text-fractal-base-white [&]:border-2 [&]:border-fractal-border-default [&:hover]:text-fractal-base-black [&:hover]:border-2 [&:hover]:border-fractal-border-default"
-                />
-              </Link>
+      <div className="page-bg relative w-full min-h-screen md:h-screen overflow-hidden flex items-center justify-center p-4 sm:p-8">
+        {/* --- BG Design --- */}
+        <div className="blob blob-periwinkle hidden md:block"
+        style={{ width: 500, height: 500, top: -120, right: -120, opacity: 0.3 }}/>
+        <div className="blob blob-pink hidden md:block" 
+          style={{ width: 400, height: 400, bottom: 100, left: -100, opacity: 0.3 }}/>
+  
+        {/* --- Form Container --- */}
+        <div className="card max-w-md w-full mx-auto h-fit">
+          <div className="flex flex-col items-center text-center pt-2 pb-1">
+            {/* Success Icon */}
+            <div className="w-16 h-16 rounded-full bg-[rgba(109,197,160,0.15)] text-[var(--success)] flex items-center justify-center mb-5">
+              <MailCheck className="w-8 h-8" strokeWidth={2.5} />
             </div>
-          </Card>
+            
+            {/* Typography */}
+            <h2 className="heading-lg mb-2">Thank you for signing up!</h2>
+            <p className="body text-[var(--gray)] mb-6 px-4">
+              You&apos;ve successfully signed up. Please check your email to confirm your account before signing in.
+            </p>
+            
+            {/* Action Button */}
+            <Link href="/auth/login" className="btn btn-primary w-full justify-center">
+              Go to Login
+            </Link>
+          </div>
         </div>
-      </div>
     </div>
-  );
+    );
 }

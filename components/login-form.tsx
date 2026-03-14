@@ -2,12 +2,11 @@
 
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
-import { Card, InputText, Button } from "@snowball-tech/fractal";
-import { Typography } from "./typography";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Image from "next/image";
+import { Mail, Lock } from "lucide-react";
 
 export function LoginForm({
   className,
@@ -78,82 +77,93 @@ export function LoginForm({
   };
 
   return (
-    <div className={cn("flex flex-col gap-4 font-sans border-2 border-fractal-border-default rounded-m shadow-brutal-2 p-4 bg-fractal-bg-body-white", className)} {...props}>
-      <Image
-        src="/kasarian_logo.jpg"
-        alt="UPB Kasarian Gender Studies Program Logo"
-        width={100}
-        height={100}
-        className="self-center rounded-full object-cover border-2 border-fractal-border-default transition-all duration-300"
-      />
-      <Typography variant="heading-2" className="font-wide font-bold text-fractal-text-default self-center">
-        Login
-      </Typography>
-      <Card color="body">
-        <form onSubmit={handleLogin}>
-          <div className="flex flex-col gap-3">
-            <InputText
+    <div className={cn("auth-card max-w-md w-full mx-auto", className)} {...props}>
+      <div className="flex flex-col items-center mb-6 text-center">
+        <Image
+          src="/kasarian_logo.jpg"
+          alt="UPB Kasarian Gender Studies Program Logo"
+          width={80}
+          height={80}
+          className="rounded-full object-cover mb-4 shadow-soft border-2 border-white"
+        />
+        <h2 className="heading-lg">Welcome Back!</h2>
+        <p className="body text-[var(--gray)] mt-1">
+          Sign in to your account to continue
+        </p>
+      </div>
+
+      <form onSubmit={handleLogin} className="flex flex-col gap-5">
+        
+        {/* Email Input */}
+        <div className="input-wrap">
+          <label htmlFor="email" className="label">Email</label>
+          <div className="input-icon-wrap">
+            <Mail className="input-prefix-icon w-2 h-2" />
+            <input
               id="email"
-              label="Email"
               type="email"
-              placeholder="m@example.com"
+              placeholder="jmdelacruz@up.edu.ph"
               required
-              fullWidth
               value={email}
-              onChange={(_e, newValue) => setEmail(newValue)}
-              className="[&_input:focus]:!border-fractal-border-primary [&_input:focus]:!shadow-brutal-1-primary"
-            />
-
-            <div className="flex flex-col gap-half">
-              <div className="flex items-center justify-between">
-                <Typography variant="body-2-median" element="label">Password</Typography>
-              </div>
-              <InputText
-                id="password"
-                type="password"
-                required
-                fullWidth
-                value={password}
-                onChange={(_e, newValue) => setPassword(newValue)}
-                className="[&_input:focus]:!border-fractal-border-primary [&_input:focus]:!shadow-brutal-1-primary"
-              />
-              <Link
-                  href="/auth/forgot-password"
-                  className="text-sm underline-offset-4 hover:underline text-fractal-text-placeholder text-right"
-                >
-                  Forgot your password?
-                </Link>
-            </div>
-
-            {error && (
-              <Typography variant="body-2" className="text-fractal-feedback-error-50">
-                {error}
-              </Typography>
-            )}
-
-            <Button
-              type="submit"
-              label={isLoading ? "Logging in..." : "Login"}
-              variant="primary"
-              fullWidth
-              disabled={isLoading}
-              className="[&]:text-fractal-base-white [&]:border-2 [&]:border-fractal-border-default [&:hover]:text-fractal-base-black [&:hover]:border-2 [&:hover]:border-fractal-border-default"
+              onChange={(e) => setEmail(e.target.value)}
+              className="input"
             />
           </div>
+        </div>
 
-          <div className="mt-3 text-center">
-            <Typography variant="body-2">
-              Don&apos;t have an account?{" "}
-              <Link
-                href="/auth/sign-up"
-                className="underline underline-offset-4 text-fractal-brand-primary font-median"
-              >
-                Sign up
-              </Link>
-            </Typography>
+        {/* Password Input */}
+        <div className="input-wrap">
+          <div className="flex items-center justify-between">
+            <label htmlFor="password" className="label">Password</label>
+            <Link
+              href="/auth/forgot-password"
+              className="caption hover:text-[var(--primary-dark)] hover:underline underline-offset-4 transition-colors"
+            >
+              Forgot password?
+            </Link>
           </div>
-        </form>
-      </Card>
+          <div className="input-icon-wrap">
+            <Lock className="input-prefix-icon w-2 h-2" />
+            <input
+              id="password"
+              type="password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="input"
+            />
+          </div>
+        </div>
+
+        {/* Error Toast */}
+        {error && (
+          <div className="toast toast-error mt-1">
+            <span className="font-semibold text-[var(--error)]">{error}</span>
+          </div>
+        )}
+
+        {/* Submit Button */}
+        <button
+          type="submit"
+          disabled={isLoading}
+          className="btn btn-primary w-full justify-center mt-2"
+        >
+          {isLoading ? "Logging in..." : "Login"}
+        </button>
+
+        {/* Footer Link */}
+        <div className="mt-2 text-center">
+          <p className="body">
+            Don&apos;t have an account?{" "}
+            <Link
+              href="/auth/sign-up"
+              className="font-bold text-[var(--soft-pink)] hover:text-[var(--primary-dark)] transition-colors"
+            >
+              Sign up
+            </Link>
+          </p>
+        </div>
+      </form>
     </div>
   );
 }
