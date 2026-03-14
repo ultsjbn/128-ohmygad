@@ -2,18 +2,10 @@
 
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import Image from "next/image";
+import { Lock } from "lucide-react";
 
 export function UpdatePasswordForm({
   className,
@@ -24,17 +16,48 @@ export function UpdatePasswordForm({
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
-  const handleForgotPassword = async (e: React.FormEvent) => {
+  const handleUpdatePassword = async (e: React.FormEvent) => {
     e.preventDefault();
     const supabase = createClient();
     setIsLoading(true);
     setError(null);
 
     try {
-      const { error } = await supabase.auth.updateUser({ password });
-      if (error) throw error;
-      // Update this route to redirect to an authenticated route. The user already has an active session.
-      router.push("/protected");
+      // update the password
+      const { data: authData, error: updateError } = await supabase.auth.updateUser({ password });
+      if (updateError) throw updateError;
+      if (!authData.user) throw new Error("No user session found.");
+
+      // fetch the user profile to chcek their role
+      const { data: profile, error: profileError } = await supabase
+        .from("profile")
+        .select("role, is_onboarded")
+        .eq("id", authData.user.id)
+        .single();
+
+      if (profileError || !profile) {
+        throw new Error("No profile found. Please contact the administrator.");
+      }
+
+      // redirect based on onboarding status and role
+      if (!profile.is_onboarded) {
+        router.push("/auth/onboarding");
+        return;
+      }
+      switch (profile.role) {
+        case "admin":
+          router.push("/admin");
+          break;
+        case "faculty":
+          router.push("/faculty");
+          break;
+        case "student":
+          router.push("/student");
+          break;
+        default:
+          throw new Error("Your account role is not recognized. Please contact the administrator.");
+      }
+
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : "An error occurred");
     } finally {
@@ -43,36 +66,58 @@ export function UpdatePasswordForm({
   };
 
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-2xl">Reset Your Password</CardTitle>
-          <CardDescription>
-            Please enter your new password below.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleForgotPassword}>
-            <div className="flex flex-col gap-6">
-              <div className="grid gap-2">
-                <Label htmlFor="password">New password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="New password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-              </div>
-              {error && <p className="text-sm text-red-500">{error}</p>}
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Saving..." : "Save new password"}
-              </Button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
+    <div className={cn("card max-w-md w-full mx-auto h-fit", className)} {...props}>
+      <div className="flex flex-col items-center mb-6 text-center">
+        <Image
+          src="/kasarian_logo.jpg"
+          alt="UPB Kasarian Gender Studies Program Logo"
+          width={80}
+          height={80}
+          className="rounded-full object-cover mb-4 shadow-soft border-2 border-white"
+        />
+        <h2 className="heading-md">Update Password</h2>
+        <p className="caption text-[var(--gray)] mt-1">
+          Please enter your new password below.
+        </p>
+      </div>
+
+      <form onSubmit={handleUpdatePassword} className="flex flex-col gap-5">
+        
+        {/* New Password Input */}
+        <div className="input-wrap">
+          <label htmlFor="password" className="label">New Password</label>
+          <div className="input-icon-wrap">
+            <Lock className="input-prefix-icon w-2 h-2" />
+            <input
+              id="password"
+              type="password"
+              placeholder="Enter new password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="input"
+            />
+          </div>
+          <span className="hint">Must be at least 8 characters long.</span>
+        </div>
+
+        {/* Error Toast */}
+        {error && (
+          <div className="toast toast-error mt-1">
+            <span className="font-semibold text-[var(--error)]">{error}</span>
+          </div>
+        )}
+
+        {/* Submit Button */}
+        <button 
+          type="submit" 
+          className="btn btn-periwinkle w-full justify-center mt-2" 
+          disabled={isLoading}
+        >
+          {isLoading ? "Saving..." : "Save new password"}
+        </button>
+
+      </form>
     </div>
   );
 }
