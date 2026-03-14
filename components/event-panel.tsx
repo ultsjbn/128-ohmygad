@@ -1,22 +1,20 @@
+"use client";
+
 import { useEffect, useState } from "react";
 import { Calendar } from "lucide-react";
-import { Typography } from "./typography";
 import { createClient } from "@/lib/supabase/client";
-import EventCard from "./event-card";
-import { Button } from "./button";
-import { Loader } from "@snowball-tech/fractal";
+import { EventCard } from "@/components/ui";
 
-interface Event {
+interface EventData {
   id: string;
-  date: string;
   title: string;
   location: string;
+  date: string;
   time: string;
+  rawStartDate: string;
   status?: string | null;
   image?: string;
 }
-
-// ─── format helpers ─────────────────────────────────────────────────────────────────
 
 const formatDate = (start: string): string =>
   new Date(start).toLocaleDateString("en-US", {
@@ -31,33 +29,25 @@ const formatTimeRange = (start: string, end: string): string => {
   return `${fmt(new Date(start))} - ${fmt(new Date(end))}`;
 };
 
-// ─── Event Panel ─────────────────────────────────────────────────────────────
-
 export const EventPanel = (): JSX.Element => {
   const supabase = createClient();
-  const [events, setEvents] = useState<Event[]>([]);
+  const [events, setEvents] = useState<EventData[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchEvents = async () => {
       setLoading(true);
 
-      // get the currently logged-in user
-      const {
-        data: { user },
-        error: userError,
-      } = await supabase.auth.getUser();
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
 
       if (userError || !user) {
         setLoading(false);
         return;
       }
 
-      // fetch events + current user's registration status
       const { data, error } = await supabase
         .from("event")
-        .select(
-          `
+        .select(`
           id,
           title,
           location,
@@ -67,8 +57,7 @@ export const EventPanel = (): JSX.Element => {
           event_registration!inner (
             status
           )
-        `,
-        )
+        `)
         .eq("event_registration.user_id", user.id)
         .order("start_date", { ascending: true });
 
@@ -78,13 +67,13 @@ export const EventPanel = (): JSX.Element => {
         return;
       }
 
-      const mapped: Event[] = (data ?? []).map((e: any) => ({
+      const mapped: EventData[] = (data ?? []).map((e: any) => ({
         id: e.id,
         title: e.title,
         location: e.location,
         date: formatDate(e.start_date),
         time: formatTimeRange(e.start_date, e.end_date),
-        // event_registration will grab the first (user's) row
+        rawStartDate: e.start_date,
         status: e.event_registration?.[0]?.status ?? null,
         image: e.banner ?? undefined,
       }));
@@ -97,36 +86,62 @@ export const EventPanel = (): JSX.Element => {
   }, []);
 
   return (
-    <div className="flex flex-col gap-6 h-full font-clash">
+    <div className="flex flex-col h-full p-6">
+      
       {/* HEADER */}
-      <div className="flex justify-between items-center shrink-0">
-        <Typography variant="heading-1">Events</Typography>
-        <div className="flex gap-2">
-          <Button label="Upcoming" variant="display" />
-          <Button label="Past" variant="primary" />
-        </div>
+      <div className="flex justify-between items-center shrink-0 border-b border-[rgba(45,42,74,0.08)] pb-4 mb-6">
+        <h2 className="heading-lg">My Events</h2>
       </div>
 
-      {/* SCROLLABLE LIST */}
-      <div className="flex flex-col gap-8 overflow-y-auto pr-4 pb-24 pt-4 custom-scrollbar">
+      {/* SCROLLABLE AREA */}
+      <div className="flex-1 flex flex-col overflow-y-auto pr-2 min-h-0 custom-scrollbar pb-4">
+        
         {loading ? (
-          <div className="flex flex-1 items-center justify-center py-12">
-            <Loader size="l"/>
+          <div className="flex flex-1 items-center justify-center py-16">
+            <div className="w-8 h-8 border-4 border-[var(--periwinkle-light)] border-t-[var(--periwinkle)] rounded-full animate-spin"></div>
           </div>
-        ) : (
-          events.map((event) => (
-            <div key={event.id} className="flex flex-row gap-4 justify-between">
-              <div className="flex flex-none items-start gap-2 pt-3 min-w-[160px] shrink-0">
-                <Calendar size={18} strokeWidth={2.5} className="text-black" />
-                <span className="text-sm font-bold">{event.date}</span>
+        ) : events.length > 0 ? (
+          
+          <div className="flex flex-col gap-6">
+            {events.map((event) => (
+              <div key={event.id} className="flex flex-col xl:flex-row gap-4 justify-between items-start">
+                {/* Date Indicator Column */}
+                <div className="flex flex-none items-center xl:items-start gap-3 xl:pt-4 min-w-[140px] shrink-0">
+                  <div className="w-10 h-10 rounded-full bg-[var(--periwinkle-light)] text-[var(--periwinkle)] flex items-center justify-center">
+                    <Calendar size={18} strokeWidth={2.5} />
+                  </div>
+                  <span className="font-bold text-[var(--primary-dark)] text-sm">{event.date}</span>
+                </div>
+                
+                {/* Event Card Column */}
+                <div className="flex-1 w-full min-w-0">
+                  <EventCard 
+                    title={event.title}
+                    category={event.status || "Registered"} 
+                    date={`${event.date} · ${event.time}`}
+                    location={event.location}
+                    registered={0} 
+                    capacity={0}   
+                    gradient="linear-gradient(135deg, #F4A7B9, #c8b3e8)"
+                    onRegister={() => console.log("Navigate to event details:", event.id)}
+                  />
+                </div>
               </div>
-              <EventCard event={event} />
-            </div>
-          ))
-        )}
+            ))}
+          </div>
 
-        {!loading && events.length === 0 && (
-          <p className="text-sm text-gray-400 font-medium">No events found.</p>
+        ) : (
+          
+          <div className="flex-1 flex flex-col items-center justify-center text-center border-2 border-dashed border-[rgba(45,42,74,0.12)] rounded-xl bg-white/50 min-h-[250px] p-6">
+            <div className="w-16 h-16 rounded-full bg-[var(--lavender)] flex items-center justify-center mb-4">
+              <Calendar size={28} className="text-[var(--periwinkle)]" />
+            </div>
+            <p className="font-bold text-[var(--primary-dark)] mb-1">No events found</p>
+            <p className="body text-[var(--gray)]">
+              You are not registered for any events yet.
+            </p>
+          </div>
+
         )}
       </div>
     </div>
