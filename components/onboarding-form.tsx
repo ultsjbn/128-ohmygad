@@ -36,6 +36,7 @@ export function OnboardingForm({
   const [isLoadingRole, setIsLoadingRole] = useState(true);
 
   // Shared fields
+  const [full_name, setFullName] = useState("");
   const [display_name, setDisplayName] = useState("");
   const [contact_num, setContactNum] = useState("");
   const [address, setAddress] = useState("");
@@ -98,6 +99,7 @@ export function OnboardingForm({
       if (userError || !user) throw new Error("No active session found. Please log in again.");
 
       const updatePayload: Record<string, unknown> = {
+        full_name: full_name || null,
         display_name: display_name || null,
         contact_num: contact_num || null,
         address: address || null,
@@ -180,6 +182,15 @@ export function OnboardingForm({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pb-4 min-w-0">
             
             <div className="md:col-span-2">
+              <Input
+                label="Full Name *"
+                required
+                placeholder="Juan M. Dela Cruz"
+                prefixIcon={<User size={15} />}
+                value={full_name}
+                onChange={(e) => setFullName(e.target.value)}
+                autoComplete="off"
+              />
               <Input
                 label="Display Name (optional)"
                 placeholder="How you want to be called"
