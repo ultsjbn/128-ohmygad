@@ -14,6 +14,8 @@ interface Event {
   time: string;
   status?: string | null;
   image?: string;
+  // added rawEndDate field to Event interface for filtering
+  rawEndDate: string;
 }
 
 // ─── format helpers ─────────────────────────────────────────────────────────────────
@@ -37,6 +39,8 @@ export const EventPanel = (): JSX.Element => {
   const supabase = createClient();
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
+  // added state to hold current filter selection
+  const [filter, setFilter] = useState<"upcoming" | "past">("upcoming");
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -64,12 +68,12 @@ export const EventPanel = (): JSX.Element => {
           start_date,
           end_date,
           banner,
-          event_registration!inner (
-            status
+          event_registration (
+            status,
+            user_id
           )
         `,
         )
-        .eq("event_registration.user_id", user.id)
         .order("start_date", { ascending: true });
 
       if (error) {
@@ -78,16 +82,24 @@ export const EventPanel = (): JSX.Element => {
         return;
       }
 
-      const mapped: Event[] = (data ?? []).map((e: any) => ({
-        id: e.id,
-        title: e.title,
-        location: e.location,
-        date: formatDate(e.start_date),
-        time: formatTimeRange(e.start_date, e.end_date),
-        // event_registration will grab the first (user's) row
-        status: e.event_registration?.[0]?.status ?? null,
-        image: e.banner ?? undefined,
-      }));
+      const mapped: Event[] = (data ?? []).map((e: any) => {
+        // this is to specifically find user's registration among all the registrations
+        const userReg = Array.isArray(e.event_registration)
+          ? e.event_registration.find((r: any) => r.user_id === user.id)
+          : e.event_registration;
+
+        return {
+          id: e.id,
+          title: e.title,
+          location: e.location,
+          date: formatDate(e.start_date),
+          time: formatTimeRange(e.start_date, e.end_date),
+          status: userReg?.status ?? null,
+          image: e.banner ?? undefined,
+          // added rawEndDate mapping to use for date comparisons
+          rawEndDate: e.end_date,
+        };
+      });
 
       setEvents(mapped);
       setLoading(false);
@@ -96,14 +108,29 @@ export const EventPanel = (): JSX.Element => {
     fetchEvents();
   }, []);
 
+  // added logic to filter events based on current date and selected filter
+  const filteredEvents = events.filter((event) => {
+    const isPast = new Date(event.rawEndDate) < new Date();
+    return filter === "upcoming" ? !isPast : isPast;
+  });
+
   return (
     <div className="flex flex-col gap-6 h-full font-clash">
       {/* HEADER */}
       <div className="flex justify-between items-center shrink-0">
         <Typography variant="heading-1">Events</Typography>
         <div className="flex gap-2">
-          <Button label="Upcoming" variant="display" />
-          <Button label="Past" variant="primary" />
+          {/* added logic to change button variant based on active filter, and onClick to set filtered view */}
+          <Button
+            label="Upcoming"
+            variant={filter === "upcoming" ? "display" : "primary"}
+            onClick={() => setFilter("upcoming")}
+          />
+          <Button
+            label="Past"
+            variant={filter === "past" ? "display" : "primary"}
+            onClick={() => setFilter("past")}
+          />
         </div>
       </div>
 
@@ -111,10 +138,11 @@ export const EventPanel = (): JSX.Element => {
       <div className="flex flex-col gap-8 overflow-y-auto pr-4 pb-24 pt-4 custom-scrollbar">
         {loading ? (
           <div className="flex flex-1 items-center justify-center py-12">
-            <Loader size="l"/>
+            <Loader size="l" />
           </div>
         ) : (
-          events.map((event) => (
+          /* I replaced mapping array from events to filteredEvents to display only selected ones */
+          filteredEvents.map((event) => (
             <div key={event.id} className="flex flex-row gap-4 justify-between">
               <div className="flex flex-none items-start gap-2 pt-3 min-w-[160px] shrink-0">
                 <Calendar size={18} strokeWidth={2.5} className="text-black" />
@@ -125,7 +153,8 @@ export const EventPanel = (): JSX.Element => {
           ))
         )}
 
-        {!loading && events.length === 0 && (
+        {/* Replaced events.length check with filteredEvents.length */}
+        {!loading && filteredEvents.length === 0 && (
           <p className="text-sm text-gray-400 font-medium">No events found.</p>
         )}
       </div>
