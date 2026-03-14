@@ -4,6 +4,9 @@ import { useEffect, useState } from "react";
 import { Calendar } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { EventCard } from "@/components/ui";
+import { Typography } from "./typography";
+import { Button } from "@/components/ui";
+import { Loader } from "@snowball-tech/fractal";
 
 interface EventData {
   id: string;
@@ -14,6 +17,8 @@ interface EventData {
   rawStartDate: string;
   status?: string | null;
   image?: string;
+  // added rawEndDate field to event interface for filtering
+  rawEndDate: string;
 }
 
 const formatDate = (start: string): string =>
@@ -33,6 +38,8 @@ export const EventPanel = (): JSX.Element => {
   const supabase = createClient();
   const [events, setEvents] = useState<EventData[]>([]);
   const [loading, setLoading] = useState(true);
+  // added state to hold current filter selection
+  const [filter, setFilter] = useState<"upcoming" | "past">("upcoming");
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -54,11 +61,12 @@ export const EventPanel = (): JSX.Element => {
           start_date,
           end_date,
           banner,
-          event_registration!inner (
-            status
+          event_registration (
+            status,
+            user_id
           )
-        `)
-        .eq("event_registration.user_id", user.id)
+        `,
+        )
         .order("start_date", { ascending: true });
 
       if (error) {
@@ -67,16 +75,24 @@ export const EventPanel = (): JSX.Element => {
         return;
       }
 
-      const mapped: EventData[] = (data ?? []).map((e: any) => ({
-        id: e.id,
-        title: e.title,
-        location: e.location,
-        date: formatDate(e.start_date),
-        time: formatTimeRange(e.start_date, e.end_date),
-        rawStartDate: e.start_date,
-        status: e.event_registration?.[0]?.status ?? null,
-        image: e.banner ?? undefined,
-      }));
+      const mapped: Event[] = (data ?? []).map((e: any) => {
+        // this is to specifically find user's registration among all the registrations
+        const userReg = Array.isArray(e.event_registration)
+          ? e.event_registration.find((r: any) => r.user_id === user.id)
+          : e.event_registration;
+
+        return {
+          id: e.id,
+          title: e.title,
+          location: e.location,
+          date: formatDate(e.start_date),
+          time: formatTimeRange(e.start_date, e.end_date),
+          status: userReg?.status ?? null,
+          image: e.banner ?? undefined,
+          // added rawEndDate mapping to use for date comparisons
+          rawEndDate: e.end_date,
+        };
+      });
 
       setEvents(mapped);
       setLoading(false);
@@ -85,49 +101,47 @@ export const EventPanel = (): JSX.Element => {
     fetchEvents();
   }, []);
 
+  // added logic to filter events based on current date and selected filter
+  const filteredEvents = events.filter((event) => {
+    const isPast = new Date(event.rawEndDate) < new Date();
+    return filter === "upcoming" ? !isPast : isPast;
+  });
+
   return (
     <div className="flex flex-col h-full p-6">
       
       {/* HEADER */}
-      <div className="flex justify-between items-center shrink-0 border-b border-[rgba(45,42,74,0.08)] pb-4 mb-6">
-        <h2 className="heading-lg">My Events</h2>
+      <div className="flex justify-between items-center shrink-0">
+        <Typography variant="heading-1">Events</Typography>
+        <div className="flex gap-2">
+          {/* added logic to change button variant based on active filter, and onClick to set filtered view */}
+          <Button
+            variant={filter === "upcoming" ? "pink" : "periwinkle"}
+            onClick={() => setFilter("upcoming")}>Upcoming</Button>
+          <Button
+            variant={filter === "past" ? "pink" : "periwinkle"}
+            onClick={() => setFilter("past")}>Past</Button>
+        </div>
       </div>
 
       {/* SCROLLABLE AREA */}
       <div className="flex-1 flex flex-col overflow-y-auto pr-2 min-h-0 custom-scrollbar pb-4">
         
         {loading ? (
-          <div className="flex flex-1 items-center justify-center py-16">
-            <div className="w-8 h-8 border-4 border-[var(--periwinkle-light)] border-t-[var(--periwinkle)] rounded-full animate-spin"></div>
+          <div className="flex flex-1 items-center justify-center py-12">
+            <Loader size="l" />
           </div>
-        ) : events.length > 0 ? (
-          
-          <div className="flex flex-col gap-6">
-            {events.map((event) => (
-              <div key={event.id} className="flex flex-col xl:flex-row gap-4 justify-between items-start">
-                {/* Date Indicator Column */}
-                <div className="flex flex-none items-center xl:items-start gap-3 xl:pt-4 min-w-[140px] shrink-0">
-                  <div className="w-10 h-10 rounded-full bg-[var(--periwinkle-light)] text-[var(--periwinkle)] flex items-center justify-center">
-                    <Calendar size={18} strokeWidth={2.5} />
-                  </div>
-                  <span className="font-bold text-[var(--primary-dark)] text-sm">{event.date}</span>
-                </div>
-                
-                {/* Event Card Column */}
-                <div className="flex-1 w-full min-w-0">
-                  <EventCard 
-                    title={event.title}
-                    category={event.status || "Registered"} 
-                    date={`${event.date} · ${event.time}`}
-                    location={event.location}
-                    registered={0} 
-                    capacity={0}   
-                    gradient="linear-gradient(135deg, #F4A7B9, #c8b3e8)"
-                    onRegister={() => console.log("Navigate to event details:", event.id)}
-                  />
-                </div>
+        ) : (
+          /* I replaced mapping array from events to filteredEvents to display only selected ones */
+          filteredEvents.map((event) => (
+            <div key={event.id} className="flex flex-row gap-4 justify-between">
+              <div className="flex flex-none items-start gap-2 pt-3 min-w-[160px] shrink-0">
+                <Calendar size={18} strokeWidth={2.5} className="text-black" />
+                <span className="text-sm font-bold">{event.date}</span>
               </div>
-            ))}
+            )
+          )
+          }
           </div>
 
         ) : (
@@ -142,6 +156,9 @@ export const EventPanel = (): JSX.Element => {
             </p>
           </div>
 
+        {/* Replaced events.length check with filteredEvents.length */}
+        {!loading && filteredEvents.length === 0 && (
+          <p className="text-sm text-gray-400 font-medium">No events found.</p>
         )}
       </div>
     </div>
