@@ -1,8 +1,8 @@
 /*
-How to use this component?
   PROPS
+  
   columns       Column<T>[]                                    (required)
-                array of column definitions - see column<T> shape below.
+                Array of column definitions - see Column<T> shape below.
   rows          T[]                                            (required)
                 Array of data objects; T can be any type.
   keyExtractor  (row: T, index: number) => string             (required)
@@ -10,21 +10,16 @@ How to use this component?
  
   Column<T> SHAPE
   
-  key     string                          unique column identifier
-  header  string                          column heading text
-  render  (row: T, index: number)         returns the cell content
+  key     string                         - unique column identifier
+  header  string                         - column heading text
+  render  (row: T, index: number)        - returns the cell content
           => React.ReactNode               (string, JSX, Badge, Avatar…)
  
   NOTES
-  • Rendered inside an omg-card with overflow:hidden so it gets
-    the card border-radius automatically. Pass noPadding if you
-    wrap it yourself.
-  • The generic <T> lets TypeScript infer cell types from your
-    data shape — no casting needed.
-  • Sorting, pagination, and filtering are intentionally left to
-    the parent; DataTable is a pure display layer.
+  Rendered inside an card with overflow:hidden so it gets the card border-radius automatically.
  
   SAMPLE USAGE
+  
   import { DataTable } from "@/components/ui";
   import type { Column } from "@/components/ui";
   import { Badge, Avatar } from "@/components/ui";
@@ -91,9 +86,9 @@ How to use this component?
   ];
  
   const rows: User[] = [
-    { id: "2021-00142", name: "First Name Last Name",   college: "CSS", role: "Student", status: "completed" },
-    { id: "2020-03301", name: "First Name Last Name", college: "CS",   role: "Student", status: "pending"   },
-    { id: "2023-98734",   name: "First Name Last Name",  college: "CAC",  role: "Faculty", status: "completed" },
+    { id: "2021-00142", name: "Maria Santos",   college: "CSS", role: "Student", status: "completed" },
+    { id: "2020-03301", name: "Juan Dela Cruz", college: "CS",   role: "Student", status: "pending"   },
+    { id: "FAC-0042",   name: "Dr. Ana Reyes",  college: "CAC",  role: "Faculty", status: "completed" },
   ];
  
   <DataTable
@@ -101,8 +96,8 @@ How to use this component?
     rows={rows}
     keyExtractor={(row) => row.id}
   />
-
 */
+
 
 import React from "react";
 
@@ -122,7 +117,7 @@ interface DataTableProps<T> {
 // DataTable
 export function DataTable<T>({ columns, rows, keyExtractor }: DataTableProps<T>) {
   return (
-    <div className="card" style={{ padding: 0, overflow: "hidden" }}>
+    <div className="card" style={{ padding: 0, overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
       <table className="table">
         <thead>
           <tr>

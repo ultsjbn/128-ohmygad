@@ -1456,6 +1456,7 @@ body {
   width: 100%;
   border-collapse: collapse;
   font-size: 14px;
+  min-width: 600px;
 }
 
 .table thead tr {
