@@ -19,7 +19,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <div className="blob blob-pink"      style={{ position:'fixed', top:-120, right:60, width:420, height:420, opacity:0.20, zIndex:0, pointerEvents:'none' }} />
       <div className="blob blob-periwinkle" style={{ position:'fixed', bottom:0, left:80, width:320, height:320, opacity:0.15, zIndex:0, pointerEvents:'none' }} />
 
-      {/* Added suspense to sidebar because it was causing delay error */}
       <Suspense>
         <AdminSidebar />
       </Suspense>
@@ -37,7 +36,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <UserMenu />
           </div>
         </header>
-        <main style={{ flex:1, overflowY:'auto', padding:'24px', paddingBottom:'96px' }}>
+        
+        <main style={{ display:'flex', flexDirection:'column', flex:1, minHeight:0, overflow:'hidden', padding:'24px' }}>
           <Suspense fallback={<div style={{ display:'flex', alignItems:'center', justifyContent:'center', height:'100%', color:'var(--gray)', fontSize:14 }}>Loading…</div>}>
             <AdminAuthGuard>{children}</AdminAuthGuard>
           </Suspense>
