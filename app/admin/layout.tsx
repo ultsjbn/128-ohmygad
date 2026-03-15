@@ -19,7 +19,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <div className="blob blob-pink"      style={{ position:'fixed', top:-120, right:60, width:420, height:420, opacity:0.20, zIndex:0, pointerEvents:'none' }} />
       <div className="blob blob-periwinkle" style={{ position:'fixed', bottom:0, left:80, width:320, height:320, opacity:0.15, zIndex:0, pointerEvents:'none' }} />
 
-      <AdminSidebar />
+      {/* Added suspense to sidebar because it was causing delay error */}
+      <Suspense>
+        <AdminSidebar />
+      </Suspense>
 
       <div style={{ position:'relative', zIndex:1, display:'flex', flexDirection:'column', flex:1, minWidth:0, overflow:'hidden' }}>
         <header style={{ display:'flex', flexShrink:0, alignItems:'center', justifyContent:'space-between', gap:16, padding:'10px 24px', background:'rgba(255,255,255,0.72)', backdropFilter:'blur(14px)', borderBottom:'1px solid rgba(45,42,74,0.07)' }}>
