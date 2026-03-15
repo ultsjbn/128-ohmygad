@@ -234,7 +234,7 @@ export default function AdminProfilePage() {
                   <input
                     className={inputCls()}
                     placeholder="e.g. Maria Santos"
-                    value={profile.full_name}
+                    value={profile.full_name ?? ''}
                     onChange={set("full_name")}
                   />
                 </FormField>

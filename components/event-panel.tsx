@@ -1,22 +1,24 @@
+"use client";
+
 import { useEffect, useState } from "react";
 import { Calendar } from "lucide-react";
-import { Typography } from "./typography";
 import { createClient } from "@/lib/supabase/client";
-import EventCard from "./event-card";
-import { Button } from "./button";
+// import { EventCard } from "@/components/ui";
+import { Typography } from "./typography";
+import { Button } from "@/components/ui";
 import { Loader } from "@snowball-tech/fractal";
 
-interface Event {
+interface EventData {
   id: string;
-  date: string;
   title: string;
   location: string;
+  date: string;
   time: string;
+  rawStartDate: string;
   status?: string | null;
   image?: string;
+  rawEndDate: string;
 }
-
-// ─── format helpers ─────────────────────────────────────────────────────────────────
 
 const formatDate = (start: string): string =>
   new Date(start).toLocaleDateString("en-US", {
@@ -31,45 +33,37 @@ const formatTimeRange = (start: string, end: string): string => {
   return `${fmt(new Date(start))} - ${fmt(new Date(end))}`;
 };
 
-// ─── Event Panel ─────────────────────────────────────────────────────────────
-
 export const EventPanel = (): JSX.Element => {
   const supabase = createClient();
-  const [events, setEvents] = useState<Event[]>([]);
+  const [events, setEvents] = useState<EventData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState<"upcoming" | "past">("upcoming");
 
   useEffect(() => {
     const fetchEvents = async () => {
       setLoading(true);
 
-      // get the currently logged-in user
-      const {
-        data: { user },
-        error: userError,
-      } = await supabase.auth.getUser();
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
 
       if (userError || !user) {
         setLoading(false);
         return;
       }
 
-      // fetch events + current user's registration status
       const { data, error } = await supabase
         .from("event")
-        .select(
-          `
+        .select(`
           id,
           title,
           location,
           start_date,
           end_date,
           banner,
-          event_registration!inner (
-            status
+          event_registration (
+            status,
+            user_id
           )
-        `,
-        )
-        .eq("event_registration.user_id", user.id)
+        `)
         .order("start_date", { ascending: true });
 
       if (error) {
@@ -78,16 +72,23 @@ export const EventPanel = (): JSX.Element => {
         return;
       }
 
-      const mapped: Event[] = (data ?? []).map((e: any) => ({
-        id: e.id,
-        title: e.title,
-        location: e.location,
-        date: formatDate(e.start_date),
-        time: formatTimeRange(e.start_date, e.end_date),
-        // event_registration will grab the first (user's) row
-        status: e.event_registration?.[0]?.status ?? null,
-        image: e.banner ?? undefined,
-      }));
+      const mapped: EventData[] = (data ?? []).map((e: any) => {
+        const userReg = Array.isArray(e.event_registration)
+          ? e.event_registration.find((r: any) => r.user_id === user.id)
+          : e.event_registration;
+
+        return {
+          id: e.id,
+          title: e.title,
+          location: e.location,
+          date: formatDate(e.start_date),
+          time: formatTimeRange(e.start_date, e.end_date),
+          status: userReg?.status ?? null,
+          image: e.banner ?? undefined,
+          rawStartDate: e.start_date,
+          rawEndDate: e.end_date,
+        };
+      });
 
       setEvents(mapped);
       setLoading(false);
@@ -96,37 +97,57 @@ export const EventPanel = (): JSX.Element => {
     fetchEvents();
   }, []);
 
+  const filteredEvents = events.filter((event) => {
+    const isPast = new Date(event.rawEndDate) < new Date();
+    return filter === "upcoming" ? !isPast : isPast;
+  });
+
   return (
-    <div className="flex flex-col gap-6 h-full font-clash">
+    <div className="flex flex-col h-full p-6">
       {/* HEADER */}
       <div className="flex justify-between items-center shrink-0">
         <Typography variant="heading-1">Events</Typography>
         <div className="flex gap-2">
-          <Button label="Upcoming" variant="display" />
-          <Button label="Past" variant="primary" />
+          <Button
+            variant={filter === "upcoming" ? "pink" : "periwinkle"}
+            onClick={() => setFilter("upcoming")}
+          >
+            Upcoming
+          </Button>
+          <Button
+            variant={filter === "past" ? "pink" : "periwinkle"}
+            onClick={() => setFilter("past")}
+          >
+            Past
+          </Button>
         </div>
       </div>
 
-      {/* SCROLLABLE LIST */}
-      <div className="flex flex-col gap-8 overflow-y-auto pr-4 pb-24 pt-4 custom-scrollbar">
+      {/* SCROLLABLE AREA */}
+      <div className="flex-1 flex flex-col overflow-y-auto pr-2 min-h-0 custom-scrollbar pb-4 mt-6">
         {loading ? (
           <div className="flex flex-1 items-center justify-center py-12">
-            <Loader size="l"/>
+            <Loader size="l" />
           </div>
-        ) : (
-          events.map((event) => (
-            <div key={event.id} className="flex flex-row gap-4 justify-between">
+        ) : filteredEvents.length > 0 ? (
+          filteredEvents.map((event) => (
+            <div key={event.id} className="flex flex-row gap-4 justify-between mb-4">
               <div className="flex flex-none items-start gap-2 pt-3 min-w-[160px] shrink-0">
                 <Calendar size={18} strokeWidth={2.5} className="text-black" />
                 <span className="text-sm font-bold">{event.date}</span>
               </div>
-              <EventCard event={event} />
             </div>
           ))
-        )}
-
-        {!loading && events.length === 0 && (
-          <p className="text-sm text-gray-400 font-medium">No events found.</p>
+        ) : (
+          <div className="flex-1 flex flex-col items-center justify-center text-center border-2 border-dashed border-[rgba(45,42,74,0.12)] rounded-xl bg-white/50 min-h-[250px] p-6">
+            <div className="w-16 h-16 rounded-full bg-[var(--lavender)] flex items-center justify-center mb-4">
+              <Calendar size={28} className="text-[var(--periwinkle)]" />
+            </div>
+            <p className="font-bold text-[var(--primary-dark)] mb-1">No events found</p>
+            <p className="text-sm text-[var(--gray)]">
+              You are not registered for any events yet.
+            </p>
+          </div>
         )}
       </div>
     </div>

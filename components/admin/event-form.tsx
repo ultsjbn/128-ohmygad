@@ -3,18 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { submitFormData } from "@/lib/form-submit.utils";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Paper, Typography } from "@snowball-tech/fractal";
+import { MapPin, Users, AlignLeft, Type } from "lucide-react";
+import { Card, Input, Select, Button, DateTimePicker } from "@/components/ui"; 
 
 export type EventFormData = {
   id?: string;
@@ -35,8 +25,18 @@ type EventFormProps = {
   mode: "create" | "edit";
 };
 
-const CATEGORIES = ["Orientation", "Forum", "Research", "Training", "Workshop"];
-const STATUSES = ["upcoming", "past"];
+const CATEGORY_OPTIONS = [
+  { value: "Orientation", label: "Orientation" },
+  { value: "Forum", label: "Forum" },
+  { value: "Research", label: "Research" },
+  { value: "Training", label: "Training" },
+  { value: "Workshop", label: "Workshop" },
+];
+
+// const STATUS_OPTIONS = [
+//   { value: "upcoming", label: "Upcoming" },
+//   { value: "past", label: "Past" },
+// ];
 
 export default function EventForm({ initialData, mode }: EventFormProps) {
   const router = useRouter();
@@ -46,15 +46,17 @@ export default function EventForm({ initialData, mode }: EventFormProps) {
   const [title, setTitle] = useState(initialData?.title ?? "");
   const [description, setDescription] = useState(initialData?.description ?? "");
   const [location, setLocation] = useState(initialData?.location ?? "");
-  const [start_date, setStartDate] = useState(initialData?.start_date?.slice(0, 16) ?? "");
-  const [end_date, setEndDate] = useState(initialData?.end_date?.slice(0, 16) ?? "");
+  
+  // removed the slice(0,16) because datetimepicker handles full iso strings
+  const [start_date, setStartDate] = useState(initialData?.start_date ?? "");
+  const [end_date, setEndDate] = useState(initialData?.end_date ?? "");
   const [capacity, setCapacity] = useState<number | "">(initialData?.capacity ?? "");
-  const [registration_open, setRegistrationOpen] = useState(initialData?.registration_open?.slice(0, 16) ?? "");
-  const [registration_close, setRegistrationClose] = useState(initialData?.registration_close?.slice(0, 16) ?? "");
+  const [registration_open, setRegistrationOpen] = useState(initialData?.registration_open ?? "");
+  const [registration_close, setRegistrationClose] = useState(initialData?.registration_close ?? "");
   const [category, setCategory] = useState(initialData?.category ?? "");
   const [status, setStatus] = useState(initialData?.status ?? "");
 
-  // Submit handler — uses shared submitFormData utility from lib/form-submit.utils
+  // submit handler
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -74,8 +76,6 @@ export default function EventForm({ initialData, mode }: EventFormProps) {
       updated_at: new Date().toISOString(),
     };
 
-    console.log("Payload being sent:", payload);
-
     const result = await submitFormData("event", payload, mode, initialData?.id);
 
     if (result.success) {
@@ -89,183 +89,149 @@ export default function EventForm({ initialData, mode }: EventFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <form onSubmit={handleSubmit} className="flex flex-col h-full lg:h-auto w-full min-h-0 relative">
+      
+      {/* scrollable wrapper for mobile, fully expanded on desktop */}
+      <div className="flex-1 overflow-y-auto lg:overflow-visible custom-scrollbar pr-1 lg:pr-0 pb-4 lg:pb-0 min-h-0">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-        {/* LEFT COLUMN */}
-        <div className="flex flex-col gap-4">
-          <Paper elevation="elevated" className="flex flex-col gap-4 p-4">
-            <Typography variant="body-1-median">Basic Information</Typography>
+          {/* left column: basic information */}
+          <div className="flex flex-col gap-6">
+            <Card className="flex flex-col gap-4 p-3 h-full">
+              <div className="border-b border-[rgba(45,42,74,0.08)] pb-3 mb-1">
+                <h3 className="heading-md">Basic Information</h3>
+              </div>
 
-            <div className="grid gap-2 pt-4">
-              <Label htmlFor="title">Title <span className="text-fractal-brand-primary">*</span></Label>
               <Input
-                id="title"
-                type="text"
+                label="Title *"
                 placeholder="e.g. Gender Sensitivity Orientation"
                 required
+                prefixIcon={<Type size={15} />}
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
               />
-            </div>
 
-            <div className="grid gap-2 pt-3">
-              <Label htmlFor="description">Description</Label>
-              <Textarea
-                id="description"
-                placeholder="Describe the event..."
-                rows={4}
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                // className="!bg-fractal-decorative-purple-90 !text-fractal-text-on-color !border-2 !border-fractal-border-default"
-                className="!bg-white"
-              />
-            </div>
+                <div className="input-wrap">
+                <label htmlFor="description" className="label">Description</label>
+                <div className="input-icon-wrap">
+                  <AlignLeft className="input-prefix-icon w-2 h-2 top-5 translate-y-0" />
+                  <textarea
+                    id="description"
+                    placeholder="Describe the event..."
+                    rows={4}
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    className="input pl-[42px] py-3 resize-y"
+                  />
+                </div>
+              </div>
 
-            <div className="grid gap-2 pt-3">
-              <Label htmlFor="location">Location <span className="text-fractal-brand-primary">*</span></Label>
               <Input
-                id="location"
-                type="text"
-                placeholder="e.g. Malcolm Hall, Room 101"
+                label="Location *"
+                placeholder="e.g. Sarmiento Hall"
                 required
+                prefixIcon={<MapPin size={15} />}
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
               />
-            </div>
 
-            <div className="grid gap-2 pt-3">
-              <Label htmlFor="capacity">Capacity <span className="text-fractal-brand-primary">*</span></Label>
-              <Input
-                id="capacity"
-                type="number"
-                min={1}
-                placeholder="e.g. 30"
-                value={capacity}
-                onChange={(e) => setCapacity(e.target.value === "" ? "" : Number(e.target.value))}
-              />
-            </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <Input
+                  label="Capacity *"
+                  type="number"
+                  min={1}
+                  placeholder="e.g. 30"
+                  required
+                  prefixIcon={<Users size={15} />}
+                  value={capacity}
+                  onChange={(e) => setCapacity(e.target.value === "" ? "" : Number(e.target.value))}
+                />
 
-            <div className="grid gap-2 pt-3">
-              <Label htmlFor="category">Category <span className="text-fractal-brand-primary">*</span></Label>
-              <Select onValueChange={setCategory} defaultValue={category} required>
-                <SelectTrigger id="category" 
-                // className="!bg-fractal-decorative-purple-90 !text-black !border-2 !border-fractal-border-default"
-                className="!bg-white">
-                  <SelectValue placeholder="Select category" />
-                </SelectTrigger>
-                <SelectContent>
-                  {CATEGORIES.map((cat) => (
-                    <SelectItem key={cat} value={cat}>{cat}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+                <Select 
+                  label="Category *"
+                  required
+                  options={[{ value: "", label: "Select category" }, ...CATEGORY_OPTIONS]}
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                />
+              </div>
 
-            <div className="grid gap-2 pt-3">
-              <Label htmlFor="status">Status <span className="text-fractal-brand-primary">*</span></Label>
-              <Select onValueChange={setStatus} defaultValue={status}>
-                <SelectTrigger id="status"
-                // className="!bg-fractal-decorative-purple-90 !text-black !border-2 !border-fractal-border-default"
-                className="!bg-white">
-                  <SelectValue placeholder="Select status" />
-                </SelectTrigger>
-                <SelectContent>
-                  {STATUSES.map((s) => (
-                    <SelectItem key={s} value={s} className="capitalize">{s}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </Paper>
-        </div>
+            </Card>
+          </div>
 
-        {/* RIGHT COLUMN */}
-        <div className="flex flex-col gap-4">
-          <Paper elevation="elevated" className="flex flex-col gap-4">
-            <Typography variant="body-1-median">Event Schedule</Typography>
+          {/* right column: event schedule & actions */}
+          <div className="flex flex-col gap-6">
+            <Card className="flex flex-col gap-4 p-6">
+              <div className="border-b border-[rgba(45,42,74,0.08)] pb-3 mb-1">
+                <h3 className="heading-md">Event Schedule</h3>
+              </div>
 
-            <div className="grid gap-2 pt-4">
-              <Label htmlFor="start_date">Start Date & Time <span className="text-fractal-brand-primary">*</span></Label>
-              <Input
-                id="start_date"
-                type="datetime-local"
+              <DateTimePicker
+                label="Start Date & Time"
+                mode="datetime"
                 required
                 value={start_date}
-                onChange={(e) => setStartDate(e.target.value)}
-                className="bg-white text-black [color-scheme:light]"
+                onChange={setStartDate}
               />
-            </div>
 
-            <div className="grid gap-2 pt-3">
-              <Label htmlFor="end_date">End Date & Time</Label>
-              <Input
-                id="end_date"
-                type="datetime-local"
+              <DateTimePicker
+                label="End Date & Time"
+                mode="datetime"
                 value={end_date}
-                onChange={(e) => setEndDate(e.target.value)}
-                className="bg-white text-black [color-scheme:light]"
+                onChange={setEndDate}
               />
-            </div>
 
-            <div className="grid gap-2 pt-3">
-              <Label htmlFor="registration_open">Registration Opens <span className="text-fractal-brand-primary">*</span></Label>
-              <Input
-                id="registration_open"
-                type="datetime-local"
+              <DateTimePicker
+                label="Registration Opens"
+                mode="datetime"
                 required
                 value={registration_open}
-                onChange={(e) => setRegistrationOpen(e.target.value)}
-                className="bg-white text-black [color-scheme:light]"
+                onChange={setRegistrationOpen}
               />
-            </div>
 
-            <div className="grid gap-2 pt-3">
-              <Label htmlFor="registration_close">Registration Closes <span className="text-fractal-brand-primary">*</span></Label>
-              <Input
-                id="registration_close"
-                type="datetime-local"
+              <DateTimePicker
+                label="Registration Closes"
+                mode="datetime"
                 required
                 value={registration_close}
-                onChange={(e) => setRegistrationClose(e.target.value)}
-                className="bg-white text-black [color-scheme:light]"
+                onChange={setRegistrationClose}
               />
-            </div>
-          </Paper>
+            </Card>
 
-          {/* Error */}
-          {error && (
-            <p className="text-sm text-red-500 border border-red-200 bg-red-50 rounded-s p-3">
-              {error}
-            </p>
-          )}
-
-          {/* Actions */}
-          <div className="flex gap-3 justify-end">
-            <Button
-              type="button"
-              size="sm"
-              variant="outline"
-              onClick={() => router.push("/admin/events")}
-              className="!border-2 !border-fractal-border-default !bg-fractal-bg-body-white hover:!bg-fractal-base-black"
-            >
-              Cancel
-            </Button>
-
-            <Button
-              type="submit"
-              size="sm"
-              className="!bg-fractal-decorative-purple-90 !text-fractal-text-on-color hover:!bg-fractal-decorative-purple-70 !border-2 !border-fractal-border-default"
-            >
-              {isLoading
-                ? mode === "create" ? "Creating..." : "Saving..."
-                : mode === "create" ? "Create Event" : "Save Changes"
-              }
-            </Button>
+            {/* error toast */}
+            {error && (
+              <div className="toast toast-error">
+                <span className="font-semibold text-[var(--error)]">{error}</span>
+              </div>
+            )}
           </div>
-        </div>
 
+        </div>
       </div>
+
+      {/* sticky footer actions on mobile, standard footer flow on desktop */}
+      <div className= "lg:static mt-2 flex gap-3 justify-end shrink-0 z-10">
+        <Button
+          type="button"
+          variant="ghost"
+          onClick={() => router.push("/admin/events")}
+        >
+          Cancel
+        </Button>
+
+        <Button
+          type="submit"
+          variant="primary"
+          disabled={isLoading}
+          className="px-8"
+        >
+          {isLoading
+            ? mode === "create" ? "Creating..." : "Saving..."
+            : mode === "create" ? "Create Event" : "Save Changes"
+          }
+        </Button>
+      </div>
+      
     </form>
   );
 }

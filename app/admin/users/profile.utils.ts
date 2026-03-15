@@ -13,9 +13,21 @@ export const sortProfiles = (
   direction: SortDirection,
 ): Profile[] =>
   [...profile].sort((a, b) => {
-    const av = (a[field] ?? "").toString().toLowerCase();
-    const bv = (b[field] ?? "").toString().toLowerCase();
-    return direction === "asc" ? av.localeCompare(bv) : bv.localeCompare(av);
+    // handle nulls
+    const av = a[field] ?? "";
+    const bv = b[field] ?? "";
+
+    // date sorting logic
+    if (field === "created_at") {
+      return direction === "asc" 
+        ? new Date(av).getTime() - new Date(bv).getTime()
+        : new Date(bv).getTime() - new Date(av).getTime();
+    }
+
+    // default string sorting
+    const strA = av.toString().toLowerCase();
+    const strB = bv.toString().toLowerCase();
+    return direction === "asc" ? strA.localeCompare(strB) : strB.localeCompare(strA);
   });
 
 export const filterProfiles = (

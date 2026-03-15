@@ -2,11 +2,11 @@
 
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
-import { Typography } from "./typography";
-import { Card, InputText, Button } from "@snowball-tech/fractal";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import Image from "next/image";
+import { Mail, Lock, User } from "lucide-react";
 
 export function SignUpForm({
   className,
@@ -53,86 +53,120 @@ export function SignUpForm({
   };
 
   return (
-    <div className={cn("flex flex-col gap-3 font-sans border-2 border-fractal-border-default rounded-m shadow-brutal-2 p-4 bg-fractal-bg-body-white", className)} {...props}>
-      <Typography variant="heading-2" className="font-wide font-bold text-fractal-text-default">
-        Sign up
-      </Typography>
-      <Card color="body">
+    <div className={cn("auth-card max-w-md w-full mx-auto", className)} {...props}>
+      <div className="flex flex-col items-center mb-4 text-center">
+        <Image
+          src="/kasarian_logo.jpg"
+          alt="UPB Kasarian Gender Studies Program Logo"
+          width={80}
+          height={80}
+          className="rounded-full object-cover mb-4 shadow-soft border-2 border-white"
+        />
+        <h2 className="heading-lg">Sign up</h2>
+        <p className="body text-[var(--gray)] mt-1">
+          Create an account to get started
+        </p>
+      </div>
 
-        <form onSubmit={handleSignUp}>
-          <div className="flex flex-col gap-3">
-
-            <InputText
+      <form onSubmit={handleSignUp} className="flex flex-col gap-3">
+        
+        {/* Full Name Input */}
+        <div className="input-wrap">
+          <label htmlFor="full_name" className="label">Full Name</label>
+          <div className="input-icon-wrap">
+            <User className="input-prefix-icon w-2 h-2" />
+            <input
               id="full_name"
-              label="Full Name"
               type="text"
               required
-              fullWidth
               value={full_name}
-              onChange={(_e, newValue) => setFullName(newValue)}
-              className="[&_input:focus]:!border-fractal-border-primary [&_input:focus]:!shadow-brutal-1-primary"
+              onChange={(e) => setFullName(e.target.value)}
+              className="input"
             />
+          </div>
+        </div>
 
-            <InputText
+        {/* Email Input */}
+        <div className="input-wrap">
+          <label htmlFor="email" className="label">Email</label>
+          <div className="input-icon-wrap">
+            <Mail className="input-prefix-icon w-2 h-2" />
+            <input
               id="email"
-              label="Email"
               type="email"
-              placeholder="m@example.com"
+              placeholder="jmdelacruz@up.edu.ph"
               required
-              fullWidth
               value={email}
-              onChange={(_e, newValue) => setEmail(newValue)}
-              className="[&_input:focus]:!border-fractal-border-primary [&_input:focus]:!shadow-brutal-1-primary"
+              onChange={(e) => setEmail(e.target.value)}
+              className="input"
             />
+          </div>
+        </div>
 
-            <InputText
+        {/* Password Input */}
+        <div className="input-wrap">
+          <label htmlFor="password" className="label">Password</label>
+          <div className="input-icon-wrap">
+            <Lock className="input-prefix-icon w-2 h-2" />
+            <input
               id="password"
-              label="Password"
               type="password"
               required
-              fullWidth
               value={password}
-              onChange={(_e, newValue) => setPassword(newValue)}
-              className="[&_input:focus]:!border-fractal-border-primary [&_input:focus]:!shadow-brutal-1-primary"
+              onChange={(e) => setPassword(e.target.value)}
+              className="input"
             />
+          </div>
+        </div>
 
-            <InputText
+        {/* Repeat Password Input */}
+        <div className="input-wrap">
+          <label htmlFor="repeat-password" className="label">Repeat Password</label>
+          <div className="input-icon-wrap">
+            <Lock className="input-prefix-icon w-2 h-2" />
+            <input
               id="repeat-password"
-              label="Repeat Password"
               type="password"
               required
-              fullWidth
               value={repeatPassword}
-              onChange={(_e, newValue) => setRepeatPassword(newValue)}
-              className="[&_input:focus]:!border-fractal-border-primary [&_input:focus]:!shadow-brutal-1-primary"
-            />
-
-            {error && (
-              <Typography variant="body-2" className="text-fractal-feedback-error-50">
-                {error}
-              </Typography>
-            )}
-
-            <Button
-              type="submit"
-              label={isLoading ? "Creating an account..." : "Sign up"}
-              variant="primary"
-              fullWidth
-              disabled={isLoading}
-              className="[&]:text-fractal-base-white [&]:border-2 [&]:border-fractal-border-default [&:hover]:text-fractal-base-black [&:hover]:border-2 [&:hover]:border-fractal-border-default"
+              onChange={(e) => setRepeatPassword(e.target.value)}
+              className={cn(
+                "input",
+                password && repeatPassword && password !== repeatPassword && "input-error"
+              )}
             />
           </div>
+        </div>
 
-          <div className="mt-3 text-center">
-            <Typography variant="body-2">
-              Already have an account?{" "}
-              <Link href="/auth/login" className="underline underline-offset-4 text-fractal-brand-primary font-median">
-                Login
-              </Link>
-            </Typography>
+        {/* Error Toast */}
+        {error && (
+          <div className="toast toast-error mt-1">
+            <span className="font-semibold text-[var(--error)]">{error}</span>
           </div>
-        </form>
-      </Card>
+        )}
+
+        {/* Submit Button */}
+        <button
+          type="submit"
+          disabled={isLoading}
+          className="btn btn-pink w-full justify-center mt-2"
+        >
+          {isLoading ? "Creating an account..." : "Sign up"}
+        </button>
+
+        {/* Footer Link */}
+        <div className="mt-2 text-center">
+          <p className="body">
+            Already have an account?{" "}
+            <Link
+              href="/auth/login"
+              className="font-bold text-[var(--periwinkle)] hover:text-[var(--primary-dark)] transition-colors"
+            >
+              Login
+            </Link>
+          </p>
+        </div>
+      </form>
     </div>
   );
 }

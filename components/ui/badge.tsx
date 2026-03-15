@@ -1,36 +1,50 @@
-import * as React from "react";
-import { cva, type VariantProps } from "class-variance-authority";
+"use client";
+import { useState } from "react";
 
-import { cn } from "@/lib/utils";
+// Badge
+type BadgeVariant = "pink" | "periwinkle" | "dark" | "success" | "warning" | "error";
 
-const badgeVariants = cva(
-  "inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
-  {
-    variants: {
-      variant: {
-        default:
-          "border-transparent bg-primary text-primary-foreground shadow hover:bg-primary/80",
-        secondary:
-          "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        destructive:
-          "border-transparent bg-destructive text-destructive-foreground shadow hover:bg-destructive/80",
-        outline: "text-foreground",
-      },
-    },
-    defaultVariants: {
-      variant: "default",
-    },
-  },
-);
+interface BadgeProps {
+  children: React.ReactNode;
+  variant?: BadgeVariant;
+  dot?: boolean;
+}
 
-export interface BadgeProps
-  extends React.HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof badgeVariants> {}
-
-function Badge({ className, variant, ...props }: BadgeProps) {
+export function Badge({ children, variant = "pink", dot = false }: BadgeProps) {
   return (
-    <div className={cn(badgeVariants({ variant }), className)} {...props} />
+    <span className={`badge badge-${variant}`}>
+      {dot && <span className="notif-dot" style={{ width: 6, height: 6 }} />}
+      {children}
+    </span>
   );
 }
 
-export { Badge, badgeVariants };
+// FilterChips 
+interface FilterChipsProps {
+  chips: string[];
+  defaultActive?: string;
+  onChange?: (active: string) => void;
+}
+
+export function FilterChips({ chips, defaultActive, onChange }: FilterChipsProps) {
+  const [active, setActive] = useState(defaultActive ?? chips[0]);
+
+  function handleClick(c: string) {
+    setActive(c);
+    onChange?.(c);
+  }
+
+  return (
+    <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+      {chips.map((c) => (
+        <button
+          key={c}
+          className={`chip${active === c ? " active" : ""}`}
+          onClick={() => handleClick(c)}
+        >
+          {c}
+        </button>
+      ))}
+    </div>
+  );
+}

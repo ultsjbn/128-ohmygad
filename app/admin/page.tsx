@@ -1,10 +1,8 @@
 "use client";
 
 import React from "react";
-//import { Paper } from "@snowball-tech/fractal"; // i dont think we're going to use this anymore
-import { Paper } from "@/components/paper";
-import { Card } from "@/components/card";
-import { Typography } from '@/components/typography';
+import { Card, StatCard } from "@/components/ui";
+import { Users, CalendarCheck, UserCheck } from "lucide-react";
 import {
   AreaChart,
   Area,
@@ -18,9 +16,9 @@ import {
   Cell,
   BarChart,
   Bar,
+  Legend,
 } from "recharts";
 
-// constant and mock data 
 import {
   eventAttendanceData,
   sexAtBirthColors,
@@ -42,90 +40,115 @@ export default function DashboardPage() {
     gadEventsCount,
   } = useDashboardData();
 
-  return (
-    <div className="max-w-[1400px] w-full h-full flex flex-col">
+  const strokeColor = "var(--primary-dark)";
 
-      {/* HEADER SECTION WITH TOTAL USERS */}
-      <div className="mb-4 shrink-0 flex items-end justify-between">
-        <div>
-          <Typography variant="heading-3">
-            Welcome,
-          </Typography>
-          <Typography variant="heading-1" className="tracking-tighter leading-none font-median">
-            Admin Name Yipee
-          </Typography>
+  return (
+    <div className="w-full h-full flex flex-col gap-6 animate-in fade-in duration-500">
+
+      {/* HEADER SECTION */}
+      <div className="shrink-0 flex items-end justify-between">
+        <div className="flex flex-col animate-in slide-in-from-bottom-2 duration-500">
+          <p className="body text-[var(--gray)] font-medium">Welcome back,</p>
+          <h1 className="heading-xl mt-1">Admin Dashboard</h1>
         </div>
-        <div className="flex flex-col items-center">
-          <Typography variant="body-1-median">Total Users</Typography>
-          <Typography variant="heading-1" className="text-4xl tracking-tighter">{userStats.total}</Typography>
+        
+        {/* Top-Level Stat Card */}
+        <div className="w-48">
+          <StatCard
+            icon={<Users size={20} className="text-[var(--periwinkle)]" />}
+            iconBg="var(--periwinkle-light)"
+            value={userStats.total}
+            label="Total Registered Users"
+          />
         </div>
       </div>
 
       {/* ANALYTICS GRID */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 flex-1 min-h-0">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 flex-1 min-h-0">
 
         {/* COLUMN 1 & 2: Event Analytics Container */}
-        <Paper elevation="elevated" title="Event Analytics" titleVariant="heading-4" className="lg:col-span-2 flex flex-col gap-1 h-full">
+        <div className="lg:col-span-2 flex flex-col gap-6 h-full min-h-0">
 
-          {/* Top Wide Card - Light Blue */}
-          <Card color="blue" title="Attendance Over Time" style={{ height: '480px' }} className="flex flex-col mb-2">
-            <div className="flex-1 w-full pt-2 min-h-0">
+          {/* Top Wide Card - Area Chart */}
+          <Card className="flex-1 flex flex-col min-h-0 p-5">
+            <h2 className="heading-md mb-4 shrink-0">Attendance Over Time</h2>
+            <div className="flex-1 w-full min-h-0">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={eventAttendanceData} margin={{ top: 3, right: 5, left: -30, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#000" opacity={0.1} />
-                  <XAxis dataKey="month" stroke="#000" fontSize={10} tickLine={false} axisLine={false} />
-                  <YAxis stroke="#000" fontSize={10} tickLine={false} axisLine={false} />
+                <AreaChart data={eventAttendanceData} margin={{ top: 5, right: 10, left: -25, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke={strokeColor} opacity={0.08} />
+                  <XAxis dataKey="month" stroke={strokeColor} fontSize={11} tickLine={false} axisLine={false} />
+                  <YAxis stroke={strokeColor} fontSize={11} tickLine={false} axisLine={false} />
                   <Tooltip contentStyle={TOOLTIP_STYLE} />
-                  <Area type="monotone" dataKey="attendees" stroke="#000" strokeWidth={3} fill="#A7F3D0" />
+                  <Area type="monotone" dataKey="attendees" stroke={strokeColor} strokeWidth={2} fill="var(--periwinkle-light)" />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
           </Card>
 
-          {/* Bottom Row - Purple and Yellow Cards */}
-          <div className="grid grid-cols-2 gap-4 shrink-0 h-[110px]">
-            <Card color="purple" title="Total GAD Events" className="h-full flex flex-col justify-between">
-              <Typography variant="heading-2" className="text-right tracking-tighter">{gadEventsCount}</Typography>
-            </Card>
-            <Card color="yellow" title="Onboarded Users" className="h-full flex flex-col justify-between">
-              <Typography variant="heading-2" className="text-right tracking-tighter">
-                {userStats.onboarded}
-              </Typography>
-            </Card>
+          {/* Bottom Row - StatCards */}
+          <div className="grid grid-cols-2 gap-6 shrink-0">
+            <StatCard
+              icon={<CalendarCheck size={20} className="text-[var(--soft-pink)]" />}
+              iconBg="var(--pink-light)"
+              value={gadEventsCount}
+              label="Total GAD Events"
+            />
+            <StatCard
+              icon={<UserCheck size={20} className="text-[var(--success)]" />}
+              iconBg="rgba(109, 197, 160, 0.15)"
+              value={userStats.onboarded}
+              label="Onboarded Users"
+            />
           </div>
 
-        </Paper>
+        </div>
 
         {/* COLUMN 3: Sex and Gender Distribution */}
-        <div className="flex flex-col gap-4 lg:col-span-1 h-full min-h-0">
+        <div className="flex flex-col gap-6 lg:col-span-1 h-full min-h-0">
+          
           {/* Sex at Birth Distribution */}
-          <Paper elevation="elevated" title="Sex at Birth" titleVariant="body-1-median" className="flex-1 flex flex-col min-h-0">
-            <div className="flex-1 w-full min-h-0">
+          <Card className="flex-1 flex flex-col min-h-0 p-5">
+            <h2 className="heading-sm mb-2 shrink-0">Sex at Birth</h2>
+            
+            <div className="flex-1 w-full min-h-0 relative">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
                     data={sexAtBirthData}
                     cx="50%"
-                    cy="50%"
-                    innerRadius="40%"
+                    cy="45%"
+                    innerRadius="60%"
                     outerRadius="80%"
-                    paddingAngle={2}
+                    paddingAngle={3}
                     dataKey="value"
-                    stroke="#000"
-                    strokeWidth={2}
+                    stroke={strokeColor}
+                    strokeWidth={1.5}
                   >
                     {sexAtBirthData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={sexAtBirthColors[index % sexAtBirthColors.length]} />
+                      <Cell 
+                        key={`cell-${index}`}
+                        fill={sexAtBirthColors[index % sexAtBirthColors.length]}
+                      />
                     ))}
                   </Pie>
+
                   <Tooltip contentStyle={TOOLTIP_STYLE} />
+
+                  <Legend
+                    verticalAlign="bottom"
+                    align="center"
+                    iconType="circle"
+                    wrapperStyle={{ paddingTop: '20px'}}
+                    formatter={(value) => <span className="text-xs font-medium text-gray-600 uppercase tracking-wider">{value}</span>}
+                  />
                 </PieChart>
               </ResponsiveContainer>
             </div>
-          </Paper>
+          </Card>
 
           {/* Gender Identity Distribution */}
-          <Paper elevation="elevated" title="Gender Identity" titleVariant="body-1-median" className="flex-1 flex flex-col min-h-0">
+          <Card className="flex-1 flex flex-col min-h-0 p-5">
+            <h2 className="heading-sm mb-2 shrink-0">Gender Identity</h2>
             <div className="flex-1 w-full min-h-0">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
@@ -133,12 +156,12 @@ export default function DashboardPage() {
                     data={genderIdentityData}
                     cx="50%"
                     cy="50%"
-                    innerRadius="40%"
+                    innerRadius="45%"
                     outerRadius="80%"
-                    paddingAngle={2}
+                    paddingAngle={3}
                     dataKey="value"
-                    stroke="#000"
-                    strokeWidth={2}
+                    stroke={strokeColor}
+                    strokeWidth={1.5}
                   >
                     {genderIdentityData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={genderIdentityColors[index % genderIdentityColors.length]} />
@@ -148,54 +171,52 @@ export default function DashboardPage() {
                 </PieChart>
               </ResponsiveContainer>
             </div>
-          </Paper>
+          </Card>
         </div>
 
         {/* COLUMN 4: Roles & Breakdown Analytics */}
-        <div className="flex flex-col gap-4 lg:col-span-1 h-full min-h-0">
-          {/* Short Card */}
-          <Paper elevation="elevated" title="Users by Role" titleVariant="body-1-median" className="flex-1 flex flex-col min-h-0">
-            <div className="flex-1 w-full min-h-0 pt-2">
+        <div className="flex flex-col gap-6 lg:col-span-1 h-full min-h-0">
+          
+          {/* Roles Card */}
+          <Card className="flex-1 flex flex-col min-h-0 p-5">
+            <h2 className="heading-sm mb-2 shrink-0">Users by Role</h2>
+            <div className="flex-1 w-full min-h-0">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={roleDistributionData} layout="vertical" margin={{ top: 0, right: 0, left: 20, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" horizontal={false} opacity={0.2} />
+                <BarChart data={roleDistributionData} layout="vertical" margin={{ top: 0, right: 10, left: 15, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" horizontal={false} opacity={0.1} />
                   <XAxis type="number" hide />
-                  <YAxis dataKey="role" type="category" stroke="#000" fontSize={11} tickLine={false} axisLine={false} />
-                  <Tooltip cursor={{ fill: 'rgba(0,0,0,0.05)' }} contentStyle={TOOLTIP_STYLE} />
-                  <Bar dataKey="count" stroke="#000" strokeWidth={2} radius={[0, 4, 4, 0]} barSize={24}>
+                  <YAxis dataKey="role" type="category" stroke={strokeColor} fontSize={11} tickLine={false} axisLine={false} />
+                  <Tooltip cursor={{ fill: 'rgba(45,42,74,0.04)' }} contentStyle={TOOLTIP_STYLE} />
+                  <Bar dataKey="count" stroke={strokeColor} strokeWidth={1.5} radius={[0, 4, 4, 0]} barSize={20}>
                     {roleDistributionData.map((entry, idx) => (
-                      <Cell
-                        key={`cell-role-${idx}`}
-                        fill={roleColors[idx % roleColors.length]}
-                      />
+                      <Cell key={`cell-role-${idx}`} fill={roleColors[idx % roleColors.length]} />
                     ))}
                   </Bar>
                 </BarChart>
               </ResponsiveContainer>
             </div>
-          </Paper>
+          </Card>
 
-          {/* Tall Card */}
-          <Paper elevation="elevated" title="Users per College" titleVariant="body-1-median" className="flex-1 flex flex-col min-h-0">
-            <div className="flex-1 w-full min-h-0 pt-2">
+          {/* College Card */}
+          <Card className="flex-1 flex flex-col min-h-0 p-5">
+            <h2 className="heading-sm mb-2 shrink-0">Users per College</h2>
+            <div className="flex-1 w-full min-h-0">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={breakdownData} margin={{ top: 0, right: 10, left: 10, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} opacity={0.2} />
-                  <XAxis dataKey="category" stroke="#000" fontSize={12} tickLine={false} axisLine={false} />
-                  <YAxis hide />
-                  <Tooltip cursor={{ fill: 'rgba(0,0,0,0.05)' }} contentStyle={TOOLTIP_STYLE} />
-                  <Bar dataKey="value" stroke="#000" strokeWidth={2} radius={[4, 4, 0, 0]} >
+                <BarChart data={breakdownData} margin={{ top: 10, right: 0, left: -25, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} opacity={0.1} />
+                  <XAxis dataKey="category" stroke={strokeColor} fontSize={11} tickLine={false} axisLine={false} />
+                  <YAxis stroke={strokeColor} fontSize={11} tickLine={false} axisLine={false} />
+                  <Tooltip cursor={{ fill: 'rgba(45,42,74,0.04)' }} contentStyle={TOOLTIP_STYLE} />
+                  <Bar dataKey="value" stroke={strokeColor} strokeWidth={1.5} radius={[4, 4, 0, 0]} barSize={32}>
                     {breakdownData.map((entry, idx) => (
-                      <Cell
-                        key={`cell-col-${idx}`}
-                        fill={collegeColors[idx % collegeColors.length]}
-                      />
+                      <Cell key={`cell-col-${idx}`} fill={collegeColors[idx % collegeColors.length]} />
                     ))}
                   </Bar>
                 </BarChart>
               </ResponsiveContainer>
             </div>
-          </Paper>
+          </Card>
+
         </div>
 
       </div>

@@ -1,57 +1,85 @@
-import * as React from "react";
-import { Slot } from "@radix-ui/react-slot";
-import { cva, type VariantProps } from "class-variance-authority";
+/* How to use this component?
 
-import { cn } from "@/lib/utils";
+PROPS
+ * variant   "primary"|"pink"|"periwinkle"|"ghost"|"soft"       default "primary"
+             "icon"|"icon-dark"
+ * size      "sm" | "md" | "lg"                                 default "md"
+ * disabled  boolean                                            default false
+ * children  ReactNode   — label text and/or icon
+ * className string      — extra CSS classes appended
+ * ...props  any native <button> attribute (onClick, type, …)
+ 
+VARIANTS
+ * primary     dark purple fill  — primary CTA
+ * pink        soft-pink fill    — secondary / highlight action
+ * periwinkle  periwinkle fill   — tertiary action
+ * ghost       transparent + border — low-emphasis action
+ * soft        lavender fill     — very low-emphasis / tag-like
+ * icon        square ghost      — icon-only, light bg on hover
+ * icon-dark   square dark fill  — icon-only on dark surfaces
 
-const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
-  {
-    variants: {
-      variant: {
-        default:
-          "bg-primary text-primary-foreground shadow hover:bg-primary/90",
-        destructive:
-          "bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90",
-        outline:
-          "border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground",
-        secondary:
-          "bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
-        link: "text-primary underline-offset-4 hover:underline",
-      },
-      size: {
-        default: "h-9 px-4 py-2",
-        sm: "h-8 rounded-md px-3 text-xs",
-        lg: "h-10 rounded-md px-8",
-        icon: "h-9 w-9",
-      },
-    },
-    defaultVariants: {
-      variant: "default",
-      size: "default",
-    },
-  },
-);
+SAMPLE USAGE
+// Basic
+<Button>Primary</Button>
+<Button variant="pink" size="lg">Register Now</Button>
+<Button variant="ghost" disabled>Unavailable</Button>
 
-export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {
-  asChild?: boolean;
+// With Lucide icon
+import { Plus, Calendar } from "lucide-react";
+<Button variant="primary"><Plus size={14} /> Add Event</Button>
+<Button variant="pink"><Calendar size={14} /> Register</Button>
+
+// Icon-only
+<Button variant="icon"><Bell size={16} /></Button>
+<Button variant="icon-dark"><Plus size={16} /></Button>
+
+// Sizes
+<Button size="sm">Small</Button>
+<Button size="md">Medium</Button>   ← default
+<Button size="lg">Large</Button>
+
+// Native button props pass through
+<Button type="submit" onClick={handleSubmit}>Submit</Button>
+
+*/
+
+import React from "react";
+
+type ButtonVariant = "primary" | "pink" | "periwinkle" | "ghost" | "soft" | "icon" | "icon-dark";
+type ButtonSize    = "sm" | "md" | "lg";
+
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: ButtonVariant;
+  size?: ButtonSize;
+  children: React.ReactNode;
 }
 
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, ...props }, ref) => {
-    const Comp = asChild ? Slot : "button";
-    return (
-      <Comp
-        className={cn(buttonVariants({ variant, size, className }))}
-        ref={ref}
-        {...props}
-      />
-    );
-  },
-);
-Button.displayName = "Button";
+export function Button({
+  variant = "primary",
+  size = "md",
+  children,
+  className = "",
+  disabled,
+  ...props
+}: ButtonProps) {
+  const variantClass = variant === "icon-dark" ? "btn-icon-dark"
+                     : variant === "icon"      ? "btn-icon"
+                     : `btn-${variant}`;
 
-export { Button, buttonVariants };
+  const sizeClass = size === "sm" ? "btn-sm"
+                  : size === "lg" ? "btn-lg"
+                  : "";
+
+  const disabledClass = disabled ? "btn-disabled" : "";
+
+  return (
+    <button
+      className={`btn ${variantClass} ${sizeClass} ${disabledClass} ${className}`.trim()}
+      disabled={disabled}
+      {...props}
+    >
+      {children}
+    </button>
+  );
+}
+
