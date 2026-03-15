@@ -37,7 +37,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </div>
         </header>
         
-        <main style={{ display:'flex', flexDirection:'column', flex:1, minHeight:0, overflow:'hidden', padding:'24px' }}>
+        {/* FIX: Changed overflow:'hidden' to overflowY:'auto' so long pages can actually scroll */}
+        <main style={{ display:'flex', flexDirection:'column', flex:1, minHeight:0, overflowY:'auto', padding:'24px' }}>
           <Suspense fallback={<div style={{ display:'flex', alignItems:'center', justifyContent:'center', height:'100%', color:'var(--gray)', fontSize:14 }}>Loading…</div>}>
             <AdminAuthGuard>{children}</AdminAuthGuard>
           </Suspense>

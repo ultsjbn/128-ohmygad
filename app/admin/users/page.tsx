@@ -1,15 +1,15 @@
 import { Suspense } from "react";
 import { connection } from "next/server";
+import { Loader2 } from "lucide-react";
 import { UsersClient } from "./users-client";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import type { Profile } from "./profile.types";
-import { Loader } from "@snowball-tech/fractal";
 
 async function getProfiles() {
   await connection();
   const { data, error } = await supabaseAdmin
     .from("profile")
-    .select("id, full_name, email, role, gso_attended")
+    .select("id, full_name, email, role, gso_attended, created_at")
     .order("created_at", { ascending: false });
 
   return { data: (data as Profile[]) ?? [], error: error?.message ?? null };
@@ -24,10 +24,12 @@ export default function UsersPage() {
   return (
     <Suspense
       fallback={
-        <div className="flex p-6 text-sm text-fractal-base-grey-30 place-content-center">
-          <div className="justify-center items-center">
-            <Loader size="xl" />
-          </div>
+        <div
+          className="flex items-center justify-center gap-3 py-16"
+          style={{ color: "var(--gray)" }}
+        >
+          <Loader2 size={22} className="animate-spin" />
+          <span className="caption">Loading users…</span>
         </div>
       }
     >

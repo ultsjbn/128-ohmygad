@@ -63,10 +63,11 @@ How to use this component?
  */
 
 "use client";
-
+ 
 import React from "react";
 import { X } from "lucide-react";
-
+import { Button } from "./button";
+ 
 interface ModalProps {
   open: boolean;
   onClose: () => void;
@@ -74,28 +75,72 @@ interface ModalProps {
   subtitle?: string;
   children: React.ReactNode;
   footer?: React.ReactNode;
+  modalStyle?: React.CSSProperties;
+  modalClassName?: string;
 }
-
-export function Modal({ open, onClose, title, subtitle, children, footer }: ModalProps) {
+ 
+export function Modal({ 
+  open, 
+  onClose, 
+  title, 
+  subtitle, 
+  children, 
+  footer, 
+  modalStyle, 
+  modalClassName 
+}: ModalProps) {
   if (!open) return null;
-
+ 
   return (
-    <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal" onClick={(e) => e.stopPropagation()}>
-        <button className="modal-close" onClick={onClose}>
-          <X size={14} />
-        </button>
-
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 sm:p-6 backdrop-blur-[2px]" 
+      onClick={onClose}
+    >
+      <div
+        className={`relative flex flex-col w-full max-w-2xl max-h-[90vh] bg-white rounded-[var(--radius-lg)] shadow-[var(--shadow-float)] overflow-hidden ${modalClassName || ""}`}
+        style={modalStyle}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Close Button */}
+        <Button 
+          variant="ghost"
+          className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-colors z-10" 
+          onClick={onClose}
+          title="Close modal"
+        >
+          <X size={18} />
+        </Button>
+ 
+        {/* Header */}
         {(title || subtitle) && (
-          <div style={{ marginBottom: 24 }}>
-            {title    && <p className="heading-md" style={{ marginBottom: 6 }}>{title}</p>}
-            {subtitle && <p className="caption">{subtitle}</p>}
+          <div className="px-6 pt-6 pb-4 border-b border-gray-100 shrink-0">
+            {title && (
+              <h2 
+                className="text-xl font-bold pr-8" 
+                style={{ color: "var(--primary-dark)" }}
+              >
+                {title}
+              </h2>
+            )}
+            {subtitle && (
+              <p className="text-sm mt-1 text-gray-500 pr-8">
+                {subtitle}
+              </p>
+            )}
           </div>
         )}
-
-        <div style={{ marginBottom: footer ? 24 : 0 }}>{children}</div>
-
-        {footer && <div>{footer}</div>}
+ 
+        {/* Body (Scrollable Area) */}
+        <div className="flex-1 overflow-y-auto p-6 min-h-0">
+          {children}
+        </div>
+ 
+        {/* Footer */}
+        {footer && (
+          <div className="px-6 py-4 border-t border-gray-100 bg-gray-50/50 shrink-0">
+            {footer}
+          </div>
+        )}
       </div>
     </div>
   );
