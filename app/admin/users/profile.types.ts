@@ -6,9 +6,15 @@ export interface Profile {
   email: string | null;
   role: UserRole | null;
   gso_attended: number;
+  created_at: string;
+  display_name?: string | null;
+  contact_num?: string | null;
+  address?: string | null;
+  college?: string | null;
+  program?: string | null;
 }
 
-export type SortField = "full_name" | "email" | "role" ;
+export type SortField = "full_name" | "email" | "role" | "created_at";
 export type SortDirection = "asc" | "desc";
 export interface SortState {
   field: SortField;
