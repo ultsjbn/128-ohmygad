@@ -16,6 +16,7 @@ import {
   Cell,
   BarChart,
   Bar,
+  Legend,
 } from "recharts";
 
 import {
@@ -108,14 +109,15 @@ export default function DashboardPage() {
           {/* Sex at Birth Distribution */}
           <Card className="flex-1 flex flex-col min-h-0 p-5">
             <h2 className="heading-sm mb-2 shrink-0">Sex at Birth</h2>
-            <div className="flex-1 w-full min-h-0">
+            
+            <div className="flex-1 w-full min-h-0 relative">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
                     data={sexAtBirthData}
                     cx="50%"
-                    cy="50%"
-                    innerRadius="45%"
+                    cy="45%"
+                    innerRadius="60%"
                     outerRadius="80%"
                     paddingAngle={3}
                     dataKey="value"
@@ -123,10 +125,22 @@ export default function DashboardPage() {
                     strokeWidth={1.5}
                   >
                     {sexAtBirthData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={sexAtBirthColors[index % sexAtBirthColors.length]} />
+                      <Cell 
+                        key={`cell-${index}`}
+                        fill={sexAtBirthColors[index % sexAtBirthColors.length]}
+                      />
                     ))}
                   </Pie>
+
                   <Tooltip contentStyle={TOOLTIP_STYLE} />
+
+                  <Legend
+                    verticalAlign="bottom"
+                    align="center"
+                    iconType="circle"
+                    wrapperStyle={{ paddingTop: '20px'}}
+                    formatter={(value) => <span className="text-xs font-medium text-gray-600 uppercase tracking-wider">{value}</span>}
+                  />
                 </PieChart>
               </ResponsiveContainer>
             </div>
