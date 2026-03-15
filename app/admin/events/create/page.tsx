@@ -1,4 +1,3 @@
-import { Typography } from "@snowball-tech/fractal";
 import EventForm from "@/components/admin/event-form";
 
 export default function CreateEventPage() {
