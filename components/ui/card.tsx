@@ -102,7 +102,7 @@ export function EventCard({
             style={{ width: "100%", justifyContent: "center" }}
             onClick={onRegister}
           >
-            <Plus size={13} /> Register
+            Register
           </button>
         </div>
       </div>
