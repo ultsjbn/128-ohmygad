@@ -5,55 +5,48 @@ import { useRouter } from "next/navigation";
 import { submitFormData } from "@/lib/form-submit.utils";
 import { MapPin, Users, AlignLeft, Type } from "lucide-react";
 import { Card, Input, Select, Button, DateTimePicker } from "@/components/ui"; 
+import { ST } from "next/dist/shared/lib/utils";
 
-export type EventFormData = {
+export type CourseFormData = {
   id?: string;
   title: string;
   description: string;
-  location: string;
-  start_date: string;
-  end_date: string;
-  capacity: number;
-  registration_open: string;
-  registration_close: string;
-  category: string;
+  semester: string;
+  start_time: string;
+  end_time: string;
+  Days: string;
   status: string;
 };
 
-type EventFormProps = {
-  initialData?: EventFormData;
+type CourseFormProps = {
+  initialData?: CourseFormData;
   mode: "create" | "edit";
 };
 
-const CATEGORY_OPTIONS = [
-  { value: "Orientation", label: "Orientation" },
-  { value: "Forum", label: "Forum" },
-  { value: "Research", label: "Research" },
-  { value: "Training", label: "Training" },
-  { value: "Workshop", label: "Workshop" },
+const SEMESTER_OPTIONS = [
+  { value: "1st Semester", label: "1st Semester" },
+  { value: "2nd Semester", label: "2nd Semester" },
+  { value: "Mid-Year", label: "Mid-Year" },
 ];
 
-// const STATUS_OPTIONS = [
-//   { value: "upcoming", label: "Upcoming" },
-//   { value: "past", label: "Past" },
-// ];
+const STATUS_OPTIONS = [
+   { value: "open", label: "Open" },
+   { value: "closed", label: "Closed" },
+ ];
 
-export default function EventForm({ initialData, mode }: EventFormProps) {
+export default function CourseForm({ initialData, mode }: CourseFormProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const [title, setTitle] = useState(initialData?.title ?? "");
   const [description, setDescription] = useState(initialData?.description ?? "");
-  const [location, setLocation] = useState(initialData?.location ?? "");
   
   // removed the slice(0,16) because datetimepicker handles full iso strings
-  const [start_date, setStartDate] = useState(initialData?.start_date ?? "");
-  const [end_date, setEndDate] = useState(initialData?.end_date ?? "");
-  const [capacity, setCapacity] = useState<number | "">(initialData?.capacity ?? "");
-  const [registration_open, setRegistrationOpen] = useState(initialData?.registration_open ?? "");
-  const [registration_close, setRegistrationClose] = useState(initialData?.registration_close ?? "");
-  const [category, setCategory] = useState(initialData?.category ?? "");
+  const [start_time, setStartTime] = useState(initialData?.start_time ?? "");
+  const [end_time, setEndTime] = useState(initialData?.end_time ?? "");
+  const [Days, setDays] = useState(initialData?.Days ?? "");
+  const [semester, setSemester] = useState(initialData?.semester ?? "");
   const [status, setStatus] = useState(initialData?.status ?? "");
 
   // submit handler
@@ -66,20 +59,17 @@ export default function EventForm({ initialData, mode }: EventFormProps) {
       title,
       description,
       location,
-      start_date,
-      end_date,
-      capacity: capacity === "" ? null : Number(capacity),
-      registration_open,
-      registration_close,
-      category,
+      start_time,
+      end_time,
+      semester,
       status,
       updated_at: new Date().toISOString(),
     };
 
-    const result = await submitFormData("event", payload, mode, initialData?.id);
+    const result = await submitFormData("course", payload, mode, initialData?.id);
 
     if (result.success) {
-      router.push("/admin/events");
+      router.push("/admin/courses");
       router.refresh();
     } else {
       setError(result.error || "An error occurred");
@@ -104,7 +94,7 @@ export default function EventForm({ initialData, mode }: EventFormProps) {
 
               <Input
                 label="Title *"
-                placeholder="e.g. Gender Sensitivity Orientation"
+                placeholder="e.g. Gender and Technology"
                 required
                 prefixIcon={<Type size={15} />}
                 value={title}
@@ -117,7 +107,7 @@ export default function EventForm({ initialData, mode }: EventFormProps) {
                   <AlignLeft className="input-prefix-icon w-2 h-2 top-5 translate-y-0" />
                   <textarea
                     id="description"
-                    placeholder="Describe the event..."
+                    placeholder="Describe the course..."
                     rows={4}
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
@@ -126,76 +116,54 @@ export default function EventForm({ initialData, mode }: EventFormProps) {
                 </div>
               </div>
 
-              <Input
-                label="Location *"
-                placeholder="e.g. Sarmiento Hall"
-                required
-                prefixIcon={<MapPin size={15} />}
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-              />
+          
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <Input
-                  label="Capacity *"
-                  type="number"
-                  min={1}
-                  placeholder="e.g. 30"
+                <Select
+                  label="Status *"
                   required
-                  prefixIcon={<Users size={15} />}
-                  value={capacity}
-                  onChange={(e) => setCapacity(e.target.value === "" ? "" : Number(e.target.value))}
+                  options={[{ value: "", label: "Select status" }, ...STATUS_OPTIONS]}
+                  value={status}
+                  onChange={(e) => setStatus(e.target.value)}
                 />
 
                 <Select 
-                  label="Category *"
+                  label="Semester *"
                   required
-                  options={[{ value: "", label: "Select category" }, ...CATEGORY_OPTIONS]}
-                  value={category}
-                  onChange={(e) => setCategory(e.target.value)}
+                  options={[{ value: "", label: "Select semester" }, ...SEMESTER_OPTIONS]}
+                  value={semester}
+                  onChange={(e) => setSemester(e.target.value)}
                 />
               </div>
 
             </Card>
           </div>
 
-          {/* right column: event schedule & actions */}
+          {/* right column: course schedule & actions */}
           <div className="flex flex-col gap-6">
             <Card className="flex flex-col gap-4 p-6">
               <div className="border-b border-[rgba(45,42,74,0.08)] pb-3 mb-1">
-                <h3 className="heading-md">Event Schedule</h3>
+                <h3 className="heading-md">Course Schedule</h3>
               </div>
 
               <DateTimePicker
-                label="Start Date & Time"
-                mode="datetime"
+                label="Start Time"
+                mode="time"
                 required
-                value={start_date}
-                onChange={setStartDate}
+                value={start_time}
+                onChange={setStartTime}
               />
 
               <DateTimePicker
-                label="End Date & Time"
-                mode="datetime"
-                value={end_date}
-                onChange={setEndDate}
+                label="End Time"
+                mode="time"
+                value={end_time}
+                onChange={setEndTime}
               />
 
-              <DateTimePicker
-                label="Registration Opens"
-                mode="datetime"
-                required
-                value={registration_open}
-                onChange={setRegistrationOpen}
-              />
+             
 
-              <DateTimePicker
-                label="Registration Closes"
-                mode="datetime"
-                required
-                value={registration_close}
-                onChange={setRegistrationClose}
-              />
+          
             </Card>
 
             {/* error toast */}

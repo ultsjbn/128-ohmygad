@@ -1,9 +1,9 @@
-import EventForm from "@/components/admin/event-form";
+import CourseForm from "@/components/admin/course-form";
 
-export default function CreateEventPage() {
+export default function CreateCoursePage() {
   return (
     <div className="h-full flex flex-col gap-6">
-      <EventForm mode="create" />
+      <CourseForm mode="create" />
     </div>
   );
 }
