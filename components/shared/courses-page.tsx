@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Typography, InputText } from "@snowball-tech/fractal";
+import { useSearchParams } from "next/navigation";
 import { Search } from "lucide-react";
 
 type Course = {
@@ -18,9 +19,10 @@ type Course = {
 };
 
 export default function CoursesPage() {
+  const searchParams = useSearchParams();
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(searchParams.get("search") || "");
 
   useEffect(() => {
     async function fetchCourses() {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowUpDown, UserPlus, Pencil, Trash2, ChevronUp, ChevronDown, Loader2 } from "lucide-react";
 import type { Profile, SortState } from "./profile.types";
 import { sortProfiles, paginate, totalPages } from "./profile.utils";
@@ -48,11 +48,12 @@ const TAB_LABELS: Record<string, string> = {
 
 export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) => {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const [profiles,    setProfiles]    = useState<Profile[]>(initialProfiles);
   const [page,        setPage]        = useState(1);
   const [activeTab,   setActiveTab]   = useState<TabKey>("all");
-  const [search,      setSearch]      = useState("");
+  const [search,      setSearch]      = useState(searchParams.get("search") || "");
   const [sort,        setSort]        = useState<SortState>({ field: "created_at", direction: "desc" });
 
   const [editModalOpen, setEditModalOpen] = useState(false);

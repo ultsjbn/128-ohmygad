@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { useSearchParams } from "next/navigation";
 import { SlidersHorizontal, Loader2, CalendarDays, MapPin, Users, Clock, X } from "lucide-react";
 import type { EventFormData } from "@/components/admin/event-form";
 
@@ -94,10 +95,11 @@ function CheckItem({
 
 // events page
 export default function EventsPage() {
+  const searchParams = useSearchParams();
 
   // useStates
   const [events,      setEvents]      = useState<EventFormData[]>([]);
-  const [search,      setSearch]      = useState("");
+  const [search,      setSearch]      = useState(searchParams.get("search") || "");
   const [isLoading,   setIsLoading]   = useState(true);
   const [error,       setError]       = useState<string | null>(null);
   const [sort,        setSort]        = useState<SortState>({ field: "start_date", direction: "desc" });

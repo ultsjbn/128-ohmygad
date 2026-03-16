@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Plus, ArrowUpDown, SlidersHorizontal, Pencil, Trash2, Loader2 } from "lucide-react";
 import type { CourseFormData } from "@/components/admin/course-form";
@@ -81,10 +81,11 @@ function CheckItem({
 // courses page proper
 export default function CoursesPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const [courses,         setCourses]         = useState<CourseFormData[]>([]);
   const [filtered,        setFiltered]        = useState<CourseFormData[]>([]);
-  const [search,          setSearch]          = useState("");
+  const [search,          setSearch]          = useState(searchParams.get("search") || "");
   const [isLoading,       setIsLoading]       = useState(true);
   const [deletingId,      setDeletingId]      = useState<string | null>(null);
   const [modalContent,    setModalContent]    = useState<{ label: string; text: string } | null>(null);

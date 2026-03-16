@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Plus, ArrowUpDown, SlidersHorizontal, Pencil, Trash2, Loader2 } from "lucide-react";
 import type { EventFormData } from "@/components/admin/event-form";
@@ -82,10 +82,11 @@ function CheckItem({
 // events page proper
 export default function EventsPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const [events,          setEvents]          = useState<EventFormData[]>([]);
   const [filtered,        setFiltered]        = useState<EventFormData[]>([]);
-  const [search,          setSearch]          = useState("");
+  const [search,          setSearch]          = useState(searchParams.get("search") || "");
   const [isLoading,       setIsLoading]       = useState(true);
   const [deletingId,      setDeletingId]      = useState<string | null>(null);
   const [modalContent,    setModalContent]    = useState<{ label: string; text: string } | null>(null);
