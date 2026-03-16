@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Plus, ArrowUpDown, SlidersHorizontal, Pencil, Trash2, Loader2 } from "lucide-react";
 import type { CourseFormData } from "@/components/admin/course-form";
@@ -22,6 +22,17 @@ import {
   Modal,
 } from "@/components/ui";
 
+function formatTime(time?: string) {
+  if (!time) return "—"
+
+  const [hour, minute] = time.split(":")
+  const h = Number(hour)
+  const suffix = h >= 12 ? "PM" : "AM"
+  const hour12 = h % 12 || 12
+
+  return `${hour12}:${minute} ${suffix}`
+}
+
 // constants 
 const SEMESTERS = ["1st Semester", "2nd Semester", "Mid-Year"];
 const STATUSES = ["open", "closed"];
@@ -37,8 +48,8 @@ const SEMESTER_VARIANT: Record<string, BadgeVariant> = {
 
 
 const STATUS_VARIANT: Record<string, BadgeVariant> = {
-  upcoming: "periwinkle",
-  past: "dark",
+  open: "periwinkle",
+  closed: "dark",
 };
 
 // checkbox
@@ -66,7 +77,7 @@ function CheckItem({
           {active && (
             <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
               <path d="M1 4l2 2 4-4" stroke="white" strokeWidth="1.5"
-                    strokeLinecap="round" strokeLinejoin="round" />
+                strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           )}
         </span>
@@ -81,18 +92,19 @@ function CheckItem({
 // courses page proper
 export default function CoursesPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
-  const [courses,         setCourses]         = useState<CourseFormData[]>([]);
-  const [filtered,        setFiltered]        = useState<CourseFormData[]>([]);
-  const [search,          setSearch]          = useState("");
-  const [isLoading,       setIsLoading]       = useState(true);
-  const [deletingId,      setDeletingId]      = useState<string | null>(null);
-  const [modalContent,    setModalContent]    = useState<{ label: string; text: string } | null>(null);
-  const [sortOrder,       setSortOrder]       = useState<"Newest" | "Oldest">("Newest");
-  
+  const [courses, setCourses] = useState<CourseFormData[]>([]);
+  const [filtered, setFiltered] = useState<CourseFormData[]>([]);
+  const [search, setSearch] = useState(searchParams.get("search") || "");
+  const [isLoading, setIsLoading] = useState(true);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [modalContent, setModalContent] = useState<{ label: string; text: string } | null>(null);
+  const [sortOrder, setSortOrder] = useState<"Newest" | "Oldest">("Newest");
+
   const [semesterFilters, setSemesterFilters] = useState<Set<string>>(new Set());
-  const [statusFilters,   setStatusFilters]   = useState<Set<string>>(new Set());
-  const [page,            setPage]            = useState(1);
+  const [statusFilters, setStatusFilters] = useState<Set<string>>(new Set());
+  const [page, setPage] = useState(1);
 
   //  Fetch 
   const getCourses = async () => {
@@ -100,7 +112,7 @@ export default function CoursesPage() {
     const { data, error } = await supabase
       .from("course")
       .select("id, title, description, semester, status, start_time, end_time, Days")
-      .order("start_date", { ascending: false });
+      .order("start_time", { ascending: false });
 
     if (!error && data) {
       setCourses(data);
@@ -111,13 +123,19 @@ export default function CoursesPage() {
 
   useEffect(() => { getCourses(); }, []);
 
+  // sync the URL search param to the local search state
+  useEffect(() => {
+    const s = searchParams.get("search");
+    if (s !== null) setSearch(s);
+  }, [searchParams]);
+
   //  filter / sort 
   useEffect(() => {
     const q = search.toLowerCase();
     let result = courses;
 
     result = result.filter((e) =>
-      `${e.title} ${e.semester || ""}`.toLowerCase().includes(q)
+      `${e.title} ${e.Days} ${e.start_time} ${e.end_time} ${e.semester ?? ""}`.toLowerCase().includes(q)
     );
     // empty set = show all. nonempty = only matching values
     if (semesterFilters.size > 0)
@@ -169,7 +187,7 @@ export default function CoursesPage() {
   };
 
   const activeFilterCount = semesterFilters.size + statusFilters.size;
-  const hasActiveFilters  = activeFilterCount > 0;
+  const hasActiveFilters = activeFilterCount > 0;
 
   // DataTable columns 
   const columns: Column<CourseFormData>[] = [
@@ -205,19 +223,29 @@ export default function CoursesPage() {
         </Badge>
       ),
     },
-    {
-      key: "start_date",
-      header: "Date",
-      render: (course) => (
+
+{
+  key: "schedule",
+  header: "Schedule",
+  render: (course) => {
+    const start = formatTime(course.start_time)
+    const end = formatTime(course.end_time)
+
+    return (
+      <div className="flex flex-col leading-tight">
+        <span className="caption text-[12px] opacity-80">
+          {course.Days || "—"}
+        </span>
+
         <span className="caption whitespace-nowrap">
-          {course.start_time
-            ? new Date(course.start_time).toLocaleDateString("en-PH", {
-                month: "short", day: "numeric", year: "numeric",
-              })
+          {start !== "—" && end !== "—"
+            ? `${start} – ${end}`
             : "—"}
         </span>
-      ),
-    },
+      </div>
+    )
+  },
+},
 
     {
       key: "actions",
@@ -271,7 +299,7 @@ export default function CoursesPage() {
         <div className="flex items-center gap-3 flex-wrap">
 
           <SearchBar
-            placeholder="Search by title, semester or ..."
+            placeholder="Search by title, semester or schedule"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             containerStyle={{ flex: 1, minWidth: 220 }}
@@ -416,11 +444,11 @@ export default function CoursesPage() {
         </Card>
 
       ) : (
-          <DataTable
-            columns={columns}
-            rows={paginate(filtered, page, PER_PAGE)}
-            keyExtractor={(course) => course.id!}
-          />
+        <DataTable
+          columns={columns}
+          rows={paginate(filtered, page, PER_PAGE)}
+          keyExtractor={(course) => course.id!}
+        />
       )}
 
       {/*  pagination  */}

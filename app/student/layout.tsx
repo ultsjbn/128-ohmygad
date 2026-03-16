@@ -1,5 +1,6 @@
 import { Suspense } from 'react';
 import { redirect } from 'next/navigation';
+import GlobalSearch from '@/components/global-search';
 import { Search, Bell } from 'lucide-react';
 import StudentSidebar from '@/components/student-sidebar';
 import { getCurrentUserWithRole } from '@/lib/auth/get-current-user';
@@ -24,10 +25,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
 
       <div style={{ position:'relative', zIndex:1, display:'flex', flexDirection:'column', flex:1, minWidth:0, overflow:'hidden' }}>
         <header style={{ display:'flex', flexShrink:0, alignItems:'center', justifyContent:'space-between', gap:16, padding:'10px 24px', background:'rgba(255,255,255,0.72)', backdropFilter:'blur(14px)', borderBottom:'1px solid rgba(45,42,74,0.07)' }}>
-          <div className="search-wrap" style={{ flex:1, maxWidth:360 }}>
-            <span className="search-icon"><Search size={15} /></span>
-            <input className="search-input" placeholder="Search events, courses, surveys…" />
-          </div>
+          <GlobalSearch role="student" placeholder="Search events, courses, surveys..." />
           <div style={{ display:'flex', alignItems:'center', gap:12 }}>
             <button className="btn btn-icon" style={{ background:'rgba(45,42,74,0.05)', color:'var(--primary-dark)' }} aria-label="Notifications">
               <Bell size={17} />
