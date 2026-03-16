@@ -123,7 +123,7 @@ export const EventPanel = (): JSX.Element => {
 
   const groups = groupByDate(filteredEvents);
 
-  //  render 
+  // render 
   return (
     <div className="flex flex-col h-full p-0 md:p-2 gap-1 md:gap-4">
 
