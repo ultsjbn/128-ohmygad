@@ -231,7 +231,7 @@ export default function CoursesPage() {
 
     return (
       <div className="flex flex-col leading-tight">
-        <span className="caption text-[12px] opacity-80">
+        <span className="caption text-[12px] opacity-100">
           {course.Days || "—"}
         </span>
 
