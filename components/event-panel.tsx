@@ -58,7 +58,7 @@ export const EventPanel = (): JSX.Element => {
           location,
           start_date,
           end_date,
-          banner,
+          banner_url,
           event_registration (
             status,
             user_id
@@ -84,7 +84,7 @@ export const EventPanel = (): JSX.Element => {
           date: formatDate(e.start_date),
           time: formatTimeRange(e.start_date, e.end_date),
           status: userReg?.status ?? null,
-          image: e.banner ?? undefined,
+          image: e.banner_url ?? undefined,
           rawStartDate: e.start_date,
           rawEndDate: e.end_date,
         };

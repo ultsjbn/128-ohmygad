@@ -64,7 +64,7 @@ export default function EventForm({ initialData, mode }: EventFormProps) {
   const [bannerPreview,   setBannerPreview]  = useState(initialData?.banner_url ?? "");
   const [uploadingBanner, setUploadingBanner] = useState(false);
 
-  // handler for when a file is picked — local preview only, no upload yet
+  // handler for when a file is picked - local preview only, no upload yet
   const handleBannerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;

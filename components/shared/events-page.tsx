@@ -209,7 +209,7 @@ export default function EventsPage() {
 
       {/* page header - hidden on mobile, visible on md+ devices */}
       <div className="hidden md:block">
-        <h1 className="heading-lg">Events</h1>
+        <h1 className="heading-lg">Discover Events</h1>
       </div>
 
       {/* search, sort, filter */}
@@ -462,7 +462,7 @@ export default function EventsPage() {
                 <X size={14} />
               </button>
 
-              {/* category + status badges - bottom-left of cover */}
+              {/* category and status badges bottom-left of cover */}
               <div className="absolute bottom-3 left-3 flex gap-2 items-center">
                 <span className="badge badge-pink">
                   {detailEvent.category ?? "Uncategorized"}
