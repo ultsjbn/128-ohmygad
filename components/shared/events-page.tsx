@@ -118,7 +118,7 @@ export default function EventsPage() {
       const supabase = createClient();
       const { data, error } = await supabase
         .from("event")
-        .select("id, title, description, category, status, start_date, end_date, capacity, location, registration_open, registration_close")
+        .select("id, title, description, category, status, start_date, end_date, capacity, location, registration_open, registration_close, banner_url")
         .order("start_date", { ascending: false });
 
       if (error) setError(error.message);
@@ -398,7 +398,11 @@ export default function EventsPage() {
                 location={event.location ?? "—"}
                 registered={0}
                 capacity={event.capacity ?? 0}
-                gradient={CATEGORY_GRADIENT[event.category ?? ""] ?? DEFAULT_GRADIENT}
+                gradient={
+					event.banner_url
+						? `url(${event.banner_url}) center/cover no-repeat`
+						: CATEGORY_GRADIENT[event.category ?? ""] ?? DEFAULT_GRADIENT
+				}
                 onRegister={(e?: React.MouseEvent) => {
                   // stop the card click from also opening the detail modal
                   e?.stopPropagation();
@@ -435,7 +439,11 @@ export default function EventsPage() {
 
             <div
               className="h-[120px] sm:h-[160px] relative shrink-0 rounded-t-[var(--radius-xl)]"
-              style={{ background: CATEGORY_GRADIENT[detailEvent.category ?? ""] ?? DEFAULT_GRADIENT }}
+              style={{
+				background: detailEvent.banner_url
+					? `url(${detailEvent.banner_url}) center/cover no-repeat`
+					: CATEGORY_GRADIENT[detailEvent.category ?? ""] ?? DEFAULT_GRADIENT
+				}}
             >
               {/* close button inside cover */}
               <button
