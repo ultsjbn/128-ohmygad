@@ -23,19 +23,18 @@ import {
 } from "@/components/ui";
 
 // constants 
-const CATEGORIES = ["1st Semester", "2nd Semester", "Mid-Year"];
+const SEMESTERS = ["1st Semester", "2nd Semester", "Mid-Year"];
 const STATUSES = ["open", "closed"];
 
 // variant helpers 
 type BadgeVariant = "pink" | "periwinkle" | "dark" | "success" | "warning" | "error";
 
-const CATEGORY_VARIANT: Record<string, BadgeVariant> = {
-  Orientation: "pink",
-  Forum: "periwinkle",
-  Research: "dark",
-  Training: "success",
-  Workshop: "warning",
+const SEMESTER_VARIANT: Record<string, BadgeVariant> = {
+  "1st Semester": "pink",
+  "2nd Semester": "periwinkle",
+  "Mid-Year": "dark",
 };
+
 
 const STATUS_VARIANT: Record<string, BadgeVariant> = {
   upcoming: "periwinkle",
@@ -91,7 +90,7 @@ export default function CoursesPage() {
   const [modalContent,    setModalContent]    = useState<{ label: string; text: string } | null>(null);
   const [sortOrder,       setSortOrder]       = useState<"Newest" | "Oldest">("Newest");
   
-  const [categoryFilters, setCategoryFilters] = useState<Set<string>>(new Set());
+  const [semesterFilters, setSemesterFilters] = useState<Set<string>>(new Set());
   const [statusFilters,   setStatusFilters]   = useState<Set<string>>(new Set());
   const [page,            setPage]            = useState(1);
 
@@ -118,29 +117,29 @@ export default function CoursesPage() {
     let result = courses;
 
     result = result.filter((e) =>
-      `${e.title} ${e.category || ""} ${e.location || ""}`.toLowerCase().includes(q)
+      `${e.title} ${e.semester || ""}`.toLowerCase().includes(q)
     );
     // empty set = show all. nonempty = only matching values
-    if (categoryFilters.size > 0)
-      result = result.filter((e) => categoryFilters.has(e.category ?? ""));
+    if (semesterFilters.size > 0)
+      result = result.filter((e) => semesterFilters.has(e.semester ?? ""));
     if (statusFilters.size > 0)
       result = result.filter((e) => statusFilters.has(e.status ?? ""));
 
     result = result.sort((a, b) => {
-      const da = new Date(a.start_date ?? "").getTime();
-      const db = new Date(b.start_date ?? "").getTime();
+      const da = new Date(a.start_time ?? "").getTime();
+      const db = new Date(b.start_time ?? "").getTime();
       return sortOrder === "Newest" ? db - da : da - db;
     });
 
     setFiltered(result);
     setPage(1);
-  }, [search, courses, sortOrder, categoryFilters, statusFilters]);
+  }, [search, courses, sortOrder, semesterFilters, statusFilters]);
 
   //  toggle helpers 
-  function toggleCategory(cat: string) {
-    setCategoryFilters((prev) => {
+  function toggleSemester(semester: string) {
+    setSemesterFilters((prev) => {
       const next = new Set(prev);
-      next.has(cat) ? next.delete(cat) : next.add(cat);
+      next.has(semester) ? next.delete(semester) : next.add(semester);
       return next;
     });
   }
@@ -154,7 +153,7 @@ export default function CoursesPage() {
   }
 
   function clearAllFilters() {
-    setCategoryFilters(new Set());
+    setSemesterFilters(new Set());
     setStatusFilters(new Set());
   }
 
@@ -169,7 +168,7 @@ export default function CoursesPage() {
     setDeletingId(null);
   };
 
-  const activeFilterCount = categoryFilters.size + statusFilters.size;
+  const activeFilterCount = semesterFilters.size + statusFilters.size;
   const hasActiveFilters  = activeFilterCount > 0;
 
   // DataTable columns 
@@ -189,11 +188,11 @@ export default function CoursesPage() {
       ),
     },
     {
-      key: "category",
-      header: "Category",
+      key: "semester",
+      header: "Semester",
       render: (course) => (
-        <Badge variant={CATEGORY_VARIANT[course.category ?? ""] ?? "dark"}>
-          {course.category}
+        <Badge variant={SEMESTER_VARIANT[course.semester ?? ""] ?? "dark"}>
+          {course.semester}
         </Badge>
       ),
     },
@@ -211,32 +210,15 @@ export default function CoursesPage() {
       header: "Date",
       render: (course) => (
         <span className="caption whitespace-nowrap">
-          {course.start_date
-            ? new Date(course.start_date).toLocaleDateString("en-PH", {
+          {course.start_time
+            ? new Date(course.start_time).toLocaleDateString("en-PH", {
                 month: "short", day: "numeric", year: "numeric",
               })
             : "—"}
         </span>
       ),
     },
-    {
-      key: "capacity",
-      header: "Capacity",
-      render: (course) => <span className="caption">{course.capacity}</span>,
-    },
-    {
-      key: "location",
-      header: "Location",
-      render: (course) => (
-        <button
-          className="caption text-left hover:underline underline-offset-4 max-w-[150px] truncate block"
-          onClick={() => setModalContent({ label: "Location", text: course.location || "—" })}
-          title="Click to view full location"
-        >
-          {course.location}
-        </button>
-      ),
-    },
+
     {
       key: "actions",
       header: "Actions",
@@ -289,7 +271,7 @@ export default function CoursesPage() {
         <div className="flex items-center gap-3 flex-wrap">
 
           <SearchBar
-            placeholder="Search by title, category, or location…"
+            placeholder="Search by title, semester or ..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             containerStyle={{ flex: 1, minWidth: 220 }}
@@ -327,14 +309,14 @@ export default function CoursesPage() {
             }
           >
             <div style={{ padding: "4px 12px 6px" }}>
-              <p className="label" style={{ marginBottom: 4 }}>Category</p>
+              <p className="label" style={{ marginBottom: 4 }}>Semester</p>
             </div>
-            {CATEGORIES.map((cat) => (
+            {SEMESTERS.map((semester) => (
               <CheckItem
-                key={cat}
-                label={cat}
-                active={categoryFilters.has(cat)}
-                onToggle={() => toggleCategory(cat)}
+                key={semester}
+                label={semester}
+                active={semesterFilters.has(semester)}
+                onToggle={() => toggleSemester(semester)}
               />
             ))}
 
@@ -360,13 +342,13 @@ export default function CoursesPage() {
           </Dropdown>
         </div>
 
-        {/* category */}
+        {/* semester */}
         <FilterChips
-          chips={["All", ...CATEGORIES]}
-          defaultActive={categoryFilters.size === 0 ? "All" : [...categoryFilters][0]}
+          chips={["All", ...SEMESTERS]}
+          defaultActive={semesterFilters.size === 0 ? "All" : [...semesterFilters][0]}
           onChange={(active) => {
-            if (active === "All") setCategoryFilters(new Set());
-            else toggleCategory(active);
+            if (active === "All") setSemesterFilters(new Set());
+            else toggleSemester(active);
           }}
         />
       </div>
@@ -376,12 +358,12 @@ export default function CoursesPage() {
         <div className="flex items-center gap-2 flex-wrap -mt-2">
           <span className="caption">Active filters:</span>
 
-          {[...categoryFilters].map((cat) => (
-            <Badge key={cat} variant="pink" dot>
-              {cat}
+          {[...semesterFilters].map((semester) => (
+            <Badge key={semester} variant="pink" dot>
+              {semester}
               <button
-                onClick={() => toggleCategory(cat)}
-                aria-label={`Remove ${cat} filter`}
+                onClick={() => toggleSemester(semester)}
+                aria-label={`Remove ${semester} filter`}
                 style={{ marginLeft: 6 }}
               >×</button>
             </Badge>

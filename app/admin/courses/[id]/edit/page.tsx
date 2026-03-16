@@ -4,33 +4,33 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Loader2, ArrowLeft } from "lucide-react";
-import EventForm, { type EventFormData } from "@/components/admin/event-form";
+import CourseForm, { type CourseFormData } from "@/components/admin/course-form";
 import { Button, Card } from "@/components/ui";
 
-export default function EditEventPage() {
+export default function EditCoursePage() {
   const { id } = useParams<{ id: string }>();
   const router  = useRouter();
 
-  const [event,     setEvent]     = useState<EventFormData | null>(null);
+  const [course,     setCourse]     = useState<CourseFormData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error,     setError]     = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchEvent = async () => {
+    const fetchCourse = async () => {
       const supabase = createClient();
       const { data, error } = await supabase
-        .from("event")
+        .from("course")
         .select("*")
         .eq("id", id)
         .single();
 
-      if (error || !data) setError("Event not found.");
-      else setEvent(data);
+      if (error || !data) setError("Course not found.");
+      else setCourse(data);
 
       setIsLoading(false);
     };
 
-    fetchEvent();
+    fetchCourse();
   }, [id]);
 
   // loading 
@@ -42,25 +42,25 @@ export default function EditEventPage() {
           style={{ color: "var(--gray)" }}
         >
           <Loader2 size={20} className="animate-spin" />
-          <span className="caption">Loading event…</span>
+          <span className="caption">Loading course…</span>
         </div>
       </Card>
     );
   }
 
   // error / not found 
-  if (error || !event) {
+  if (error || !course) {
     return (
       <Card>
         <div className="flex flex-col items-center justify-center gap-4 py-12">
           <p className="caption" style={{ color: "var(--error)" }}>
-            {error ?? "Event not found."}
+            {error ?? "Course not found."}
           </p>
           <Button
             variant="ghost"
-            onClick={() => router.push("/admin/events")}
+            onClick={() => router.push("/admin/courses")}
           >
-            <ArrowLeft size={15} /> Back to Events
+            <ArrowLeft size={15} /> Back to Courses
           </Button>
         </div>
       </Card>
@@ -74,15 +74,15 @@ export default function EditEventPage() {
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => router.push("/admin/events")}
+          onClick={() => router.push("/admin/courses")}
         >
-          <ArrowLeft size={15} /> Events
+          <ArrowLeft size={15} /> Courses
         </Button>
         <span className="caption">/</span>
-        <h1 className="heading-md">Edit Event</h1>
+        <h1 className="heading-md">Edit Course</h1>
       </div>
 
-      <EventForm mode="edit" initialData={event} />
+      <CourseForm mode="edit" initialData={course} />
     </div>
   );
 }
