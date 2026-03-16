@@ -37,8 +37,8 @@ const SEMESTER_VARIANT: Record<string, BadgeVariant> = {
 
 
 const STATUS_VARIANT: Record<string, BadgeVariant> = {
-  upcoming: "periwinkle",
-  past: "dark",
+  open: "periwinkle",
+  closed: "dark",
 };
 
 // checkbox
@@ -100,7 +100,7 @@ export default function CoursesPage() {
     const { data, error } = await supabase
       .from("course")
       .select("id, title, description, semester, status, start_time, end_time, Days")
-      .order("start_date", { ascending: false });
+      .order("start_time", { ascending: false });
 
     if (!error && data) {
       setCourses(data);
@@ -206,8 +206,8 @@ export default function CoursesPage() {
       ),
     },
     {
-      key: "start_date",
-      header: "Date",
+      key: "start_time",
+      header: "Time",
       render: (course) => (
         <span className="caption whitespace-nowrap">
           {course.start_time

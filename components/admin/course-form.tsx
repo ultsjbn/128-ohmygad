@@ -181,7 +181,7 @@ export default function CourseForm({ initialData, mode }: CourseFormProps) {
         <Button
           type="button"
           variant="ghost"
-          onClick={() => router.push("/admin/events")}
+          onClick={() => router.push("/admin/courses")}
         >
           Cancel
         </Button>
@@ -194,7 +194,7 @@ export default function CourseForm({ initialData, mode }: CourseFormProps) {
         >
           {isLoading
             ? mode === "create" ? "Creating..." : "Saving..."
-            : mode === "create" ? "Create Event" : "Save Changes"
+            : mode === "create" ? "Create Course" : "Save Changes"
           }
         </Button>
       </div>
