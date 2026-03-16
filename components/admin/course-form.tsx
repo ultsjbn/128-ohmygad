@@ -62,6 +62,7 @@ export default function CourseForm({ initialData, mode }: CourseFormProps) {
       end_time,
       semester,
       status,
+      Days,
       updated_at: new Date().toISOString(),
     };
 
@@ -158,6 +159,13 @@ export default function CourseForm({ initialData, mode }: CourseFormProps) {
                 mode="time"
                 value={end_time}
                 onChange={setEndTime}
+              />
+
+              <Input
+                label="Days"
+                placeholder="e.g. MWF, TTh"
+                value={Days}
+                onChange={(e) => setDays(e.target.value)}
               />
 
              
