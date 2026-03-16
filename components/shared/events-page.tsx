@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { SlidersHorizontal, Loader2, CalendarDays, MapPin, Users, Clock, X, ArrowUpDown } from "lucide-react";
 import type { EventFormData } from "@/components/admin/event-form";
+import ScrollToTop from "@/components/ui/scroll-to-top";
 
 import {
   SearchBar,
@@ -538,7 +539,8 @@ export default function EventsPage() {
           </div>
         )}
       </Modal>
-
+        {/* hide scroll to top if event details is open */}
+        <ScrollToTop hidden={!!detailEvent} />
     </div>
   );
 }
