@@ -35,21 +35,21 @@ interface FilterState {
 
 // sort options
 const SORT_OPTIONS: { label: string; field: SortField }[] = [
-  { label: "Title",    field: "title"      },
-  { label: "Category", field: "category"   },
-  { label: "Status",   field: "status"     },
-  { label: "Date",     field: "start_date" },
-  { label: "Capacity", field: "capacity"   },
-  { label: "Location", field: "location"   },
+  { label: "Title", field: "title" },
+  { label: "Category", field: "category" },
+  { label: "Status", field: "status" },
+  { label: "Date", field: "start_date" },
+  { label: "Capacity", field: "capacity" },
+  { label: "Location", field: "location" },
 ];
 
 // category for gradient map since no images pa
 const CATEGORY_GRADIENT: Record<string, string> = {
   Orientation: "linear-gradient(135deg, #F4A7B9 0%, #B8B5E8 100%)",
-  Forum:       "linear-gradient(135deg, #F4A7B9 0%, #FAF8FF 100%)",
-  Research:    "linear-gradient(135deg, #B8B5E8 0%, #FAF8FF 100%)",
-  Training:    "linear-gradient(135deg, #6DC5A0 0%, #FAF8FF 100%)",
-  Workshop:    "linear-gradient(135deg, #2D2A4A 0%, #FAF8FF 100%)",
+  Forum: "linear-gradient(135deg, #F4A7B9 0%, #FAF8FF 100%)",
+  Research: "linear-gradient(135deg, #B8B5E8 0%, #FAF8FF 100%)",
+  Training: "linear-gradient(135deg, #6DC5A0 0%, #FAF8FF 100%)",
+  Workshop: "linear-gradient(135deg, #2D2A4A 0%, #FAF8FF 100%)",
 };
 const DEFAULT_GRADIENT = "linear-gradient(135deg, #B8B5E8 0%, #2D2A4A 100%)";
 
@@ -57,8 +57,8 @@ const DEFAULT_GRADIENT = "linear-gradient(135deg, #B8B5E8 0%, #2D2A4A 100%)";
 type BadgeVariant = "pink" | "periwinkle" | "dark" | "success" | "warning" | "error";
 const STATUS_VARIANT: Record<string, BadgeVariant> = {
   upcoming: "pink",
-  past:     "dark",
-  ongoing:  "success",
+  past: "dark",
+  ongoing: "success",
 };
 
 // checkbox item used inside filter dropdown (multi-select)
@@ -81,7 +81,7 @@ function CheckItem({
           {active && (
             <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
               <path d="M1 4l2 2 4-4" stroke="white" strokeWidth="1.5"
-                    strokeLinecap="round" strokeLinejoin="round" />
+                strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           )}
         </span>
@@ -98,19 +98,19 @@ export default function EventsPage() {
   const searchParams = useSearchParams();
 
   // useStates
-  const [events,      setEvents]      = useState<EventFormData[]>([]);
-  const [search,      setSearch]      = useState(searchParams.get("search") || "");
-  const [isLoading,   setIsLoading]   = useState(true);
-  const [error,       setError]       = useState<string | null>(null);
-  const [sort,        setSort]        = useState<SortState>({ field: "start_date", direction: "desc" });
-  const [filters,     setFilters]     = useState<FilterState>({ status: new Set(), category: new Set() });
-  const [activeChip,  setActiveChip]  = useState("All");
+  const [events, setEvents] = useState<EventFormData[]>([]);
+  const [search, setSearch] = useState(searchParams.get("search") || "");
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [sort, setSort] = useState<SortState>({ field: "start_date", direction: "desc" });
+  const [filters, setFilters] = useState<FilterState>({ status: new Set(), category: new Set() });
+  const [activeChip, setActiveChip] = useState("All");
   // event detail modal
   const [detailEvent, setDetailEvent] = useState<EventFormData | null>(null);
 
   // filter options
-  const statuses        = Array.from(new Set(events.map((e) => e.status?.toLowerCase().trim()).filter(Boolean))) as string[];
-  const categories      = Array.from(new Set(events.map((e) => e.category).filter(Boolean))) as string[];
+  const statuses = Array.from(new Set(events.map((e) => e.status?.toLowerCase().trim()).filter(Boolean))) as string[];
+  const categories = Array.from(new Set(events.map((e) => e.category).filter(Boolean))) as string[];
   const hasActiveFilters = filters.status.size > 0 || filters.category.size > 0;
   const activeFilterCount = filters.status.size + filters.category.size;
 
@@ -129,6 +129,12 @@ export default function EventsPage() {
     }
     fetchEvents();
   }, []);
+
+  // sync the URL search param to the local search 
+  useEffect(() => {
+    const s = searchParams.get("search");
+    if (s !== null) setSearch(s);
+  }, [searchParams]);
 
   // sorting functions
   const sortEvents = (eventsToSort: EventFormData[], sortState: SortState): EventFormData[] => {
@@ -187,7 +193,7 @@ export default function EventsPage() {
       .filter((e) =>
         `${e.title} ${e.category || ""} ${e.location || ""}`.toLowerCase().includes(search.toLowerCase())
       )
-      .filter((e) => filters.status.size   === 0 || filters.status.has(e.status?.toLowerCase().trim()   ?? ""))
+      .filter((e) => filters.status.size === 0 || filters.status.has(e.status?.toLowerCase().trim() ?? ""))
       .filter((e) => filters.category.size === 0 || filters.category.has(e.category ?? "")),
     sort
   );
@@ -197,7 +203,7 @@ export default function EventsPage() {
     ? `${SORT_OPTIONS.find((o) => o.field === sort.field)?.label} ${sort.direction === "asc" ? "↑" : "↓"}`
     : "Sort";
 
-// PAGE PROPER --------------------------------------------------------------------------------------------------------
+  // PAGE PROPER --------------------------------------------------------------------------------------------------------
   return (
     <div className="flex flex-col gap-4">
 
@@ -209,93 +215,93 @@ export default function EventsPage() {
       {/* search, sort, filter */}
       <div className="flex flex-col gap-3">
         <div className="flex items-center gap-3 flex-wrap overflow-visible">
-            {/* search bar */}
-            <SearchBar
-                placeholder="Search by title, category, or location…"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                containerStyle={{ flex: 1, minWidth: 120 }}
-            />
+          {/* search bar */}
+          <SearchBar
+            placeholder="Search by title, category, or location…"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            containerStyle={{ flex: 1, minWidth: 120 }}
+          />
 
-            {/* grouped sort and filter */}
-            <div className="flex items-center gap-2 shrink-0">
+          {/* grouped sort and filter */}
+          <div className="flex items-center gap-2 shrink-0">
             {/* sort active field shown as text and arrow in trigger, dot indicator in list */}
             <Dropdown
-                trigger={
+              trigger={
                 <Button variant={sort.field !== "start_date" ? "periwinkle" : "ghost"}>
-                    {sortLabel}
+                  {sortLabel}
                 </Button>
-                }
+              }
             >
-                {SORT_OPTIONS.map(({ label, field }) => {
+              {SORT_OPTIONS.map(({ label, field }) => {
                 const isActive = sort.field === field;
                 return (
-                    <DropdownItem key={field} onClick={() => handleSort(field)}>
+                  <DropdownItem key={field} onClick={() => handleSort(field)}>
                     <span className="flex items-center gap-2">
-                        {/* active dot only on the selected item */}
-                        <span className={`w-1.5 h-1.5 rounded-full shrink-0 border-[1.5px] ${isActive ? "bg-[var(--primary-dark)] border-[var(--primary-dark)]" : "bg-transparent border-[rgba(45,42,74,0.20)]"}`} />
-                        <span>{isActive ? <strong>{label} {sort.direction === "asc" ? "↑" : "↓"}</strong> : label}</span>
+                      {/* active dot only on the selected item */}
+                      <span className={`w-1.5 h-1.5 rounded-full shrink-0 border-[1.5px] ${isActive ? "bg-[var(--primary-dark)] border-[var(--primary-dark)]" : "bg-transparent border-[rgba(45,42,74,0.20)]"}`} />
+                      <span>{isActive ? <strong>{label} {sort.direction === "asc" ? "↑" : "↓"}</strong> : label}</span>
                     </span>
-                    </DropdownItem>
+                  </DropdownItem>
                 );
-                })}
-                <DropdownDivider />
-                <DropdownItem onClick={() => setSort({ field: "start_date", direction: "desc" })}>
+              })}
+              <DropdownDivider />
+              <DropdownItem onClick={() => setSort({ field: "start_date", direction: "desc" })}>
                 Reset sort
-                </DropdownItem>
+              </DropdownItem>
             </Dropdown>
 
             {/* filter multi-select */}
             <Dropdown
-                trigger={
+              trigger={
                 <Button variant={hasActiveFilters ? "pink" : "ghost"}>
-                    <SlidersHorizontal size={15} /> Filter
-                    {hasActiveFilters && (
+                  <SlidersHorizontal size={15} /> Filter
+                  {hasActiveFilters && (
                     <span className="inline-flex items-center justify-center w-4 h-4 rounded-full text-[10px] font-bold text-white bg-[var(--primary-dark)] ml-0.5">
-                        {activeFilterCount}
+                      {activeFilterCount}
                     </span>
-                    )}
+                  )}
                 </Button>
-                }
+              }
             >
-                {/* status section */}
-                {statuses.length > 0 && (
+              {/* status section */}
+              {statuses.length > 0 && (
                 <>
-                    <div className="px-3 pt-1 pb-1.5">
+                  <div className="px-3 pt-1 pb-1.5">
                     <p className="label mb-1">Status</p>
-                    </div>
-                    {statuses.map((s) => (
+                  </div>
+                  {statuses.map((s) => (
                     <CheckItem
-                        key={s}
-                        label={s}
-                        active={filters.status.has(s)}
-                        onToggle={() => toggleFilter("status", s)}
-                        capitalize
+                      key={s}
+                      label={s}
+                      active={filters.status.has(s)}
+                      onToggle={() => toggleFilter("status", s)}
+                      capitalize
                     />
-                    ))}
-                    <DropdownDivider />
+                  ))}
+                  <DropdownDivider />
                 </>
-                )}
+              )}
 
-                {/* category section */}
-                {categories.length > 0 && (
+              {/* category section */}
+              {categories.length > 0 && (
                 <>
-                    <div className="px-3 pt-1.5 pb-1">
+                  <div className="px-3 pt-1.5 pb-1">
                     <p className="label mb-1">Category</p>
-                    </div>
-                    {categories.map((cat) => (
+                  </div>
+                  {categories.map((cat) => (
                     <CheckItem
-                        key={cat}
-                        label={cat}
-                        active={filters.category.has(cat)}
-                        onToggle={() => toggleFilter("category", cat)}
+                      key={cat}
+                      label={cat}
+                      active={filters.category.has(cat)}
+                      onToggle={() => toggleFilter("category", cat)}
                     />
-                    ))}
-                    <DropdownDivider />
+                  ))}
+                  <DropdownDivider />
                 </>
-                )}
+              )}
 
-                <DropdownItem onClick={clearFilters}>Clear all filters</DropdownItem>
+              <DropdownItem onClick={clearFilters}>Clear all filters</DropdownItem>
             </Dropdown>
           </div>{/* end sort filter group */}
         </div>
@@ -356,8 +362,8 @@ export default function EventsPage() {
               {hasActiveFilters
                 ? "No events match your filters."
                 : search
-                ? "No events match your search."
-                : "No events available."}
+                  ? "No events match your search."
+                  : "No events available."}
             </p>
             {(hasActiveFilters || search) && (
               <Button variant="ghost" size="sm" onClick={() => { clearFilters(); setSearch(""); }}>
@@ -389,8 +395,8 @@ export default function EventsPage() {
                 date={
                   event.start_date
                     ? new Date(event.start_date).toLocaleDateString("en-PH", {
-                        month: "short", day: "numeric", year: "numeric",
-                      })
+                      month: "short", day: "numeric", year: "numeric",
+                    })
                     : "—"
                 }
                 location={event.location ?? "—"}
@@ -422,7 +428,7 @@ export default function EventsPage() {
         modalStyle={{ maxWidth: 600, overflowY: "auto", maxHeight: "90vh", padding: 0 }}
         footer={
           <div className="pb-4 pr-4 pl-4 pt-2">
-            <Button variant="primary" className="w-full" onClick={() => {/* registration handler */}}>
+            <Button variant="primary" className="w-full" onClick={() => {/* registration handler */ }}>
               Register
             </Button>
           </div>
@@ -431,7 +437,7 @@ export default function EventsPage() {
         {detailEvent && (
           <div className="flex flex-col">
             {/* cover */}
-            <div 
+            <div
               className="h-[200px] relative shrink-0 rounded-t-[var(--radius-xl)]"
               style={{ background: CATEGORY_GRADIENT[detailEvent.category ?? ""] ?? DEFAULT_GRADIENT }}
             >

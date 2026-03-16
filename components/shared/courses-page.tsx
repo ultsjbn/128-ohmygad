@@ -42,6 +42,12 @@ export default function CoursesPage() {
     fetchCourses();
   }, []);
 
+  // sync the URL search param to the local search 
+  useEffect(() => {
+    const s = searchParams.get("search");
+    if (s !== null) setSearch(s);
+  }, [searchParams]);
+
   const filtered = courses.filter((c) =>
     `${c.title} ${c.start_time || ""} ${c.end_time || ""} ${c.semester || ""}`
       .toLowerCase()

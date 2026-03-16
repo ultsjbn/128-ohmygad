@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowUpDown, UserPlus, Pencil, Trash2, ChevronUp, ChevronDown, Loader2 } from "lucide-react";
 import type { Profile, SortState } from "./profile.types";
@@ -8,7 +8,7 @@ import { sortProfiles, paginate, totalPages } from "./profile.utils";
 import { PER_PAGE } from "@/lib/pagination.utils";
 import { Pagination } from "@/components/pagination";
 import UserForm from "@/components/admin/user-form";
-import { deleteUser } from "./action"; 
+import { deleteUser } from "./action";
 
 import {
   Button,
@@ -33,38 +33,44 @@ interface UsersClientProps {
 }
 
 const ROLE_VARIANT: Record<string, "pink" | "periwinkle" | "dark"> = {
-  admin:   "dark",
+  admin: "dark",
   faculty: "periwinkle",
   student: "pink",
 };
 
 const TABS = ["all", "student", "faculty", "admin"];
 const TAB_LABELS: Record<string, string> = {
-  all:     "All Users",
+  all: "All Users",
   student: "Students",
   faculty: "Faculty",
-  admin:   "Admin",
+  admin: "Admin",
 };
 
 export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const [profiles,    setProfiles]    = useState<Profile[]>(initialProfiles);
-  const [page,        setPage]        = useState(1);
-  const [activeTab,   setActiveTab]   = useState<TabKey>("all");
-  const [search,      setSearch]      = useState(searchParams.get("search") || "");
-  const [sort,        setSort]        = useState<SortState>({ field: "created_at", direction: "desc" });
+  const [profiles, setProfiles] = useState<Profile[]>(initialProfiles);
+  const [page, setPage] = useState(1);
+  const [activeTab, setActiveTab] = useState<TabKey>("all");
+  const [search, setSearch] = useState(searchParams.get("search") || "");
+  const [sort, setSort] = useState<SortState>({ field: "created_at", direction: "desc" });
 
   const [editModalOpen, setEditModalOpen] = useState(false);
-  const [editUser,      setEditUser]      = useState<any>(null);
-  const [editLoading,   setEditLoading]   = useState(false);
-  const [editError,     setEditError]     = useState<string | null>(null);
+  const [editUser, setEditUser] = useState<any>(null);
+  const [editLoading, setEditLoading] = useState(false);
+  const [editError, setEditError] = useState<string | null>(null);
 
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [deleteTarget,    setDeleteTarget]    = useState<Profile | null>(null);
-  const [isDeleting,      setIsDeleting]      = useState(false);
-  const [deleteError,     setDeleteError]     = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<Profile | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+
+  // sync the URL search param to local search 
+  useEffect(() => {
+    const s = searchParams.get("search");
+    if (s !== null) setSearch(s);
+  }, [searchParams]);
 
   const filtered = useMemo(() => {
     let result = profiles;
@@ -80,7 +86,7 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
   }, [profiles, sort, activeTab, search]);
 
   const paginatedProfiles = paginate(filtered, page, PER_PAGE);
-  const pageCount  = totalPages(filtered.length, PER_PAGE);
+  const pageCount = totalPages(filtered.length, PER_PAGE);
 
   const handleTabChange = (tab: string) => { setActiveTab(tab as TabKey); setPage(1); };
 
@@ -98,7 +104,7 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
     setEditLoading(true);
     setEditModalOpen(true);
     try {
-      const res  = await fetch(`/api/admin/get-user?id=${userId}`);
+      const res = await fetch(`/api/admin/get-user?id=${userId}`);
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to fetch user");
       setEditUser(data);
@@ -190,10 +196,10 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
           <Button variant="icon" title="Edit user" onClick={() => openEditModal(p.id)}>
             <Pencil size={14} />
           </Button>
-          <Button 
-            variant="icon" 
+          <Button
+            variant="icon"
             title="Delete user"
-            style={{ color: "var(--error)" }} 
+            style={{ color: "var(--error)" }}
             onClick={() => openDeleteModal(p)}
           >
             <Trash2 size={14} />
@@ -274,10 +280,10 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
             </div>
           </Card>
         ) : (
-          <DataTable 
-            columns={columns} 
-            rows={paginatedProfiles} 
-            keyExtractor={(p) => p.id} 
+          <DataTable
+            columns={columns}
+            rows={paginatedProfiles}
+            keyExtractor={(p) => p.id}
           />
         )
       )}
@@ -336,7 +342,7 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
               Cancel
             </Button>
             <Button variant="primary" style={{ flex: 1, background: "var(--error)" }} disabled={isDeleting} onClick={handleDelete}>
-              {isDeleting ? <><Loader2 size={14} className="animate-spin mr-2" /> Deleting…</> : <><Trash2 size={14} className="mr-2"/> Delete User</>}
+              {isDeleting ? <><Loader2 size={14} className="animate-spin mr-2" /> Deleting…</> : <><Trash2 size={14} className="mr-2" /> Delete User</>}
             </Button>
           </div>
         }
