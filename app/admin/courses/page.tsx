@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Plus, ArrowUpDown, SlidersHorizontal, Pencil, Trash2, Loader2 } from "lucide-react";
 import type { CourseFormData } from "@/components/admin/course-form";
@@ -66,7 +66,7 @@ function CheckItem({
           {active && (
             <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
               <path d="M1 4l2 2 4-4" stroke="white" strokeWidth="1.5"
-                    strokeLinecap="round" strokeLinejoin="round" />
+                strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           )}
         </span>
@@ -81,18 +81,19 @@ function CheckItem({
 // courses page proper
 export default function CoursesPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
-  const [courses,         setCourses]         = useState<CourseFormData[]>([]);
-  const [filtered,        setFiltered]        = useState<CourseFormData[]>([]);
-  const [search,          setSearch]          = useState("");
-  const [isLoading,       setIsLoading]       = useState(true);
-  const [deletingId,      setDeletingId]      = useState<string | null>(null);
-  const [modalContent,    setModalContent]    = useState<{ label: string; text: string } | null>(null);
-  const [sortOrder,       setSortOrder]       = useState<"Newest" | "Oldest">("Newest");
-  
+  const [courses, setCourses] = useState<CourseFormData[]>([]);
+  const [filtered, setFiltered] = useState<CourseFormData[]>([]);
+  const [search, setSearch] = useState(searchParams.get("search") || "");
+  const [isLoading, setIsLoading] = useState(true);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [modalContent, setModalContent] = useState<{ label: string; text: string } | null>(null);
+  const [sortOrder, setSortOrder] = useState<"Newest" | "Oldest">("Newest");
+
   const [semesterFilters, setSemesterFilters] = useState<Set<string>>(new Set());
-  const [statusFilters,   setStatusFilters]   = useState<Set<string>>(new Set());
-  const [page,            setPage]            = useState(1);
+  const [statusFilters, setStatusFilters] = useState<Set<string>>(new Set());
+  const [page, setPage] = useState(1);
 
   //  Fetch 
   const getCourses = async () => {
@@ -110,6 +111,12 @@ export default function CoursesPage() {
   };
 
   useEffect(() => { getCourses(); }, []);
+
+  // sync the URL search param to the local search state
+  useEffect(() => {
+    const s = searchParams.get("search");
+    if (s !== null) setSearch(s);
+  }, [searchParams]);
 
   //  filter / sort 
   useEffect(() => {
@@ -169,7 +176,7 @@ export default function CoursesPage() {
   };
 
   const activeFilterCount = semesterFilters.size + statusFilters.size;
-  const hasActiveFilters  = activeFilterCount > 0;
+  const hasActiveFilters = activeFilterCount > 0;
 
   // DataTable columns 
   const columns: Column<CourseFormData>[] = [
@@ -212,8 +219,8 @@ export default function CoursesPage() {
         <span className="caption whitespace-nowrap">
           {course.start_time
             ? new Date(course.start_time).toLocaleDateString("en-PH", {
-                month: "short", day: "numeric", year: "numeric",
-              })
+              month: "short", day: "numeric", year: "numeric",
+            })
             : "—"}
         </span>
       ),
@@ -416,11 +423,11 @@ export default function CoursesPage() {
         </Card>
 
       ) : (
-          <DataTable
-            columns={columns}
-            rows={paginate(filtered, page, PER_PAGE)}
-            keyExtractor={(course) => course.id!}
-          />
+        <DataTable
+          columns={columns}
+          rows={paginate(filtered, page, PER_PAGE)}
+          keyExtractor={(course) => course.id!}
+        />
       )}
 
       {/*  pagination  */}

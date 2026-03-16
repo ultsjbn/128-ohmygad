@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Plus, ArrowUpDown, SlidersHorizontal, Pencil, Trash2, Loader2 } from "lucide-react";
 import type { EventFormData } from "@/components/admin/event-form";
@@ -67,7 +67,7 @@ function CheckItem({
           {active && (
             <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
               <path d="M1 4l2 2 4-4" stroke="white" strokeWidth="1.5"
-                    strokeLinecap="round" strokeLinejoin="round" />
+                strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           )}
         </span>
@@ -82,18 +82,19 @@ function CheckItem({
 // events page proper
 export default function EventsPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
-  const [events,          setEvents]          = useState<EventFormData[]>([]);
-  const [filtered,        setFiltered]        = useState<EventFormData[]>([]);
-  const [search,          setSearch]          = useState("");
-  const [isLoading,       setIsLoading]       = useState(true);
-  const [deletingId,      setDeletingId]      = useState<string | null>(null);
-  const [modalContent,    setModalContent]    = useState<{ label: string; text: string } | null>(null);
-  const [sortOrder,       setSortOrder]       = useState<"Newest" | "Oldest">("Newest");
-  
+  const [events, setEvents] = useState<EventFormData[]>([]);
+  const [filtered, setFiltered] = useState<EventFormData[]>([]);
+  const [search, setSearch] = useState(searchParams.get("search") || "");
+  const [isLoading, setIsLoading] = useState(true);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [modalContent, setModalContent] = useState<{ label: string; text: string } | null>(null);
+  const [sortOrder, setSortOrder] = useState<"Newest" | "Oldest">("Newest");
+
   const [categoryFilters, setCategoryFilters] = useState<Set<string>>(new Set());
-  const [statusFilters,   setStatusFilters]   = useState<Set<string>>(new Set());
-  const [page,            setPage]            = useState(1);
+  const [statusFilters, setStatusFilters] = useState<Set<string>>(new Set());
+  const [page, setPage] = useState(1);
 
   //  Fetch 
   const getEvents = async () => {
@@ -111,6 +112,12 @@ export default function EventsPage() {
   };
 
   useEffect(() => { getEvents(); }, []);
+
+  // sync the URL search param to local search 
+  useEffect(() => {
+    const s = searchParams.get("search");
+    if (s !== null) setSearch(s);
+  }, [searchParams]);
 
   //  filter / sort 
   useEffect(() => {
@@ -170,7 +177,7 @@ export default function EventsPage() {
   };
 
   const activeFilterCount = categoryFilters.size + statusFilters.size;
-  const hasActiveFilters  = activeFilterCount > 0;
+  const hasActiveFilters = activeFilterCount > 0;
 
   // DataTable columns 
   const columns: Column<EventFormData>[] = [
@@ -213,8 +220,8 @@ export default function EventsPage() {
         <span className="caption whitespace-nowrap">
           {event.start_date
             ? new Date(event.start_date).toLocaleDateString("en-PH", {
-                month: "short", day: "numeric", year: "numeric",
-              })
+              month: "short", day: "numeric", year: "numeric",
+            })
             : "—"}
         </span>
       ),
@@ -434,11 +441,11 @@ export default function EventsPage() {
         </Card>
 
       ) : (
-          <DataTable
-            columns={columns}
-            rows={paginate(filtered, page, PER_PAGE)}
-            keyExtractor={(event) => event.id!}
-          />
+        <DataTable
+          columns={columns}
+          rows={paginate(filtered, page, PER_PAGE)}
+          keyExtractor={(event) => event.id!}
+        />
       )}
 
       {/*  pagination  */}
