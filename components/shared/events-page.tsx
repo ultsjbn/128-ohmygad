@@ -17,6 +17,7 @@ import {
   DropdownItem,
   DropdownDivider,
 } from "@/components/ui";
+import { useSearchParams } from "next/navigation";
 
 // sort types
 type SortField = "title" | "category" | "status" | "start_date" | "capacity" | "location";
