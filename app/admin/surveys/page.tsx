@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Loader, Paper } from "@snowball-tech/fractal";
 import { Plus, ArrowUpDown, SlidersHorizontal } from "lucide-react";
@@ -13,15 +13,17 @@ import { paginate, totalPages, PER_PAGE } from "@/lib/pagination.utils";
 import DetailModal from "@/components/detail-modal";
 import ListToolbar from "@/components/list-toolbar";
 import RowActions from "@/components/row-actions";
+import { SearchBar } from "@/components/ui";
 
 const STATUSES = ["All", "open", "closed"];
 const SORT_OPTIONS = ["Newest", "Oldest"];
 
 export default function SurveysPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [surveys, setSurveys] = useState<SurveyFormData[]>([]);
   const [filtered, setFiltered] = useState<SurveyFormData[]>([]);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(searchParams.get("search") || "");
   const [isLoading, setIsLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [modalContent, setModalContent] = useState<{ label: string; text: string } | null>(null);
@@ -47,6 +49,12 @@ export default function SurveysPage() {
   };
 
   useEffect(() => { getSurveys(); }, []);
+
+  // sync the URL search param to the local search state
+  useEffect(() => {
+    const s = searchParams.get("search");
+    if (s !== null) setSearch(s);
+  }, [searchParams]);
 
   useEffect(() => {
     const q = search.toLowerCase();
@@ -113,9 +121,8 @@ export default function SurveysPage() {
                 <button
                   key={opt}
                   onClick={() => { setSortOrder(opt); setShowSortMenu(false); }}
-                  className={`w-full text-left px-4 py-2 text-sm hover:bg-fractal-base-grey-90 transition-colors ${
-                    sortOrder === opt ? "font-median bg-fractal-decorative-yellow-90" : ""
-                  }`}
+                  className={`w-full text-left px-4 py-2 text-sm hover:bg-fractal-base-grey-90 transition-colors ${sortOrder === opt ? "font-median bg-fractal-decorative-yellow-90" : ""
+                    }`}
                 >
                   {opt}
                 </button>
@@ -143,9 +150,8 @@ export default function SurveysPage() {
                 <button
                   key={s}
                   onClick={() => setStatusFilter(s)}
-                  className={`text-left px-3 py-1.5 text-sm rounded-s capitalize hover:bg-fractal-base-grey-90 transition-colors ${
-                    statusFilter === s ? "font-median bg-fractal-decorative-yellow-90 border border-fractal-border-default" : ""
-                  }`}
+                  className={`text-left px-3 py-1.5 text-sm rounded-s capitalize hover:bg-fractal-base-grey-90 transition-colors ${statusFilter === s ? "font-median bg-fractal-decorative-yellow-90 border border-fractal-border-default" : ""
+                    }`}
                 >
                   {s}
                 </button>
@@ -171,15 +177,17 @@ export default function SurveysPage() {
       </ListToolbar>
 
       {/* Active filter chip */}
-      {statusFilter !== "All" && (
-        <div className="flex items-center gap-2 flex-wrap shrink-0">
-          <Typography variant="body-2" className="text-fractal-text-placeholder">Filters:</Typography>
-          <span className="px-2 py-0.5 text-xs font-median border-2 border-fractal-border-default rounded-s bg-fractal-decorative-yellow-90 shadow-brutal-1 capitalize flex items-center gap-1">
-            {statusFilter}
-            <button onClick={() => setStatusFilter("All")} className="ml-1 hover:text-red-500">×</button>
-          </span>
-        </div>
-      )}
+      {
+        statusFilter !== "All" && (
+          <div className="flex items-center gap-2 flex-wrap shrink-0">
+            <Typography variant="body-2" className="text-fractal-text-placeholder">Filters:</Typography>
+            <span className="px-2 py-0.5 text-xs font-median border-2 border-fractal-border-default rounded-s bg-fractal-decorative-yellow-90 shadow-brutal-1 capitalize flex items-center gap-1">
+              {statusFilter}
+              <button onClick={() => setStatusFilter("All")} className="ml-1 hover:text-red-500">×</button>
+            </span>
+          </div>
+        )
+      }
 
       <Paper elevation="elevated" className="overflow-auto p-0">
         {isLoading ? (
@@ -205,9 +213,8 @@ export default function SurveysPage() {
               {paginate(filtered, page, PER_PAGE).map((survey, i) => (
                 <tr
                   key={survey.id}
-                  className={`border-b border-fractal-border-default hover:bg-fractal-base-grey-90 transition-colors ${
-                    i % 2 === 0 ? "bg-fractal-bg-body-white" : "bg-fractal-bg-body-default"
-                  }`}
+                  className={`border-b border-fractal-border-default hover:bg-fractal-base-grey-90 transition-colors ${i % 2 === 0 ? "bg-fractal-bg-body-white" : "bg-fractal-bg-body-default"
+                    }`}
                 >
                   <td
                     className="p-3 font-median max-w-[260px] truncate cursor-pointer hover:underline"
@@ -217,13 +224,12 @@ export default function SurveysPage() {
                     {survey.title}
                   </td>
                   <td className="p-3">
-                    <span className={`px-2 py-0.5 rounded-s text-xs font-median capitalize border border-fractal-border-default ${
-                      survey.status === "open"
-                        ? "bg-fractal-decorative-yellow-50"
-                        : survey.status === "closed"
+                    <span className={`px-2 py-0.5 rounded-s text-xs font-median capitalize border border-fractal-border-default ${survey.status === "open"
+                      ? "bg-fractal-decorative-yellow-50"
+                      : survey.status === "closed"
                         ? "bg-red-100 text-red-700"
                         : "bg-fractal-base-grey-90"
-                    }`}>
+                      }`}>
                       {survey.status || "—"}
                     </span>
                   </td>
@@ -247,22 +253,26 @@ export default function SurveysPage() {
         )}
       </Paper>
 
-      {!isLoading && filtered.length > 0 && (
-        <div className="flex items-center justify-between px-1 text-sm text-fractal-base-grey-30">
-          <span>
-            Showing {Math.min((page - 1) * PER_PAGE + 1, filtered.length)}–{Math.min(page * PER_PAGE, filtered.length)} of {filtered.length} surveys
-          </span>
-          <Pagination page={page} total={totalPages(filtered.length, PER_PAGE)} onChange={setPage} />
-        </div>
-      )}
+      {
+        !isLoading && filtered.length > 0 && (
+          <div className="flex items-center justify-between px-1 text-sm text-fractal-base-grey-30">
+            <span>
+              Showing {Math.min((page - 1) * PER_PAGE + 1, filtered.length)}–{Math.min(page * PER_PAGE, filtered.length)} of {filtered.length} surveys
+            </span>
+            <Pagination page={page} total={totalPages(filtered.length, PER_PAGE)} onChange={setPage} />
+          </div>
+        )
+      }
 
-      {modalContent && (
-        <DetailModal
-          label={modalContent.label}
-          text={modalContent.text}
-          onClose={() => setModalContent(null)}
-        />
-      )}
-    </div>
+      {
+        modalContent && (
+          <DetailModal
+            label={modalContent.label}
+            text={modalContent.text}
+            onClose={() => setModalContent(null)}
+          />
+        )
+      }
+    </div >
   );
 }
