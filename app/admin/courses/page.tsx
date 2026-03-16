@@ -22,6 +22,17 @@ import {
   Modal,
 } from "@/components/ui";
 
+function formatTime(time?: string) {
+  if (!time) return "—"
+
+  const [hour, minute] = time.split(":")
+  const h = Number(hour)
+  const suffix = h >= 12 ? "PM" : "AM"
+  const hour12 = h % 12 || 12
+
+  return `${hour12}:${minute} ${suffix}`
+}
+
 // constants 
 const SEMESTERS = ["1st Semester", "2nd Semester", "Mid-Year"];
 const STATUSES = ["open", "closed"];
@@ -217,29 +228,22 @@ export default function CoursesPage() {
   key: "schedule",
   header: "Schedule",
   render: (course) => {
-    const formatTime = (time?: string) =>
-      time
-        ? new Date(time).toLocaleTimeString("en-PH", {
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: true,
-          })
-        : "";
-
-    const start = formatTime(course.start_time);
-    const end = formatTime(course.end_time);
+    const start = formatTime(course.start_time)
+    const end = formatTime(course.end_time)
 
     return (
       <div className="flex flex-col leading-tight">
-        <span className="caption text-[12px] opacity-100">
+        <span className="caption text-[12px] opacity-80">
           {course.Days || "—"}
         </span>
 
         <span className="caption whitespace-nowrap">
-          {start && end ? `${start} – ${end}` : "—"}
+          {start !== "—" && end !== "—"
+            ? `${start} – ${end}`
+            : "—"}
         </span>
       </div>
-    );
+    )
   },
 },
 
