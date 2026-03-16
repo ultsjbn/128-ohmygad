@@ -58,7 +58,6 @@ export default function CourseForm({ initialData, mode }: CourseFormProps) {
     const payload = {
       title,
       description,
-      location,
       start_time,
       end_time,
       semester,

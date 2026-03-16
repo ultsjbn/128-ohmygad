@@ -1333,6 +1333,24 @@ body {
   padding: 20px;
 }
 
+/* on small screens no backdrop padding, modal goes full-screen */
+@media (max-width: 480px) {
+    .modal-backdrop {
+        padding: 0;
+        align-items: flex-end;
+    }
+}
+
+/* on small screens full height, rounded only at top, slides up from bottom */
+@media (max-width: 480px) {
+    .modal {
+        max-width: 100%;
+        max-height: calc(92dvh - 72px);
+        border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+}
+
 .modal {
   background: var(--white);
   border-radius: var(--radius-xl);
@@ -1342,6 +1360,10 @@ body {
   padding: 32px;
   position: relative;
   animation: modalIn 0.25s ease;
+  max-height: calc(100dvh - 40px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 @keyframes modalIn {
