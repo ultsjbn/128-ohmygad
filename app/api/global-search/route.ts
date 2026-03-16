@@ -32,6 +32,12 @@ export async function GET(request: Request) {
       .select("id, title")
       .ilike("title", `%${query}%`)
       .limit(5);
+
+    const { data: surveys } = await supabaseAdmin
+      .from("survey")
+      .select("id, title")
+      .ilike("title", `%${query}%`)
+      .limit(5);
       
     let users: any[] = [];
     if (role === "admin") {
@@ -46,6 +52,7 @@ export async function GET(request: Request) {
     const results = [
       ...(courses?.map(c => ({ id: c.id, title: c.title, type: "Course" })) || []),
       ...(events?.map(e => ({ id: e.id, title: e.title, type: "Event" })) || []),
+      ...(surveys?.map(s => ({ id: s.id, title: s.title, type: "Survey" })) || []),
       ...(users?.map(u => ({ id: u.id, title: u.full_name || u.email, type: "User" })) || []),
     ];
 
