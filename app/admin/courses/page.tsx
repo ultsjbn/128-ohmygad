@@ -1,429 +1,471 @@
 "use client";
-//code ni bea kasi nairita ako sobra
+
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Loader, Paper } from "@snowball-tech/fractal";
-import { Plus, ArrowUpDown, SlidersHorizontal, ChevronUp, ChevronDown } from "lucide-react";
-import { Button } from "@/components/button";
-import { Typography } from "@/components/typography";
-import { Pagination } from "@/components/pagination";
+import { createClient } from "@/lib/supabase/client";
+import { Plus, ArrowUpDown, SlidersHorizontal, Pencil, Trash2, Loader2 } from "lucide-react";
+import type { EventFormData } from "@/components/admin/event-form";
 import { paginate, totalPages, PER_PAGE } from "@/lib/pagination.utils";
-import { sortItems } from "@/lib/sort.utils";
-import { CourseFormData } from "@/components/admin/course-form";
-import DetailModal from "@/components/detail-modal";
-import ListToolbar from "@/components/list-toolbar";
-import RowActions from "@/components/row-actions";
+import { Pagination } from "@/components/pagination";
 
-type SortField = "title" | "semester" | "status" | "start_time";
-type SortDirection = "asc" | "desc";
+import {
+  Button,
+  Badge,
+  FilterChips,
+  SearchBar,
+  Card,
+  DataTable,
+  type Column,
+  Dropdown,
+  DropdownItem,
+  DropdownDivider,
+  Modal,
+} from "@/components/ui";
 
-interface SortState {
-  field: SortField;
-  direction: SortDirection;
-}
+// constants 
+const CATEGORIES = ["Orientation", "Forum", "Research", "Training", "Workshop"];
+const STATUSES = ["upcoming", "past"];
 
-interface FilterState {
-  status: string[];
-  semester: string[];
-}
+// variant helpers 
+type BadgeVariant = "pink" | "periwinkle" | "dark" | "success" | "warning" | "error";
 
-export default function CoursesPage() {
-  const router = useRouter();
-  const [courses, setCourses] = useState<CourseFormData[]>([]);
-  const [filtered, setFiltered] = useState<CourseFormData[]>([]);
-  const [search, setSearch] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
-  const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [modalContent, setModalContent] = useState<{ label: string; text: string } | null>(null);
-  const [sort, setSort] = useState<SortState>({ field: "start_time", direction: "desc" });
-  const [showSortMenu, setShowSortMenu] = useState(false);
-  const [showFilterMenu, setShowFilterMenu] = useState(false);
-  const [filters, setFilters] = useState<FilterState>({
-    status: [],
-    semester: [],
-  });
+const CATEGORY_VARIANT: Record<string, BadgeVariant> = {
+  Orientation: "pink",
+  Forum: "periwinkle",
+  Research: "dark",
+  Training: "success",
+  Workshop: "warning",
+};
 
+const STATUS_VARIANT: Record<string, BadgeVariant> = {
+  upcoming: "periwinkle",
+  past: "dark",
+};
 
-  // next fix: case sensitivity of database inputs, pero ganto muna
-  const statuses = Array.from(
-    new Set(
-      courses
-        .map((e) => e.status?.toLowerCase().trim())
-        .filter(Boolean)
-    )
+// checkbox
+function CheckItem({
+  label,
+  active,
+  onToggle,
+  capitalize = false,
+}: {
+  label: string;
+  active: boolean;
+  onToggle: () => void;
+  capitalize?: boolean;
+}) {
+  return (
+    <DropdownItem onClick={onToggle}>
+      <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
+        {/* mini checkbox */}
+        <span style={{
+          width: 14, height: 14, borderRadius: 4, flexShrink: 0,
+          border: `1.5px solid ${active ? "var(--primary-dark)" : "rgba(45,42,74,0.20)"}`,
+          background: active ? "var(--primary-dark)" : "transparent",
+          display: "inline-flex", alignItems: "center", justifyContent: "center",
+        }}>
+          {active && (
+            <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
+              <path d="M1 4l2 2 4-4" stroke="white" strokeWidth="1.5"
+                    strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          )}
+        </span>
+        <span className={capitalize ? "capitalize" : ""}>
+          {active ? <strong>{label}</strong> : label}
+        </span>
+      </span>
+    </DropdownItem>
   );
-  const categories = Array.from(new Set(courses.map((e) => e.semester).filter(Boolean)));
+}
 
-  const hasActiveFilters =
-    filters.status.length > 0 ||
-    filters.semester.length > 0;
-  const [page, setPage] = useState(1);
+// events page proper
+export default function EventsPage() {
+  const router = useRouter();
 
-  const getCourses = async () => {
-    try {
-      const res = await fetch("/api/courses");
-      const json = await res.json();
-      if (json.success && Array.isArray(json.courses)) {
-        setCourses(json.courses);
-        setFiltered(json.courses);
-      }
-    } catch (err) {
-      console.error("Failed to fetch courses:", err);
+  const [events,          setEvents]          = useState<EventFormData[]>([]);
+  const [filtered,        setFiltered]        = useState<EventFormData[]>([]);
+  const [search,          setSearch]          = useState("");
+  const [isLoading,       setIsLoading]       = useState(true);
+  const [deletingId,      setDeletingId]      = useState<string | null>(null);
+  const [modalContent,    setModalContent]    = useState<{ label: string; text: string } | null>(null);
+  const [sortOrder,       setSortOrder]       = useState<"Newest" | "Oldest">("Newest");
+  
+  const [categoryFilters, setCategoryFilters] = useState<Set<string>>(new Set());
+  const [statusFilters,   setStatusFilters]   = useState<Set<string>>(new Set());
+  const [page,            setPage]            = useState(1);
+
+  //  Fetch 
+  const getEvents = async () => {
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from("event")
+      .select("id, title, description, category, status, start_date, end_date, capacity, location, registration_open, registration_close")
+      .order("start_date", { ascending: false });
+
+    if (!error && data) {
+      setEvents(data);
+      setFiltered(data);
     }
     setIsLoading(false);
   };
 
-  useEffect(() => {
-    getCourses();
-  }, []);
+  useEffect(() => { getEvents(); }, []);
 
-  // Search, filters, and sorting
+  //  filter / sort 
   useEffect(() => {
     const q = search.toLowerCase();
-    let result = courses;
+    let result = events;
 
-    // Text search
-    result = result.filter(
-      (e) =>
-        e.title?.toLowerCase().includes(q) ||
-        e.semester?.toLowerCase().includes(q) ||
-        e.status?.toLowerCase().includes(q)
+    result = result.filter((e) =>
+      `${e.title} ${e.category || ""} ${e.location || ""}`.toLowerCase().includes(q)
     );
+    // empty set = show all. nonempty = only matching values
+    if (categoryFilters.size > 0)
+      result = result.filter((e) => categoryFilters.has(e.category ?? ""));
+    if (statusFilters.size > 0)
+      result = result.filter((e) => statusFilters.has(e.status ?? ""));
 
-    // Status filter
-    if (filters.status.length > 0) {
-      result = result.filter((e) => filters.status.includes(e.status));
-    }
-
-    // Semester filter
-    if (filters.semester.length > 0) {
-      result = result.filter((e) => filters.semester.includes(e.semester));
-    }
-
-    // Sorting — delegated to shared sortItems utility from lib/sort.utils
-    result = sortItems(result, sort.field as keyof CourseFormData, sort.direction, ["start_time"]);
-    setFiltered(result);
-  }, [search, courses, sort, filters]);
-
-  const handleSort = (field: SortField) => {
-    setSort((prev) => ({
-      field,
-      direction: prev.field === field && prev.direction === "asc" ? "desc" : "asc",
-    }));
-    setShowSortMenu(false);
-  };
-
-  const toggleFilter = (type: "status" | "semester", value: string) => {
-    setFilters((prev) => ({
-      ...prev,
-      [type]: prev[type].includes(value)
-        ? prev[type].filter((v) => v !== value)
-        : [...prev[type], value],
-    }));
-  };
-
-  const clearFilters = () => {
-    setFilters({
-      status: [],
-      semester: [],
+    result = result.sort((a, b) => {
+      const da = new Date(a.start_date ?? "").getTime();
+      const db = new Date(b.start_date ?? "").getTime();
+      return sortOrder === "Newest" ? db - da : da - db;
     });
-    setSearch("");
-  };
 
+    setFiltered(result);
+    setPage(1);
+  }, [search, events, sortOrder, categoryFilters, statusFilters]);
+
+  //  toggle helpers 
+  function toggleCategory(cat: string) {
+    setCategoryFilters((prev) => {
+      const next = new Set(prev);
+      next.has(cat) ? next.delete(cat) : next.add(cat);
+      return next;
+    });
+  }
+
+  function toggleStatus(s: string) {
+    setStatusFilters((prev) => {
+      const next = new Set(prev);
+      next.has(s) ? next.delete(s) : next.add(s);
+      return next;
+    });
+  }
+
+  function clearAllFilters() {
+    setCategoryFilters(new Set());
+    setStatusFilters(new Set());
+  }
+
+  // delete 
   const handleDelete = async (id: string, title: string) => {
-    const confirmed = window.confirm(
-      `Are you sure you want to delete "${title}"? This action cannot be undone.`
-    );
-    if (!confirmed) return;
-
+    if (!window.confirm(`Delete "${title}"? This cannot be undone.`)) return;
     setDeletingId(id);
-    try {
-      const res = await fetch(`/api/courses/${id}`, { method: "DELETE" });
-      const json = await res.json();
-      if (!json.success) {
-        alert("Failed to delete course: " + (json.error || "Unknown error"));
-      } else {
-        setCourses((prev) => prev.filter((e) => e.id !== id));
-      }
-    } catch (err) {
-      alert("Failed to delete course.");
-    }
+    const supabase = createClient();
+    const { error } = await supabase.from("event").delete().eq("id", id);
+    if (error) alert("Failed to delete event: " + error.message);
+    else setEvents((prev) => prev.filter((e) => e.id !== id));
     setDeletingId(null);
   };
 
-  const getSortIndicator = (field: SortField) => {
-    if (sort.field !== field) return null;
-    return sort.direction === "asc" ? <ChevronUp size={16} /> : <ChevronDown size={16} />;
-  };
+  const activeFilterCount = categoryFilters.size + statusFilters.size;
+  const hasActiveFilters  = activeFilterCount > 0;
 
-  const sortOptions: { label: string; field: SortField }[] = [
-    { label: "Title", field: "title" },
-    { label: "Semester", field: "semester" },
-    { label: "Status", field: "status" },
-    { label: "Time", field: "start_time" },
+  // DataTable columns 
+  const columns: Column<EventFormData>[] = [
+    {
+      key: "title",
+      header: "Title",
+      render: (event) => (
+        <button
+          className="text-left font-semibold hover:underline underline-offset-4 max-w-[200px] truncate block"
+          style={{ color: "var(--primary-dark)", fontSize: 13 }}
+          onClick={() => setModalContent({ label: event.title, text: event.description })}
+          title="Click to view description"
+        >
+          {event.title}
+        </button>
+      ),
+    },
+    {
+      key: "category",
+      header: "Category",
+      render: (event) => (
+        <Badge variant={CATEGORY_VARIANT[event.category ?? ""] ?? "dark"}>
+          {event.category}
+        </Badge>
+      ),
+    },
+    {
+      key: "status",
+      header: "Status",
+      render: (event) => (
+        <Badge variant={STATUS_VARIANT[event.status ?? ""] ?? "dark"}>
+          <span className="capitalize">{event.status}</span>
+        </Badge>
+      ),
+    },
+    {
+      key: "start_date",
+      header: "Date",
+      render: (event) => (
+        <span className="caption whitespace-nowrap">
+          {event.start_date
+            ? new Date(event.start_date).toLocaleDateString("en-PH", {
+                month: "short", day: "numeric", year: "numeric",
+              })
+            : "—"}
+        </span>
+      ),
+    },
+    {
+      key: "capacity",
+      header: "Capacity",
+      render: (event) => <span className="caption">{event.capacity}</span>,
+    },
+    {
+      key: "location",
+      header: "Location",
+      render: (event) => (
+        <button
+          className="caption text-left hover:underline underline-offset-4 max-w-[150px] truncate block"
+          onClick={() => setModalContent({ label: "Location", text: event.location || "—" })}
+          title="Click to view full location"
+        >
+          {event.location}
+        </button>
+      ),
+    },
+    {
+      key: "actions",
+      header: "Actions",
+      render: (event) => (
+        <div style={{ display: "flex", justifyContent: "flex-end", gap: 4 }}>
+          <Button
+            variant="icon"
+            title="Edit event"
+            onClick={() => router.push(`/admin/events/${event.id}/edit`)}
+          >
+            <Pencil size={14} />
+          </Button>
+          <Button
+            variant="icon"
+            title="Delete event"
+            disabled={deletingId === event.id}
+            style={deletingId === event.id ? { opacity: 0.5 } : { color: "var(--error)" }}
+            onClick={() => handleDelete(event.id!, event.title)}
+          >
+            {deletingId === event.id
+              ? <Loader2 size={14} className="animate-spin" />
+              : <Trash2 size={14} />}
+          </Button>
+        </div>
+      ),
+    },
   ];
 
-
+  // 
   return (
-    <div className="mx-auto min-h-full flex flex-col gap-6">
+    <div className="flex flex-col gap-6">
 
-      <div className="flex flex-col gap-1">
-        <Typography variant="heading-2">Course Management</Typography>
+      {/*  page header  */}
+      <div className="flex items-start justify-between gap-4 flex-wrap mt-1">
+        <div>
+          <h1 className="heading-lg">Events Management</h1>
+          <p className="caption mt-1">
+            {isLoading ? "Loading…" : `${filtered.length} event${filtered.length !== 1 ? "s" : ""} total`}
+          </p>
+        </div>
+        <Button variant="primary" onClick={() => router.push("/admin/events/create")}>
+          <Plus size={16} /> Add Event
+        </Button>
       </div>
 
-      {/* Search + Sort + Filter + Action — uses shared ListToolbar */}
-      <ListToolbar
-        searchPlaceholder="Search by title, semester, or status..."
-        searchValue={search}
-        onSearchChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)}
-      >
-        {/* Sort Button with Dropdown Menu */}
-        <div className="relative">
-          <Button
-            label={`Sort${sort.field !== "start_time" ? ": " + sortOptions.find(o => o.field === sort.field)?.label : ""}`}
-            variant="display"
-            icon={<ArrowUpDown size={18} />}
-            iconPosition="left"
-            onClick={() => setShowSortMenu(!showSortMenu)}
-            className="whitespace-nowrap"
+      {/*  toolbar  */}
+      <div className="flex flex-col gap-3">
+
+        {/* search, sort, filter */}
+        <div className="flex items-center gap-3 flex-wrap">
+
+          <SearchBar
+            placeholder="Search by title, category, or location…"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            containerStyle={{ flex: 1, minWidth: 220 }}
           />
 
-          {showSortMenu && (
-            <div className="absolute top-full right-0 mt-2 bg-white border-2 border-fractal-border-default rounded-s shadow-brutal-1 z-40 min-w-[180px]">
-              {sortOptions.map((option) => (
-                <button
-                  key={option.field}
-                  onClick={() => handleSort(option.field)}
-                  className={`w-full text-left px-4 py-2 text-sm font-median hover:bg-fractal-base-grey-90 transition-colors flex items-center justify-between ${sort.field === option.field ? "bg-fractal-base-grey-90" : ""
-                    }`}
-                >
-                  <span>{option.label}</span>
-                  {sort.field === option.field && (
-                    <span className="ml-2">
-                      {sort.direction === "asc" ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-                    </span>
-                  )}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
+          {/* sort single select */}
+          <Dropdown
+            trigger={
+              <Button variant="ghost">
+                <ArrowUpDown size={15} /> {sortOrder}
+              </Button>
+            }
+          >
+            {(["Newest", "Oldest"] as const).map((opt) => (
+              <DropdownItem key={opt} onClick={() => setSortOrder(opt)}>
+                {sortOrder === opt ? <strong>{opt}</strong> : opt}
+              </DropdownItem>
+            ))}
+          </Dropdown>
 
-        {/* Filter */}
-        <div className="relative">
-          <Button
-            label="Filter"
-            variant={hasActiveFilters ? "primary-dark" : "display"}
-            icon={<SlidersHorizontal size={18} />}
-            iconPosition="left"
-            onClick={() => setShowFilterMenu(!showFilterMenu)}
-            className="whitespace-nowrap"
-          />
-
-          {showFilterMenu && (
-            <div className="absolute top-full right-0 mt-2 bg-white border-2 border-fractal-border-default rounded-s shadow-brutal-1 z-40 min-w-[240px] max-h-96 overflow-y-auto">
-
-              {/* Status Filter */}
-              {statuses.length > 0 && (
-                <div className="border-b border-fractal-border-default p-3">
-                  <Typography variant="body-2-median" className="mb-2 block">
-                    Status
-                  </Typography>
-                  {statuses.map((status) => (
-                    <label
-                      key={status}
-                      className="flex items-center gap-2 px-2 py-1.5 cursor-pointer hover:bg-fractal-base-grey-90 rounded transition-colors"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={filters.status.includes(status)}
-                        onChange={() => toggleFilter("status", status)}
-                        className="w-4 h-4 appearance-none border-2 border-fractal rounded-full bg-white checked:bg-fractal-brand-primary" // to do: update to fractal checkbox 
-                      />
-                      <Typography variant="body-2" className="capitalize">
-                        {status}
-                      </Typography>
-                    </label>
-                  ))}
-                </div>
-              )}
-
-              {/* Category */}
-              {categories.length > 0 && (
-                <div className="border-b border-fractal-border-default p-3">
-                  <Typography variant="body-2-median" className="mb-2 block">
-                    Category
-                  </Typography>
-                  {categories.map((category) => (
-                    <label
-                      key={category}
-                      className="flex items-center gap-2 px-2 py-1.5 cursor-pointer hover:bg-fractal-base-grey-90 rounded transition-colors"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={filters.semester.includes(category)}
-                        onChange={() => toggleFilter("semester", category)}
-                        className="w-4 h-4 appearance-none border-2 border-fractal rounded-full bg-white checked:bg-fractal-brand-primary" // to do: update to fractal checkbox 
-                      />
-                      <Typography variant="body-2">{category}</Typography>
-                    </label>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-
-        <Button
-          label="Add Course"
-          variant="primary-dark"
-          icon={<Plus size={18} />}
-          iconPosition="left"
-          onClick={() => router.push("/admin/courses/create")}
-        />
-      </ListToolbar>
-
-
-
-      <Paper elevation="elevated" className="overflow-hidden p-0">
-        {isLoading ? (
-          <div className="p-8 text-center">
-            <Loader size="xl" />
-          </div>
-        ) : filtered.length === 0 ? (
-          <div className="p-8 text-center">
-            <Typography
-              variant="body-1"
-              className="text-fractal-text-placeholder"
-            >
-              {hasActiveFilters
-                ? "No courses match your filters."
-                : search
-                  ? "No courses match your search."
-                  : "No courses yet. Create one to get started."}
-            </Typography>
-          </div>
-        ) : (
-          <table className="w-full text-sm">
-            <thead className="border-b-2 border-fractal-border-default bg-fractal-base-grey-90 sticky top-0">
-              <tr>
-                <th
-                  className="text-left p-3 font-median cursor-pointer hover:bg-fractal-base-grey-80 transition-colors"
-                  onClick={() => handleSort("title")}
-                  title="Click to sort"
-                >
-                  <div className="flex items-center gap-1">
-                    Title
-                    {getSortIndicator("title")}
-                  </div>
-                </th>
-                <th
-                  className="text-left p-3 font-median cursor-pointer hover:bg-fractal-base-grey-80 transition-colors"
-                  onClick={() => handleSort("semester")}
-                  title="Click to sort"
-                >
-                  <div className="flex items-center gap-1">
-                    Category
-                    {getSortIndicator("semester")}
-                  </div>
-                </th>
-                <th
-                  className="text-left p-3 font-median cursor-pointer hover:bg-fractal-base-grey-80 transition-colors"
-                  onClick={() => handleSort("status")}
-                  title="Click to sort"
-                >
-                  <div className="flex items-center gap-1">
-                    Status
-                    {getSortIndicator("status")}
-                  </div>
-                </th>
-                <th
-                  className="text-left p-3 font-median cursor-pointer hover:bg-fractal-base-grey-80 transition-colors"
-                  onClick={() => handleSort("start_time")}
-                  title="Click to sort"
-                >
-                  <div className="flex items-center gap-1">
-                    Date
-                    {getSortIndicator("start_time")}
-                  </div>
-                </th>
-                <th className="text-right p-3 font-median">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {paginate(filtered, page, PER_PAGE).map((course, i) => (
-                <tr
-                  key={course.id}
-                  className={`border-b border-fractal-border-default hover:bg-fractal-base-grey-90 transition-colors ${i % 2 === 0
-                    ? "bg-fractal-bg-body-white"
-                    : "bg-fractal-bg-body-default"
-                    }`}
-                >
-                  <td
-                    className="p-3 font-median max-w-[200px] truncate cursor-pointer hover:underline"
-                    onClick={() => setModalContent({ label: course.title, text: course.description })}
-                    title="Click to view full title and course description"
+          {/* filter multi-select */}
+          <Dropdown
+            trigger={
+              <Button variant={hasActiveFilters ? "pink" : "ghost"}>
+                <SlidersHorizontal size={15} /> Filter
+                {hasActiveFilters && (
+                  <span
+                    className="inline-flex items-center justify-center w-4 h-4 rounded-full text-[10px] font-bold text-white"
+                    style={{ background: "var(--primary-dark)", marginLeft: 2 }}
                   >
-                    {course.title}
-                  </td>
-                  <td className="p-3">
-                    <span
-                      className={`px-2 py-0.5 rounded-s text-xs font-median border-2 border-fractal-border-default bg-fractal-base-grey-90`}
-                    >
-                      {course.semester}
-                    </span>
-                  </td>
-                  <td className="p-3">
-                    <span
-                      className={`px-2 py-0.5 rounded-s text-xs font-median capitalize border border-fractal-border-default`}
-                    >
-                      {course.status}
-                    </span>
-                  </td>
-                  <td className="p-3 text-fractal-text-placeholder whitespace-nowrap">
-                    {course.start_time
-                      ? new Date(course.start_time).toLocaleDateString("en-PH", {
-                        month: "short",
-                        day: "numeric",
-                        year: "numeric",
-                      })
-                      : "—"}
-                  </td>
+                    {activeFilterCount}
+                  </span>
+                )}
+              </Button>
+            }
+          >
+            <div style={{ padding: "4px 12px 6px" }}>
+              <p className="label" style={{ marginBottom: 4 }}>Category</p>
+            </div>
+            {CATEGORIES.map((cat) => (
+              <CheckItem
+                key={cat}
+                label={cat}
+                active={categoryFilters.has(cat)}
+                onToggle={() => toggleCategory(cat)}
+              />
+            ))}
 
+            <DropdownDivider />
 
-                  {/* Row actions — uses shared RowActions component */}
-                  <RowActions
-                    editUrl={`/admin/courses/${course.id}/edit`}
-                    onDelete={() => handleDelete(course.id!, course.title)}
-                    isDeleting={deletingId === course.id}
-                    editTitle="Edit course"
-                    deleteTitle="Delete course"
-                  />
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </Paper>
+            <div style={{ padding: "6px 12px 4px" }}>
+              <p className="label" style={{ marginBottom: 4 }}>Status</p>
+            </div>
+            {STATUSES.map((s) => (
+              <CheckItem
+                key={s}
+                label={s}
+                active={statusFilters.has(s)}
+                onToggle={() => toggleStatus(s)}
+                capitalize
+              />
+            ))}
 
-      {/* Pagination */}
-      {!isLoading && filtered.length > 0 && (
-        <div className="flex items-center justify-between px-1 text-sm text-fractal-base-grey-30">
-          <span>
-            Showing {Math.min((page - 1) * PER_PAGE + 1, filtered.length)}–{Math.min(page * PER_PAGE, filtered.length)} of {filtered.length} courses
-          </span>
-          <Pagination page={page} total={totalPages(filtered.length, PER_PAGE)} onChange={setPage} />
+            <DropdownDivider />
+            <DropdownItem onClick={clearAllFilters}>
+              Clear all filters
+            </DropdownItem>
+          </Dropdown>
+        </div>
+
+        {/* category */}
+        <FilterChips
+          chips={["All", ...CATEGORIES]}
+          defaultActive={categoryFilters.size === 0 ? "All" : [...categoryFilters][0]}
+          onChange={(active) => {
+            if (active === "All") setCategoryFilters(new Set());
+            else toggleCategory(active);
+          }}
+        />
+      </div>
+
+      {/*  active filter pills  */}
+      {hasActiveFilters && (
+        <div className="flex items-center gap-2 flex-wrap -mt-2">
+          <span className="caption">Active filters:</span>
+
+          {[...categoryFilters].map((cat) => (
+            <Badge key={cat} variant="pink" dot>
+              {cat}
+              <button
+                onClick={() => toggleCategory(cat)}
+                aria-label={`Remove ${cat} filter`}
+                style={{ marginLeft: 6 }}
+              >×</button>
+            </Badge>
+          ))}
+
+          {[...statusFilters].map((s) => (
+            <Badge key={s} variant="warning" dot>
+              <span className="capitalize">{s}</span>
+              <button
+                onClick={() => toggleStatus(s)}
+                aria-label={`Remove ${s} filter`}
+                style={{ marginLeft: 6 }}
+              >×</button>
+            </Badge>
+          ))}
+
+          <Button variant="soft" size="sm" onClick={clearAllFilters}>
+            Clear all
+          </Button>
         </div>
       )}
 
-      {/* Detail Modal — uses shared DetailModal component */}
-      {modalContent && (
-        <DetailModal
-          label={modalContent.label}
-          text={modalContent.text}
-          onClose={() => setModalContent(null)}
-        />
+      {/*  table / empty / loading  */}
+      {isLoading ? (
+        <Card>
+          <div className="flex items-center justify-center gap-3 py-10" style={{ color: "var(--gray)" }}>
+            <Loader2 size={20} className="animate-spin" />
+            <span className="caption">Loading events…</span>
+          </div>
+        </Card>
+
+      ) : filtered.length === 0 ? (
+        <Card>
+          <div className="flex flex-col items-center justify-center gap-3 py-12">
+            <p className="caption">
+              {search || hasActiveFilters
+                ? "No events match your search or filters."
+                : "No events yet. Add your first event to get started."}
+            </p>
+            {(search || hasActiveFilters) && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => { setSearch(""); clearAllFilters(); }}
+              >
+                Clear search &amp; filters
+              </Button>
+            )}
+          </div>
+        </Card>
+
+      ) : (
+          <DataTable
+            columns={columns}
+            rows={paginate(filtered, page, PER_PAGE)}
+            keyExtractor={(event) => event.id!}
+          />
       )}
+
+      {/*  pagination  */}
+      {!isLoading && filtered.length > 0 && (
+        <div className="flex items-center justify-between flex-wrap gap-3">
+          <span className="caption">
+            Showing {Math.min((page - 1) * PER_PAGE + 1, filtered.length)}–{Math.min(page * PER_PAGE, filtered.length)} of {filtered.length} events
+          </span>
+          <Pagination
+            page={page}
+            total={totalPages(filtered.length, PER_PAGE)}
+            onChange={setPage}
+          />
+        </div>
+      )}
+
+      {/*  detail modal  */}
+      <Modal
+        open={!!modalContent}
+        onClose={() => setModalContent(null)}
+        title={modalContent?.label}
+      >
+        <p style={{ fontSize: 14, lineHeight: 1.8, color: "var(--primary-dark)", whiteSpace: "pre-wrap" }}>
+          {modalContent?.text || "No description provided."}
+        </p>
+      </Modal>
+
     </div>
   );
 }
