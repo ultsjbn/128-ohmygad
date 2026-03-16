@@ -135,7 +135,7 @@ export default function CoursesPage() {
     let result = courses;
 
     result = result.filter((e) =>
-      `${e.title} ${e.semester ?? ""}`.toLowerCase().includes(q)
+      `${e.title} ${e.Days} ${e.start_time} ${e.end_time} ${e.semester ?? ""}`.toLowerCase().includes(q)
     );
     // empty set = show all. nonempty = only matching values
     if (semesterFilters.size > 0)
@@ -299,7 +299,7 @@ export default function CoursesPage() {
         <div className="flex items-center gap-3 flex-wrap">
 
           <SearchBar
-            placeholder="Search by title, semester or ..."
+            placeholder="Search by title, semester or schedule"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             containerStyle={{ flex: 1, minWidth: 220 }}
