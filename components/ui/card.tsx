@@ -54,7 +54,7 @@ export function StatCard({ icon, iconBg = "var(--pink-light)", value, label, var
 }
 
 // EventCard
-import { Clock, MapPin, Plus } from "lucide-react";
+import { Clock, MapPin } from "lucide-react";
 
 export interface EventCardProps {
   title: string;
