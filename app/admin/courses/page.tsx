@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Plus, ArrowUpDown, SlidersHorizontal, Pencil, Trash2, Loader2 } from "lucide-react";
-import type { EventFormData } from "@/components/admin/event-form";
+import type { CourseFormData } from "@/components/admin/course-form";
 import { paginate, totalPages, PER_PAGE } from "@/lib/pagination.utils";
 import { Pagination } from "@/components/pagination";
 
@@ -23,8 +23,8 @@ import {
 } from "@/components/ui";
 
 // constants 
-const CATEGORIES = ["Orientation", "Forum", "Research", "Training", "Workshop"];
-const STATUSES = ["upcoming", "past"];
+const CATEGORIES = ["1st Semester", "2nd Semester", "Mid-Year"];
+const STATUSES = ["open", "closed"];
 
 // variant helpers 
 type BadgeVariant = "pink" | "periwinkle" | "dark" | "success" | "warning" | "error";
@@ -79,12 +79,12 @@ function CheckItem({
   );
 }
 
-// events page proper
-export default function EventsPage() {
+// courses page proper
+export default function CoursesPage() {
   const router = useRouter();
 
-  const [events,          setEvents]          = useState<EventFormData[]>([]);
-  const [filtered,        setFiltered]        = useState<EventFormData[]>([]);
+  const [courses,         setCourses]         = useState<CourseFormData[]>([]);
+  const [filtered,        setFiltered]        = useState<CourseFormData[]>([]);
   const [search,          setSearch]          = useState("");
   const [isLoading,       setIsLoading]       = useState(true);
   const [deletingId,      setDeletingId]      = useState<string | null>(null);
@@ -96,26 +96,26 @@ export default function EventsPage() {
   const [page,            setPage]            = useState(1);
 
   //  Fetch 
-  const getEvents = async () => {
+  const getCourses = async () => {
     const supabase = createClient();
     const { data, error } = await supabase
-      .from("event")
-      .select("id, title, description, category, status, start_date, end_date, capacity, location, registration_open, registration_close")
+      .from("course")
+      .select("id, title, description, semester, status, start_time, end_time, Days")
       .order("start_date", { ascending: false });
 
     if (!error && data) {
-      setEvents(data);
+      setCourses(data);
       setFiltered(data);
     }
     setIsLoading(false);
   };
 
-  useEffect(() => { getEvents(); }, []);
+  useEffect(() => { getCourses(); }, []);
 
   //  filter / sort 
   useEffect(() => {
     const q = search.toLowerCase();
-    let result = events;
+    let result = courses;
 
     result = result.filter((e) =>
       `${e.title} ${e.category || ""} ${e.location || ""}`.toLowerCase().includes(q)
@@ -134,7 +134,7 @@ export default function EventsPage() {
 
     setFiltered(result);
     setPage(1);
-  }, [search, events, sortOrder, categoryFilters, statusFilters]);
+  }, [search, courses, sortOrder, categoryFilters, statusFilters]);
 
   //  toggle helpers 
   function toggleCategory(cat: string) {
@@ -163,9 +163,9 @@ export default function EventsPage() {
     if (!window.confirm(`Delete "${title}"? This cannot be undone.`)) return;
     setDeletingId(id);
     const supabase = createClient();
-    const { error } = await supabase.from("event").delete().eq("id", id);
-    if (error) alert("Failed to delete event: " + error.message);
-    else setEvents((prev) => prev.filter((e) => e.id !== id));
+    const { error } = await supabase.from("course").delete().eq("id", id);
+    if (error) alert("Failed to delete course: " + error.message);
+    else setCourses((prev) => prev.filter((e) => e.id !== id));
     setDeletingId(null);
   };
 
@@ -173,46 +173,46 @@ export default function EventsPage() {
   const hasActiveFilters  = activeFilterCount > 0;
 
   // DataTable columns 
-  const columns: Column<EventFormData>[] = [
+  const columns: Column<CourseFormData>[] = [
     {
       key: "title",
       header: "Title",
-      render: (event) => (
+      render: (course) => (
         <button
           className="text-left font-semibold hover:underline underline-offset-4 max-w-[200px] truncate block"
           style={{ color: "var(--primary-dark)", fontSize: 13 }}
-          onClick={() => setModalContent({ label: event.title, text: event.description })}
+          onClick={() => setModalContent({ label: course.title, text: course.description })}
           title="Click to view description"
         >
-          {event.title}
+          {course.title}
         </button>
       ),
     },
     {
       key: "category",
       header: "Category",
-      render: (event) => (
-        <Badge variant={CATEGORY_VARIANT[event.category ?? ""] ?? "dark"}>
-          {event.category}
+      render: (course) => (
+        <Badge variant={CATEGORY_VARIANT[course.category ?? ""] ?? "dark"}>
+          {course.category}
         </Badge>
       ),
     },
     {
       key: "status",
       header: "Status",
-      render: (event) => (
-        <Badge variant={STATUS_VARIANT[event.status ?? ""] ?? "dark"}>
-          <span className="capitalize">{event.status}</span>
+      render: (course) => (
+        <Badge variant={STATUS_VARIANT[course.status ?? ""] ?? "dark"}>
+          <span className="capitalize">{course.status}</span>
         </Badge>
       ),
     },
     {
       key: "start_date",
       header: "Date",
-      render: (event) => (
+      render: (course) => (
         <span className="caption whitespace-nowrap">
-          {event.start_date
-            ? new Date(event.start_date).toLocaleDateString("en-PH", {
+          {course.start_date
+            ? new Date(course.start_date).toLocaleDateString("en-PH", {
                 month: "short", day: "numeric", year: "numeric",
               })
             : "—"}
@@ -222,41 +222,41 @@ export default function EventsPage() {
     {
       key: "capacity",
       header: "Capacity",
-      render: (event) => <span className="caption">{event.capacity}</span>,
+      render: (course) => <span className="caption">{course.capacity}</span>,
     },
     {
       key: "location",
       header: "Location",
-      render: (event) => (
+      render: (course) => (
         <button
           className="caption text-left hover:underline underline-offset-4 max-w-[150px] truncate block"
-          onClick={() => setModalContent({ label: "Location", text: event.location || "—" })}
+          onClick={() => setModalContent({ label: "Location", text: course.location || "—" })}
           title="Click to view full location"
         >
-          {event.location}
+          {course.location}
         </button>
       ),
     },
     {
       key: "actions",
       header: "Actions",
-      render: (event) => (
+      render: (course) => (
         <div style={{ display: "flex", justifyContent: "flex-end", gap: 4 }}>
           <Button
             variant="icon"
-            title="Edit event"
-            onClick={() => router.push(`/admin/events/${event.id}/edit`)}
+            title="Edit course"
+            onClick={() => router.push(`/admin/courses/${course.id}/edit`)}
           >
             <Pencil size={14} />
           </Button>
           <Button
             variant="icon"
-            title="Delete event"
-            disabled={deletingId === event.id}
-            style={deletingId === event.id ? { opacity: 0.5 } : { color: "var(--error)" }}
-            onClick={() => handleDelete(event.id!, event.title)}
+            title="Delete course"
+            disabled={deletingId === course.id}
+            style={deletingId === course.id ? { opacity: 0.5 } : { color: "var(--error)" }}
+            onClick={() => handleDelete(course.id!, course.title)}
           >
-            {deletingId === event.id
+            {deletingId === course.id
               ? <Loader2 size={14} className="animate-spin" />
               : <Trash2 size={14} />}
           </Button>
@@ -272,13 +272,13 @@ export default function EventsPage() {
       {/*  page header  */}
       <div className="flex items-start justify-between gap-4 flex-wrap mt-1">
         <div>
-          <h1 className="heading-lg">Events Management</h1>
+          <h1 className="heading-lg">Courses Management</h1>
           <p className="caption mt-1">
-            {isLoading ? "Loading…" : `${filtered.length} event${filtered.length !== 1 ? "s" : ""} total`}
+            {isLoading ? "Loading…" : `${filtered.length} course${filtered.length !== 1 ? "s" : ""} total`}
           </p>
         </div>
-        <Button variant="primary" onClick={() => router.push("/admin/events/create")}>
-          <Plus size={16} /> Add Event
+        <Button variant="primary" onClick={() => router.push("/admin/courses/create")}>
+          <Plus size={16} /> Add Course
         </Button>
       </div>
 
@@ -409,7 +409,7 @@ export default function EventsPage() {
         <Card>
           <div className="flex items-center justify-center gap-3 py-10" style={{ color: "var(--gray)" }}>
             <Loader2 size={20} className="animate-spin" />
-            <span className="caption">Loading events…</span>
+            <span className="caption">Loading courses…</span>
           </div>
         </Card>
 
@@ -418,8 +418,8 @@ export default function EventsPage() {
           <div className="flex flex-col items-center justify-center gap-3 py-12">
             <p className="caption">
               {search || hasActiveFilters
-                ? "No events match your search or filters."
-                : "No events yet. Add your first event to get started."}
+                ? "No courses match your search or filters."
+                : "No courses yet. Add your first course to get started."}
             </p>
             {(search || hasActiveFilters) && (
               <Button
@@ -437,7 +437,7 @@ export default function EventsPage() {
           <DataTable
             columns={columns}
             rows={paginate(filtered, page, PER_PAGE)}
-            keyExtractor={(event) => event.id!}
+            keyExtractor={(course) => course.id!}
           />
       )}
 
@@ -445,7 +445,7 @@ export default function EventsPage() {
       {!isLoading && filtered.length > 0 && (
         <div className="flex items-center justify-between flex-wrap gap-3">
           <span className="caption">
-            Showing {Math.min((page - 1) * PER_PAGE + 1, filtered.length)}–{Math.min(page * PER_PAGE, filtered.length)} of {filtered.length} events
+            Showing {Math.min((page - 1) * PER_PAGE + 1, filtered.length)}–{Math.min(page * PER_PAGE, filtered.length)} of {filtered.length} courses
           </span>
           <Pagination
             page={page}
