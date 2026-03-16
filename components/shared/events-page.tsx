@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { SlidersHorizontal, Loader2, CalendarDays, MapPin, Users, Clock, X } from "lucide-react";
+import { SlidersHorizontal, Loader2, CalendarDays, MapPin, Users, Clock, X, ArrowUpDown } from "lucide-react";
 import type { EventFormData } from "@/components/admin/event-form";
 
 import {
@@ -199,8 +199,8 @@ export default function EventsPage() {
   return (
     <div className="flex flex-col gap-4">
 
-      {/* page header */}
-      <div>
+      {/* page header - hidden on mobile, visible on md+ devices */}
+      <div className="hidden md:block">
         <h1 className="heading-lg">Events</h1>
       </div>
 
@@ -209,7 +209,7 @@ export default function EventsPage() {
         <div className="flex items-center gap-3 flex-wrap overflow-visible">
             {/* search bar */}
             <SearchBar
-                placeholder="Search by title, category, or location…"
+                placeholder="Search…"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 containerStyle={{ flex: 1, minWidth: 120 }}
@@ -217,11 +217,13 @@ export default function EventsPage() {
 
             {/* grouped sort and filter */}
             <div className="flex items-center gap-2 shrink-0">
-            {/* sort active field shown as text and arrow in trigger, dot indicator in list */}
+            {/* sort is icon only on mobile, text+arrow on md+ devices */}
             <Dropdown
                 trigger={
                 <Button variant={sort.field !== "start_date" ? "periwinkle" : "ghost"}>
-                    {sortLabel}
+                    <ArrowUpDown size={15} />
+                    {/* label hidden on mobile */}
+                    <span className="hidden md:inline"> {sortLabel}</span>
                 </Button>
                 }
             >
@@ -243,11 +245,13 @@ export default function EventsPage() {
                 </DropdownItem>
             </Dropdown>
 
-            {/* filter multi-select */}
+            {/* filter is icon only on mobile, text on md+ devices */}
             <Dropdown
                 trigger={
                 <Button variant={hasActiveFilters ? "pink" : "ghost"}>
-                    <SlidersHorizontal size={15} /> Filter
+                    <SlidersHorizontal size={15} />
+                    {/* label hidden on mobile */}
+                    <span className="hidden md:inline">Filter</span>
                     {hasActiveFilters && (
                     <span className="inline-flex items-center justify-center w-4 h-4 rounded-full text-[10px] font-bold text-white bg-[var(--primary-dark)] ml-0.5">
                         {activeFilterCount}
@@ -417,9 +421,9 @@ export default function EventsPage() {
         open={!!detailEvent}
         onClose={() => setDetailEvent(null)}
         hideCloseButton
-        modalStyle={{ maxWidth: 600, overflowY: "auto", maxHeight: "90vh", padding: 0 }}
+        modalStyle={{ maxWidth: 600, padding: 0 }}
         footer={
-          <div className="pb-4 pr-4 pl-4 pt-2">
+          <div className="px-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] sm:px-4 sm:pb-4 shrink-0">
             <Button variant="primary" className="w-full" onClick={() => {/* registration handler */}}>
               Register
             </Button>
@@ -427,22 +431,23 @@ export default function EventsPage() {
         }
       >
         {detailEvent && (
-          <div className="flex flex-col">
-            {/* cover */}
-            <div 
-              className="h-[200px] relative shrink-0 rounded-t-[var(--radius-xl)]"
+          <div className="flex flex-col min-h-0">
+
+            <div
+              className="h-[120px] sm:h-[160px] relative shrink-0 rounded-t-[var(--radius-xl)]"
               style={{ background: CATEGORY_GRADIENT[detailEvent.category ?? ""] ?? DEFAULT_GRADIENT }}
             >
+              {/* close button inside cover */}
               <button
                 onClick={() => setDetailEvent(null)}
                 aria-label="Close"
-                className="absolute top-3.5 right-3.5 w-6 h-6 rounded-full bg-[rgba(255,255,255,0.88)] border-none cursor-pointer flex items-center justify-center text-[var(--primary-dark)] backdrop-blur-[4px] z-10"
+                className="absolute top-3 right-3 w-4 h-4 sm:w-6 sm:h-6 rounded-full border-none cursor-pointer flex items-center justify-center text-[var(--primary-dark)] z-10 backdrop-blur-sm bg-white/80"
               >
-                <X size={16} />
+                <X size={14} />
               </button>
 
-              {/* category and status badges - bottom-left of cover */}
-              <div className="absolute bottom-2 left-3 flex gap-2 items-center">
+              {/* category + status badges - bottom-left of cover */}
+              <div className="absolute bottom-3 left-3 flex gap-2 items-center">
                 <span className="badge badge-pink">
                   {detailEvent.category ?? "Uncategorized"}
                 </span>
@@ -454,17 +459,17 @@ export default function EventsPage() {
               </div>
             </div>
 
-            {/* body padded section below the cover */}
-            <div className="flex flex-col gap-1 p-4">
+            {/* body — overflow-y-auto here so only body scrolls, cover + footer stay fixed */}
+            <div className="flex flex-col gap-3 p-3 sm:p-5 overflow-y-auto">
 
               {/* title */}
-              <h2 className="heading-lg m-0">{detailEvent.title}</h2>
+              <h2 className="heading-md m-0">{detailEvent.title}</h2>
 
               {/* details row */}
-              <div className="flex flex-col gap-1">
+              <div className="flex flex-col gap-1.5">
                 {/* ---------- date ---------- */}
-                <div className="flex items-center gap-4 body">
-                  <CalendarDays size={15} />
+                <div className="flex items-start gap-3 caption sm:text-sm text-[var(--gray)]">
+                  <CalendarDays size={15} className="shrink-0 mt-0.5" />
                   <span>
                     {detailEvent.start_date
                       ? new Date(detailEvent.start_date).toLocaleDateString("en-PH", { weekday: "long", month: "long", day: "numeric", year: "numeric" })
@@ -475,19 +480,19 @@ export default function EventsPage() {
                   </span>
                 </div>
                 {/* ---------- location ---------- */}
-                <div className="flex items-center gap-4 body">
-                  <MapPin size={15} />
+                <div className="flex items-center gap-3 caption sm:text-sm text-[var(--gray)]">
+                  <MapPin size={15} className="shrink-0" />
                   <span>{detailEvent.location ?? "—"}</span>
                 </div>
                 {/* ---------- capacity ---------- */}
-                <div className="flex items-center gap-4 body">
-                  <Users size={15} />
+                <div className="flex items-center gap-3 caption sm:text-sm text-[var(--gray)]">
+                  <Users size={15} className="shrink-0" />
                   <span>Capacity: {detailEvent.capacity ?? "—"}</span>
                 </div>
                 {/* ---------- registration ---------- */}
                 {(detailEvent.registration_open || detailEvent.registration_close) && (
-                  <div className="flex items-center gap-4 body">
-                    <Clock size={15} />
+                  <div className="flex items-center gap-3 caption sm:text-sm text-[var(--gray)]">
+                    <Clock size={15} className="shrink-0" />
                     <span>
                       Registration:&nbsp;
                       {detailEvent.registration_open
@@ -506,8 +511,8 @@ export default function EventsPage() {
               <div className="divider" />
 
               {/* full description */}
-              <div>
-                <p className="label mb-2">About this event</p>
+              <div className="flex flex-col gap-2 pb-2">
+                <p className="label">ABOUT THIS EVENT</p>
                 <p className="body whitespace-pre-wrap">
                   {detailEvent.description || "No description provided."}
                 </p>
