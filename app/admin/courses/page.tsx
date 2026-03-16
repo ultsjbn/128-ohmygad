@@ -210,32 +210,15 @@ export default function CoursesPage() {
       header: "Date",
       render: (course) => (
         <span className="caption whitespace-nowrap">
-          {course.start_date
-            ? new Date(course.start_date).toLocaleDateString("en-PH", {
+          {course.start_time
+            ? new Date(course.start_time).toLocaleDateString("en-PH", {
                 month: "short", day: "numeric", year: "numeric",
               })
             : "—"}
         </span>
       ),
     },
-    {
-      key: "capacity",
-      header: "Capacity",
-      render: (course) => <span className="caption">{course.capacity}</span>,
-    },
-    {
-      key: "location",
-      header: "Location",
-      render: (course) => (
-        <button
-          className="caption text-left hover:underline underline-offset-4 max-w-[150px] truncate block"
-          onClick={() => setModalContent({ label: "Location", text: course.location || "—" })}
-          title="Click to view full location"
-        >
-          {course.location}
-        </button>
-      ),
-    },
+
     {
       key: "actions",
       header: "Actions",
