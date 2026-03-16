@@ -101,7 +101,7 @@ export default function EventsPage() {
     const supabase = createClient();
     const { data, error } = await supabase
       .from("event")
-      .select("id, title, description, category, status, start_date, end_date, capacity, location, registration_open, registration_close")
+      .select("id, title, description, category, status, start_date, end_date, capacity, location, registration_open, registration_close, banner_url")
       .order("start_date", { ascending: false });
 
     if (!error && data) {
