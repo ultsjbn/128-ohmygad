@@ -13,10 +13,10 @@ interface GlobalSearchProps {
 interface SearchResult {
   id: string;
   title: string;
-  type: "Course" | "Event" | "User";
+  type: "Course" | "Event" | "User" | "Survey";
 }
 
-export default function GlobalSearch({ role, placeholder = "Search events, users, courses..." }: GlobalSearchProps) {
+export default function GlobalSearch({ role, placeholder = "Search events, users, courses, surveys..." }: GlobalSearchProps) {
   const router = useRouter();
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
@@ -41,7 +41,6 @@ export default function GlobalSearch({ role, placeholder = "Search events, users
       setLoading(false);
       return;
     }
-
 
     async function fetchResults() {
       setLoading(true);
@@ -82,6 +81,8 @@ export default function GlobalSearch({ role, placeholder = "Search events, users
       router.push(`/${role}/events?search=${encodeURIComponent(r.title)}`);
     } else if (r.type === "User" && role === "admin") {
       router.push(`/admin/users?search=${encodeURIComponent(r.title)}`);
+    } else if (r.type === "Survey") {
+      router.push(`/${role}/surveys?search=${encodeURIComponent(r.title)}`);
     }
   };
 
@@ -141,7 +142,7 @@ export default function GlobalSearch({ role, placeholder = "Search events, users
                   <span style={{ fontSize: 14, color: "var(--primary-dark)", fontWeight: 500, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "70%" }}>
                     {r.title}
                   </span>
-                  <Badge variant={r.type === "User" ? "pink" : r.type === "Course" ? "periwinkle" : "dark"}>
+                  <Badge variant={r.type === "User" ? "pink" : r.type === "Course" ? "periwinkle" : r.type === "Survey" ? "pink" : "dark"}>
                     {r.type}
                   </Badge>
                 </div>
