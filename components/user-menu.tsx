@@ -5,14 +5,25 @@ import { Menu, MenuItem, MenuItemSeparator } from "@snowball-tech/fractal";
 import { User, Settings, LogOut } from "lucide-react";
 import { createBrowserClient } from '@supabase/ssr';
 import { useRouter } from 'next/navigation';
+import { createPortal } from "react-dom";
+
 
 type Role = 'admin' | 'student' | 'faculty';
+
+
 
 export default function UserMenu() {
   const [isOpen, setIsOpen] = useState(false);
   const [role, setRole] = useState<Role | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
 
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -59,8 +70,10 @@ export default function UserMenu() {
         />
       </div>
 
-      {isOpen && (
-        <div className="absolute right-0 top-full mt-2 w-48 z-50">
+
+      {mounted && isOpen && 
+        createPortal(
+        <div className="absolute right-0 top-full mt-2 w-48 z-[9999]">
           <Menu>
             <MenuItem
               icon={<User size={16} />}
@@ -85,8 +98,12 @@ export default function UserMenu() {
               onClick={handleSignOut}
             />
           </Menu>
-        </div>
+        </div>,
+        document.body
       )}
+
+
+
     </div>
   );
 }
