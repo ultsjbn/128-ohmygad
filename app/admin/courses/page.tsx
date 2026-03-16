@@ -22,6 +22,17 @@ import {
   Modal,
 } from "@/components/ui";
 
+function formatTime(time?: string) {
+  if (!time) return "—"
+
+  const [hour, minute] = time.split(":")
+  const h = Number(hour)
+  const suffix = h >= 12 ? "PM" : "AM"
+  const hour12 = h % 12 || 12
+
+  return `${hour12}:${minute} ${suffix}`
+}
+
 // constants 
 const SEMESTERS = ["1st Semester", "2nd Semester", "Mid-Year"];
 const STATUSES = ["open", "closed"];
@@ -124,7 +135,7 @@ export default function CoursesPage() {
     let result = courses;
 
     result = result.filter((e) =>
-      `${e.title} ${e.semester || ""}`.toLowerCase().includes(q)
+      `${e.title} ${e.Days} ${e.start_time} ${e.end_time} ${e.semester ?? ""}`.toLowerCase().includes(q)
     );
     // empty set = show all. nonempty = only matching values
     if (semesterFilters.size > 0)
@@ -212,19 +223,29 @@ export default function CoursesPage() {
         </Badge>
       ),
     },
-    {
-      key: "start_time",
-      header: "Time",
-      render: (course) => (
+
+{
+  key: "schedule",
+  header: "Schedule",
+  render: (course) => {
+    const start = formatTime(course.start_time)
+    const end = formatTime(course.end_time)
+
+    return (
+      <div className="flex flex-col leading-tight">
+        <span className="caption text-[12px] opacity-80">
+          {course.Days || "—"}
+        </span>
+
         <span className="caption whitespace-nowrap">
-          {course.start_time
-            ? new Date(course.start_time).toLocaleDateString("en-PH", {
-              month: "short", day: "numeric", year: "numeric",
-            })
+          {start !== "—" && end !== "—"
+            ? `${start} – ${end}`
             : "—"}
         </span>
-      ),
-    },
+      </div>
+    )
+  },
+},
 
     {
       key: "actions",
@@ -278,7 +299,7 @@ export default function CoursesPage() {
         <div className="flex items-center gap-3 flex-wrap">
 
           <SearchBar
-            placeholder="Search by title, semester or ..."
+            placeholder="Search by title, semester or schedule"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             containerStyle={{ flex: 1, minWidth: 220 }}
