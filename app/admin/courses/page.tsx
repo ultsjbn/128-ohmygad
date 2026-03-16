@@ -117,7 +117,7 @@ export default function CoursesPage() {
     let result = courses;
 
     result = result.filter((e) =>
-      `${e.title} ${e.semester || ""}`.toLowerCase().includes(q)
+      `${e.title} ${e.semester ?? ""}`.toLowerCase().includes(q)
     );
     // empty set = show all. nonempty = only matching values
     if (semesterFilters.size > 0)
@@ -205,19 +205,36 @@ export default function CoursesPage() {
         </Badge>
       ),
     },
-    {
-      key: "start_time",
-      header: "Time",
-      render: (course) => (
-        <span className="caption whitespace-nowrap">
-          {course.start_time
-            ? new Date(course.start_time).toLocaleDateString("en-PH", {
-                month: "short", day: "numeric", year: "numeric",
-              })
-            : "—"}
+
+{
+  key: "schedule",
+  header: "Schedule",
+  render: (course) => {
+    const formatTime = (time?: string) =>
+      time
+        ? new Date(time).toLocaleTimeString("en-PH", {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true,
+          })
+        : "";
+
+    const start = formatTime(course.start_time);
+    const end = formatTime(course.end_time);
+
+    return (
+      <div className="flex flex-col leading-tight">
+        <span className="caption text-[12px] opacity-80">
+          {course.Days || "—"}
         </span>
-      ),
-    },
+
+        <span className="caption whitespace-nowrap">
+          {start && end ? `${start} – ${end}` : "—"}
+        </span>
+      </div>
+    );
+  },
+},
 
     {
       key: "actions",
