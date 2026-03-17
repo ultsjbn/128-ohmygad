@@ -120,11 +120,11 @@ function Spinner({ value, onUp, onDn, format }: {
 }) {
   return (
     <div className="dtp-spinner">
-      <button className="dtp-spin-btn" onClick={onUp}>
+      <button type="button" className="dtp-spin-btn" onClick={onUp}>
         <ChevronLeft size={14} style={{ transform: "rotate(90deg)" }} />
       </button>
       <span className="dtp-spin-val">{format(value)}</span>
-      <button className="dtp-spin-btn" onClick={onDn}>
+      <button type="button" className="dtp-spin-btn" onClick={onDn}>
         <ChevronRight size={14} style={{ transform: "rotate(90deg)" }} />
       </button>
     </div>
@@ -288,7 +288,7 @@ export function DateTimePicker({
         )}
 
         {displayVal && (
-          <button className="dtp-clear-btn" onClick={clear} tabIndex={-1}>
+          <button type="button" className="dtp-clear-btn" onClick={clear} tabIndex={-1}>
             <X size={12} />
           </button>
         )}
@@ -304,9 +304,9 @@ export function DateTimePicker({
           {panel === "cal" && (
             <>
               <div className="dtp-cal-nav">
-                <button className="dtp-nav-btn" onClick={prevMonth}><ChevronLeft size={15} /></button>
+                <button type="button" className="dtp-nav-btn" onClick={prevMonth}><ChevronLeft size={15} /></button>
                 <span className="dtp-nav-label">{MONTHS[calMonth]} {calYear}</span>
-                <button className="dtp-nav-btn" onClick={nextMonth}><ChevronRight size={15} /></button>
+                <button type="button" className="dtp-nav-btn" onClick={nextMonth}><ChevronRight size={15} /></button>
               </div>
 
               <div className="dtp-dow-row">
@@ -316,6 +316,7 @@ export function DateTimePicker({
               <div className="dtp-grid">
                 {cells.map((day, i) => (
                   <button
+                    type="button"
                     key={i}
                     disabled={!day || isDis(day)}
                     onClick={() => day && !isDis(day) && pickDay(day)}
@@ -335,7 +336,7 @@ export function DateTimePicker({
               {mode === "datetime" && (
                 <div className="dtp-cal-footer">
                   {selDate ? (
-                    <button className="dtp-switch-btn" onClick={() => setPanel("time")}>
+                    <button type="button" className="dtp-switch-btn" onClick={() => setPanel("time")}>
                       <Clock size={13} /> Set time
                     </button>
                   ) : (
@@ -352,7 +353,7 @@ export function DateTimePicker({
           {panel === "time" && (
             <div className="dtp-time-panel">
               {mode === "datetime" && (
-                <button className="dtp-back-btn" onClick={() => setPanel("cal")}>
+                <button type="button" className="dtp-back-btn" onClick={() => setPanel("cal")}>
                   <ChevronLeft size={13} />
                   {selDate
                     ? `${MONTHS[selDate.getMonth()].slice(0,3)} ${selDate.getDate()}, ${selDate.getFullYear()}`
@@ -368,7 +369,7 @@ export function DateTimePicker({
                 <Spinner value={minutes} onUp={() => setMinutes(m => (m + 5) % 60)}         onDn={() => setMinutes(m => m === 0 ? 55 : m - 5)} format={pad} />
                 <div className="dtp-ampm-toggle">
                   {(["AM","PM"] as const).map(ap => (
-                    <button key={ap} className={`dtp-ampm-btn${ampm === ap ? " active" : ""}`} onClick={() => setAmpm(ap)}>
+                    <button type="button" key={ap} className={`dtp-ampm-btn${ampm === ap ? " active" : ""}`} onClick={() => setAmpm(ap)}>
                       {ap}
                     </button>
                   ))}
@@ -385,6 +386,7 @@ export function DateTimePicker({
                   { label: "6:00 PM",  h: 6,  m: 0, ap: "PM" as const },
                 ].map(p => (
                   <button
+                    type="button"
                     key={p.label}
                     className={`dtp-preset${hours === p.h && minutes === p.m && ampm === p.ap ? " active" : ""}`}
                     onClick={() => { setHours(p.h); setMinutes(p.m); setAmpm(p.ap); }}
@@ -394,7 +396,7 @@ export function DateTimePicker({
                 ))}
               </div>
 
-              <button className="dtp-confirm-btn" onClick={confirmTime}>
+              <button type="button" className="dtp-confirm-btn" onClick={confirmTime}>
                 <Check size={14} /> Confirm
               </button>
             </div>

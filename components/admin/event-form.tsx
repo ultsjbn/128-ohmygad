@@ -29,10 +29,10 @@ type EventFormProps = {
 
 const CATEGORY_OPTIONS = [
   { value: "Orientation", label: "Orientation" },
-  { value: "Forum",       label: "Forum"       },
-  { value: "Research",    label: "Research"    },
-  { value: "Training",    label: "Training"    },
-  { value: "Workshop",    label: "Workshop"    },
+  { value: "Forum", label: "Forum" },
+  { value: "Research", label: "Research" },
+  { value: "Training", label: "Training" },
+  { value: "Workshop", label: "Workshop" },
 ];
 
 const STATUS_OPTIONS = [
@@ -43,25 +43,25 @@ const STATUS_OPTIONS = [
 export default function EventForm({ initialData, mode }: EventFormProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError]         = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const [title,              setTitle]              = useState(initialData?.title              ?? "");
-  const [description,        setDescription]        = useState(initialData?.description        ?? "");
-  const [location,           setLocation]           = useState(initialData?.location           ?? "");
+  const [title, setTitle] = useState(initialData?.title ?? "");
+  const [description, setDescription] = useState(initialData?.description ?? "");
+  const [location, setLocation] = useState(initialData?.location ?? "");
 
   // removed the slice(0,16) because datetimepicker handles full iso strings
-  const [start_date,         setStartDate]          = useState(initialData?.start_date         ?? "");
-  const [end_date,           setEndDate]            = useState(initialData?.end_date           ?? "");
-  const [capacity,           setCapacity]           = useState<number | "">(initialData?.capacity ?? "");
-  const [registration_open,  setRegistrationOpen]   = useState(initialData?.registration_open  ?? "");
-  const [registration_close, setRegistrationClose]  = useState(initialData?.registration_close ?? "");
-  const [category,           setCategory]           = useState(initialData?.category           ?? "");
-  const [status,             setStatus]             = useState(initialData?.status             ?? "");
+  const [start_date, setStartDate] = useState(initialData?.start_date ?? "");
+  const [end_date, setEndDate] = useState(initialData?.end_date ?? "");
+  const [capacity, setCapacity] = useState<number | "">(initialData?.capacity ?? "");
+  const [registration_open, setRegistrationOpen] = useState(initialData?.registration_open ?? "");
+  const [registration_close, setRegistrationClose] = useState(initialData?.registration_close ?? "");
+  const [category, setCategory] = useState(initialData?.category ?? "");
+  const [status, setStatus] = useState(initialData?.status ?? "");
 
   // for banner images
-  const [banner_url,      setBannerUrl]      = useState(initialData?.banner_url ?? "");
-  const [bannerFile,      setBannerFile]     = useState<File | null>(null);
-  const [bannerPreview,   setBannerPreview]  = useState(initialData?.banner_url ?? "");
+  const [banner_url, setBannerUrl] = useState(initialData?.banner_url ?? "");
+  const [bannerFile, setBannerFile] = useState<File | null>(null);
+  const [bannerPreview, setBannerPreview] = useState(initialData?.banner_url ?? "");
   const [uploadingBanner, setUploadingBanner] = useState(false);
 
   // handler for when a file is picked - local preview only, no upload yet
@@ -79,15 +79,15 @@ export default function EventForm({ initialData, mode }: EventFormProps) {
   };
 
   // strips timezone so the string is accepted by timestamp without time zone
-    const toLocalTimestamp = (iso: string) => {
-        if (!iso || iso.trim() === "") return null;
-        
-        const d = new Date(iso);
-        if (isNaN(d.getTime())) return null; 
+  const toLocalTimestamp = (iso: string) => {
+    if (!iso || iso.trim() === "") return null;
 
-        const pad = (n: number) => String(n).padStart(2, "0");
-        return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
-    };
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return null;
+
+    const pad = (n: number) => String(n).padStart(2, "0");
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+  };
 
   // submit handler
   const handleSubmit = async (e: React.FormEvent) => {
@@ -101,7 +101,7 @@ export default function EventForm({ initialData, mode }: EventFormProps) {
     if (bannerFile) {
       setUploadingBanner(true);
       const supabase = createClient();
-      const ext      = bannerFile.name.split(".").pop();
+      const ext = bannerFile.name.split(".").pop();
       const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
 
       const { error: uploadError } = await supabase.storage
@@ -123,19 +123,97 @@ export default function EventForm({ initialData, mode }: EventFormProps) {
       setUploadingBanner(false);
     }
 
+    // validation Logic
+    if (!title || !location || !start_date || !registration_open || !registration_close || !capacity || !category || !status) {
+      setError("Please fill in all required fields.");
+      setIsLoading(false);
+      return;
+    }
+
+    const start = new Date(start_date);
+    const end = end_date ? new Date(end_date) : null;
+    const regOpen = new Date(registration_open);
+    const regClose = new Date(registration_close);
+
+    // Get the start of today for comparison
+    const nowLocal = new Date();
+    const startOfToday = new Date(nowLocal.getFullYear(), nowLocal.getMonth(), nowLocal.getDate());
+
+    if (status === "upcoming") {
+      if (start < startOfToday) {
+        setError("Upcoming events cannot have a start date in the past.");
+        setIsLoading(false);
+        return;
+      }
+      if (end && end < startOfToday) {
+        setError("Upcoming events cannot have an end date in the past.");
+        setIsLoading(false);
+        return;
+      }
+      if (regOpen < startOfToday) {
+        setError("Upcoming events cannot have registration open in the past.");
+        setIsLoading(false);
+        return;
+      }
+      if (regClose < startOfToday) {
+        setError("Upcoming events cannot have registration close in the past.");
+        setIsLoading(false);
+        return;
+      }
+    } else if (status === "past") {
+      if (start >= startOfToday) {
+        setError("Past events cannot have a start date of today or in the future.");
+        setIsLoading(false);
+        return;
+      }
+      if (end && end >= startOfToday) {
+        setError("Past events cannot have an end date of today or in the future.");
+        setIsLoading(false);
+        return;
+      }
+      if (regOpen >= startOfToday) {
+        setError("Past events cannot have registration open of today or in the future.");
+        setIsLoading(false);
+        return;
+      }
+      if (regClose >= startOfToday) {
+        setError("Past events cannot have registration close of today or in the future.");
+        setIsLoading(false);
+        return;
+      }
+    }
+
+    if (end && start >= end) {
+      setError("End date must be after the start date.");
+      setIsLoading(false);
+      return;
+    }
+
+    if (regOpen >= regClose) {
+      setError("Registration close date must be after the open date.");
+      setIsLoading(false);
+      return;
+    }
+
+    if (capacity !== "" && Number(capacity) <= 0) {
+      setError("Capacity must be greater than 0.");
+      setIsLoading(false);
+      return;
+    }
+
     const payload = {
-        title,
-        description,
-        location,
-        start_date:         toLocalTimestamp(start_date),
-        end_date:           toLocalTimestamp(end_date),
-        registration_open:  toLocalTimestamp(registration_open),
-        registration_close: toLocalTimestamp(registration_close),
-        capacity:           capacity === "" ? null : Number(capacity),
-        category,
-        status,
-        updated_at:         toLocalTimestamp(new Date().toISOString()),
-        banner_url:         finalBannerUrl || null,
+      title,
+      description,
+      location,
+      start_date: toLocalTimestamp(start_date),
+      end_date: toLocalTimestamp(end_date),
+      registration_open: toLocalTimestamp(registration_open),
+      registration_close: toLocalTimestamp(registration_close),
+      capacity: capacity === "" ? null : Number(capacity),
+      category,
+      status,
+      updated_at: toLocalTimestamp(new Date().toISOString()),
+      banner_url: finalBannerUrl || null,
     };
 
     console.log("payload", payload);
@@ -203,20 +281,20 @@ export default function EventForm({ initialData, mode }: EventFormProps) {
                 <label className="label">Banner Image</label>
 
                 {bannerPreview ? (
-                    <div className="relative rounded-[var(--radius-md)] overflow-hidden">
-                        <img
-                        src={bannerPreview}
-                        alt="Banner preview"
-                        className="w-full h-40 object-cover"
-                        />
-                        <button
-                        type="button"
-                        onClick={removeBanner}
-                        className="absolute top-2 right-2 w-7 h-7 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center text-[var(--primary-dark)] border-none cursor-pointer"
-                        >
-                        <X size={14} />
-                        </button>
-                    </div>
+                  <div className="relative rounded-[var(--radius-md)] overflow-hidden">
+                    <img
+                      src={bannerPreview}
+                      alt="Banner preview"
+                      className="w-full h-40 object-cover"
+                    />
+                    <button
+                      type="button"
+                      onClick={removeBanner}
+                      className="absolute top-2 right-2 w-7 h-7 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center text-[var(--primary-dark)] border-none cursor-pointer"
+                    >
+                      <X size={14} />
+                    </button>
+                  </div>
                 ) : (
                   <label className="flex flex-col items-center justify-center gap-2 h-32 rounded-[var(--radius-md)] border-2 border-dashed border-[rgba(45,42,74,0.15)] cursor-pointer hover:border-[var(--periwinkle)] hover:bg-[var(--lavender)] transition-all">
                     <ImagePlus size={22} className="text-[var(--gray)]" />
@@ -253,11 +331,11 @@ export default function EventForm({ initialData, mode }: EventFormProps) {
                 />
 
                 <Select
-                    label="Status *"
-                    required
-                    options={[{ value: "", label: "Select status" }, ...STATUS_OPTIONS]}
-                    value={status}
-                    onChange={(e) => setStatus(e.target.value)}
+                  label="Status *"
+                  required
+                  options={[{ value: "", label: "Select status" }, ...STATUS_OPTIONS]}
+                  value={status}
+                  onChange={(e) => setStatus(e.target.value)}
                 />
               </div>
             </Card>
@@ -332,8 +410,8 @@ export default function EventForm({ initialData, mode }: EventFormProps) {
           {uploadingBanner
             ? "Uploading banner…"
             : isLoading
-            ? mode === "create" ? "Creating..." : "Saving..."
-            : mode === "create" ? "Create Event" : "Save Changes"
+              ? mode === "create" ? "Creating..." : "Saving..."
+              : mode === "create" ? "Create Event" : "Save Changes"
           }
         </Button>
       </div>
