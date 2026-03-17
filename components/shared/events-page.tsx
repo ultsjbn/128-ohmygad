@@ -113,12 +113,26 @@ export default function EventsPage() {
   const [registeringId, setRegisteringId] = useState<string | null>(null);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [registerError, setRegisterError] = useState<string | null>(null);
+  const [regCounts, setRegCounts] = useState<Record<string, number>>({});
+
+    const [toast, setToast] = useState<{
+        variant: "success" | "error" | "warning" | "info";
+        title: string;
+        message?: string;
+    } | null>(null);
+
+    const showToast = (t: typeof toast) => {
+        setToast(t);
+        setTimeout(() => setToast(null), 3500);
+    };
 
   // filter options
   const statuses = Array.from(new Set(events.map((e) => e.status?.toLowerCase().trim()).filter(Boolean))) as string[];
   const categories = Array.from(new Set(events.map((e) => e.category).filter(Boolean))) as string[];
   const hasActiveFilters = filters.status.size > 0 || filters.category.size > 0;
   const activeFilterCount = filters.status.size + filters.category.size;
+
+  
 
   // useEffect for fetching events
   useEffect(() => {
@@ -145,6 +159,17 @@ export default function EventsPage() {
         .select("id, title, description, category, status, start_date, end_date, capacity, location, registration_open, registration_close, banner_url")
         .order("start_date", { ascending: false });
 
+        const { data: counts } = await supabase
+            .from("event_registration")
+            .select("event_id")
+            .neq("status", "cancelled");
+
+        if (counts) {
+            const map: Record<string, number> = {};
+            counts.forEach((r) => { map[r.event_id] = (map[r.event_id] ?? 0) + 1; });
+            setRegCounts(map);
+        }
+
       if (error) setError(error.message);
       else if (data) setEvents(data);
       setIsLoading(false);
@@ -159,38 +184,56 @@ export default function EventsPage() {
   }, [searchParams]);
 
   // handle registrations
-  const handleRegister = async (eventId: string, e?: React.MouseEvent) => {
-    e?.stopPropagation();
-    setRegisterError(null);
+    const handleRegister = async (eventId: string, e?: React.MouseEvent) => {
+        e?.stopPropagation();
 
-    // if already registered, do nothing
-    if (registeredIds.has(eventId)) return;
+        if (registeredIds.has(eventId)) return;
 
-    if (!currentUserId) {
-      setRegisterError("You must be logged in to register.");
-      return;
-    }
+        if (!currentUserId) {
+            showToast({ variant: "error", title: "Not logged in", message: "Please log in to register for events." });
+            return;
+        }
 
-    setRegisteringId(eventId);
-    const supabase = createClient();
-    // add user to registered
-    const { error } = await supabase
-      .from("event_registration")
-      .insert({
-        event_id: eventId,
-        user_id: currentUserId,
-        status: "registered",
-        registration_date: new Date().toISOString(),
-      });
+        // registration window check
+        const event = events.find((ev) => ev.id === eventId);
+        const now = new Date();
+        if (event?.registration_open && new Date(event.registration_open) > now) {
+            showToast({ variant: "warning", title: "Registration not yet open", message: "Registration hasn't started for this event." });
+            return;
+        }
+        if (event?.registration_close && new Date(event.registration_close) < now) {
+            showToast({ variant: "error", title: "Registration closed", message: "The deadline has already passed." });
+            return;
+        }
 
-    if (error) {
-      setRegisterError("Failed to register: " + error.message);
-    } else {
-      setRegisteredIds((prev) => new Set([...prev, eventId]));
-    }
+        setRegisteringId(eventId);
+        const supabase = createClient();
 
-    setRegisteringId(null);
-  };  
+        const { error } = await supabase
+            .from("event_registration")
+            .insert({
+            event_id: eventId,
+            user_id: currentUserId,
+            status: "registered",
+            registration_date: new Date().toISOString(),
+            });
+
+        if (error) {
+            showToast({
+                variant: "error",
+                title: "Registration failed",
+                message: error.message });
+        } else {
+            setRegisteredIds((prev) => new Set([...prev, eventId]));
+            setRegCounts((prev) => ({ ...prev, [eventId]: (prev[eventId] ?? 0) + 1 }));
+            showToast({
+                variant: "success",
+                title: "Registered!",
+                message: `You've registered for ${event?.title}.` });
+        }
+
+        setRegisteringId(null);
+    };
 
   // sorting functions
   const sortEvents = (eventsToSort: EventFormData[], sortState: SortState): EventFormData[] => {
@@ -419,7 +462,7 @@ export default function EventsPage() {
                   category={event.category ?? "Uncategorized"}
                   date={event.start_date ? new Date(event.start_date).toLocaleDateString("en-PH", { month: "short", day: "numeric", year: "numeric" }) : "—"}
                   location={event.location ?? "—"}
-                  registered={0}
+                  registered={regCounts[event.id!] ?? 0}
                   capacity={event.capacity ?? 0}
                   gradient={event.banner_url ? `url(${event.banner_url}) center/cover no-repeat` : CATEGORY_GRADIENT[event.category ?? ""] ?? DEFAULT_GRADIENT}
                   registerLabel={isRegistered ? "Registered" : isRegistering ? "Processing…" : "Register"}
@@ -444,21 +487,18 @@ export default function EventsPage() {
         hideCloseButton
         modalStyle={{ maxWidth: 600, padding: 0 }}
         footer={
-          detailEvent && (
-            <div className="px-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] sm:px-4 sm:pb-4 shrink-0 flex flex-col gap-2">
-              {registerError && (
-                <p className="caption text-[var(--error)] text-center">{registerError}</p>
-              )}
-              <Button
-                variant={isDetailRegistered ? "soft" : "primary"}
-                className="w-full"
-                disabled={isDetailRegistering}
-                onClick={(e) => handleRegister(detailEvent.id!, e)}
-              >
-                {isDetailRegistering ? "Processing…" : isDetailRegistered ? "Registered" : "Register"}
-              </Button>
-            </div>
-          )
+            detailEvent && (
+                <div className="px-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] sm:px-4 sm:pb-4 shrink-0">
+                <Button
+                    variant={isDetailRegistered ? "soft" : "primary"}
+                    className="w-full"
+                    disabled={isDetailRegistering || isDetailRegistered}
+                    onClick={(e) => handleRegister(detailEvent.id!, e)}
+                >
+                    {isDetailRegistering ? "Processing…" : isDetailRegistered ? "Registered" : "Register"}
+                </Button>
+                </div>
+            )
         }
       >
         {detailEvent && (
@@ -528,6 +568,15 @@ export default function EventsPage() {
                 )}
               </div>
 
+              {/* capacity progress bar */}
+                {detailEvent.capacity != null && (
+                    <ProgressBar
+                        value={Math.round(((regCounts[detailEvent.id!] ?? 0) / detailEvent.capacity) * 100)}
+                        label="Registered"
+                        sublabel={`${regCounts[detailEvent.id!] ?? 0} / ${detailEvent.capacity}`}
+                    />
+                )}
+
               {/* divider */}
               <div className="divider" />
 
@@ -541,6 +590,12 @@ export default function EventsPage() {
         )}
       </Modal>
 
+        {toast && (
+        <div className="fixed bottom-6 right-4 z-[999] sm:right-6">
+            <Toast variant={toast.variant} title={toast.title} message={toast.message} />
+        </div>
+        )}
+        
       {/* hide scroll to top if event details are open */}
       <ScrollToTop hidden={!!detailEvent} />
     </div>

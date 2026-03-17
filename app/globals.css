@@ -539,6 +539,13 @@ body {
   transition: var(--transition);
 }
 
+.card-no-shadow {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    transition: var(--transition);
+}
+
 .auth-card {
   background: var(--white);
   border-radius: var(--radius-lg);

@@ -1,6 +1,6 @@
 import React from "react";
 
-type CardVariant = "default" | "pink" | "periwinkle" | "dark" | "glass";
+type CardVariant = "default" | "pink" | "periwinkle" | "dark" | "glass" | "no-shadow";
 
 interface CardProps {
   children: React.ReactNode;
@@ -16,6 +16,7 @@ export function Card({ children, variant = "default", className = "", style, noP
     : variant === "periwinkle" ? "card-periwinkle"
     : variant === "dark" ? "card-dark"
     : variant === "glass" ? "card-glass"
+    : variant === "no-shadow" ? "card-no-shadow"
     : "card";
 
   return (

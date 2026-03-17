@@ -34,7 +34,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
             <UserMenu />
           </div>
         </header>
-        <main style={{ flex:1, overflowY:'auto', padding:'24px', paddingBottom:'96px' }}>
+        <main style={{ flex:1, overflowY:'scroll', padding:'24px', paddingBottom:'96px' }}>
           <Suspense fallback={<div style={{ display:'flex', alignItems:'center', justifyContent:'center', height:'100%', color:'var(--gray)', fontSize:14 }}>Loading…</div>}>
             <StudentAuthGuard>{children}</StudentAuthGuard>
           </Suspense>
