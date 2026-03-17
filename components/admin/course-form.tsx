@@ -45,12 +45,6 @@ export default function CourseForm({ initialData, mode }: CourseFormProps) {
   
   const parseTime = (value?: string) => {
     if (!value) return "";
-
-    const date = new Date(value);
-    if (!isNaN(date.getTime())) {
-      return date.toTimeString().slice(0, 5); // "HH:MM"
-    }
-
     const match = value.match(/(\d{1,2}:\d{2})/);
     return match ? match[1] : "";
   };
@@ -73,19 +67,36 @@ export default function CourseForm({ initialData, mode }: CourseFormProps) {
       return;
     }
 
-    const timeToMinutes = (time: string) => {
-      const [h, m] = time.split(':').map(Number);
+    const parseTimeToMinutes = (timeRaw: string) => {
+      const timeStr = parseTime(timeRaw);
+      if (!timeStr) return null;
+      const match = timeStr.match(/^(\d{1,2}):(\d{2})$/);
+      if (!match) return null;
+      const h = Number(match[1]);
+      const m = Number(match[2]);
+      if (Number.isNaN(h) || Number.isNaN(m) || h < 0 || h > 23 || m < 0 || m > 59) return null;
       return h * 60 + m;
     };
 
-    if (start_time && end_time && timeToMinutes(start_time) >= timeToMinutes(end_time)) {
+    const startMinutes = parseTimeToMinutes(start_time);
+    const endMinutes = parseTimeToMinutes(end_time);
+
+    if (startMinutes === null || endMinutes === null) {
+      setError("Invalid time format. Please select a valid start and end time.");
+      setIsLoading(false);
+      return;
+    }
+
+    if (startMinutes >= endMinutes) {
       setError("End time must be after the start time.");
       setIsLoading(false);
       return;
     }
 
-    const formatTime = (time: string) => 
-      time.length === 5 ? time + ":00" : time; // assume "HH:MM" -> "HH:MM:SS"
+    const formatTime = (timeRaw: string) => {
+      const parsed = parseTime(timeRaw);
+      return parsed.length === 5 ? parsed + ":00" : parsed;
+    };
 
     const payload = {
       title,

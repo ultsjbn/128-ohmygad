@@ -30,11 +30,33 @@ export async function GET() {
   }
 }
 
+function parseTimeToMinutes(time?: string | null) {
+  if (!time) return null;
+  const match = time.match(/^(\d{1,2}):(\d{2})/);
+  if (!match) return null;
+  const h = Number(match[1]);
+  const m = Number(match[2]);
+  if (Number.isNaN(h) || Number.isNaN(m) || h < 0 || h > 23 || m < 0 || m > 59) return null;
+  return h * 60 + m;
+}
+
 export async function POST(req: Request) {
   try {
     const body = await req.json();
     // the course table may have End_time instead of end_time depending on how it was created
     const { title, description = "", start_time = null, end_time = null, instructor_id = null, status = "active", semester = "" } = body;
+
+    // validate times
+    if (start_time && end_time) {
+      const startMinutes = parseTimeToMinutes(start_time);
+      const endMinutes = parseTimeToMinutes(end_time);
+      if (startMinutes === null || endMinutes === null) {
+        return NextResponse.json({ success: false, error: "Invalid time format for start or end time." }, { status: 400 });
+      }
+      if (startMinutes >= endMinutes) {
+        return NextResponse.json({ success: false, error: "End time must be after start time." }, { status: 400 });
+      }
+    }
 
     console.log("[POST /api/courses] Received body:", body);
 

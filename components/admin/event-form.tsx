@@ -52,7 +52,9 @@ export default function EventForm({ initialData, mode }: EventFormProps) {
   // removed the slice(0,16) because datetimepicker handles full iso strings
   const [start_date, setStartDate] = useState(initialData?.start_date ?? "");
   const [end_date, setEndDate] = useState(initialData?.end_date ?? "");
-  const [capacity, setCapacity] = useState<number | "">(initialData?.capacity ?? "");
+  const [capacity, setCapacity] = useState<number | null>(
+    initialData?.capacity ?? null
+  );
   const [registration_open, setRegistrationOpen] = useState(initialData?.registration_open ?? "");
   const [registration_close, setRegistrationClose] = useState(initialData?.registration_close ?? "");
   const [category, setCategory] = useState(initialData?.category ?? "");
@@ -195,8 +197,14 @@ export default function EventForm({ initialData, mode }: EventFormProps) {
       return;
     }
 
-    if (capacity !== "" && Number(capacity) <= 0) {
+    if (capacity !== null && capacity <= 0) {
       setError("Capacity must be greater than 0.");
+      setIsLoading(false);
+      return;
+    }
+
+    if (capacity !== null && capacity > 9999) {
+      setError("Capacity must be at most 9999.");
       setIsLoading(false);
       return;
     }
@@ -209,7 +217,7 @@ export default function EventForm({ initialData, mode }: EventFormProps) {
       end_date: toLocalTimestamp(end_date),
       registration_open: toLocalTimestamp(registration_open),
       registration_close: toLocalTimestamp(registration_close),
-      capacity: capacity === "" ? null : Number(capacity),
+      capacity: capacity === null ? null : capacity,
       category,
       status,
       updated_at: toLocalTimestamp(new Date().toISOString()),
@@ -315,11 +323,12 @@ export default function EventForm({ initialData, mode }: EventFormProps) {
                   label="Capacity *"
                   type="number"
                   min={1}
+                  max={9999}
                   placeholder="e.g. 30"
                   required
                   prefixIcon={<Users size={15} />}
-                  value={capacity}
-                  onChange={(e) => setCapacity(e.target.value === "" ? "" : Number(e.target.value))}
+                  value={capacity ?? ""}
+                  onChange={(e) => setCapacity(e.target.value === "" ? null : Number(e.target.value))}
                 />
 
                 <Select

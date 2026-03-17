@@ -245,7 +245,8 @@ export function DateTimePicker({
   const timeStr = `${pad(hours)}:${pad(minutes)} ${ampm}`;
   let displayVal = "";
   if (mode === "time") {
-    displayVal = hours ? timeStr : "";
+    // Only show a value when the controlled `value` prop is set.
+    displayVal = value ? timeStr : "";
   } else if (selDate) {
     const ds = `${MONTHS[selDate.getMonth()].slice(0,3)} ${selDate.getDate()}, ${selDate.getFullYear()}`;
     displayVal = mode === "datetime" ? `${ds}  ·  ${timeStr}` : ds;
