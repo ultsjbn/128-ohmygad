@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import { LogOut } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 export interface NavItem {
@@ -16,7 +15,6 @@ interface SidebarProps {
   expanded?: boolean;
   appName?: string;
   onNavigate?: (id: string) => void;
-  onLogout?: () => void;
 }
 
 export function Sidebar({
@@ -25,7 +23,6 @@ export function Sidebar({
   expanded = false,
   appName = "OhMyGAD!",
   onNavigate,
-  onLogout,
 }: SidebarProps) {
   const [active, setActive] = useState(defaultActive ?? items[0]?.id);
 
@@ -53,12 +50,6 @@ export function Sidebar({
             <Icon size={16} /> {label}
           </div>
         ))}
-
-        <div style={{ marginTop: "auto" }}>
-          <div className="sidebar-item-expanded" onClick={onLogout}>
-            <LogOut size={16} /> Logout
-          </div>
-        </div>
       </div>
     );
   }
@@ -77,11 +68,6 @@ export function Sidebar({
         </div>
       ))}
 
-      <div style={{ marginTop: "auto" }}>
-        <div className="sidebar-item" onClick={onLogout}>
-          <LogOut size={18} />
-        </div>
-      </div>
     </div>
   );
 }

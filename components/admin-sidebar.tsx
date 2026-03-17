@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import {
   LayoutDashboard, Calendar, Users, BookOpen,
-  ClipboardList, ChevronsLeft, ChevronsRight, LogOut,
+  ClipboardList, ChevronsLeft, ChevronsRight,
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -138,15 +138,6 @@ export default function AdminSidebar() {
       </div>
 
       <div style={{ width: "100%", display: "flex", flexDirection: "column", alignItems: isCollapsed ? "center" : "stretch", gap: 2, borderTop: "1px solid rgba(255,255,255,0.10)", paddingTop: 8, marginTop: 8 }}>
-        <button
-          className={`sidebar-item${isCollapsed ? "" : "-expanded"}`}
-          style={{ background: "none", border: "none", cursor: "pointer", color: "rgba(244,123,123,0.65)" }}
-          title={isCollapsed ? "Logout" : ""}
-        >
-          <LogOut size={isCollapsed ? 20 : 18} />
-          {!isCollapsed && <span>Logout</span>}
-        </button>
-
         <button
           onClick={() => setIsCollapsed(!isCollapsed)}
           className={`sidebar-item${isCollapsed ? "" : "-expanded"}`}
