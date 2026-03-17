@@ -175,6 +175,16 @@ export default function SurveyForm({ mode, initialData, initialQuestions = [] }:
       }
     }
 
+    if (open_at && close_at) {
+      const openTime = new Date(open_at).getTime();
+      const closeTime = new Date(close_at).getTime();
+      if (openTime >= closeTime) {
+        setError("Survey close time must be after the open time.");
+        setIsLoading(false);
+        return;
+      }
+    }
+
     const supabase = createClient();
 
     const surveyPayload = {

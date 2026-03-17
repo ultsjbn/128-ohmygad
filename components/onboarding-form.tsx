@@ -43,7 +43,7 @@ export function OnboardingForm({
   const [pronouns, setPronouns] = useState("");
   const [sex_at_birth, setSexAtBirth] = useState("");
   const [gender_identity, setGenderIdentity] = useState("");
-  
+
   // Student fields
   const [college, setCollege] = useState("");
   const [program, setProgram] = useState("");
@@ -104,7 +104,7 @@ export function OnboardingForm({
         contact_num: contact_num || null,
         address: address || null,
         pronouns: pronouns || null,
-        sex_at_birth: sex_at_birth, 
+        sex_at_birth: sex_at_birth,
         gender_identity: gender_identity || null,
         college: college || null,
         program: program || null,
@@ -138,7 +138,7 @@ export function OnboardingForm({
     } // catching errors: 
     catch (error: any) {
       console.error("Onboarding Save Error:", error);
-      
+
       // unique violation error, if it already exists, show this error
       if (error?.code === '23505' || error?.message?.includes('duplicate key')) {
         setError("This student number or contact number is already registered to another account.");
@@ -169,7 +169,7 @@ export function OnboardingForm({
           height={90}
           className="rounded-full object-cover mb-5 shadow-soft border-2 border-white"
         />
-        <h2 className="heading-lg leading-tight">Complete<br/>Your Profile</h2>
+        <h2 className="heading-lg leading-tight">Complete<br />Your Profile</h2>
         <p className="body text-[var(--gray)] mt-3">
           {role === "student" && "Finish setting up your student account to access the dashboard."}
           {role === "faculty" && "Finish setting up your faculty account to access the dashboard."}
@@ -233,7 +233,7 @@ export function OnboardingForm({
                   value={college}
                   onChange={(e) => {
                     setCollege(e.target.value);
-                    setProgram(""); 
+                    setProgram("");
                   }}
                   options={[
                     { value: "", label: "Select college" },
@@ -263,6 +263,7 @@ export function OnboardingForm({
               required
               placeholder="09XX XXX XXXX"
               prefixIcon={<Phone size={15} />}
+              maxLength={15}
               value={contact_num}
               onChange={(e) => setContactNum(e.target.value)}
               autoComplete="off"

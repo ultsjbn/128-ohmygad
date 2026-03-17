@@ -43,11 +43,20 @@ export default function CourseForm({ initialData, mode }: CourseFormProps) {
   const [title, setTitle] = useState(initialData?.title ?? "");
   const [description, setDescription] = useState(initialData?.description ?? "");
   
-  // removed the slice(0,16) because datetimepicker handles full iso strings
-  const [start_time, setStartTime] = useState<Date | null>(
-    initialData?.start_time ? new Date(initialData.start_time) : null);
-  const [end_time, setEndTime] = useState<Date | null>(
-    initialData?.end_time ? new Date(initialData.end_time) : null);
+  const parseTime = (value?: string) => {
+    if (!value) return "";
+
+    const date = new Date(value);
+    if (!isNaN(date.getTime())) {
+      return date.toTimeString().slice(0, 5); // "HH:MM"
+    }
+
+    const match = value.match(/(\d{1,2}:\d{2})/);
+    return match ? match[1] : "";
+  };
+
+  const [start_time, setStartTime] = useState<string>(parseTime(initialData?.start_time));
+  const [end_time, setEndTime] = useState<string>(parseTime(initialData?.end_time));
   const [days, setDays] = useState(initialData?.days ?? "");
   const [semester, setSemester] = useState(initialData?.semester ?? "");
   const [status, setStatus] = useState(initialData?.status ?? "");
@@ -58,8 +67,25 @@ export default function CourseForm({ initialData, mode }: CourseFormProps) {
     setIsLoading(true);
     setError(null);
 
-    const formatTime = (date: Date) => 
-      date.toTimeString().slice(0,8); // "HH:MM:SS"
+    if (!title || !status || !semester || !start_time || !end_time) {
+      setError("Please fill in all required fields.");
+      setIsLoading(false);
+      return;
+    }
+
+    const timeToMinutes = (time: string) => {
+      const [h, m] = time.split(':').map(Number);
+      return h * 60 + m;
+    };
+
+    if (start_time && end_time && timeToMinutes(start_time) >= timeToMinutes(end_time)) {
+      setError("End time must be after the start time.");
+      setIsLoading(false);
+      return;
+    }
+
+    const formatTime = (time: string) => 
+      time.length === 5 ? time + ":00" : time; // assume "HH:MM" -> "HH:MM:SS"
 
     const payload = {
       title,
