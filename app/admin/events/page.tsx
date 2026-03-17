@@ -96,8 +96,11 @@ export default function EventsPage() {
   const [categoryFilter, setCategoryFilter] = useState<string>("All");
   const [statusFilters, setStatusFilters] = useState<Set<string>>(new Set());
   const [page, setPage] = useState(1);
+  
+  // for the delete confirmation modal
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; title: string } | null>(null);
 
-  //  Fetch 
+  // fetch 
   const getEvents = async () => {
     const supabase = createClient();
     const { data, error } = await supabase
@@ -114,13 +117,13 @@ export default function EventsPage() {
 
   useEffect(() => { getEvents(); }, []);
 
-  // sync the URL search param to local search 
+  // sync the url search param to local search 
   useEffect(() => {
     const s = searchParams.get("search");
     if (s !== null) setSearch(s);
   }, [searchParams]);
 
-  //  filter / sort 
+  // filter / sort 
   useEffect(() => {
     const q = search.toLowerCase();
     let result = events;
@@ -129,17 +132,17 @@ export default function EventsPage() {
       `${e.title} ${e.category || ""} ${e.location || ""}`.toLowerCase().includes(q)
     );
 
-    // Category filter
+    // category filter
     if (categoryFilter !== "All") {
       result = result.filter((e) => e.category === categoryFilter);
     }
 
-    // Status filter
+    // status filter
     if (statusFilters.size > 0) {
       result = result.filter((e) => statusFilters.has(e.status ?? ""));
     }
 
-    // Sorting
+    // sorting
     result = result.sort((a, b) => {
       let aVal: any = a[sort.field as keyof EventFormData];
       let bVal: any = b[sort.field as keyof EventFormData];
@@ -167,7 +170,7 @@ export default function EventsPage() {
     setPage(1);
   }, [search, events, sort, categoryFilter, statusFilters]);
 
-  //  toggle helpers 
+  // toggle helpers 
   function toggleStatus(s: string) {
     setStatusFilters((prev) => {
       const next = new Set(prev);
@@ -194,21 +197,29 @@ export default function EventsPage() {
     return sort.direction === "asc" ? <ChevronUp size={12} /> : <ChevronDown size={12} />;
   }
 
-  // delete 
-  const handleDelete = async (id: string, title: string) => {
-    if (!window.confirm(`Delete "${title}"? This cannot be undone.`)) return;
-    setDeletingId(id);
+  // delete execution logic triggered by the modal
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
+    
+    setDeletingId(deleteTarget.id);
     const supabase = createClient();
-    const { error } = await supabase.from("event").delete().eq("id", id);
-    if (error) alert("Failed to delete event: " + error.message);
-    else setEvents((prev) => prev.filter((e) => e.id !== id));
+    
+    const { error } = await supabase.from("event").delete().eq("id", deleteTarget.id);
+    
+    if (error) {
+      alert("Failed to delete event: " + error.message);
+    } else {
+      setEvents((prev) => prev.filter((e) => e.id !== deleteTarget.id));
+    }
+    
     setDeletingId(null);
+    setDeleteTarget(null);
   };
 
   const activeFilterCount = (categoryFilter !== "All" ? 1 : 0) + statusFilters.size;
   const hasActiveFilters = activeFilterCount > 0;
 
-  // DataTable columns 
+  // datatable columns 
   const columns: Column<EventFormData>[] = [
     {
       key: "title",
@@ -290,7 +301,7 @@ export default function EventsPage() {
             title="Delete event"
             disabled={deletingId === event.id}
             style={deletingId === event.id ? { opacity: 0.5 } : { color: "var(--error)" }}
-            onClick={() => handleDelete(event.id!, event.title)}
+            onClick={() => setDeleteTarget({ id: event.id!, title: event.title })}
           >
             {deletingId === event.id
               ? <Loader2 size={14} className="animate-spin" />
@@ -301,11 +312,10 @@ export default function EventsPage() {
     },
   ];
 
-  // 
   return (
     <div className="flex flex-col gap-6">
 
-      {/*  page header  */}
+      {/* page header */}
       <div className="flex items-start justify-between gap-4 flex-wrap mt-1">
         <div>
           <h1 className="heading-lg">Events Management</h1>
@@ -318,7 +328,7 @@ export default function EventsPage() {
         </Button>
       </div>
 
-      {/*  toolbar  */}
+      {/* toolbar */}
       <div className="flex flex-col gap-3">
 
         {/* search, sort, filter */}
@@ -397,7 +407,7 @@ export default function EventsPage() {
         />
       </div>
 
-      {/*  active filter pills  */}
+      {/* active filter pills */}
       {hasActiveFilters && (
         <div className="flex items-center gap-2 flex-wrap -mt-2">
           <span className="caption">Active filters:</span>
@@ -430,7 +440,7 @@ export default function EventsPage() {
         </div>
       )}
 
-      {/*  table / empty / loading  */}
+      {/* table / empty / loading */}
       {isLoading ? (
         <Card>
           <div className="flex items-center justify-center gap-3 py-10" style={{ color: "var(--gray)" }}>
@@ -467,7 +477,7 @@ export default function EventsPage() {
         />
       )}
 
-      {/*  pagination  */}
+      {/* pagination */}
       {!isLoading && filtered.length > 0 && (
         <div className="flex items-center justify-between flex-wrap gap-3">
           <span className="caption">
@@ -481,7 +491,7 @@ export default function EventsPage() {
         </div>
       )}
 
-      {/*  detail modal  */}
+      {/* detail modal */}
       <Modal
         open={!!modalContent}
         onClose={() => setModalContent(null)}
@@ -490,6 +500,31 @@ export default function EventsPage() {
         <p style={{ fontSize: 14, lineHeight: 1.8, color: "var(--primary-dark)", whiteSpace: "pre-wrap" }}>
           {modalContent?.text || "No description provided."}
         </p>
+      </Modal>
+
+      {/* confirm delete modal */}
+      <Modal
+        open={!!deleteTarget}
+        onClose={() => !deletingId && setDeleteTarget(null)}
+        title="Delete Event?"
+        subtitle="This action cannot be undone. All registrations and data tied to this event will be permanently removed."
+        footer={
+          <div className="flex gap-3 w-full">
+            <Button variant="ghost" className="flex-1" onClick={() => setDeleteTarget(null)} disabled={!!deletingId}>
+              Cancel
+            </Button>
+            <Button variant="primary" className="flex-1 !bg-[var(--error)]" onClick={confirmDelete} disabled={!!deletingId}>
+              {deletingId ? "Deleting..." : "Yes, Delete"}
+            </Button>
+          </div>
+        }
+      >
+        {deleteTarget && (
+          <div className="p-4 rounded-xl bg-[var(--pink-light)] border border-[rgba(244,123,123,0.2)]">
+            <p className="text-sm text-[var(--error)] font-bold mb-1">Warning</p>
+            <p className="text-sm text-[var(--primary-dark)]">You are about to delete: <strong className="break-words">{deleteTarget.title}</strong></p>
+          </div>
+        )}
       </Modal>
 
     </div>

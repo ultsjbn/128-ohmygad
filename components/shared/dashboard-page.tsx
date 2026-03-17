@@ -47,12 +47,12 @@ export default function DashboardPage({ rightPanel }: DashboardPageProps) {
             {/* centered inner wrapper */}
             <div className="flex gap-4 md:gap-6 flex-1 min-h-0 w-full md:px-2 max-w-[1100px]">
 
-                {/* events panel — grows to fill, min width so it never gets too cramped */}
+                {/* events panel - grows to fill, min width so it never gets too cramped */}
                 <Card className="flex flex-col p-0 overflow-hidden min-h-0 flex-1 min-w-0">
                     <EventPanel />
                 </Card>
 
-                {/* right panel — fixed comfortable width, grows if needed */}
+                {/* right panel - fixed comfortable width, grows if needed */}
                 {rightPanel && (
                     <div className="hidden lg:flex flex-col gap-4 min-h-0 overflow-y-scroll w-[340px] shrink-0">
                     {rightPanel}

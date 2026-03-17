@@ -83,6 +83,9 @@ export default function SurveysPage() {
   const [statusFilters, setStatusFilters] = useState<Set<string>>(new Set());
   const [page, setPage] = useState(1);
 
+  // for the delete confirmation modal
+    const [deleteTarget, setDeleteTarget] = useState<{ id: string; title: string } | null>(null);
+
   // Fetch
   const getSurveys = async () => {
     const supabase = createClient();
@@ -142,15 +145,23 @@ export default function SurveysPage() {
     setStatusFilters(new Set());
   }
 
-  // delete
-  const handleDelete = async (id: string, title: string) => {
-    if (!window.confirm(`Delete "${title}"? This cannot be undone.`)) return;
-    setDeletingId(id);
+  // delete execution logic triggered by the modal
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
+    
+    setDeletingId(deleteTarget.id);
     const supabase = createClient();
-    const { error } = await supabase.from("survey").delete().eq("id", id);
-    if (error) alert("Failed to delete: " + error.message);
-    else setSurveys((prev) => prev.filter((s) => s.id !== id));
+    
+    const { error } = await supabase.from("survey").delete().eq("id", deleteTarget.id);
+    
+    if (error) {
+      alert("Failed to delete survey: " + error.message);
+    } else {
+      setSurveys((prev) => prev.filter((e) => e.id !== deleteTarget.id));
+    }
+    
     setDeletingId(null);
+    setDeleteTarget(null);
   };
 
   const formatDate = (val?: string | null) =>
@@ -215,7 +226,7 @@ export default function SurveysPage() {
             title="Delete survey"
             disabled={deletingId === survey.id}
             style={deletingId === survey.id ? { opacity: 0.5 } : { color: "var(--error)" }}
-            onClick={() => handleDelete(survey.id!, survey.title)}
+            onClick={() => setDeleteTarget({ id: survey.id!, title: survey.title })}
           >
             {deletingId === survey.id
               ? <Loader2 size={14} className="animate-spin" />
@@ -381,6 +392,31 @@ export default function SurveysPage() {
           {modalContent?.text || "No description provided."}
         </p>
       </Modal>
+
+      {/* confirm delete modal */}
+        <Modal
+            open={!!deleteTarget}
+            onClose={() => !deletingId && setDeleteTarget(null)}
+            title="Delete Survey?"
+            subtitle="This action cannot be undone."
+            footer={
+            <div className="flex gap-3 w-full">
+                <Button variant="ghost" className="flex-1" onClick={() => setDeleteTarget(null)} disabled={!!deletingId}>
+                Cancel
+                </Button>
+                <Button variant="primary" className="flex-1 !bg-[var(--error)]" onClick={confirmDelete} disabled={!!deletingId}>
+                {deletingId ? "Deleting..." : "Yes, Delete"}
+                </Button>
+            </div>
+            }
+        >
+            {deleteTarget && (
+            <div className="p-4 rounded-xl bg-[var(--pink-light)] border border-[rgba(244,123,123,0.2)]">
+                <p className="text-sm text-[var(--error)] font-bold mb-1">Warning</p>
+                <p className="text-sm text-[var(--primary-dark)]">You are about to delete: <strong className="break-words">{deleteTarget.title}</strong></p>
+            </div>
+            )}
+        </Modal>
 
     </div>
   );

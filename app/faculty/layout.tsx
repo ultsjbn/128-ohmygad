@@ -39,6 +39,7 @@ export default function FacultyLayout({ children }: { children: React.ReactNode 
             }}>
           <GlobalSearch role="faculty" placeholder="Search events, courses, surveys..." />
           <div style={{ display:'flex', alignItems:'center', gap:12 }}>
+
             <UserMenu />
           </div>
         </header>
