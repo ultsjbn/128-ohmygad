@@ -1,6 +1,7 @@
 import React from "react";
+import { Clock, MapPin } from "lucide-react";
 
-type CardVariant = "default" | "pink" | "periwinkle" | "dark" | "glass";
+type CardVariant = "default" | "pink" | "periwinkle" | "dark" | "glass" | "no-shadow";
 
 interface CardProps {
   children: React.ReactNode;
@@ -16,6 +17,7 @@ export function Card({ children, variant = "default", className = "", style, noP
     : variant === "periwinkle" ? "card-periwinkle"
     : variant === "dark" ? "card-dark"
     : variant === "glass" ? "card-glass"
+    : variant === "no-shadow" ? "card-no-shadow"
     : "card";
 
   return (
@@ -28,7 +30,7 @@ export function Card({ children, variant = "default", className = "", style, noP
   );
 }
 
-// StatCard
+// statcard
 interface StatCardProps {
   icon: React.ReactNode;
   iconBg?: string;
@@ -53,9 +55,7 @@ export function StatCard({ icon, iconBg = "var(--pink-light)", value, label, var
   );
 }
 
-// EventCard
-import { Clock, MapPin } from "lucide-react";
-
+// eventcard
 export interface EventCardProps {
   title: string;
   category: string;
@@ -64,16 +64,18 @@ export interface EventCardProps {
   registered: number;
   capacity: number;
   gradient: string;
-  onRegister?: () => void;
+  onRegister?: (e?: React.MouseEvent) => void;
   registerLabel?: string;
   registerDisabled?: boolean;
+  isRegistered?: boolean;
 }
 
 export function EventCard({
   title, category, date, location,
-  registered, capacity, gradient, onRegister, registerDisabled, registerLabel
+  registered, capacity, gradient, onRegister, registerDisabled, registerLabel, isRegistered
 }: EventCardProps) {
   const pct = Math.round((registered / capacity) * 100);
+  
   return (
     <div className="event-card">
       <div className="event-cover" style={{ background: gradient }}>
@@ -100,8 +102,11 @@ export function EventCard({
         </div>
         <div style={{ marginTop: 14 }}>
           <button
-            className="btn btn-primary btn-sm"
-            style={{ width: "100%", justifyContent: "center" }}
+            className={`btn btn-sm w-full flex justify-center transition-opacity ${
+              isRegistered 
+                ? "btn-ghost" 
+                : "btn-primary"
+            }`}
             onClick={onRegister}
             disabled={registerDisabled}
           >
@@ -113,7 +118,7 @@ export function EventCard({
   );
 }
 
-// ParticipantCard
+// participantcard
 interface ParticipantCardProps {
   name: string;
   studentId: string;
@@ -147,9 +152,3 @@ export function ParticipantCard({ name, studentId, college, role, gsoCount }: Pa
     </div>
   );
 }
-
-/*
-How to use this component?
-
-
-*/

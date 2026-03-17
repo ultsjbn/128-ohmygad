@@ -1,11 +1,9 @@
 import { Suspense } from 'react';
 import { redirect } from 'next/navigation';
 import GlobalSearch from '@/components/global-search';
-import { Search, Bell } from 'lucide-react';
 import StudentSidebar from '@/components/student-sidebar';
 import { getCurrentUserWithRole } from '@/lib/auth/get-current-user';
 import UserMenu from '@/components/user-menu';
-import ScrollToTop from '@/components/ui/scroll-to-top';
 
 async function StudentAuthGuard({ children }: { children: React.ReactNode }) {
   const result = await getCurrentUserWithRole();
@@ -25,16 +23,26 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
       <StudentSidebar />
 
       <div style={{ position:'relative', zIndex:1, display:'flex', flexDirection:'column', flex:1, minWidth:0, overflow:'hidden' }}>
-        <header style={{ display:'flex', flexShrink:0, alignItems:'center', justifyContent:'space-between', gap:16, padding:'10px 24px', background:'rgba(255,255,255,0.72)', backdropFilter:'blur(14px)', borderBottom:'1px solid rgba(45,42,74,0.07)' }}>
+        <header style={{ 
+            position: 'relative', 
+            zIndex: 50,           
+            display:'flex', 
+            flexShrink:0, 
+            alignItems:'center', 
+            justifyContent:'space-between', 
+            gap:16, 
+            padding:'10px 24px', 
+            background:'rgba(255,255,255,0.45)', 
+            backdropFilter:'blur(16px)', 
+            WebkitBackdropFilter:'blur(16px)',
+            borderBottom:'1px solid rgba(45,42,74,0.07)' 
+        }}>
           <GlobalSearch role="student" placeholder="Search events, courses, surveys..." />
           <div style={{ display:'flex', alignItems:'center', gap:12 }}>
-            <button className="btn btn-icon" style={{ background:'rgba(45,42,74,0.05)', color:'var(--primary-dark)' }} aria-label="Notifications">
-              <Bell size={17} />
-            </button>
             <UserMenu />
           </div>
         </header>
-        <main style={{ flex:1, overflowY:'auto', padding:'24px', paddingBottom:'96px' }}>
+        <main style={{ flex:1, overflowY:'scroll', padding:'24px', paddingBottom:'96px' }}>
           <Suspense fallback={<div style={{ display:'flex', alignItems:'center', justifyContent:'center', height:'100%', color:'var(--gray)', fontSize:14 }}>Loading…</div>}>
             <StudentAuthGuard>{children}</StudentAuthGuard>
           </Suspense>

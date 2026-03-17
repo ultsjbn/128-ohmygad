@@ -12,56 +12,8 @@ export default function RightPanel() {
   return (
     <aside className="flex flex-col gap-4 w-full">
 
-      {/* calendar */}
-      <Card variant="glass" className="p-3 w-full overflow-hidden">
-        {/* DayPicker CSS overrides scoped to this card */}
-        <style>{`
-          .rdp {
-            --rdp-accent-color: var(--soft-pink);
-            --rdp-background-color: var(--pink-light);
-            margin: 0;
-            width: 100%;
-          }
-          .rdp-month { width: 100%; }
-          .rdp-table  { width: 100%; }
-          .rdp-caption_label {
-            font-family: var(--font-display);
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--primary-dark);
-          }
-          .rdp-head_cell {
-            font-size: 11px;
-            font-weight: 600;
-            color: var(--gray);
-            text-transform: uppercase;
-          }
-          .rdp-day {
-            font-size: 12px;
-            color: var(--primary-dark);
-            border-radius: var(--radius-full);
-          }
-          .rdp-day_today:not(.rdp-day_selected) {
-            color: var(--soft-pink);
-            font-weight: 700;
-          }
-          .rdp-day_selected,
-          .rdp-day_selected:hover {
-            background: var(--soft-pink) !important;
-            color: white !important;
-            border-radius: var(--radius-full);
-          }
-          .rdp-nav_button svg { fill: var(--soft-pink); }
-        `}</style>
-        <Suspense>
-          <DayPicker
-            animate
-            mode="single"
-            selected={selected}
-            onSelect={setSelected}
-          />
-        </Suspense>
-      </Card>
+      {/* calendar removed */}
+
 
       {/* GSOs attended */}
       <Card

@@ -68,7 +68,6 @@ function groupByDate(events: EventData[]): EventGroup[] {
 }
 
 //  component 
-
 export const EventPanel = (): JSX.Element => {
   const supabase = createClient();
   const [events, setEvents]   = useState<EventData[]>([]);
@@ -81,34 +80,39 @@ export const EventPanel = (): JSX.Element => {
       const { data: { user }, error: userError } = await supabase.auth.getUser();
       if (userError || !user) { setLoading(false); return; }
 
+      // query from event_registration so we only get events the user registered for
       const { data, error } = await supabase
-        .from("event")
+        .from("event_registration")
         .select(`
-          id, title, location, start_date, end_date, banner_url, category, status,
-          event_registration ( status, user_id )
+          status,
+          event (
+            id, title, location, start_date, end_date, banner_url, category
+          )
         `)
-        .order("start_date", { ascending: true });
+        .eq("user_id", user.id)
+        .neq("status", "cancelled")
+        .order("event(start_date)", { ascending: true });
 
       if (error) { console.error("Failed to fetch events:", error.message); setLoading(false); return; }
 
-      const mapped: EventData[] = (data ?? []).map((e: any) => {
-        const userReg = Array.isArray(e.event_registration)
-          ? e.event_registration.find((r: any) => r.user_id === user.id)
-          : e.event_registration;
-        return {
-          id:                 e.id,
-          title:              e.title,
-          location:           e.location ?? "—",
-          date:               formatDateLabel(e.start_date),
-          dayOfWeek:          formatDayOfWeek(e.start_date),
-          time:               formatTime(e.start_date),
-          rawStartDate:       e.start_date,
-          rawEndDate:         e.end_date,
-          registrationStatus: userReg?.status ?? null,
-          category:           e.category ?? null,
-          banner_url:         e.banner_url ?? null,
-        };
-      });
+      const mapped: EventData[] = (data ?? [])
+        .filter((r: any) => r.event)
+        .map((r: any) => {
+          const e = r.event;
+          return {
+            id:                 e.id,
+            title:              e.title,
+            location:           e.location ?? "—",
+            date:               formatDateLabel(e.start_date),
+            dayOfWeek:          formatDayOfWeek(e.start_date),
+            time:               formatTime(e.start_date),
+            rawStartDate:       e.start_date,
+            rawEndDate:         e.end_date ?? e.start_date,
+            registrationStatus: r.status ?? null,
+            category:           e.category ?? null,
+            banner_url:         e.banner_url ?? null,
+          };
+        });
 
       setEvents(mapped);
       setLoading(false);
@@ -116,8 +120,10 @@ export const EventPanel = (): JSX.Element => {
     fetchEvents();
   }, []);
 
+  // fallback to rawStartDate if end_date is null so the filter doesn't break
   const filteredEvents = events.filter((e) => {
-    const isPast = new Date(e.rawEndDate) < new Date();
+    const compareDate = e.rawEndDate || e.rawStartDate;
+    const isPast = new Date(compareDate) < new Date();
     return filter === "upcoming" ? !isPast : isPast;
   });
 
@@ -128,7 +134,7 @@ export const EventPanel = (): JSX.Element => {
     <div className="flex flex-col h-full p-0 md:p-2 gap-1 md:gap-4">
 
       {/*  header  */}
-      <div className="flex items-center justify-between shrink-0">
+    <div className="flex items-center justify-between shrink-0 min-w-0 w-full">
         <h2 className="heading-lg m-0">Events</h2>
         <div className="flex gap-1 p-1 rounded-[var(--radius-full)] bg-[var(--lavender)]">
           <Button
@@ -151,7 +157,7 @@ export const EventPanel = (): JSX.Element => {
       </div>
 
       {/*  scrollable timeline  */}
-      <div className="flex-1 overflow-y-auto min-h-0 custom-scrollbar pb-4">
+    <div className="w-full pb-4">
 
         {/* loading skeletons */}
         {loading && (
@@ -204,16 +210,27 @@ export const EventPanel = (): JSX.Element => {
 
         {/* empty state */}
         {!loading && groups.length === 0 && (
-          <Card variant="glass" className="flex flex-col items-center justify-center text-center min-h-[220px] gap-3">
+          <Card variant="no-shadow" className="flex flex-col items-center justify-center text-center min-h-[220px] gap-3">
             <div className="w-14 h-14 rounded-full bg-[var(--lavender)] flex items-center justify-center">
               <Calendar size={26} className="text-[var(--periwinkle)]" />
             </div>
             <div>
               <p className="label text-[var(--primary-dark)]">No events found</p>
               <p className="caption text-[var(--gray)] mt-0.5">
-                {filter === "upcoming" ? "You have no upcoming events." : "No past events to show."}
+                {filter === "upcoming"
+                  ? "You haven't registered for any upcoming events."
+                  : "You have no past registered events."}
               </p>
             </div>
+            {filter === "upcoming" && (
+              <Button
+                variant="soft"
+                size="sm"
+                onClick={() => window.location.href = "/events"}
+              >
+                Browse Events
+              </Button>
+            )}
           </Card>
         )}
 
