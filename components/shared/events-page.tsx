@@ -246,10 +246,7 @@ export default function EventsPage() {
     sort
   );
 
-  // show active field + direction arrow, just text
-  const sortLabel = sort.field !== "start_date"
-    ? `${SORT_OPTIONS.find((o) => o.field === sort.field)?.label} ${sort.direction === "asc" ? "↑" : "↓"}`
-    : "Sort";
+  const sortLabel = `${SORT_OPTIONS.find((o) => o.field === sort.field)?.label} ${sort.direction === "asc" ? "↑" : "↓"}`;
 
   const isDetailRegistered  = detailEvent ? registeredIds.has(detailEvent.id!)    : false;
   const isDetailRegistering = detailEvent ? registeringId === detailEvent.id       : false;
@@ -278,7 +275,7 @@ export default function EventsPage() {
           <div className="flex items-center gap-2 shrink-0">
             {/* sort is icon only on mobile, text+arrow on md+ devices */}
             <Dropdown trigger={
-              <Button variant={sort.field !== "start_date" ? "periwinkle" : "ghost"}>
+              <Button variant="periwinkle">
                 <ArrowUpDown size={15} />
                 {/* label hidden on mobile */}
                 <span className="hidden md:inline"> {sortLabel}</span>
