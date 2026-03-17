@@ -111,7 +111,7 @@ export default function CoursesPage() {
     const supabase = createClient();
     const { data, error } = await supabase
       .from("course")
-      .select("id, title, description, semester, status, start_time, end_time, Days")
+      .select("id, title, description, semester, status, start_time, end_time, days")
       .order("start_time", { ascending: false });
 
     if (!error && data) {
@@ -135,7 +135,7 @@ export default function CoursesPage() {
     let result = courses;
 
     result = result.filter((e) =>
-      `${e.title} ${e.Days} ${e.start_time} ${e.end_time} ${e.semester ?? ""}`.toLowerCase().includes(q)
+      `${e.title} ${e.days} ${e.start_time} ${e.end_time} ${e.semester ?? ""}`.toLowerCase().includes(q)
     );
     // empty set = show all. nonempty = only matching values
     if (semesterFilters.size > 0)
@@ -234,7 +234,7 @@ export default function CoursesPage() {
     return (
       <div className="flex flex-col leading-tight">
         <span className="caption text-[12px] opacity-80">
-          {course.Days || "—"}
+          {course.days || "—"}
         </span>
 
         <span className="caption whitespace-nowrap">
