@@ -231,8 +231,11 @@
   --pink-light: #FDE8EE;
   --periwinkle-light: #EDEAF9;
   --success: #6DC5A0;
+  --success-light:#bcf3dc;
   --warning: #F4C97A;
+  --warning-light:#f3eebc;
   --error: #F47B7B;
+  --error-light:#f3bcbc;
 
   /* Shadows */
   --shadow-soft: 0 8px 32px rgba(45, 42, 74, 0.10);
@@ -1242,12 +1245,12 @@ body {
 }
 
 .toast-success {
-  background: rgba(109, 197, 160, 0.10);
+  background: var(--success-light);
   border-color: var(--success);
 }
 
 .toast-error {
-  background: rgba(244, 123, 123, 0.10);
+  background: var(--error-light);
   border-color: var(--error);
 }
 
@@ -1257,7 +1260,7 @@ body {
 }
 
 .toast-warning {
-  background: rgba(244, 201, 122, 0.15);
+  background: var(--warning-light);
   border-color: var(--warning);
 }
 
