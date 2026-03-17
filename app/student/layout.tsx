@@ -25,12 +25,9 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
       <StudentSidebar />
 
       <div style={{ position:'relative', zIndex:1, display:'flex', flexDirection:'column', flex:1, minWidth:0, overflow:'hidden' }}>
-        <header style={{ display:'flex', flexShrink:0, alignItems:'center', justifyContent:'space-between', gap:16, padding:'10px 24px', background:'rgba(255,255,255,0.72)', backdropFilter:'blur(14px)', borderBottom:'1px solid rgba(45,42,74,0.07)' }}>
+        <header style={{ position: 'relative', zIndex: 50, display:'flex', flexShrink:0, alignItems:'center', justifyContent:'space-between', gap:16, padding:'10px 24px', background:'rgba(255,255,255,0.72)', backdropFilter:'blur(14px)', borderBottom:'1px solid rgba(45,42,74,0.07)' }}>
           <GlobalSearch role="student" placeholder="Search events, courses, surveys..." />
           <div style={{ display:'flex', alignItems:'center', gap:12 }}>
-            <button className="btn btn-icon" style={{ background:'rgba(45,42,74,0.05)', color:'var(--primary-dark)' }} aria-label="Notifications">
-              <Bell size={17} />
-            </button>
             <UserMenu />
           </div>
         </header>
