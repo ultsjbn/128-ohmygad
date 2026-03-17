@@ -235,6 +235,37 @@ export default function EventsPage() {
         setRegisteringId(null);
     };
 
+  // handle canceling registrations
+
+    const handleCancelRegistration = async (eventId: string, e?: React.MouseEvent) => {
+        e?.stopPropagation();
+
+        if (!currentUserId) return;
+
+        setRegisteringId(eventId);
+        const supabase = createClient();
+
+        const { error } = await supabase
+            .from("event_registration")
+            .update({ status: "cancelled" })
+            .eq("event_id", eventId)
+            .eq("user_id", currentUserId);
+
+        if (error) {
+            showToast({ variant: "error", title: "Cancellation failed", message: error.message });
+        } else {
+            setRegisteredIds((prev) => {
+            const next = new Set(prev);
+            next.delete(eventId);
+            return next;
+            });
+            setRegCounts((prev) => ({ ...prev, [eventId]: Math.max((prev[eventId] ?? 1) - 1, 0) }));
+            showToast({ variant: "info", title: "Registration cancelled", message: "You've cancelled your registration." });
+        }
+
+        setRegisteringId(null);
+    };
+
   // sorting functions
   const sortEvents = (eventsToSort: EventFormData[], sortState: SortState): EventFormData[] => {
     const { field, direction } = sortState;
@@ -318,7 +349,7 @@ export default function EventsPage() {
           <div className="flex items-center gap-2 shrink-0">
             {/* sort is icon only on mobile, text+arrow on md+ devices */}
             <Dropdown trigger={
-              <Button variant="periwinkle">
+              <Button variant="ghost">
                 <ArrowUpDown size={15} />
                 {/* label hidden on mobile */}
                 <span className="hidden md:inline"> {sortLabel}</span>
@@ -455,16 +486,19 @@ export default function EventsPage() {
                   </div>
                 )}
                 <EventCard
-                  title={event.title}
-                  category={event.category ?? "Uncategorized"}
-                  date={event.start_date ? new Date(event.start_date).toLocaleDateString("en-PH", { month: "short", day: "numeric", year: "numeric" }) : "—"}
-                  location={event.location ?? "—"}
-                  registered={regCounts[event.id!] ?? 0}
-                  capacity={event.capacity ?? 0}
-                  gradient={event.banner_url ? `url(${event.banner_url}) center/cover no-repeat` : CATEGORY_GRADIENT[event.category ?? ""] ?? DEFAULT_GRADIENT}
-                  registerLabel={isRegistered ? "Registered" : isRegistering ? "Processing…" : "Register"}
-                  registerDisabled={isRegistered || isRegistering}
-                  onRegister={(e?: React.MouseEvent) => handleRegister(event.id!, e)}
+                    title={event.title}
+                    category={event.category ?? "Uncategorized"}
+                    date={event.start_date ? new Date(event.start_date).toLocaleDateString("en-PH", { month: "short", day: "numeric", year: "numeric" }) : "—"}
+                    location={event.location ?? "—"}
+                    registered={regCounts[event.id!] ?? 0}
+                    capacity={event.capacity ?? 0}
+                    gradient={event.banner_url ? `url(${event.banner_url}) center/cover no-repeat` : CATEGORY_GRADIENT[event.category ?? ""] ?? DEFAULT_GRADIENT}
+                    registerLabel={isRegistering ? "Processing…" : isRegistered ? "Cancel Registration" : "Register"}
+                    registerDisabled={isRegistering}
+                    isRegistered={isRegistered}
+                    onRegister={(e?: React.MouseEvent) =>
+                        isRegistered ? handleCancelRegistration(event.id!, e) : handleRegister(event.id!, e)
+                    }
                 />
               </div>
             );
@@ -487,12 +521,19 @@ export default function EventsPage() {
             detailEvent && (
                 <div className="px-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] sm:px-4 sm:pb-4 shrink-0">
                 <Button
-                    variant={isDetailRegistered ? "soft" : "primary"}
+                    variant={isDetailRegistered ? "ghost" : "primary"}
                     className="w-full"
-                    disabled={isDetailRegistering || isDetailRegistered}
-                    onClick={(e) => handleRegister(detailEvent.id!, e)}
+                    disabled={isDetailRegistering}
+                    onClick={(e) => isDetailRegistered
+                    ? handleCancelRegistration(detailEvent.id!, e)
+                    : handleRegister(detailEvent.id!, e)
+                    }
                 >
-                    {isDetailRegistering ? "Processing…" : isDetailRegistered ? "Registered" : "Register"}
+                    {isDetailRegistering
+                    ? "Processing…"
+                    : isDetailRegistered
+                        ? "Cancel Registration"
+                        : "Register"}
                 </Button>
                 </div>
             )
