@@ -1,7 +1,6 @@
 import { Suspense } from 'react';
 import { redirect } from 'next/navigation';
 import GlobalSearch from '@/components/global-search';
-import { Search, Bell } from 'lucide-react';
 import AdminSidebar from '@/components/admin-sidebar';
 import { getCurrentUserWithRole } from '@/lib/auth/get-current-user';
 import UserMenu from '@/components/user-menu';
@@ -25,7 +24,20 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       </Suspense>
 
       <div style={{ position:'relative', zIndex:1, display:'flex', flexDirection:'column', flex:1, minWidth:0, overflow:'hidden' }}>
-        <header style={{ position: 'relative', zIndex: 50, display:'flex', flexShrink:0, alignItems:'center', justifyContent:'space-between', gap:16, padding:'10px 24px', background:'rgba(255,255,255,0.72)', backdropFilter:'blur(14px)', borderBottom:'1px solid rgba(45,42,74,0.07)' }}>
+            <header style={{ 
+                position: 'relative', 
+                zIndex: 50,           
+                display:'flex', 
+                flexShrink:0, 
+                alignItems:'center', 
+                justifyContent:'space-between', 
+                gap:16, 
+                padding:'10px 24px', 
+                background:'rgba(255,255,255,0.45)', 
+                backdropFilter:'blur(16px)', 
+                WebkitBackdropFilter:'blur(16px)',
+                borderBottom:'1px solid rgba(45,42,74,0.07)' 
+            }}>
           <GlobalSearch role="admin" placeholder="Search events, users, courses..." />
           <div style={{ display:'flex', alignItems:'center', gap:12 }}>
             <UserMenu />
