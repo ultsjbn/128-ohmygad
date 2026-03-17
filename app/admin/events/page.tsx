@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { Plus, ArrowUpDown, SlidersHorizontal, Pencil, Trash2, Loader2 } from "lucide-react";
+import { Plus, ArrowUpDown, SlidersHorizontal, Pencil, Trash2, Loader2, ChevronUp, ChevronDown } from "lucide-react";
 import type { EventFormData } from "@/components/admin/event-form";
 import { paginate, totalPages, PER_PAGE } from "@/lib/pagination.utils";
 import { Pagination } from "@/components/pagination";
@@ -25,8 +25,9 @@ import {
 // constants 
 const CATEGORIES = ["Orientation", "Forum", "Research", "Training", "Workshop"];
 const STATUSES = ["upcoming", "past"];
+const SORT_FIELDS = ["title", "category", "status", "start_date"] as const;
 
-// variant helpers 
+type SortField = typeof SORT_FIELDS[number];
 type BadgeVariant = "pink" | "periwinkle" | "dark" | "success" | "warning" | "error";
 
 const CATEGORY_VARIANT: Record<string, BadgeVariant> = {
@@ -90,9 +91,9 @@ export default function EventsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [modalContent, setModalContent] = useState<{ label: string; text: string } | null>(null);
-  const [sortOrder, setSortOrder] = useState<"Newest" | "Oldest">("Newest");
+  const [sort, setSort] = useState<{ field: SortField; direction: "asc" | "desc" }>({ field: "start_date", direction: "desc" });
 
-  const [categoryFilters, setCategoryFilters] = useState<Set<string>>(new Set());
+  const [categoryFilter, setCategoryFilter] = useState<string>("All");
   const [statusFilters, setStatusFilters] = useState<Set<string>>(new Set());
   const [page, setPage] = useState(1);
 
@@ -127,31 +128,46 @@ export default function EventsPage() {
     result = result.filter((e) =>
       `${e.title} ${e.category || ""} ${e.location || ""}`.toLowerCase().includes(q)
     );
-    // empty set = show all. nonempty = only matching values
-    if (categoryFilters.size > 0)
-      result = result.filter((e) => categoryFilters.has(e.category ?? ""));
-    if (statusFilters.size > 0)
-      result = result.filter((e) => statusFilters.has(e.status ?? ""));
 
+    // Category filter
+    if (categoryFilter !== "All") {
+      result = result.filter((e) => e.category === categoryFilter);
+    }
+
+    // Status filter
+    if (statusFilters.size > 0) {
+      result = result.filter((e) => statusFilters.has(e.status ?? ""));
+    }
+
+    // Sorting
     result = result.sort((a, b) => {
-      const da = new Date(a.start_date ?? "").getTime();
-      const db = new Date(b.start_date ?? "").getTime();
-      return sortOrder === "Newest" ? db - da : da - db;
+      let aVal: any = a[sort.field as keyof EventFormData];
+      let bVal: any = b[sort.field as keyof EventFormData];
+
+      if (aVal == null && bVal == null) return 0;
+      if (aVal == null) return sort.direction === "asc" ? 1 : -1;
+      if (bVal == null) return sort.direction === "asc" ? -1 : 1;
+
+      if (sort.field === "start_date") {
+        aVal = new Date(aVal).getTime();
+        bVal = new Date(bVal).getTime();
+      }
+
+      if (typeof aVal === "string" && typeof bVal === "string") {
+        aVal = aVal.toLowerCase();
+        bVal = bVal.toLowerCase();
+      }
+
+      if (aVal < bVal) return sort.direction === "asc" ? -1 : 1;
+      if (aVal > bVal) return sort.direction === "asc" ? 1 : -1;
+      return 0;
     });
 
     setFiltered(result);
     setPage(1);
-  }, [search, events, sortOrder, categoryFilters, statusFilters]);
+  }, [search, events, sort, categoryFilter, statusFilters]);
 
   //  toggle helpers 
-  function toggleCategory(cat: string) {
-    setCategoryFilters((prev) => {
-      const next = new Set(prev);
-      next.has(cat) ? next.delete(cat) : next.add(cat);
-      return next;
-    });
-  }
-
   function toggleStatus(s: string) {
     setStatusFilters((prev) => {
       const next = new Set(prev);
@@ -161,8 +177,21 @@ export default function EventsPage() {
   }
 
   function clearAllFilters() {
-    setCategoryFilters(new Set());
+    setCategoryFilter("All");
     setStatusFilters(new Set());
+  }
+
+  const handleSort = (field: SortField) => {
+    setSort((prev) => ({
+      field,
+      direction: prev.field === field && prev.direction === "asc" ? "desc" : "asc",
+    }));
+    setPage(1);
+  };
+
+  function SortIcon({ field }: { field: SortField }) {
+    if (sort.field !== field) return <ArrowUpDown size={12} style={{ opacity: 0.35 }} />;
+    return sort.direction === "asc" ? <ChevronUp size={12} /> : <ChevronDown size={12} />;
   }
 
   // delete 
@@ -176,7 +205,7 @@ export default function EventsPage() {
     setDeletingId(null);
   };
 
-  const activeFilterCount = categoryFilters.size + statusFilters.size;
+  const activeFilterCount = (categoryFilter !== "All" ? 1 : 0) + statusFilters.size;
   const hasActiveFilters = activeFilterCount > 0;
 
   // DataTable columns 
@@ -302,22 +331,29 @@ export default function EventsPage() {
             containerStyle={{ flex: 1, minWidth: 220 }}
           />
 
-          {/* sort single select */}
+          {/* sort multi-select */}
           <Dropdown
             trigger={
               <Button variant="ghost">
-                <ArrowUpDown size={15} /> {sortOrder}
+                <ArrowUpDown size={15} /> Sort
               </Button>
             }
           >
-            {(["Newest", "Oldest"] as const).map((opt) => (
-              <DropdownItem key={opt} onClick={() => setSortOrder(opt)}>
-                {sortOrder === opt ? <strong>{opt}</strong> : opt}
+            {SORT_FIELDS.map((field) => (
+              <DropdownItem key={field} onClick={() => handleSort(field)}>
+                <span className="flex items-center justify-between gap-6 w-full">
+                  <span className="capitalize">{field === "start_date" ? "Date" : field}</span>
+                  <SortIcon field={field} />
+                </span>
               </DropdownItem>
             ))}
+            <DropdownDivider />
+            <DropdownItem onClick={() => { setSort({ field: "start_date", direction: "desc" }); setPage(1); }}>
+              Reset sort
+            </DropdownItem>
           </Dropdown>
 
-          {/* filter multi-select */}
+          {/* filter status only */}
           <Dropdown
             trigger={
               <Button variant={hasActiveFilters ? "pink" : "ghost"}>
@@ -334,20 +370,6 @@ export default function EventsPage() {
             }
           >
             <div style={{ padding: "4px 12px 6px" }}>
-              <p className="label" style={{ marginBottom: 4 }}>Category</p>
-            </div>
-            {CATEGORIES.map((cat) => (
-              <CheckItem
-                key={cat}
-                label={cat}
-                active={categoryFilters.has(cat)}
-                onToggle={() => toggleCategory(cat)}
-              />
-            ))}
-
-            <DropdownDivider />
-
-            <div style={{ padding: "6px 12px 4px" }}>
               <p className="label" style={{ marginBottom: 4 }}>Status</p>
             </div>
             {STATUSES.map((s) => (
@@ -367,14 +389,11 @@ export default function EventsPage() {
           </Dropdown>
         </div>
 
-        {/* category */}
+        {/* category filter chips - single select */}
         <FilterChips
           chips={["All", ...CATEGORIES]}
-          defaultActive={categoryFilters.size === 0 ? "All" : [...categoryFilters][0]}
-          onChange={(active) => {
-            if (active === "All") setCategoryFilters(new Set());
-            else toggleCategory(active);
-          }}
+          defaultActive={categoryFilter}
+          onChange={(active) => setCategoryFilter(active)}
         />
       </div>
 
@@ -383,16 +402,16 @@ export default function EventsPage() {
         <div className="flex items-center gap-2 flex-wrap -mt-2">
           <span className="caption">Active filters:</span>
 
-          {[...categoryFilters].map((cat) => (
-            <Badge key={cat} variant="pink" dot>
-              {cat}
+          {categoryFilter !== "All" && (
+            <Badge variant="pink" dot>
+              {categoryFilter}
               <button
-                onClick={() => toggleCategory(cat)}
-                aria-label={`Remove ${cat} filter`}
+                onClick={() => setCategoryFilter("All")}
+                aria-label={`Remove ${categoryFilter} filter`}
                 style={{ marginLeft: 6 }}
               >×</button>
             </Badge>
-          ))}
+          )}
 
           {[...statusFilters].map((s) => (
             <Badge key={s} variant="warning" dot>
