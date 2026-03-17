@@ -18,11 +18,8 @@ export default function UserMenu() {
   const menuRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
-  const [mounted, setMounted] = useState(false);
+  const [position, setPosition] = useState({ top: 0, left: 0 });
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
 
   const supabase = createBrowserClient(
@@ -62,7 +59,19 @@ export default function UserMenu() {
     <div className="relative" ref={menuRef}>
       <div
         className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity"
-        onClick={() => setIsOpen(!isOpen)}
+        
+        onClick={() => {
+          if (menuRef.current) {
+          const rect = menuRef.current.getBoundingClientRect();
+
+    setPosition({
+      top: rect.bottom + 8,
+      left: rect.right - 192
+    });
+  }
+
+  setIsOpen(!isOpen);
+}}
       >
         <User
           size={16}
@@ -71,36 +80,44 @@ export default function UserMenu() {
       </div>
 
 
-      {mounted && isOpen && 
-        createPortal(
-        <div className="absolute right-0 top-full mt-2 w-48 z-[9999]">
-          <Menu>
-            <MenuItem
-              icon={<User size={16} />}
-              label="My Profile"
-              onClick={() => {
-                setIsOpen(false);
-                router.push(getProfilePath());
-              }}
-            />
-            <MenuItem
-              icon={<Settings size={16} />}
-              label="Settings"
-              onClick={() => {
-                setIsOpen(false);
-                router.push(getSettingsPath());
-              }}
-            />
-            <MenuItemSeparator />
-            <MenuItem
-              icon={<LogOut size={16} />}
-              label="Sign out"
-              onClick={handleSignOut}
-            />
-          </Menu>
-        </div>,
-        document.body
-      )}
+      {isOpen && typeof window !== "undefined" &&
+  createPortal(
+      <div
+      style={{
+        position: "fixed",
+        top: position.top,
+        left: position.left
+      }}
+      className="w-48 z-[9999]"
+      >
+      <Menu>
+        <MenuItem
+          icon={<User size={16} />}
+          label="My Profile"
+          onClick={() => {
+            setIsOpen(false);
+            router.push(getProfilePath());
+          }}
+        />
+        <MenuItem
+          icon={<Settings size={16} />}
+          label="Settings"
+          onClick={() => {
+            setIsOpen(false);
+            router.push(getSettingsPath());
+          }}
+        />
+        <MenuItemSeparator />
+        <MenuItem
+          icon={<LogOut size={16} />}
+          label="Sign out"
+          onClick={handleSignOut}
+        />
+      </Menu>
+    </div>,
+    document.body
+  )
+}
 
 
 
