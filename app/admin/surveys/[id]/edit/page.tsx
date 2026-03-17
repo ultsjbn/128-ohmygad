@@ -25,7 +25,7 @@ export default function EditSurveyPage() {
       const [surveyResult, questionsResult] = await Promise.all([
         supabase
           .from("survey")
-          .select("id, title, description, open_at, close_at")
+          .select("id, title, description, status, event_id, open_at, close_at")
           .eq("id", id)
           .single(),
         supabase
