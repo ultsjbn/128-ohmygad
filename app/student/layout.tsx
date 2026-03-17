@@ -1,11 +1,9 @@
 import { Suspense } from 'react';
 import { redirect } from 'next/navigation';
 import GlobalSearch from '@/components/global-search';
-import { Search, Bell } from 'lucide-react';
 import StudentSidebar from '@/components/student-sidebar';
 import { getCurrentUserWithRole } from '@/lib/auth/get-current-user';
 import UserMenu from '@/components/user-menu';
-import ScrollToTop from '@/components/ui/scroll-to-top';
 
 async function StudentAuthGuard({ children }: { children: React.ReactNode }) {
   const result = await getCurrentUserWithRole();

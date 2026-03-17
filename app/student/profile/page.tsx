@@ -4,8 +4,8 @@ import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client"; // using shared client
 import { useRouter } from "next/navigation";
 import {
-  User, Mail, Phone, BookOpen, MapPin,
-  Save, ChevronLeft, GraduationCap, Heart, Building2
+  User, Phone, BookOpen, MapPin,
+  Save, ChevronLeft, Heart,
 } from "lucide-react";
 
 import { Card, Input, Select, Button, Badge, Tabs, ProgressBar, Toast } from "@/components/ui";
