@@ -20,7 +20,6 @@ import {
 } from "@/components/ui";
 import { useSearchParams } from "next/navigation";
 
-// sort types
 type SortField = "title" | "category" | "status" | "start_date" | "capacity" | "location";
 type SortDirection = "asc" | "desc";
 
@@ -34,7 +33,6 @@ interface FilterState {
   category: Set<string>;
 }
 
-// sort options
 const SORT_OPTIONS: { label: string; field: SortField }[] = [
   { label: "Title", field: "title" },
   { label: "Category", field: "category" },
@@ -44,7 +42,6 @@ const SORT_OPTIONS: { label: string; field: SortField }[] = [
   { label: "Location", field: "location" },
 ];
 
-// category for gradient map since no images pa
 const CATEGORY_GRADIENT: Record<string, string> = {
   Orientation: "linear-gradient(135deg, #F4A7B9 0%, #B8B5E8 100%)",
   Forum: "linear-gradient(135deg, #F4A7B9 0%, #FAF8FF 100%)",
@@ -54,7 +51,6 @@ const CATEGORY_GRADIENT: Record<string, string> = {
 };
 const DEFAULT_GRADIENT = "linear-gradient(135deg, #B8B5E8 0%, #2D2A4A 100%)";
 
-// status badge variants
 type BadgeVariant = "pink" | "periwinkle" | "dark" | "success" | "warning" | "error";
 const STATUS_VARIANT: Record<string, BadgeVariant> = {
   upcoming: "pink",
@@ -62,7 +58,6 @@ const STATUS_VARIANT: Record<string, BadgeVariant> = {
   ongoing: "success",
 };
 
-// checkbox item used inside filter dropdown (multi-select)
 function CheckItem({
   label,
   active,
@@ -77,28 +72,22 @@ function CheckItem({
   return (
     <DropdownItem onClick={onToggle}>
       <span className="flex items-center gap-2">
-        {/* mini checkbox */}
         <span className={`w-[14px] h-[14px] rounded shrink-0 border-[1.5px] inline-flex items-center justify-center ${active ? "border-[var(--primary-dark)] bg-[var(--primary-dark)]" : "border-[rgba(45,42,74,0.20)] bg-transparent"}`}>
           {active && (
             <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
-              <path d="M1 4l2 2 4-4" stroke="white" strokeWidth="1.5"
-                strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M1 4l2 2 4-4" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           )}
         </span>
-        <span className={capitalize ? "capitalize" : ""}>
-          {active ? <strong>{label}</strong> : label}
-        </span>
+        <span className={capitalize ? "capitalize" : ""}>{active ? <strong>{label}</strong> : label}</span>
       </span>
     </DropdownItem>
   );
 }
 
-// events page
 export default function EventsPage() {
   const searchParams = useSearchParams();
 
-  // useStates
   const [events, setEvents] = useState<EventFormData[]>([]);
   const [search, setSearch] = useState(searchParams.get("search") || "");
   const [isLoading, setIsLoading] = useState(true);
@@ -106,19 +95,39 @@ export default function EventsPage() {
   const [sort, setSort] = useState<SortState>({ field: "start_date", direction: "desc" });
   const [filters, setFilters] = useState<FilterState>({ status: new Set(), category: new Set() });
   const [activeChip, setActiveChip] = useState("All");
-  // event detail modal
   const [detailEvent, setDetailEvent] = useState<EventFormData | null>(null);
 
-  // filter options
+  // ── Registration state ──
+  const [registeredIds, setRegisteredIds] = useState<Set<string>>(new Set());
+  const [registeringId, setRegisteringId] = useState<string | null>(null);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [registerError, setRegisterError] = useState<string | null>(null);
+
   const statuses = Array.from(new Set(events.map((e) => e.status?.toLowerCase().trim()).filter(Boolean))) as string[];
   const categories = Array.from(new Set(events.map((e) => e.category).filter(Boolean))) as string[];
   const hasActiveFilters = filters.status.size > 0 || filters.category.size > 0;
   const activeFilterCount = filters.status.size + filters.category.size;
 
-  // useEffect for fetching events
+  // ── Fetch events + user + registrations ──
   useEffect(() => {
-    async function fetchEvents() {
+    async function fetchData() {
       const supabase = createClient();
+
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        setCurrentUserId(user.id);
+
+        // Fetch existing registrations
+        const { data: regs } = await supabase
+          .from("event_registration")
+          .select("event_id")
+          .eq("user_id", user.id);
+
+        if (regs) setRegisteredIds(new Set(regs.map((r) => r.event_id)));
+      }
+
+      // Fetch events
       const { data, error } = await supabase
         .from("event")
         .select("id, title, description, category, status, start_date, end_date, capacity, location, registration_open, registration_close, banner_url")
@@ -128,16 +137,49 @@ export default function EventsPage() {
       else if (data) setEvents(data);
       setIsLoading(false);
     }
-    fetchEvents();
+    fetchData();
   }, []);
 
-  // sync the URL search param to the local search 
   useEffect(() => {
     const s = searchParams.get("search");
     if (s !== null) setSearch(s);
   }, [searchParams]);
 
-  // sorting functions
+  // Register
+  const handleRegister = async (eventId: string, e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    setRegisterError(null);
+
+    // Already registered — do nothing
+    if (registeredIds.has(eventId)) return;
+
+    if (!currentUserId) {
+      setRegisterError("You must be logged in to register.");
+      return;
+    }
+
+    setRegisteringId(eventId);
+    const supabase = createClient();
+
+    const { error } = await supabase
+      .from("event_registration")
+      .insert({
+        event_id:          eventId,
+        user_id:           currentUserId,
+        status:            "registered",
+        registration_date: new Date().toISOString(),
+      });
+
+    if (error) {
+      setRegisterError("Failed to register: " + error.message);
+    } else {
+      setRegisteredIds((prev) => new Set([...prev, eventId]));
+    }
+
+    setRegisteringId(null);
+  };  
+
+  // Sort
   const sortEvents = (eventsToSort: EventFormData[], sortState: SortState): EventFormData[] => {
     const { field, direction } = sortState;
     const sorted = [...eventsToSort];
@@ -156,14 +198,9 @@ export default function EventsPage() {
     return sorted;
   };
 
-  const handleSort = (field: SortField) => {
-    setSort((prev) => ({
-      field,
-      direction: prev.field === field && prev.direction === "asc" ? "desc" : "asc",
-    }));
-  };
+  const handleSort = (field: SortField) =>
+    setSort((prev) => ({ field, direction: prev.field === field && prev.direction === "asc" ? "desc" : "asc" }));
 
-  // toggle filter helpers
   const toggleFilter = (type: "status" | "category", value: string) => {
     setFilters((prev) => {
       const next = new Set(prev[type]);
@@ -172,12 +209,8 @@ export default function EventsPage() {
     });
   };
 
-  const clearFilters = () => {
-    setFilters({ status: new Set(), category: new Set() });
-    setActiveChip("All");
-  };
+  const clearFilters = () => { setFilters({ status: new Set(), category: new Set() }); setActiveChip("All"); };
 
-  // clicking active chip resets to All
   const handleChipChange = (chip: string) => {
     if (chip === "All" || chip === activeChip) {
       setActiveChip("All");
@@ -188,60 +221,50 @@ export default function EventsPage() {
     }
   };
 
-  // apply search filters sort
   const filtered = sortEvents(
     events
-      .filter((e) =>
-        `${e.title} ${e.category || ""} ${e.location || ""}`.toLowerCase().includes(search.toLowerCase())
-      )
+      .filter((e) => `${e.title} ${e.category || ""} ${e.location || ""}`.toLowerCase().includes(search.toLowerCase()))
       .filter((e) => filters.status.size === 0 || filters.status.has(e.status?.toLowerCase().trim() ?? ""))
       .filter((e) => filters.category.size === 0 || filters.category.has(e.category ?? "")),
     sort
   );
 
-  // show active field + direction arrow, just text
   const sortLabel = sort.field !== "start_date"
     ? `${SORT_OPTIONS.find((o) => o.field === sort.field)?.label} ${sort.direction === "asc" ? "↑" : "↓"}`
     : "Sort";
 
-  // PAGE PROPER --------------------------------------------------------------------------------------------------------
+  const isDetailRegistered  = detailEvent ? registeredIds.has(detailEvent.id!)    : false;
+  const isDetailRegistering = detailEvent ? registeringId === detailEvent.id       : false;
+
   return (
     <div className="flex flex-col gap-4">
 
-      {/* page header - hidden on mobile, visible on md+ devices */}
       <div className="hidden md:block">
         <h1 className="heading-lg">Discover Events</h1>
       </div>
 
-      {/* search, sort, filter */}
+      {/* search + sort + filter */}
       <div className="flex flex-col gap-3">
         <div className="flex items-center gap-3 flex-wrap overflow-visible">
-            {/* search bar */}
-            <SearchBar
-                placeholder="Search…"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                containerStyle={{ flex: 1, minWidth: 120 }}
-            />
+          <SearchBar
+            placeholder="Search…"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            containerStyle={{ flex: 1, minWidth: 120 }}
+          />
 
-            {/* grouped sort and filter */}
-            <div className="flex items-center gap-2 shrink-0">
-            {/* sort is icon only on mobile, text+arrow on md+ devices */}
-            <Dropdown
-              trigger={
-                <Button variant={sort.field !== "start_date" ? "periwinkle" : "ghost"}>
-                    <ArrowUpDown size={15} />
-                    {/* label hidden on mobile */}
-                    <span className="hidden md:inline"> {sortLabel}</span>
-                </Button>
-              }
-            >
+          <div className="flex items-center gap-2 shrink-0">
+            <Dropdown trigger={
+              <Button variant={sort.field !== "start_date" ? "periwinkle" : "ghost"}>
+                <ArrowUpDown size={15} />
+                <span className="hidden md:inline"> {sortLabel}</span>
+              </Button>
+            }>
               {SORT_OPTIONS.map(({ label, field }) => {
                 const isActive = sort.field === field;
                 return (
                   <DropdownItem key={field} onClick={() => handleSort(field)}>
                     <span className="flex items-center gap-2">
-                      {/* active dot only on the selected item */}
                       <span className={`w-1.5 h-1.5 rounded-full shrink-0 border-[1.5px] ${isActive ? "bg-[var(--primary-dark)] border-[var(--primary-dark)]" : "bg-transparent border-[rgba(45,42,74,0.20)]"}`} />
                       <span>{isActive ? <strong>{label} {sort.direction === "asc" ? "↑" : "↓"}</strong> : label}</span>
                     </span>
@@ -249,75 +272,41 @@ export default function EventsPage() {
                 );
               })}
               <DropdownDivider />
-              <DropdownItem onClick={() => setSort({ field: "start_date", direction: "desc" })}>
-                Reset sort
-              </DropdownItem>
+              <DropdownItem onClick={() => setSort({ field: "start_date", direction: "desc" })}>Reset sort</DropdownItem>
             </Dropdown>
 
-            {/* filter is icon only on mobile, text on md+ devices */}
-            <Dropdown
-              trigger={
-                <Button variant={hasActiveFilters ? "pink" : "ghost"}>
-                    <SlidersHorizontal size={15} />
-                    {/* label hidden on mobile */}
-                    <span className="hidden md:inline">Filter</span>
-                    {hasActiveFilters && (
-                    <span className="inline-flex items-center justify-center w-4 h-4 rounded-full text-[10px] font-bold text-white bg-[var(--primary-dark)] ml-0.5">
-                      {activeFilterCount}
-                    </span>
-                  )}
-                </Button>
-              }
-            >
-              {/* status section */}
+            <Dropdown trigger={
+              <Button variant={hasActiveFilters ? "pink" : "ghost"}>
+                <SlidersHorizontal size={15} />
+                <span className="hidden md:inline">Filter</span>
+                {hasActiveFilters && (
+                  <span className="inline-flex items-center justify-center w-4 h-4 rounded-full text-[10px] font-bold text-white bg-[var(--primary-dark)] ml-0.5">
+                    {activeFilterCount}
+                  </span>
+                )}
+              </Button>
+            }>
               {statuses.length > 0 && (
                 <>
-                  <div className="px-3 pt-1 pb-1.5">
-                    <p className="label mb-1">Status</p>
-                  </div>
-                  {statuses.map((s) => (
-                    <CheckItem
-                      key={s}
-                      label={s}
-                      active={filters.status.has(s)}
-                      onToggle={() => toggleFilter("status", s)}
-                      capitalize
-                    />
-                  ))}
+                  <div className="px-3 pt-1 pb-1.5"><p className="label mb-1">Status</p></div>
+                  {statuses.map((s) => <CheckItem key={s} label={s} active={filters.status.has(s)} onToggle={() => toggleFilter("status", s)} capitalize />)}
                   <DropdownDivider />
                 </>
               )}
-
-              {/* category section */}
               {categories.length > 0 && (
                 <>
-                  <div className="px-3 pt-1.5 pb-1">
-                    <p className="label mb-1">Category</p>
-                  </div>
-                  {categories.map((cat) => (
-                    <CheckItem
-                      key={cat}
-                      label={cat}
-                      active={filters.category.has(cat)}
-                      onToggle={() => toggleFilter("category", cat)}
-                    />
-                  ))}
+                  <div className="px-3 pt-1.5 pb-1"><p className="label mb-1">Category</p></div>
+                  {categories.map((cat) => <CheckItem key={cat} label={cat} active={filters.category.has(cat)} onToggle={() => toggleFilter("category", cat)} />)}
                   <DropdownDivider />
                 </>
               )}
-
               <DropdownItem onClick={clearFilters}>Clear all filters</DropdownItem>
             </Dropdown>
-          </div>{/* end sort filter group */}
+          </div>
         </div>
 
-        {/* category single select below search bar */}
         {categories.length > 0 && (
-          <FilterChips
-            chips={["All", ...categories]}
-            defaultActive={activeChip}
-            onChange={handleChipChange}
-          />
+          <FilterChips chips={["All", ...categories]} defaultActive={activeChip} onChange={handleChipChange} />
         )}
       </div>
 
@@ -325,7 +314,6 @@ export default function EventsPage() {
       {hasActiveFilters && (
         <div className="flex items-center gap-2 flex-wrap -mt-2">
           <span className="caption">Active filters:</span>
-
           {[...filters.status].map((s) => (
             <Badge key={s} variant="warning" dot>
               <span className="capitalize">{s}</span>
@@ -338,12 +326,11 @@ export default function EventsPage() {
               <button onClick={() => { toggleFilter("category", cat); setActiveChip("All"); }} className="ml-1.5" aria-label={`Remove ${cat} filter`}>×</button>
             </Badge>
           ))}
-
           <Button variant="soft" size="sm" onClick={clearFilters}>Clear all</Button>
         </div>
       )}
 
-      {/* content - loading / error / empty / cards */}
+      {/* event grid */}
       {isLoading ? (
         <Card>
           <div className="flex items-center justify-center gap-3 py-10 text-[var(--gray)]">
@@ -351,7 +338,6 @@ export default function EventsPage() {
             <span className="caption">Loading events…</span>
           </div>
         </Card>
-
       ) : error ? (
         <Card>
           <div className="flex flex-col items-center justify-center gap-3 py-10">
@@ -359,16 +345,11 @@ export default function EventsPage() {
             <Button variant="ghost" size="sm" onClick={() => window.location.reload()}>Retry</Button>
           </div>
         </Card>
-
       ) : filtered.length === 0 ? (
         <Card>
           <div className="flex flex-col items-center justify-center gap-3 py-12">
             <p className="caption">
-              {hasActiveFilters
-                ? "No events match your filters."
-                : search
-                  ? "No events match your search."
-                  : "No events available."}
+              {hasActiveFilters ? "No events match your filters." : search ? "No events match your search." : "No events available."}
             </p>
             {(hasActiveFilters || search) && (
               <Button variant="ghost" size="sm" onClick={() => { clearFilters(); setSearch(""); }}>
@@ -377,97 +358,87 @@ export default function EventsPage() {
             )}
           </div>
         </Card>
-
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-          {filtered.map((event) => (
-            <div
-              key={event.id}
-              className="relative cursor-pointer"
-              onClick={() => setDetailEvent(event)}
-            >
-              {/* status badge overlaid top-right of the cover */}
-              {event.status && (
-                <div className="absolute top-3 right-3 z-[2]">
-                  <Badge variant={STATUS_VARIANT[event.status.toLowerCase().trim()] ?? "dark"}>
-                    <span className="capitalize">{event.status}</span>
-                  </Badge>
-                </div>
-              )}
-              <EventCard
-                title={event.title}
-                category={event.category ?? "Uncategorized"}
-                date={
-                  event.start_date
-                    ? new Date(event.start_date).toLocaleDateString("en-PH", {
-                      month: "short", day: "numeric", year: "numeric",
-                    })
-                    : "—"
-                }
-                location={event.location ?? "—"}
-                registered={0}
-                capacity={event.capacity ?? 0}
-                gradient={
-					event.banner_url
-						? `url(${event.banner_url}) center/cover no-repeat`
-						: CATEGORY_GRADIENT[event.category ?? ""] ?? DEFAULT_GRADIENT
-				}
-                onRegister={(e?: React.MouseEvent) => {
-                  // stop the card click from also opening the detail modal
-                  e?.stopPropagation();
-                  /* registration handler */
-                }}
-              />
-            </div>
-          ))}
+          {filtered.map((event) => {
+            const isRegistered  = registeredIds.has(event.id!);
+            const isRegistering = registeringId === event.id;
+            return (
+              <div
+                key={event.id}
+                className="relative cursor-pointer"
+                onClick={() => { setDetailEvent(event); setRegisterError(null); }}
+              >
+                {/* status badge */}
+                {event.status && (
+                  <div className="absolute top-3 right-3 z-[2]">
+                    <Badge variant={STATUS_VARIANT[event.status.toLowerCase().trim()] ?? "dark"}>
+                      <span className="capitalize">{event.status}</span>
+                    </Badge>
+                  </div>
+                )}
+                <EventCard
+                  title={event.title}
+                  category={event.category ?? "Uncategorized"}
+                  date={event.start_date ? new Date(event.start_date).toLocaleDateString("en-PH", { month: "short", day: "numeric", year: "numeric" }) : "—"}
+                  location={event.location ?? "—"}
+                  registered={0}
+                  capacity={event.capacity ?? 0}
+                  gradient={event.banner_url ? `url(${event.banner_url}) center/cover no-repeat` : CATEGORY_GRADIENT[event.category ?? ""] ?? DEFAULT_GRADIENT}
+                  registerLabel={isRegistered ? "Registered" : isRegistering ? "Processing…" : "Register"}
+                  registerDisabled={isRegistered || isRegistering}
+                  onRegister={(e?: React.MouseEvent) => handleRegister(event.id!, e)}
+                />
+              </div>
+            );
+          })}
         </div>
       )}
 
-      {/* result count footer */}
       {!isLoading && !error && filtered.length > 0 && (
-        <p className="caption">
-          Showing {filtered.length} of {events.length} events
-        </p>
+        <p className="caption">Showing {filtered.length} of {events.length} events</p>
       )}
 
+      {/* event detail modal */}
       <Modal
         open={!!detailEvent}
-        onClose={() => setDetailEvent(null)}
+        onClose={() => { setDetailEvent(null); setRegisterError(null); }}
         hideCloseButton
         modalStyle={{ maxWidth: 600, padding: 0 }}
         footer={
-          <div className="px-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] sm:px-4 sm:pb-4 shrink-0">
-            <Button variant="primary" className="w-full" onClick={() => {/* registration handler */}}>
-              Register
-            </Button>
-          </div>
+          detailEvent && (
+            <div className="px-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] sm:px-4 sm:pb-4 shrink-0 flex flex-col gap-2">
+              {registerError && (
+                <p className="caption text-[var(--error)] text-center">{registerError}</p>
+              )}
+              <Button
+                variant={isDetailRegistered ? "soft" : "primary"}
+                className="w-full"
+                disabled={isDetailRegistering}
+                onClick={(e) => handleRegister(detailEvent.id!, e)}
+              >
+                {isDetailRegistering ? "Processing…" : isDetailRegistered ? "Registered" : "Register"}
+              </Button>
+            </div>
+          )
         }
       >
         {detailEvent && (
           <div className="flex flex-col min-h-0">
-
             <div
               className="h-[120px] sm:h-[160px] relative shrink-0 rounded-t-[var(--radius-xl)]"
-              style={{
-				background: detailEvent.banner_url
-					? `url(${detailEvent.banner_url}) center/cover no-repeat`
-					: CATEGORY_GRADIENT[detailEvent.category ?? ""] ?? DEFAULT_GRADIENT
-				}}
+              style={{ background: detailEvent.banner_url ? `url(${detailEvent.banner_url}) center/cover no-repeat` : CATEGORY_GRADIENT[detailEvent.category ?? ""] ?? DEFAULT_GRADIENT }}
             >
-              {/* close button inside cover */}
               <button
-                onClick={() => setDetailEvent(null)}
+                onClick={() => { setDetailEvent(null); setRegisterError(null); }}
                 aria-label="Close"
                 className="absolute top-3 right-3 w-4 h-4 sm:w-6 sm:h-6 rounded-full border-none cursor-pointer flex items-center justify-center text-[var(--primary-dark)] z-10 backdrop-blur-sm bg-white/80"
               >
                 <X size={14} />
               </button>
 
-              {/* category and status badges bottom-left of cover */}
               <div className="absolute bottom-3 left-3 flex gap-2 items-center">
-                <span className="badge badge-pink">
-                  {detailEvent.category ?? "Uncategorized"}
-                </span>
+                <span className="badge badge-pink">{detailEvent.category ?? "Uncategorized"}</span>
                 {detailEvent.status && (
                   <Badge variant={STATUS_VARIANT[detailEvent.status.toLowerCase().trim()] ?? "dark"}>
                     <span className="capitalize">{detailEvent.status}</span>
@@ -476,71 +447,52 @@ export default function EventsPage() {
               </div>
             </div>
 
-            {/* body — overflow-y-auto here so only body scrolls, cover + footer stay fixed */}
             <div className="flex flex-col gap-3 p-3 sm:p-5 overflow-y-auto">
-
-              {/* title */}
               <h2 className="heading-md m-0">{detailEvent.title}</h2>
 
-              {/* details row */}
               <div className="flex flex-col gap-1.5">
-                {/* ---------- date ---------- */}
                 <div className="flex items-start gap-3 caption sm:text-sm text-[var(--gray)]">
                   <CalendarDays size={15} className="shrink-0 mt-0.5" />
                   <span>
-                    {detailEvent.start_date
-                      ? new Date(detailEvent.start_date).toLocaleDateString("en-PH", { weekday: "long", month: "long", day: "numeric", year: "numeric" })
-                      : "—"}
+                    {detailEvent.start_date ? new Date(detailEvent.start_date).toLocaleDateString("en-PH", { weekday: "long", month: "long", day: "numeric", year: "numeric" }) : "—"}
                     {detailEvent.end_date && detailEvent.end_date !== detailEvent.start_date && (
                       <> — {new Date(detailEvent.end_date).toLocaleDateString("en-PH", { month: "long", day: "numeric", year: "numeric" })}</>
                     )}
                   </span>
                 </div>
-                {/* ---------- location ---------- */}
                 <div className="flex items-center gap-3 caption sm:text-sm text-[var(--gray)]">
                   <MapPin size={15} className="shrink-0" />
                   <span>{detailEvent.location ?? "—"}</span>
                 </div>
-                {/* ---------- capacity ---------- */}
                 <div className="flex items-center gap-3 caption sm:text-sm text-[var(--gray)]">
                   <Users size={15} className="shrink-0" />
                   <span>Capacity: {detailEvent.capacity ?? "—"}</span>
                 </div>
-                {/* ---------- registration ---------- */}
                 {(detailEvent.registration_open || detailEvent.registration_close) && (
                   <div className="flex items-center gap-3 caption sm:text-sm text-[var(--gray)]">
                     <Clock size={15} className="shrink-0" />
                     <span>
                       Registration:&nbsp;
-                      {detailEvent.registration_open
-                        ? new Date(detailEvent.registration_open).toLocaleDateString("en-PH", { month: "short", day: "numeric" })
-                        : "?"}
+                      {detailEvent.registration_open ? new Date(detailEvent.registration_open).toLocaleDateString("en-PH", { month: "short", day: "numeric" }) : "?"}
                       &nbsp;–&nbsp;
-                      {detailEvent.registration_close
-                        ? new Date(detailEvent.registration_close).toLocaleDateString("en-PH", { month: "short", day: "numeric" })
-                        : "?"}
+                      {detailEvent.registration_close ? new Date(detailEvent.registration_close).toLocaleDateString("en-PH", { month: "short", day: "numeric" }) : "?"}
                     </span>
                   </div>
                 )}
               </div>
 
-              {/* divider */}
               <div className="divider" />
 
-              {/* full description */}
               <div className="flex flex-col gap-2 pb-2">
                 <p className="label">ABOUT THIS EVENT</p>
-                <p className="body whitespace-pre-wrap">
-                  {detailEvent.description || "No description provided."}
-                </p>
+                <p className="body whitespace-pre-wrap">{detailEvent.description || "No description provided."}</p>
               </div>
-
-            </div>{/* end body */}
+            </div>
           </div>
         )}
       </Modal>
-        {/* hide scroll to top if event details is open */}
-        <ScrollToTop hidden={!!detailEvent} />
+
+      <ScrollToTop hidden={!!detailEvent} />
     </div>
   );
 }

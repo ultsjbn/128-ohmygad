@@ -65,11 +65,13 @@ export interface EventCardProps {
   capacity: number;
   gradient: string;
   onRegister?: () => void;
+  registerLabel?: string;
+  registerDisabled?: boolean;
 }
 
 export function EventCard({
   title, category, date, location,
-  registered, capacity, gradient, onRegister,
+  registered, capacity, gradient, onRegister, registerDisabled, registerLabel
 }: EventCardProps) {
   const pct = Math.round((registered / capacity) * 100);
   return (
@@ -101,8 +103,9 @@ export function EventCard({
             className="btn btn-primary btn-sm"
             style={{ width: "100%", justifyContent: "center" }}
             onClick={onRegister}
+            disabled={registerDisabled}
           >
-            Register
+           {registerLabel ?? "Register"}
           </button>
         </div>
       </div>
