@@ -100,16 +100,16 @@ export default function DashboardPage() {
         <Card className="lg:col-span-1 flex flex-col p-5 lg:p-6 min-h-[350px]">
           <h2 className="heading-md mb-6 shrink-0">Quick Actions</h2>
           <div className="flex flex-col gap-3 flex-1 justify-center">
-            <Button variant="periwinkle" onClick={() => router.push('/admin/users/create')} className="w-full justify-start py-5 shadow-soft hover:-translate-y-1 transition-transform">
+            <Button variant="soft" onClick={() => router.push('/admin/users/create')} className="w-full justify-start py-5 shadow-soft hover:-translate-y-1 transition-transform">
               <UserPlus size={18} className="mr-3 shrink-0" /> Create User
             </Button>
-            <Button variant="pink" onClick={() => router.push('/admin/events/create')} className="w-full justify-start py-5 shadow-soft hover:-translate-y-1 transition-transform">
+            <Button variant="soft" onClick={() => router.push('/admin/events/create')} className="w-full justify-start py-5 shadow-soft hover:-translate-y-1 transition-transform">
               <CalendarPlus size={18} className="mr-3 shrink-0" /> New Event
             </Button>
-            <Button variant="dark" onClick={() => router.push('/admin/courses/create')} className="w-full justify-start py-5 shadow-soft hover:-translate-y-1 transition-transform text-white">
+            <Button variant="soft" onClick={() => router.push('/admin/courses/create')} className="w-full justify-start py-5 shadow-soft hover:-translate-y-1 transition-transform text-white">
               <BookOpen size={18} className="mr-3 shrink-0" /> Add Course
             </Button>
-            <Button variant="ghost" onClick={() => router.push('/admin/surveys/create')} className="w-full justify-start py-5 bg-white border border-[rgba(45,42,74,0.08)] shadow-soft hover:-translate-y-1 transition-transform">
+            <Button variant="soft" onClick={() => router.push('/admin/surveys/create')} className="w-full justify-start py-5 bg-white border border-[rgba(45,42,74,0.08)] shadow-soft hover:-translate-y-1 transition-transform">
               <ClipboardList size={18} className="mr-3 shrink-0 text-[var(--primary-dark)]" /> New Survey
             </Button>
           </div>
