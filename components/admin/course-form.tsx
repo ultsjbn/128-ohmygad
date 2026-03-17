@@ -14,7 +14,7 @@ export type CourseFormData = {
   semester: string;
   start_time: string;
   end_time: string;
-  Days: string;
+  days: string;
   status: string;
 };
 
@@ -43,9 +43,11 @@ export default function CourseForm({ initialData, mode }: CourseFormProps) {
   const [description, setDescription] = useState(initialData?.description ?? "");
   
   // removed the slice(0,16) because datetimepicker handles full iso strings
-  const [start_time, setStartTime] = useState(initialData?.start_time ?? "");
-  const [end_time, setEndTime] = useState(initialData?.end_time ?? "");
-  const [Days, setDays] = useState(initialData?.Days ?? "");
+  const [start_time, setStartTime] = useState<Date | null>(
+    initialData?.start_time ? new Date(initialData.start_time) : null);
+  const [end_time, setEndTime] = useState<Date | null>(
+    initialData?.end_time ? new Date(initialData.end_time) : null);
+  const [days, setDays] = useState(initialData?.days ?? "");
   const [semester, setSemester] = useState(initialData?.semester ?? "");
   const [status, setStatus] = useState(initialData?.status ?? "");
 
@@ -55,25 +57,29 @@ export default function CourseForm({ initialData, mode }: CourseFormProps) {
     setIsLoading(true);
     setError(null);
 
+    const formatTime = (date: Date) => 
+      date.toTimeString().slice(0,8); // "HH:MM:SS"
+
     const payload = {
       title,
       description,
-      start_time,
-      end_time,
+      start_time: start_time ? formatTime(start_time) : null,
+      end_time: end_time ? formatTime(end_time) : null,
       semester,
       status,
-      Days,
+      days,
       updated_at: new Date().toISOString(),
     };
 
     const result = await submitFormData("course", payload, mode, initialData?.id);
 
-    if (result.success) {
+        if (result.success) {
       router.push("/admin/courses");
       router.refresh();
-    } else {
-      setError(result.error || "An error occurred");
-    }
+      } else {
+        console.error("Submit error:", result);
+        setError(JSON.stringify(result));
+      }
 
     setIsLoading(false);
   };
@@ -157,6 +163,7 @@ export default function CourseForm({ initialData, mode }: CourseFormProps) {
               <DateTimePicker
                 label="End Time"
                 mode="time"
+                required
                 value={end_time}
                 onChange={setEndTime}
               />
@@ -164,7 +171,7 @@ export default function CourseForm({ initialData, mode }: CourseFormProps) {
               <Input
                 label="Days"
                 placeholder="e.g. MWF, TTh"
-                value={Days}
+                value={days}
                 onChange={(e) => setDays(e.target.value)}
               />
 
