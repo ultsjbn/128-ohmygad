@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { Plus, ArrowUpDown, SlidersHorizontal, Pencil, Trash2, Loader2 } from "lucide-react";
+import { Plus, ArrowUpDown, SlidersHorizontal, Pencil, Trash2, Loader2, ChevronUp, ChevronDown } from "lucide-react";
 import type { CourseFormData } from "@/components/admin/course-form";
 import { paginate, totalPages, PER_PAGE } from "@/lib/pagination.utils";
 import { Pagination } from "@/components/pagination";
@@ -36,6 +36,10 @@ function formatTime(time?: string) {
 // constants 
 const SEMESTERS = ["1st Semester", "2nd Semester", "Mid-Year"];
 const STATUSES = ["open", "closed"];
+const SORT_FIELDS = ["title", "semester", "status", "start_time"] as const;
+
+type SortField = typeof SORT_FIELDS[number];
+type SortDirection = "asc" | "desc";
 
 // variant helpers 
 type BadgeVariant = "pink" | "periwinkle" | "dark" | "success" | "warning" | "error";
@@ -100,9 +104,9 @@ export default function CoursesPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [modalContent, setModalContent] = useState<{ label: string; text: string } | null>(null);
-  const [sortOrder, setSortOrder] = useState<"Newest" | "Oldest">("Newest");
+  const [sort, setSort] = useState<{ field: SortField; direction: SortDirection }>({ field: "start_time", direction: "desc" });
 
-  const [semesterFilters, setSemesterFilters] = useState<Set<string>>(new Set());
+  const [semesterFilter, setSemesterFilter] = useState<string>("All");
   const [statusFilters, setStatusFilters] = useState<Set<string>>(new Set());
   const [page, setPage] = useState(1);
 
@@ -137,31 +141,46 @@ export default function CoursesPage() {
     result = result.filter((e) =>
       `${e.title} ${e.days} ${e.start_time} ${e.end_time} ${e.semester ?? ""}`.toLowerCase().includes(q)
     );
-    // empty set = show all. nonempty = only matching values
-    if (semesterFilters.size > 0)
-      result = result.filter((e) => semesterFilters.has(e.semester ?? ""));
-    if (statusFilters.size > 0)
-      result = result.filter((e) => statusFilters.has(e.status ?? ""));
 
+    // Semester filter (single-select)
+    if (semesterFilter !== "All") {
+      result = result.filter((e) => e.semester === semesterFilter);
+    }
+
+    // Status filter (multi-select)
+    if (statusFilters.size > 0) {
+      result = result.filter((e) => statusFilters.has(e.status ?? ""));
+    }
+
+    // Sorting (multi-field)
     result = result.sort((a, b) => {
-      const da = new Date(a.start_time ?? "").getTime();
-      const db = new Date(b.start_time ?? "").getTime();
-      return sortOrder === "Newest" ? db - da : da - db;
+      let aVal: any = a[sort.field as keyof CourseFormData];
+      let bVal: any = b[sort.field as keyof CourseFormData];
+
+      if (aVal == null && bVal == null) return 0;
+      if (aVal == null) return sort.direction === "asc" ? 1 : -1;
+      if (bVal == null) return sort.direction === "asc" ? -1 : 1;
+
+      if (sort.field === "start_time") {
+        aVal = new Date(aVal).getTime();
+        bVal = new Date(bVal).getTime();
+      }
+
+      if (typeof aVal === "string" && typeof bVal === "string") {
+        aVal = aVal.toLowerCase();
+        bVal = bVal.toLowerCase();
+      }
+
+      if (aVal < bVal) return sort.direction === "asc" ? -1 : 1;
+      if (aVal > bVal) return sort.direction === "asc" ? 1 : -1;
+      return 0;
     });
 
     setFiltered(result);
     setPage(1);
-  }, [search, courses, sortOrder, semesterFilters, statusFilters]);
+  }, [search, courses, sort, semesterFilter, statusFilters]);
 
   //  toggle helpers 
-  function toggleSemester(semester: string) {
-    setSemesterFilters((prev) => {
-      const next = new Set(prev);
-      next.has(semester) ? next.delete(semester) : next.add(semester);
-      return next;
-    });
-  }
-
   function toggleStatus(s: string) {
     setStatusFilters((prev) => {
       const next = new Set(prev);
@@ -171,8 +190,21 @@ export default function CoursesPage() {
   }
 
   function clearAllFilters() {
-    setSemesterFilters(new Set());
+    setSemesterFilter("All");
     setStatusFilters(new Set());
+  }
+
+  const handleSort = (field: SortField) => {
+    setSort((prev) => ({
+      field,
+      direction: prev.field === field && prev.direction === "asc" ? "desc" : "asc",
+    }));
+    setPage(1);
+  };
+
+  function SortIcon({ field }: { field: SortField }) {
+    if (sort.field !== field) return <ArrowUpDown size={12} style={{ opacity: 0.35 }} />;
+    return sort.direction === "asc" ? <ChevronUp size={12} /> : <ChevronDown size={12} />;
   }
 
   // delete 
@@ -186,7 +218,7 @@ export default function CoursesPage() {
     setDeletingId(null);
   };
 
-  const activeFilterCount = semesterFilters.size + statusFilters.size;
+  const activeFilterCount = (semesterFilter !== "All" ? 1 : 0) + statusFilters.size;
   const hasActiveFilters = activeFilterCount > 0;
 
   // DataTable columns 
@@ -305,22 +337,29 @@ export default function CoursesPage() {
             containerStyle={{ flex: 1, minWidth: 220 }}
           />
 
-          {/* sort single select */}
+          {/* sort multi-field */}
           <Dropdown
             trigger={
               <Button variant="ghost">
-                <ArrowUpDown size={15} /> {sortOrder}
+                <ArrowUpDown size={15} /> Sort
               </Button>
             }
           >
-            {(["Newest", "Oldest"] as const).map((opt) => (
-              <DropdownItem key={opt} onClick={() => setSortOrder(opt)}>
-                {sortOrder === opt ? <strong>{opt}</strong> : opt}
+            {SORT_FIELDS.map((field) => (
+              <DropdownItem key={field} onClick={() => handleSort(field)}>
+                <span className="flex items-center justify-between gap-6 w-full">
+                  <span className="capitalize">{field === "start_time" ? "Time" : field}</span>
+                  <SortIcon field={field} />
+                </span>
               </DropdownItem>
             ))}
+            <DropdownDivider />
+            <DropdownItem onClick={() => { setSort({ field: "start_time", direction: "desc" }); setPage(1); }}>
+              Reset sort
+            </DropdownItem>
           </Dropdown>
 
-          {/* filter multi-select */}
+          {/* filter status only */}
           <Dropdown
             trigger={
               <Button variant={hasActiveFilters ? "pink" : "ghost"}>
@@ -337,20 +376,6 @@ export default function CoursesPage() {
             }
           >
             <div style={{ padding: "4px 12px 6px" }}>
-              <p className="label" style={{ marginBottom: 4 }}>Semester</p>
-            </div>
-            {SEMESTERS.map((semester) => (
-              <CheckItem
-                key={semester}
-                label={semester}
-                active={semesterFilters.has(semester)}
-                onToggle={() => toggleSemester(semester)}
-              />
-            ))}
-
-            <DropdownDivider />
-
-            <div style={{ padding: "6px 12px 4px" }}>
               <p className="label" style={{ marginBottom: 4 }}>Status</p>
             </div>
             {STATUSES.map((s) => (
@@ -370,14 +395,11 @@ export default function CoursesPage() {
           </Dropdown>
         </div>
 
-        {/* semester */}
+        {/* semester filter chips - single select */}
         <FilterChips
           chips={["All", ...SEMESTERS]}
-          defaultActive={semesterFilters.size === 0 ? "All" : [...semesterFilters][0]}
-          onChange={(active) => {
-            if (active === "All") setSemesterFilters(new Set());
-            else toggleSemester(active);
-          }}
+          defaultActive={semesterFilter}
+          onChange={(active) => setSemesterFilter(active)}
         />
       </div>
 
@@ -386,16 +408,16 @@ export default function CoursesPage() {
         <div className="flex items-center gap-2 flex-wrap -mt-2">
           <span className="caption">Active filters:</span>
 
-          {[...semesterFilters].map((semester) => (
-            <Badge key={semester} variant="pink" dot>
-              {semester}
+          {semesterFilter !== "All" && (
+            <Badge variant="pink" dot>
+              {semesterFilter}
               <button
-                onClick={() => toggleSemester(semester)}
-                aria-label={`Remove ${semester} filter`}
+                onClick={() => setSemesterFilter("All")}
+                aria-label={`Remove ${semesterFilter} filter`}
                 style={{ marginLeft: 6 }}
               >×</button>
             </Badge>
-          ))}
+          )}
 
           {[...statusFilters].map((s) => (
             <Badge key={s} variant="warning" dot>
