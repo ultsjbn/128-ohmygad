@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import { SlidersHorizontal, Loader2, CalendarDays, MapPin, Users, Clock, X, ArrowUpDown } from "lucide-react";
 import type { EventFormData } from "@/components/admin/event-form";
 import ScrollToTop from "@/components/ui/scroll-to-top";
+import { Toast, ProgressBar } from "@/components/ui";
 
 import {
   SearchBar,
@@ -20,6 +21,7 @@ import {
 } from "@/components/ui";
 import { useSearchParams } from "next/navigation";
 
+// sort types
 type SortField = "title" | "category" | "status" | "start_date" | "capacity" | "location";
 type SortDirection = "asc" | "desc";
 
@@ -33,6 +35,7 @@ interface FilterState {
   category: Set<string>;
 }
 
+// sort options
 const SORT_OPTIONS: { label: string; field: SortField }[] = [
   { label: "Title", field: "title" },
   { label: "Category", field: "category" },
@@ -42,6 +45,7 @@ const SORT_OPTIONS: { label: string; field: SortField }[] = [
   { label: "Location", field: "location" },
 ];
 
+// category for gradient map since no images pa
 const CATEGORY_GRADIENT: Record<string, string> = {
   Orientation: "linear-gradient(135deg, #F4A7B9 0%, #B8B5E8 100%)",
   Forum: "linear-gradient(135deg, #F4A7B9 0%, #FAF8FF 100%)",
@@ -51,6 +55,7 @@ const CATEGORY_GRADIENT: Record<string, string> = {
 };
 const DEFAULT_GRADIENT = "linear-gradient(135deg, #B8B5E8 0%, #2D2A4A 100%)";
 
+// status badge variants
 type BadgeVariant = "pink" | "periwinkle" | "dark" | "success" | "warning" | "error";
 const STATUS_VARIANT: Record<string, BadgeVariant> = {
   upcoming: "pink",
@@ -58,6 +63,7 @@ const STATUS_VARIANT: Record<string, BadgeVariant> = {
   ongoing: "success",
 };
 
+// checkbox item used inside filter dropdown (multi-select)
 function CheckItem({
   label,
   active,
@@ -72,6 +78,7 @@ function CheckItem({
   return (
     <DropdownItem onClick={onToggle}>
       <span className="flex items-center gap-2">
+        {/* mini checkbox */}
         <span className={`w-[14px] h-[14px] rounded shrink-0 border-[1.5px] inline-flex items-center justify-center ${active ? "border-[var(--primary-dark)] bg-[var(--primary-dark)]" : "border-[rgba(45,42,74,0.20)] bg-transparent"}`}>
           {active && (
             <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
@@ -85,9 +92,11 @@ function CheckItem({
   );
 }
 
+// events page
 export default function EventsPage() {
   const searchParams = useSearchParams();
 
+  // useStates
   const [events, setEvents] = useState<EventFormData[]>([]);
   const [search, setSearch] = useState(searchParams.get("search") || "");
   const [isLoading, setIsLoading] = useState(true);
@@ -95,30 +104,33 @@ export default function EventsPage() {
   const [sort, setSort] = useState<SortState>({ field: "start_date", direction: "desc" });
   const [filters, setFilters] = useState<FilterState>({ status: new Set(), category: new Set() });
   const [activeChip, setActiveChip] = useState("All");
+  
+  // event detail modal
   const [detailEvent, setDetailEvent] = useState<EventFormData | null>(null);
 
-  // ── Registration state ──
+  // user registration
   const [registeredIds, setRegisteredIds] = useState<Set<string>>(new Set());
   const [registeringId, setRegisteringId] = useState<string | null>(null);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [registerError, setRegisterError] = useState<string | null>(null);
 
+  // filter options
   const statuses = Array.from(new Set(events.map((e) => e.status?.toLowerCase().trim()).filter(Boolean))) as string[];
   const categories = Array.from(new Set(events.map((e) => e.category).filter(Boolean))) as string[];
   const hasActiveFilters = filters.status.size > 0 || filters.category.size > 0;
   const activeFilterCount = filters.status.size + filters.category.size;
 
-  // ── Fetch events + user + registrations ──
+  // useEffect for fetching events
   useEffect(() => {
     async function fetchData() {
       const supabase = createClient();
 
-      // Get current user
+      // 1 - get current user
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         setCurrentUserId(user.id);
 
-        // Fetch existing registrations
+        // 2 - fetch existing registrations
         const { data: regs } = await supabase
           .from("event_registration")
           .select("event_id")
@@ -127,7 +139,7 @@ export default function EventsPage() {
         if (regs) setRegisteredIds(new Set(regs.map((r) => r.event_id)));
       }
 
-      // Fetch events
+      // 3 - fetch events
       const { data, error } = await supabase
         .from("event")
         .select("id, title, description, category, status, start_date, end_date, capacity, location, registration_open, registration_close, banner_url")
@@ -140,17 +152,18 @@ export default function EventsPage() {
     fetchData();
   }, []);
 
+  // sync the URL search param to the local search
   useEffect(() => {
     const s = searchParams.get("search");
     if (s !== null) setSearch(s);
   }, [searchParams]);
 
-  // Register
+  // handle registrations
   const handleRegister = async (eventId: string, e?: React.MouseEvent) => {
     e?.stopPropagation();
     setRegisterError(null);
 
-    // Already registered — do nothing
+    // if already registered, do nothing
     if (registeredIds.has(eventId)) return;
 
     if (!currentUserId) {
@@ -160,13 +173,13 @@ export default function EventsPage() {
 
     setRegisteringId(eventId);
     const supabase = createClient();
-
+    // add user to registered
     const { error } = await supabase
       .from("event_registration")
       .insert({
-        event_id:          eventId,
-        user_id:           currentUserId,
-        status:            "registered",
+        event_id: eventId,
+        user_id: currentUserId,
+        status: "registered",
         registration_date: new Date().toISOString(),
       });
 
@@ -179,7 +192,7 @@ export default function EventsPage() {
     setRegisteringId(null);
   };  
 
-  // Sort
+  // sorting functions
   const sortEvents = (eventsToSort: EventFormData[], sortState: SortState): EventFormData[] => {
     const { field, direction } = sortState;
     const sorted = [...eventsToSort];
@@ -201,6 +214,7 @@ export default function EventsPage() {
   const handleSort = (field: SortField) =>
     setSort((prev) => ({ field, direction: prev.field === field && prev.direction === "asc" ? "desc" : "asc" }));
 
+  // toggle filter helpers
   const toggleFilter = (type: "status" | "category", value: string) => {
     setFilters((prev) => {
       const next = new Set(prev[type]);
@@ -209,8 +223,10 @@ export default function EventsPage() {
     });
   };
 
+  // clear filters
   const clearFilters = () => { setFilters({ status: new Set(), category: new Set() }); setActiveChip("All"); };
 
+  // clicking active chip resets to All
   const handleChipChange = (chip: string) => {
     if (chip === "All" || chip === activeChip) {
       setActiveChip("All");
@@ -221,6 +237,7 @@ export default function EventsPage() {
     }
   };
 
+  // apply search filters sort
   const filtered = sortEvents(
     events
       .filter((e) => `${e.title} ${e.category || ""} ${e.location || ""}`.toLowerCase().includes(search.toLowerCase()))
@@ -229,6 +246,7 @@ export default function EventsPage() {
     sort
   );
 
+  // show active field + direction arrow, just text
   const sortLabel = sort.field !== "start_date"
     ? `${SORT_OPTIONS.find((o) => o.field === sort.field)?.label} ${sort.direction === "asc" ? "↑" : "↓"}`
     : "Sort";
@@ -236,16 +254,19 @@ export default function EventsPage() {
   const isDetailRegistered  = detailEvent ? registeredIds.has(detailEvent.id!)    : false;
   const isDetailRegistering = detailEvent ? registeringId === detailEvent.id       : false;
 
+  // PAGE PROPER ----------------------------------------------------------------
   return (
     <div className="flex flex-col gap-4">
 
+      {/* page header - hidden on mobile, visible on md+ devices */}
       <div className="hidden md:block">
         <h1 className="heading-lg">Discover Events</h1>
       </div>
 
-      {/* search + sort + filter */}
+      {/* search, sort, filter */}
       <div className="flex flex-col gap-3">
         <div className="flex items-center gap-3 flex-wrap overflow-visible">
+          {/* search bar */}
           <SearchBar
             placeholder="Search…"
             value={search}
@@ -253,10 +274,13 @@ export default function EventsPage() {
             containerStyle={{ flex: 1, minWidth: 120 }}
           />
 
+          {/* grouped sort and filter */}
           <div className="flex items-center gap-2 shrink-0">
+            {/* sort is icon only on mobile, text+arrow on md+ devices */}
             <Dropdown trigger={
               <Button variant={sort.field !== "start_date" ? "periwinkle" : "ghost"}>
                 <ArrowUpDown size={15} />
+                {/* label hidden on mobile */}
                 <span className="hidden md:inline"> {sortLabel}</span>
               </Button>
             }>
@@ -265,6 +289,7 @@ export default function EventsPage() {
                 return (
                   <DropdownItem key={field} onClick={() => handleSort(field)}>
                     <span className="flex items-center gap-2">
+                      {/* active dot only on the selected item */}
                       <span className={`w-1.5 h-1.5 rounded-full shrink-0 border-[1.5px] ${isActive ? "bg-[var(--primary-dark)] border-[var(--primary-dark)]" : "bg-transparent border-[rgba(45,42,74,0.20)]"}`} />
                       <span>{isActive ? <strong>{label} {sort.direction === "asc" ? "↑" : "↓"}</strong> : label}</span>
                     </span>
@@ -275,9 +300,11 @@ export default function EventsPage() {
               <DropdownItem onClick={() => setSort({ field: "start_date", direction: "desc" })}>Reset sort</DropdownItem>
             </Dropdown>
 
+            {/* filter is icon only on mobile, text on md+ devices */}
             <Dropdown trigger={
               <Button variant={hasActiveFilters ? "pink" : "ghost"}>
                 <SlidersHorizontal size={15} />
+                {/* label hidden on mobile */}
                 <span className="hidden md:inline">Filter</span>
                 {hasActiveFilters && (
                   <span className="inline-flex items-center justify-center w-4 h-4 rounded-full text-[10px] font-bold text-white bg-[var(--primary-dark)] ml-0.5">
@@ -286,6 +313,7 @@ export default function EventsPage() {
                 )}
               </Button>
             }>
+              {/* status section */}
               {statuses.length > 0 && (
                 <>
                   <div className="px-3 pt-1 pb-1.5"><p className="label mb-1">Status</p></div>
@@ -293,6 +321,7 @@ export default function EventsPage() {
                   <DropdownDivider />
                 </>
               )}
+              {/* category section */}
               {categories.length > 0 && (
                 <>
                   <div className="px-3 pt-1.5 pb-1"><p className="label mb-1">Category</p></div>
@@ -302,9 +331,10 @@ export default function EventsPage() {
               )}
               <DropdownItem onClick={clearFilters}>Clear all filters</DropdownItem>
             </Dropdown>
-          </div>
+          </div>{/* end sort filter group */}
         </div>
 
+        {/* category single select below search bar */}
         {categories.length > 0 && (
           <FilterChips chips={["All", ...categories]} defaultActive={activeChip} onChange={handleChipChange} />
         )}
@@ -330,7 +360,8 @@ export default function EventsPage() {
         </div>
       )}
 
-      {/* event grid */}
+      {/* content - loading / error / empty / cards */}
+      {/* loading */}
       {isLoading ? (
         <Card>
           <div className="flex items-center justify-center gap-3 py-10 text-[var(--gray)]">
@@ -338,6 +369,8 @@ export default function EventsPage() {
             <span className="caption">Loading events…</span>
           </div>
         </Card>
+      
+      // error
       ) : error ? (
         <Card>
           <div className="flex flex-col items-center justify-center gap-3 py-10">
@@ -345,6 +378,8 @@ export default function EventsPage() {
             <Button variant="ghost" size="sm" onClick={() => window.location.reload()}>Retry</Button>
           </div>
         </Card>
+      
+      /* not error, no results */
       ) : filtered.length === 0 ? (
         <Card>
           <div className="flex flex-col items-center justify-center gap-3 py-12">
@@ -358,6 +393,8 @@ export default function EventsPage() {
             )}
           </div>
         </Card>
+      
+      /* not error, yes results */
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {filtered.map((event) => {
@@ -369,7 +406,7 @@ export default function EventsPage() {
                 className="relative cursor-pointer"
                 onClick={() => { setDetailEvent(event); setRegisterError(null); }}
               >
-                {/* status badge */}
+                {/* status badge overlaid top-right of the cover */}
                 {event.status && (
                   <div className="absolute top-3 right-3 z-[2]">
                     <Badge variant={STATUS_VARIANT[event.status.toLowerCase().trim()] ?? "dark"}>
@@ -395,11 +432,12 @@ export default function EventsPage() {
         </div>
       )}
 
+      {/* result count footer */}
       {!isLoading && !error && filtered.length > 0 && (
         <p className="caption">Showing {filtered.length} of {events.length} events</p>
       )}
 
-      {/* event detail modal */}
+      {/* when opened the event */}
       <Modal
         open={!!detailEvent}
         onClose={() => { setDetailEvent(null); setRegisterError(null); }}
@@ -426,9 +464,10 @@ export default function EventsPage() {
         {detailEvent && (
           <div className="flex flex-col min-h-0">
             <div
-              className="h-[120px] sm:h-[160px] relative shrink-0 rounded-t-[var(--radius-xl)]"
+              className="h-[180px] sm:h-[160px] relative shrink-0 rounded-t-[var(--radius-xl)]"
               style={{ background: detailEvent.banner_url ? `url(${detailEvent.banner_url}) center/cover no-repeat` : CATEGORY_GRADIENT[detailEvent.category ?? ""] ?? DEFAULT_GRADIENT }}
             >
+              {/* close button inside cover */}
               <button
                 onClick={() => { setDetailEvent(null); setRegisterError(null); }}
                 aria-label="Close"
@@ -437,6 +476,7 @@ export default function EventsPage() {
                 <X size={14} />
               </button>
 
+              {/* category and status badges bottom-left of cover */}
               <div className="absolute bottom-3 left-3 flex gap-2 items-center">
                 <span className="badge badge-pink">{detailEvent.category ?? "Uncategorized"}</span>
                 {detailEvent.status && (
@@ -447,10 +487,14 @@ export default function EventsPage() {
               </div>
             </div>
 
+            {/* body - overflow-y-auto here so only body scrolls, cover + footer stay fixed */}
             <div className="flex flex-col gap-3 p-3 sm:p-5 overflow-y-auto">
+              {/* title */}
               <h2 className="heading-md m-0">{detailEvent.title}</h2>
 
+              {/* details row */}
               <div className="flex flex-col gap-1.5">
+                {/* ---------- date ---------- */}
                 <div className="flex items-start gap-3 caption sm:text-sm text-[var(--gray)]">
                   <CalendarDays size={15} className="shrink-0 mt-0.5" />
                   <span>
@@ -460,14 +504,17 @@ export default function EventsPage() {
                     )}
                   </span>
                 </div>
+                {/* ---------- location ---------- */}
                 <div className="flex items-center gap-3 caption sm:text-sm text-[var(--gray)]">
                   <MapPin size={15} className="shrink-0" />
                   <span>{detailEvent.location ?? "—"}</span>
                 </div>
+                {/* ---------- capacity ---------- */}
                 <div className="flex items-center gap-3 caption sm:text-sm text-[var(--gray)]">
                   <Users size={15} className="shrink-0" />
                   <span>Capacity: {detailEvent.capacity ?? "—"}</span>
                 </div>
+                {/* ---------- registration ---------- */}
                 {(detailEvent.registration_open || detailEvent.registration_close) && (
                   <div className="flex items-center gap-3 caption sm:text-sm text-[var(--gray)]">
                     <Clock size={15} className="shrink-0" />
@@ -481,17 +528,20 @@ export default function EventsPage() {
                 )}
               </div>
 
+              {/* divider */}
               <div className="divider" />
 
+              {/* full description */}
               <div className="flex flex-col gap-2 pb-2">
                 <p className="label">ABOUT THIS EVENT</p>
                 <p className="body whitespace-pre-wrap">{detailEvent.description || "No description provided."}</p>
               </div>
-            </div>
+            </div>{/* end body */}
           </div>
         )}
       </Modal>
 
+      {/* hide scroll to top if event details are open */}
       <ScrollToTop hidden={!!detailEvent} />
     </div>
   );
