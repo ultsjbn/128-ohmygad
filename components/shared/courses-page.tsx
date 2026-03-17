@@ -1,493 +1,124 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { createClient } from "@/lib/supabase/client";
-import { SlidersHorizontal, Loader2, CalendarDays, MapPin, Users, Clock, X, ArrowUpDown } from "lucide-react";
-import type { CourseFormData } from "@/components/admin/course-form";
-import ScrollToTop from "@/components/ui/scroll-to-top";
-
-import {
-  SearchBar,
-  EventCard,
-  Badge,
-  FilterChips,
-  Button,
-  Card,
-  Modal,
-  Dropdown,
-  DropdownItem,
-  DropdownDivider,
-} from "@/components/ui";
+import { Typography, InputText } from "@snowball-tech/fractal";
 import { useSearchParams } from "next/navigation";
+import { Search } from "lucide-react";
 
-type SortField = "title" | "semester" | "status" | "start_time";
-type SortDirection = "asc" | "desc";
-
-interface SortState {
-  field: SortField;
-  direction: SortDirection;
-}
-
-interface FilterState {
-  status: Set<string>;
-  semester: Set<string>;
-}
-
-const SORT_OPTIONS: { label: string; field: SortField }[] = [
-  { label: "Title", field: "title" },
-  { label: "Semester", field: "semester" },
-  { label: "Status", field: "status" },
-  { label: "Time", field: "start_time" },
-];
-
-const SEMESTER_GRADIENT: Record<string, string> = {
-  "1st Semester": "linear-gradient(135deg, #F4A7B9 0%, #B8B5E8 100%)",
-  "2nd Semester": "linear-gradient(135deg, #B8B5E8 0%, #FAF8FF 100%)",
-  "Mid-Year": "linear-gradient(135deg, #6DC5A0 0%, #FAF8FF 100%)",
+type Course = {
+  id: string;
+  title: string;
+  description?: string;
+  start_time?: string;
+  end_time?: string;
+  instructor_id?: string;
+  status?: string;
+  semester?: string;
+  created_at?: string;
+  updated_at?: string;
 };
-const DEFAULT_GRADIENT = "linear-gradient(135deg, #B8B5E8 0%, #2D2A4A 100%)";
-
-type BadgeVariant = "pink" | "periwinkle" | "dark" | "success" | "warning" | "error";
-const STATUS_VARIANT: Record<string, BadgeVariant> = {
-  open: "pink",
-  closed: "dark",
-};
-
-function CheckItem({
-  label,
-  active,
-  onToggle,
-  capitalize = false,
-}: {
-  label: string;
-  active: boolean;
-  onToggle: () => void;
-  capitalize?: boolean;
-}) {
-  return (
-    <DropdownItem onClick={onToggle}>
-      <span className="flex items-center gap-2">
-        <span className={`w-[14px] h-[14px] rounded shrink-0 border-[1.5px] inline-flex items-center justify-center ${active ? "border-[var(--primary-dark)] bg-[var(--primary-dark)]" : "border-[rgba(45,42,74,0.20)] bg-transparent"}`}>
-          {active && (
-            <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
-              <path d="M1 4l2 2 4-4" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          )}
-        </span>
-        <span className={capitalize ? "capitalize" : ""}>{active ? <strong>{label}</strong> : label}</span>
-      </span>
-    </DropdownItem>
-  );
-}
 
 export default function CoursesPage() {
   const searchParams = useSearchParams();
-
-  const [courses, setCourses] = useState<CourseFormData[]>([]);
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState(searchParams.get("search") || "");
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [sort, setSort] = useState<SortState>({ field: "start_time", direction: "desc" });
-  const [filters, setFilters] = useState<FilterState>({ status: new Set(), semester: new Set() });
-  const [activeChip, setActiveChip] = useState("All");
-  const [detailCourse, setDetailCourse] = useState<CourseFormData | null>(null);
 
-  // ── Registration state ──
-  const [registeredIds, setRegisteredIds] = useState<Set<string>>(new Set());
-  const [registeringId, setRegisteringId] = useState<string | null>(null);
-  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
-  const [registerError, setRegisterError] = useState<string | null>(null);
-
-  const statuses = Array.from(new Set(courses.map((e) => e.status?.toLowerCase().trim()).filter(Boolean))) as string[];
-  const semesters = Array.from(new Set(courses.map((e) => e.semester).filter(Boolean))) as string[];
-  const hasActiveFilters = filters.status.size > 0 || filters.semester.size > 0;
-  const activeFilterCount = filters.status.size + filters.semester.size;
-
-  // ── Fetch events + user + registrations ──
   useEffect(() => {
-    async function fetchData() {
-      const supabase = createClient();
-
-      // Get current user
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        setCurrentUserId(user.id);
-
-        // Fetch existing registrations
-        const { data: regs } = await supabase
-          .from("event_registration")
-          .select("event_id")
-          .eq("user_id", user.id);
-
-        if (regs) setRegisteredIds(new Set(regs.map((r) => r.event_id)));
+    async function fetchCourses() {
+      try {
+        setLoading(true);
+        const res = await fetch("/api/courses");
+        const json = await res.json();
+        if (json.success && Array.isArray(json.courses)) {
+          setCourses(json.courses);
+        }
+      } catch (err) {
+        console.error("[fetchCourses] Error:", err);
+      } finally {
+        setLoading(false);
       }
-
-      // Fetch courses
-      const { data, error } = await supabase
-        .from("course")
-        .select("id, title, description, semester, status, start_time, banner_url")
-        .order("start_time", { ascending: false });
-
-      if (error) setError(error.message);
-      else if (data) setCourses(data);
-      setIsLoading(false);
     }
-    fetchData();
+    fetchCourses();
   }, []);
 
+  // sync the URL search param to the local search 
   useEffect(() => {
     const s = searchParams.get("search");
     if (s !== null) setSearch(s);
   }, [searchParams]);
 
-  // Register
-  const handleRegister = async (eventId: string, e?: React.MouseEvent) => {
-    e?.stopPropagation();
-    setRegisterError(null);
-
-    // Already registered — do nothing
-    if (registeredIds.has(eventId)) return;
-
-    if (!currentUserId) {
-      setRegisterError("You must be logged in to register.");
-      return;
-    }
-
-    setRegisteringId(eventId);
-    const supabase = createClient();
-
-    const { error } = await supabase
-      .from("event_registration")
-      .insert({
-        event_id:          eventId,
-        user_id:           currentUserId,
-        status:            "registered",
-        registration_date: new Date().toISOString(),
-      });
-
-    if (error) {
-      setRegisterError("Failed to register: " + error.message);
-    } else {
-      setRegisteredIds((prev) => new Set([...prev, eventId]));
-    }
-
-    setRegisteringId(null);
-  };  
-
-  // Sort
-  const sortEvents = (eventsToSort: EventFormData[], sortState: SortState): EventFormData[] => {
-    const { field, direction } = sortState;
-    const sorted = [...eventsToSort];
-    sorted.sort((a, b) => {
-      let aVal: any = a[field as keyof EventFormData];
-      let bVal: any = b[field as keyof EventFormData];
-      if (aVal == null && bVal == null) return 0;
-      if (aVal == null) return direction === "asc" ? 1 : -1;
-      if (bVal == null) return direction === "asc" ? -1 : 1;
-      if (field === "start_date") { aVal = new Date(aVal).getTime(); bVal = new Date(bVal).getTime(); }
-      if (typeof aVal === "string" && typeof bVal === "string") { aVal = aVal.toLowerCase(); bVal = bVal.toLowerCase(); }
-      if (aVal < bVal) return direction === "asc" ? -1 : 1;
-      if (aVal > bVal) return direction === "asc" ? 1 : -1;
-      return 0;
-    });
-    return sorted;
-  };
-
-  const handleSort = (field: SortField) =>
-    setSort((prev) => ({ field, direction: prev.field === field && prev.direction === "asc" ? "desc" : "asc" }));
-
-  const toggleFilter = (type: "status" | "category", value: string) => {
-    setFilters((prev) => {
-      const next = new Set(prev[type]);
-      next.has(value) ? next.delete(value) : next.add(value);
-      return { ...prev, [type]: next };
-    });
-  };
-
-  const clearFilters = () => { setFilters({ status: new Set(), category: new Set() }); setActiveChip("All"); };
-
-  const handleChipChange = (chip: string) => {
-    if (chip === "All" || chip === activeChip) {
-      setActiveChip("All");
-      setFilters((prev) => ({ ...prev, category: new Set() }));
-    } else {
-      setActiveChip(chip);
-      setFilters((prev) => ({ ...prev, category: new Set([chip]) }));
-    }
-  };
-
-  const filtered = sortEvents(
-    events
-      .filter((e) => `${e.title} ${e.category || ""} ${e.location || ""}`.toLowerCase().includes(search.toLowerCase()))
-      .filter((e) => filters.status.size === 0 || filters.status.has(e.status?.toLowerCase().trim() ?? ""))
-      .filter((e) => filters.category.size === 0 || filters.category.has(e.category ?? "")),
-    sort
+  const filtered = courses.filter((c) =>
+    `${c.title} ${c.start_time || ""} ${c.end_time || ""} ${c.semester || ""}`
+      .toLowerCase()
+      .includes(search.toLowerCase())
   );
 
-  const sortLabel = sort.field !== "start_date"
-    ? `${SORT_OPTIONS.find((o) => o.field === sort.field)?.label} ${sort.direction === "asc" ? "↑" : "↓"}`
-    : "Sort";
-
-  const isDetailRegistered  = detailEvent ? registeredIds.has(detailEvent.id!)    : false;
-  const isDetailRegistering = detailEvent ? registeringId === detailEvent.id       : false;
-
   return (
-    <div className="flex flex-col gap-4">
+    <div className="mx-auto h-full flex flex-col gap-6">
 
-      <div className="hidden md:block">
-        <h1 className="heading-lg">Discover Events</h1>
+      {/* Search */}
+      <div className="shrink-0">
+        <InputText
+          placeholder="Search courses..."
+          fullWidth
+          prefix={<Search size={18} />}
+          onChange={(_e, value) => setSearch(value)}
+          value={search}
+        />
       </div>
 
-      {/* search + sort + filter */}
-      <div className="flex flex-col gap-3">
-        <div className="flex items-center gap-3 flex-wrap overflow-visible">
-          <SearchBar
-            placeholder="Search…"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            containerStyle={{ flex: 1, minWidth: 120 }}
-          />
-
-          <div className="flex items-center gap-2 shrink-0">
-            <Dropdown trigger={
-              <Button variant={sort.field !== "start_date" ? "periwinkle" : "ghost"}>
-                <ArrowUpDown size={15} />
-                <span className="hidden md:inline"> {sortLabel}</span>
-              </Button>
-            }>
-              {SORT_OPTIONS.map(({ label, field }) => {
-                const isActive = sort.field === field;
-                return (
-                  <DropdownItem key={field} onClick={() => handleSort(field)}>
-                    <span className="flex items-center gap-2">
-                      <span className={`w-1.5 h-1.5 rounded-full shrink-0 border-[1.5px] ${isActive ? "bg-[var(--primary-dark)] border-[var(--primary-dark)]" : "bg-transparent border-[rgba(45,42,74,0.20)]"}`} />
-                      <span>{isActive ? <strong>{label} {sort.direction === "asc" ? "↑" : "↓"}</strong> : label}</span>
-                    </span>
-                  </DropdownItem>
-                );
-              })}
-              <DropdownDivider />
-              <DropdownItem onClick={() => setSort({ field: "start_date", direction: "desc" })}>Reset sort</DropdownItem>
-            </Dropdown>
-
-            <Dropdown trigger={
-              <Button variant={hasActiveFilters ? "pink" : "ghost"}>
-                <SlidersHorizontal size={15} />
-                <span className="hidden md:inline">Filter</span>
-                {hasActiveFilters && (
-                  <span className="inline-flex items-center justify-center w-4 h-4 rounded-full text-[10px] font-bold text-white bg-[var(--primary-dark)] ml-0.5">
-                    {activeFilterCount}
-                  </span>
-                )}
-              </Button>
-            }>
-              {statuses.length > 0 && (
-                <>
-                  <div className="px-3 pt-1 pb-1.5"><p className="label mb-1">Status</p></div>
-                  {statuses.map((s) => <CheckItem key={s} label={s} active={filters.status.has(s)} onToggle={() => toggleFilter("status", s)} capitalize />)}
-                  <DropdownDivider />
-                </>
-              )}
-              {categories.length > 0 && (
-                <>
-                  <div className="px-3 pt-1.5 pb-1"><p className="label mb-1">Category</p></div>
-                  {categories.map((cat) => <CheckItem key={cat} label={cat} active={filters.category.has(cat)} onToggle={() => toggleFilter("category", cat)} />)}
-                  <DropdownDivider />
-                </>
-              )}
-              <DropdownItem onClick={clearFilters}>Clear all filters</DropdownItem>
-            </Dropdown>
-          </div>
+      {/* Content */}
+      {loading ? (
+        <div className="p-8 text-center">
+          <Typography variant="body-1" className="text-fractal-text-placeholder">Loading courses...</Typography>
         </div>
-
-        {categories.length > 0 && (
-          <FilterChips chips={["All", ...categories]} defaultActive={activeChip} onChange={handleChipChange} />
-        )}
-      </div>
-
-      {/* active filter pills */}
-      {hasActiveFilters && (
-        <div className="flex items-center gap-2 flex-wrap -mt-2">
-          <span className="caption">Active filters:</span>
-          {[...filters.status].map((s) => (
-            <Badge key={s} variant="warning" dot>
-              <span className="capitalize">{s}</span>
-              <button onClick={() => toggleFilter("status", s)} className="ml-1.5" aria-label={`Remove ${s} filter`}>×</button>
-            </Badge>
-          ))}
-          {[...filters.category].map((cat) => (
-            <Badge key={cat} variant="pink" dot>
-              {cat}
-              <button onClick={() => { toggleFilter("category", cat); setActiveChip("All"); }} className="ml-1.5" aria-label={`Remove ${cat} filter`}>×</button>
-            </Badge>
-          ))}
-          <Button variant="soft" size="sm" onClick={clearFilters}>Clear all</Button>
-        </div>
-      )}
-
-      {/* event grid */}
-      {isLoading ? (
-        <Card>
-          <div className="flex items-center justify-center gap-3 py-10 text-[var(--gray)]">
-            <Loader2 size={20} className="animate-spin" />
-            <span className="caption">Loading events…</span>
-          </div>
-        </Card>
-      ) : error ? (
-        <Card>
-          <div className="flex flex-col items-center justify-center gap-3 py-10">
-            <p className="caption text-[var(--error)]">Error: {error}</p>
-            <Button variant="ghost" size="sm" onClick={() => window.location.reload()}>Retry</Button>
-          </div>
-        </Card>
       ) : filtered.length === 0 ? (
-        <Card>
-          <div className="flex flex-col items-center justify-center gap-3 py-12">
-            <p className="caption">
-              {hasActiveFilters ? "No events match your filters." : search ? "No events match your search." : "No events available."}
-            </p>
-            {(hasActiveFilters || search) && (
-              <Button variant="ghost" size="sm" onClick={() => { clearFilters(); setSearch(""); }}>
-                Clear search &amp; filters
-              </Button>
-            )}
-          </div>
-        </Card>
+        <div className="p-8 text-center">
+          <Typography variant="body-1" className="text-fractal-text-placeholder">
+            {search ? "No courses match your search." : "No courses available."}
+          </Typography>
+        </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-          {filtered.map((event) => {
-            const isRegistered  = registeredIds.has(event.id!);
-            const isRegistering = registeringId === event.id;
-            return (
-              <div
-                key={event.id}
-                className="relative cursor-pointer"
-                onClick={() => { setDetailEvent(event); setRegisterError(null); }}
-              >
-                {/* status badge */}
-                {event.status && (
-                  <div className="absolute top-3 right-3 z-[2]">
-                    <Badge variant={STATUS_VARIANT[event.status.toLowerCase().trim()] ?? "dark"}>
-                      <span className="capitalize">{event.status}</span>
-                    </Badge>
-                  </div>
-                )}
-                <EventCard
-                  title={event.title}
-                  category={event.category ?? "Uncategorized"}
-                  date={event.start_date ? new Date(event.start_date).toLocaleDateString("en-PH", { month: "short", day: "numeric", year: "numeric" }) : "—"}
-                  location={event.location ?? "—"}
-                  registered={0}
-                  capacity={event.capacity ?? 0}
-                  gradient={event.banner_url ? `url(${event.banner_url}) center/cover no-repeat` : CATEGORY_GRADIENT[event.category ?? ""] ?? DEFAULT_GRADIENT}
-                  registerLabel={isRegistered ? "Registered" : isRegistering ? "Processing…" : "Register"}
-                  registerDisabled={isRegistered || isRegistering}
-                  onRegister={(e?: React.MouseEvent) => handleRegister(event.id!, e)}
-                />
+          {filtered.map((course) => (
+            <div
+              key={course.id}
+              className="flex flex-col gap-2 border-2 border-fractal-border-default rounded-s bg-fractal-bg-body-white hover:shadow-brutal-1 transition-all overflow-hidden"
+            >
+              <div className="h-1.5 w-full bg-fractal-decorative-blue-70" />
+
+              <div className="flex items-start justify-between px-4 pt-2">
+                <Typography variant="body-1-median" className="flex-1">{course.title}</Typography>
+                <span className="px-2 py-0.5 text-xs font-median border border-fractal-base-grey-70 rounded-s bg-fractal-base-grey-90 capitalize ml-2 shrink-0">
+                  {course.status || "—"}
+                </span>
               </div>
-            );
-          })}
+
+              <div className="flex flex-col gap-1.5 px-4 pb-3">
+                <Typography variant="body-2" className="text-fractal-text-placeholder line-clamp-2">
+                  {course.description || "—"}
+                </Typography>
+                <Typography variant="body-2" className="text-fractal-text-placeholder">
+                  <strong>Start:</strong> {course.start_time || "—"}
+                </Typography>
+                <Typography variant="body-2" className="text-fractal-text-placeholder">
+                  <strong>End:</strong> {course.end_time || "—"}
+                </Typography>
+                <Typography variant="body-2" className="text-fractal-text-placeholder">
+                  <strong>Semester:</strong> {course.semester || "—"}
+                </Typography>
+              </div>
+            </div>
+          ))}
         </div>
       )}
 
-      {!isLoading && !error && filtered.length > 0 && (
-        <p className="caption">Showing {filtered.length} of {events.length} events</p>
+      {!loading && (
+        <Typography variant="body-2" className="text-fractal-text-placeholder shrink-0">
+          Showing {filtered.length} of {courses.length} courses
+        </Typography>
       )}
-
-      {/* event detail modal */}
-      <Modal
-        open={!!detailEvent}
-        onClose={() => { setDetailEvent(null); setRegisterError(null); }}
-        hideCloseButton
-        modalStyle={{ maxWidth: 600, padding: 0 }}
-        footer={
-          detailEvent && (
-            <div className="px-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] sm:px-4 sm:pb-4 shrink-0 flex flex-col gap-2">
-              {registerError && (
-                <p className="caption text-[var(--error)] text-center">{registerError}</p>
-              )}
-              <Button
-                variant={isDetailRegistered ? "soft" : "primary"}
-                className="w-full"
-                disabled={isDetailRegistering}
-                onClick={(e) => handleRegister(detailEvent.id!, e)}
-              >
-                {isDetailRegistering ? "Processing…" : isDetailRegistered ? "Registered" : "Register"}
-              </Button>
-            </div>
-          )
-        }
-      >
-        {detailEvent && (
-          <div className="flex flex-col min-h-0">
-            <div
-              className="h-[120px] sm:h-[160px] relative shrink-0 rounded-t-[var(--radius-xl)]"
-              style={{ background: detailEvent.banner_url ? `url(${detailEvent.banner_url}) center/cover no-repeat` : CATEGORY_GRADIENT[detailEvent.category ?? ""] ?? DEFAULT_GRADIENT }}
-            >
-              <button
-                onClick={() => { setDetailEvent(null); setRegisterError(null); }}
-                aria-label="Close"
-                className="absolute top-3 right-3 w-4 h-4 sm:w-6 sm:h-6 rounded-full border-none cursor-pointer flex items-center justify-center text-[var(--primary-dark)] z-10 backdrop-blur-sm bg-white/80"
-              >
-                <X size={14} />
-              </button>
-
-              <div className="absolute bottom-3 left-3 flex gap-2 items-center">
-                <span className="badge badge-pink">{detailEvent.category ?? "Uncategorized"}</span>
-                {detailEvent.status && (
-                  <Badge variant={STATUS_VARIANT[detailEvent.status.toLowerCase().trim()] ?? "dark"}>
-                    <span className="capitalize">{detailEvent.status}</span>
-                  </Badge>
-                )}
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-3 p-3 sm:p-5 overflow-y-auto">
-              <h2 className="heading-md m-0">{detailEvent.title}</h2>
-
-              <div className="flex flex-col gap-1.5">
-                <div className="flex items-start gap-3 caption sm:text-sm text-[var(--gray)]">
-                  <CalendarDays size={15} className="shrink-0 mt-0.5" />
-                  <span>
-                    {detailEvent.start_date ? new Date(detailEvent.start_date).toLocaleDateString("en-PH", { weekday: "long", month: "long", day: "numeric", year: "numeric" }) : "—"}
-                    {detailEvent.end_date && detailEvent.end_date !== detailEvent.start_date && (
-                      <> — {new Date(detailEvent.end_date).toLocaleDateString("en-PH", { month: "long", day: "numeric", year: "numeric" })}</>
-                    )}
-                  </span>
-                </div>
-                <div className="flex items-center gap-3 caption sm:text-sm text-[var(--gray)]">
-                  <MapPin size={15} className="shrink-0" />
-                  <span>{detailEvent.location ?? "—"}</span>
-                </div>
-                <div className="flex items-center gap-3 caption sm:text-sm text-[var(--gray)]">
-                  <Users size={15} className="shrink-0" />
-                  <span>Capacity: {detailEvent.capacity ?? "—"}</span>
-                </div>
-                {(detailEvent.registration_open || detailEvent.registration_close) && (
-                  <div className="flex items-center gap-3 caption sm:text-sm text-[var(--gray)]">
-                    <Clock size={15} className="shrink-0" />
-                    <span>
-                      Registration:&nbsp;
-                      {detailEvent.registration_open ? new Date(detailEvent.registration_open).toLocaleDateString("en-PH", { month: "short", day: "numeric" }) : "?"}
-                      &nbsp;–&nbsp;
-                      {detailEvent.registration_close ? new Date(detailEvent.registration_close).toLocaleDateString("en-PH", { month: "short", day: "numeric" }) : "?"}
-                    </span>
-                  </div>
-                )}
-              </div>
-
-              <div className="divider" />
-
-              <div className="flex flex-col gap-2 pb-2">
-                <p className="label">ABOUT THIS EVENT</p>
-                <p className="body whitespace-pre-wrap">{detailEvent.description || "No description provided."}</p>
-              </div>
-            </div>
-          </div>
-        )}
-      </Modal>
-
-      <ScrollToTop hidden={!!detailEvent} />
     </div>
   );
 }
