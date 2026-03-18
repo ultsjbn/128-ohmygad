@@ -118,6 +118,24 @@ export function EventCard({
   );
 }
 
+
+// coursecard
+export interface CourseCardProps {
+  title: string;
+  category: string;
+  time: string;
+  gradient: string;
+  onRegister?: (e?: React.MouseEvent) => void;
+  registerLabel?: string;
+  registerDisabled?: boolean;
+  isRegistered?: boolean;
+}
+
+
+
+
+
+
 // participantcard
 interface ParticipantCardProps {
   name: string;
@@ -126,6 +144,8 @@ interface ParticipantCardProps {
   role: string;
   gsoCount: string;
 }
+
+
 
 export function ParticipantCard({ name, studentId, college, role, gsoCount }: ParticipantCardProps) {
   return (

@@ -1,14 +1,23 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { SlidersHorizontal, Loader2, CalendarDays, MapPin, Users, Clock, X, ArrowUpDown } from "lucide-react";
-import type { CourseFormData } from "@/components/admin/course-form";
-import ScrollToTop from "@/components/ui/scroll-to-top";
+import { Typography, InputText } from "@snowball-tech/fractal";
+import { useSearchParams } from "next/navigation";
+import { 
+  SlidersHorizontal, 
+  Loader2, 
+  BookOpen, 
+  Clock, 
+  X, 
+  ArrowUpDown, 
+  Search, 
+  Calendar, 
+  GraduationCap 
+} from "lucide-react";
 
 import {
   SearchBar,
-  EventCard,
   Badge,
   FilterChips,
   Button,
@@ -17,8 +26,24 @@ import {
   Dropdown,
   DropdownItem,
   DropdownDivider,
+  Toast,
 } from "@/components/ui";
-import { useSearchParams } from "next/navigation";
+
+// --- Types & Constants ---
+
+type Course = {
+  id: string;
+  title: string;
+  description?: string;
+  start_time?: string;
+  end_time?: string;
+  days?: string;
+  instructor_id?: string;
+  status?: string;
+  semester?: string;
+  capacity?: number;
+  enrolled_count?: number;
+};
 
 type SortField = "title" | "semester" | "status" | "start_time";
 type SortDirection = "asc" | "desc";
@@ -37,166 +62,83 @@ const SORT_OPTIONS: { label: string; field: SortField }[] = [
   { label: "Title", field: "title" },
   { label: "Semester", field: "semester" },
   { label: "Status", field: "status" },
-  { label: "Time", field: "start_time" },
+  { label: "Start Time", field: "start_time" },
 ];
 
-const SEMESTER_GRADIENT: Record<string, string> = {
-  "1st Semester": "linear-gradient(135deg, #F4A7B9 0%, #B8B5E8 100%)",
-  "2nd Semester": "linear-gradient(135deg, #B8B5E8 0%, #FAF8FF 100%)",
-  "Mid-Year": "linear-gradient(135deg, #6DC5A0 0%, #FAF8FF 100%)",
-};
-const DEFAULT_GRADIENT = "linear-gradient(135deg, #B8B5E8 0%, #2D2A4A 100%)";
-
-type BadgeVariant = "pink" | "periwinkle" | "dark" | "success" | "warning" | "error";
-const STATUS_VARIANT: Record<string, BadgeVariant> = {
-  open: "pink",
-  closed: "dark",
+const STATUS_VARIANT: Record<string, "success" | "warning" | "error" | "dark" | "pink"> = {
+  open: "success",
+  closed: "error",
+  ongoing: "warning",
+  archived: "dark",
 };
 
-function CheckItem({
-  label,
-  active,
-  onToggle,
-  capitalize = false,
-}: {
-  label: string;
-  active: boolean;
-  onToggle: () => void;
-  capitalize?: boolean;
-}) {
+// --- Helper Component ---
+
+function CheckItem({ label, active, onToggle }: { label: string; active: boolean; onToggle: () => void }) {
   return (
     <DropdownItem onClick={onToggle}>
       <span className="flex items-center gap-2">
         <span className={`w-[14px] h-[14px] rounded shrink-0 border-[1.5px] inline-flex items-center justify-center ${active ? "border-[var(--primary-dark)] bg-[var(--primary-dark)]" : "border-[rgba(45,42,74,0.20)] bg-transparent"}`}>
-          {active && (
-            <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
-              <path d="M1 4l2 2 4-4" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          )}
+          {active && <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1 4l2 2 4-4" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>}
         </span>
-        <span className={capitalize ? "capitalize" : ""}>{active ? <strong>{label}</strong> : label}</span>
+        <span className="capitalize">{active ? <strong>{label}</strong> : label}</span>
       </span>
     </DropdownItem>
   );
 }
 
+// --- Main Component ---
+
 export default function CoursesPage() {
   const searchParams = useSearchParams();
 
-  const [courses, setCourses] = useState<CourseFormData[]>([]);
-  const [search, setSearch] = useState(searchParams.get("search") || "");
+  // State
+  const [courses, setCourses] = useState<Course[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [sort, setSort] = useState<SortState>({ field: "start_time", direction: "desc" });
+  const [search, setSearch] = useState(searchParams.get("search") || "");
+  const [sort, setSort] = useState<SortState>({ field: "title", direction: "asc" });
   const [filters, setFilters] = useState<FilterState>({ status: new Set(), semester: new Set() });
-  const [activeChip, setActiveChip] = useState("All");
-  const [detailCourse, setDetailCourse] = useState<CourseFormData | null>(null);
+  const [activeSemesterChip, setActiveSemesterChip] = useState("All Semesters");
+  const [detailCourse, setDetailCourse] = useState<Course | null>(null);
+  const [toast, setToast] = useState<{ variant: "success" | "error" | "info"; title: string } | null>(null);
 
-  // ── Registration state ──
-  const [registeredIds, setRegisteredIds] = useState<Set<string>>(new Set());
-  const [registeringId, setRegisteringId] = useState<string | null>(null);
-  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
-  const [registerError, setRegisterError] = useState<string | null>(null);
-
-  const statuses = Array.from(new Set(courses.map((e) => e.status?.toLowerCase().trim()).filter(Boolean))) as string[];
-  const semesters = Array.from(new Set(courses.map((e) => e.semester).filter(Boolean))) as string[];
-  const hasActiveFilters = filters.status.size > 0 || filters.semester.size > 0;
-  const activeFilterCount = filters.status.size + filters.semester.size;
-
-  // ── Fetch events + user + registrations ──
+  // Fetch Logic
   useEffect(() => {
-    async function fetchData() {
-      const supabase = createClient();
-
-      // Get current user
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        setCurrentUserId(user.id);
-
-        // Fetch existing registrations
-        const { data: regs } = await supabase
-          .from("event_registration")
-          .select("event_id")
-          .eq("user_id", user.id);
-
-        if (regs) setRegisteredIds(new Set(regs.map((r) => r.event_id)));
+    async function fetchCourses() {
+      try {
+        setIsLoading(true);
+        const res = await fetch("/api/courses");
+        const json = await res.json();
+        if (json.success) setCourses(json.courses);
+      } catch (err) {
+        setToast({ variant: "error", title: "Failed to load courses" });
+      } finally {
+        setIsLoading(false);
       }
-
-      // Fetch courses
-      const { data, error } = await supabase
-        .from("course")
-        .select("id, title, description, semester, status, start_time, banner_url")
-        .order("start_time", { ascending: false });
-
-      if (error) setError(error.message);
-      else if (data) setCourses(data);
-      setIsLoading(false);
     }
-    fetchData();
+    fetchCourses();
   }, []);
 
-  useEffect(() => {
-    const s = searchParams.get("search");
-    if (s !== null) setSearch(s);
-  }, [searchParams]);
+  // Filter & Sort Logic
+  const semesters = useMemo(() => Array.from(new Set(courses.map((c) => c.semester).filter(Boolean))), [courses]);
+  const statuses = useMemo(() => Array.from(new Set(courses.map((c) => c.status).filter(Boolean))), [courses]);
 
-  // Register
-  const handleRegister = async (eventId: string, e?: React.MouseEvent) => {
-    e?.stopPropagation();
-    setRegisterError(null);
+  const filteredAndSorted = useMemo(() => {
+    let result = courses.filter((c) => 
+      `${c.title} ${c.semester}`.toLowerCase().includes(search.toLowerCase()) &&
+      (filters.status.size === 0 || filters.status.has(c.status || "")) &&
+      (filters.semester.size === 0 || filters.semester.has(c.semester || ""))
+    );
 
-    // Already registered — do nothing
-    if (registeredIds.has(eventId)) return;
-
-    if (!currentUserId) {
-      setRegisterError("You must be logged in to register.");
-      return;
-    }
-
-    setRegisteringId(eventId);
-    const supabase = createClient();
-
-    const { error } = await supabase
-      .from("event_registration")
-      .insert({
-        event_id:          eventId,
-        user_id:           currentUserId,
-        status:            "registered",
-        registration_date: new Date().toISOString(),
-      });
-
-    if (error) {
-      setRegisterError("Failed to register: " + error.message);
-    } else {
-      setRegisteredIds((prev) => new Set([...prev, eventId]));
-    }
-
-    setRegisteringId(null);
-  };  
-
-  // Sort
-  const sortEvents = (eventsToSort: EventFormData[], sortState: SortState): EventFormData[] => {
-    const { field, direction } = sortState;
-    const sorted = [...eventsToSort];
-    sorted.sort((a, b) => {
-      let aVal: any = a[field as keyof EventFormData];
-      let bVal: any = b[field as keyof EventFormData];
-      if (aVal == null && bVal == null) return 0;
-      if (aVal == null) return direction === "asc" ? 1 : -1;
-      if (bVal == null) return direction === "asc" ? -1 : 1;
-      if (field === "start_date") { aVal = new Date(aVal).getTime(); bVal = new Date(bVal).getTime(); }
-      if (typeof aVal === "string" && typeof bVal === "string") { aVal = aVal.toLowerCase(); bVal = bVal.toLowerCase(); }
-      if (aVal < bVal) return direction === "asc" ? -1 : 1;
-      if (aVal > bVal) return direction === "asc" ? 1 : -1;
-      return 0;
+    return result.sort((a, b) => {
+      const aVal = (a[sort.field] || "").toString().toLowerCase();
+      const bVal = (b[sort.field] || "").toString().toLowerCase();
+      return sort.direction === "asc" ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
     });
-    return sorted;
-  };
+  }, [courses, search, filters, sort]);
 
-  const handleSort = (field: SortField) =>
-    setSort((prev) => ({ field, direction: prev.field === field && prev.direction === "asc" ? "desc" : "asc" }));
-
-  const toggleFilter = (type: "status" | "category", value: string) => {
+  // Handlers
+  const toggleFilter = (type: keyof FilterState, value: string) => {
     setFilters((prev) => {
       const next = new Set(prev[type]);
       next.has(value) ? next.delete(value) : next.add(value);
@@ -204,290 +146,126 @@ export default function CoursesPage() {
     });
   };
 
-  const clearFilters = () => { setFilters({ status: new Set(), category: new Set() }); setActiveChip("All"); };
-
-  const handleChipChange = (chip: string) => {
-    if (chip === "All" || chip === activeChip) {
-      setActiveChip("All");
-      setFilters((prev) => ({ ...prev, category: new Set() }));
-    } else {
-      setActiveChip(chip);
-      setFilters((prev) => ({ ...prev, category: new Set([chip]) }));
-    }
+  const handleSemesterChip = (sem: string) => {
+    setActiveSemesterChip(sem);
+    setFilters(prev => ({ ...prev, semester: sem === "All Semesters" ? new Set() : new Set([sem]) }));
   };
 
-  const filtered = sortEvents(
-    events
-      .filter((e) => `${e.title} ${e.category || ""} ${e.location || ""}`.toLowerCase().includes(search.toLowerCase()))
-      .filter((e) => filters.status.size === 0 || filters.status.has(e.status?.toLowerCase().trim() ?? ""))
-      .filter((e) => filters.category.size === 0 || filters.category.has(e.category ?? "")),
-    sort
-  );
-
-  const sortLabel = sort.field !== "start_date"
-    ? `${SORT_OPTIONS.find((o) => o.field === sort.field)?.label} ${sort.direction === "asc" ? "↑" : "↓"}`
-    : "Sort";
-
-  const isDetailRegistered  = detailEvent ? registeredIds.has(detailEvent.id!)    : false;
-  const isDetailRegistering = detailEvent ? registeringId === detailEvent.id       : false;
-
   return (
-    <div className="flex flex-col gap-4">
-
+    <div className="flex flex-col gap-6">
+      {/* Header */}
       <div className="hidden md:block">
-        <h1 className="heading-lg">Discover Events</h1>
+        <h1 className="heading-lg">Course Catalog</h1>
       </div>
 
-      {/* search + sort + filter */}
+      {/* Toolbar */}
       <div className="flex flex-col gap-3">
-        <div className="flex items-center gap-3 flex-wrap overflow-visible">
-          <SearchBar
-            placeholder="Search…"
+        <div className="flex items-center gap-3 flex-wrap">
+          <InputText
+            placeholder="Search courses..."
+            className="flex-1 min-w-[200px]"
+            prefix={<Search size={18} />}
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            containerStyle={{ flex: 1, minWidth: 120 }}
+            onChange={(_e, val) => setSearch(val)}
           />
 
-          <div className="flex items-center gap-2 shrink-0">
+          <div className="flex items-center gap-2">
+            {/* Sort Dropdown */}
             <Dropdown trigger={
-              <Button variant={sort.field !== "start_date" ? "periwinkle" : "ghost"}>
+              <Button variant="ghost">
                 <ArrowUpDown size={15} />
-                <span className="hidden md:inline"> {sortLabel}</span>
+                <span className="hidden md:inline ml-2 capitalize">{sort.field}</span>
               </Button>
             }>
-              {SORT_OPTIONS.map(({ label, field }) => {
-                const isActive = sort.field === field;
-                return (
-                  <DropdownItem key={field} onClick={() => handleSort(field)}>
-                    <span className="flex items-center gap-2">
-                      <span className={`w-1.5 h-1.5 rounded-full shrink-0 border-[1.5px] ${isActive ? "bg-[var(--primary-dark)] border-[var(--primary-dark)]" : "bg-transparent border-[rgba(45,42,74,0.20)]"}`} />
-                      <span>{isActive ? <strong>{label} {sort.direction === "asc" ? "↑" : "↓"}</strong> : label}</span>
-                    </span>
-                  </DropdownItem>
-                );
-              })}
-              <DropdownDivider />
-              <DropdownItem onClick={() => setSort({ field: "start_date", direction: "desc" })}>Reset sort</DropdownItem>
+              {SORT_OPTIONS.map((opt) => (
+                <DropdownItem key={opt.field} onClick={() => setSort({ field: opt.field, direction: sort.field === opt.field && sort.direction === "asc" ? "desc" : "asc" })}>
+                  {opt.label} {sort.field === opt.field && (sort.direction === "asc" ? "↑" : "↓")}
+                </DropdownItem>
+              ))}
             </Dropdown>
 
+            {/* Filter Dropdown */}
             <Dropdown trigger={
-              <Button variant={hasActiveFilters ? "pink" : "ghost"}>
+              <Button variant={filters.status.size > 0 ? "pink" : "ghost"}>
                 <SlidersHorizontal size={15} />
-                <span className="hidden md:inline">Filter</span>
-                {hasActiveFilters && (
-                  <span className="inline-flex items-center justify-center w-4 h-4 rounded-full text-[10px] font-bold text-white bg-[var(--primary-dark)] ml-0.5">
-                    {activeFilterCount}
-                  </span>
-                )}
+                <span className="hidden md:inline ml-2">Filter</span>
               </Button>
             }>
-              {statuses.length > 0 && (
-                <>
-                  <div className="px-3 pt-1 pb-1.5"><p className="label mb-1">Status</p></div>
-                  {statuses.map((s) => <CheckItem key={s} label={s} active={filters.status.has(s)} onToggle={() => toggleFilter("status", s)} capitalize />)}
-                  <DropdownDivider />
-                </>
-              )}
-              {categories.length > 0 && (
-                <>
-                  <div className="px-3 pt-1.5 pb-1"><p className="label mb-1">Category</p></div>
-                  {categories.map((cat) => <CheckItem key={cat} label={cat} active={filters.category.has(cat)} onToggle={() => toggleFilter("category", cat)} />)}
-                  <DropdownDivider />
-                </>
-              )}
-              <DropdownItem onClick={clearFilters}>Clear all filters</DropdownItem>
+              <div className="px-3 py-2 font-bold text-xs uppercase opacity-50">Status</div>
+              {statuses.map(s => <CheckItem key={s} label={s} active={filters.status.has(s)} onToggle={() => toggleFilter("status", s)} />)}
+              <DropdownDivider />
+              <DropdownItem onClick={() => setFilters({ status: new Set(), semester: new Set() })}>Reset Filters</DropdownItem>
             </Dropdown>
           </div>
         </div>
 
-        {categories.length > 0 && (
-          <FilterChips chips={["All", ...categories]} defaultActive={activeChip} onChange={handleChipChange} />
-        )}
+        <FilterChips 
+          chips={["All Semesters", ...semesters]} 
+          defaultActive={activeSemesterChip} 
+          onChange={handleSemesterChip} 
+        />
       </div>
 
-      {/* active filter pills */}
-      {hasActiveFilters && (
-        <div className="flex items-center gap-2 flex-wrap -mt-2">
-          <span className="caption">Active filters:</span>
-          {[...filters.status].map((s) => (
-            <Badge key={s} variant="warning" dot>
-              <span className="capitalize">{s}</span>
-              <button onClick={() => toggleFilter("status", s)} className="ml-1.5" aria-label={`Remove ${s} filter`}>×</button>
-            </Badge>
-          ))}
-          {[...filters.category].map((cat) => (
-            <Badge key={cat} variant="pink" dot>
-              {cat}
-              <button onClick={() => { toggleFilter("category", cat); setActiveChip("All"); }} className="ml-1.5" aria-label={`Remove ${cat} filter`}>×</button>
-            </Badge>
-          ))}
-          <Button variant="soft" size="sm" onClick={clearFilters}>Clear all</Button>
-        </div>
-      )}
-
-      {/* event grid */}
+      {/* Grid */}
       {isLoading ? (
-        <Card>
-          <div className="flex items-center justify-center gap-3 py-10 text-[var(--gray)]">
-            <Loader2 size={20} className="animate-spin" />
-            <span className="caption">Loading events…</span>
-          </div>
+        <Card className="flex items-center justify-center py-20 text-gray-400">
+          <Loader2 className="animate-spin mr-2" size={20} /> Loading catalog...
         </Card>
-      ) : error ? (
-        <Card>
-          <div className="flex flex-col items-center justify-center gap-3 py-10">
-            <p className="caption text-[var(--error)]">Error: {error}</p>
-            <Button variant="ghost" size="sm" onClick={() => window.location.reload()}>Retry</Button>
-          </div>
-        </Card>
-      ) : filtered.length === 0 ? (
-        <Card>
-          <div className="flex flex-col items-center justify-center gap-3 py-12">
-            <p className="caption">
-              {hasActiveFilters ? "No events match your filters." : search ? "No events match your search." : "No events available."}
-            </p>
-            {(hasActiveFilters || search) && (
-              <Button variant="ghost" size="sm" onClick={() => { clearFilters(); setSearch(""); }}>
-                Clear search &amp; filters
-              </Button>
-            )}
-          </div>
-        </Card>
+      ) : filteredAndSorted.length === 0 ? (
+        <Card className="py-20 text-center text-gray-500">No courses found matching your criteria.</Card>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-          {filtered.map((event) => {
-            const isRegistered  = registeredIds.has(event.id!);
-            const isRegistering = registeringId === event.id;
-            return (
-              <div
-                key={event.id}
-                className="relative cursor-pointer"
-                onClick={() => { setDetailEvent(event); setRegisterError(null); }}
-              >
-                {/* status badge */}
-                {event.status && (
-                  <div className="absolute top-3 right-3 z-[2]">
-                    <Badge variant={STATUS_VARIANT[event.status.toLowerCase().trim()] ?? "dark"}>
-                      <span className="capitalize">{event.status}</span>
-                    </Badge>
-                  </div>
-                )}
-                <EventCard
-                  title={event.title}
-                  category={event.category ?? "Uncategorized"}
-                  date={event.start_date ? new Date(event.start_date).toLocaleDateString("en-PH", { month: "short", day: "numeric", year: "numeric" }) : "—"}
-                  location={event.location ?? "—"}
-                  registered={0}
-                  capacity={event.capacity ?? 0}
-                  gradient={event.banner_url ? `url(${event.banner_url}) center/cover no-repeat` : CATEGORY_GRADIENT[event.category ?? ""] ?? DEFAULT_GRADIENT}
-                  registerLabel={isRegistered ? "Registered" : isRegistering ? "Processing…" : "Register"}
-                  registerDisabled={isRegistered || isRegistering}
-                  onRegister={(e?: React.MouseEvent) => handleRegister(event.id!, e)}
-                />
+          {filteredAndSorted.map((course) => (
+            <Card 
+              key={course.id} 
+              className="cursor-pointer hover:shadow-md transition-shadow"
+              onClick={() => setDetailCourse(course)}
+            >
+              <div className="flex justify-between items-start mb-2">
+                <Badge variant={STATUS_VARIANT[course.status?.toLowerCase() || ""] || "dark"}>{course.status}</Badge>
+                <span className="caption text-gray-400">{course.semester}</span>
               </div>
-            );
-          })}
+              <h3 className="heading-sm mb-2">{course.title}</h3>
+              <div className="flex flex-col gap-1 text-sm text-gray-500">
+                <div className="flex items-center gap-2"><Clock size={14}/> {course.start_time} - {course.end_time}</div>
+                <div className="flex items-center gap-2"><Calendar size={14}/> {course.days || "TBA"}</div>
+              </div>
+            </Card>
+          ))}
         </div>
       )}
 
-      {!isLoading && !error && filtered.length > 0 && (
-        <p className="caption">Showing {filtered.length} of {events.length} events</p>
-      )}
-
-      {/* event detail modal */}
-      <Modal
-        open={!!detailEvent}
-        onClose={() => { setDetailEvent(null); setRegisterError(null); }}
-        hideCloseButton
-        modalStyle={{ maxWidth: 600, padding: 0 }}
-        footer={
-          detailEvent && (
-            <div className="px-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] sm:px-4 sm:pb-4 shrink-0 flex flex-col gap-2">
-              {registerError && (
-                <p className="caption text-[var(--error)] text-center">{registerError}</p>
-              )}
-              <Button
-                variant={isDetailRegistered ? "soft" : "primary"}
-                className="w-full"
-                disabled={isDetailRegistering}
-                onClick={(e) => handleRegister(detailEvent.id!, e)}
-              >
-                {isDetailRegistering ? "Processing…" : isDetailRegistered ? "Registered" : "Register"}
-              </Button>
+      {/* Detail Modal */}
+      <Modal open={!!detailCourse} onClose={() => setDetailCourse(null)} hideCloseButton modalStyle={{ maxWidth: 500 }}>
+        {detailCourse && (
+          <div className="flex flex-col gap-4 p-5">
+            <div className="flex justify-between items-center">
+              <Badge variant="pink">{detailCourse.semester}</Badge>
+              <button onClick={() => setDetailCourse(null)}><X size={20}/></button>
             </div>
-          )
-        }
-      >
-        {detailEvent && (
-          <div className="flex flex-col min-h-0">
-            <div
-              className="h-[120px] sm:h-[160px] relative shrink-0 rounded-t-[var(--radius-xl)]"
-              style={{ background: detailEvent.banner_url ? `url(${detailEvent.banner_url}) center/cover no-repeat` : CATEGORY_GRADIENT[detailEvent.category ?? ""] ?? DEFAULT_GRADIENT }}
-            >
-              <button
-                onClick={() => { setDetailEvent(null); setRegisterError(null); }}
-                aria-label="Close"
-                className="absolute top-3 right-3 w-4 h-4 sm:w-6 sm:h-6 rounded-full border-none cursor-pointer flex items-center justify-center text-[var(--primary-dark)] z-10 backdrop-blur-sm bg-white/80"
-              >
-                <X size={14} />
-              </button>
-
-              <div className="absolute bottom-3 left-3 flex gap-2 items-center">
-                <span className="badge badge-pink">{detailEvent.category ?? "Uncategorized"}</span>
-                {detailEvent.status && (
-                  <Badge variant={STATUS_VARIANT[detailEvent.status.toLowerCase().trim()] ?? "dark"}>
-                    <span className="capitalize">{detailEvent.status}</span>
-                  </Badge>
-                )}
-              </div>
+            <h2 className="heading-md">{detailCourse.title}</h2>
+            <div className="divider" />
+            <div className="space-y-3">
+              <p className="label">Course Description</p>
+              <p className="body text-gray-600">{detailCourse.description || "No description provided."}</p>
             </div>
-
-            <div className="flex flex-col gap-3 p-3 sm:p-5 overflow-y-auto">
-              <h2 className="heading-md m-0">{detailEvent.title}</h2>
-
-              <div className="flex flex-col gap-1.5">
-                <div className="flex items-start gap-3 caption sm:text-sm text-[var(--gray)]">
-                  <CalendarDays size={15} className="shrink-0 mt-0.5" />
-                  <span>
-                    {detailEvent.start_date ? new Date(detailEvent.start_date).toLocaleDateString("en-PH", { weekday: "long", month: "long", day: "numeric", year: "numeric" }) : "—"}
-                    {detailEvent.end_date && detailEvent.end_date !== detailEvent.start_date && (
-                      <> — {new Date(detailEvent.end_date).toLocaleDateString("en-PH", { month: "long", day: "numeric", year: "numeric" })}</>
-                    )}
-                  </span>
-                </div>
-                <div className="flex items-center gap-3 caption sm:text-sm text-[var(--gray)]">
-                  <MapPin size={15} className="shrink-0" />
-                  <span>{detailEvent.location ?? "—"}</span>
-                </div>
-                <div className="flex items-center gap-3 caption sm:text-sm text-[var(--gray)]">
-                  <Users size={15} className="shrink-0" />
-                  <span>Capacity: {detailEvent.capacity ?? "—"}</span>
-                </div>
-                {(detailEvent.registration_open || detailEvent.registration_close) && (
-                  <div className="flex items-center gap-3 caption sm:text-sm text-[var(--gray)]">
-                    <Clock size={15} className="shrink-0" />
-                    <span>
-                      Registration:&nbsp;
-                      {detailEvent.registration_open ? new Date(detailEvent.registration_open).toLocaleDateString("en-PH", { month: "short", day: "numeric" }) : "?"}
-                      &nbsp;–&nbsp;
-                      {detailEvent.registration_close ? new Date(detailEvent.registration_close).toLocaleDateString("en-PH", { month: "short", day: "numeric" }) : "?"}
-                    </span>
-                  </div>
-                )}
-              </div>
-
-              <div className="divider" />
-
-              <div className="flex flex-col gap-2 pb-2">
-                <p className="label">ABOUT THIS EVENT</p>
-                <p className="body whitespace-pre-wrap">{detailEvent.description || "No description provided."}</p>
-              </div>
+            <div className="grid grid-cols-2 gap-4 mt-2">
+              <div className="flex items-center gap-2 text-sm"><BookOpen size={16}/> Instructor ID: {detailCourse.instructor_id}</div>
+              <div className="flex items-center gap-2 text-sm"><GraduationCap size={16}/> Status: {detailCourse.status}</div>
             </div>
+            <Button className="w-full mt-4" onClick={() => setToast({ variant: "success", title: "Enrolled Successfully!" })}>
+              Enroll in Course
+            </Button>
           </div>
         )}
       </Modal>
 
-      <ScrollToTop hidden={!!detailEvent} />
+      {/* Toast Notification */}
+      {toast && (
+        <div className="fixed bottom-6 right-6 z-50">
+          <Toast variant={toast.variant} title={toast.title} onClose={() => setToast(null)} />
+        </div>
+      )}
     </div>
   );
 }

@@ -60,7 +60,7 @@ export default function CourseCard({ course }) {
         style={{ flex: 1, minWidth: 0 }}
       >
         {/* Title */}
-        <Typography variant="heading-4">{event.title}</Typography>
+        <Typography variant="heading-4">{course.title}</Typography>
 
         {/* Meta */}
         <div className="flex flex-col gap-1.5 mb-3">
@@ -69,7 +69,7 @@ export default function CourseCard({ course }) {
             style={{ fontSize: "12.5px" }}
           >
             <MapPin size={18} className="text-fractal-icon-dark"/>
-            <Typography variant="body-2">{event.location}</Typography>
+            <Typography variant="body-2">{course.location}</Typography>
           </div>
           <div
             className="flex items-center gap-1.5 text-gray-500"
@@ -77,13 +77,13 @@ export default function CourseCard({ course }) {
           >
             <Clock4 size={18} className="text-fractal-icon-dark"/>
             <span>
-              {event.startTime} – {event.endTime}
+              {course.startTime} – {course.endTime}
             </span>
           </div>
         </div>
 
         {/* Status badge */}
-        <StatusBadge status={event.status} />
+        <StatusBadge status={course.status} />
       </div>
 
       {/* Right pic */}
@@ -93,8 +93,8 @@ export default function CourseCard({ course }) {
       >
         {!imgError ? (
           <img
-            src={event.image}
-            alt={event.title}
+            src={course.image}
+            alt={course.title}
             onError={() => setImgError(true)}
             style={{
               width: "100%",

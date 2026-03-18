@@ -43,6 +43,14 @@ export default function CourseForm({ initialData, mode }: CourseFormProps) {
   const [title, setTitle] = useState(initialData?.title ?? "");
   const [description, setDescription] = useState(initialData?.description ?? "");
   
+  const [banner_url, setBannerUrl] = useState(initialData?.banner_url ?? "");
+  const [bannerFile, setBannerFile] = useState<File | null>(null);
+  const [bannerPreview, setBannerPreview] = useState(initialData?.banner_url ?? "");
+  const [uploadingBanner, setUploadingBanner] = useState(false);
+
+
+
+
   const parseTime = (value?: string) => {
     if (!value) return "";
     const match = value.match(/(\d{1,2}:\d{2})/);
