@@ -104,7 +104,7 @@ export default function AdminSidebar() {
           />
           {!isCollapsed && (
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginTop: 8 }}>
-              <span style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 15, color: "white", letterSpacing: "-0.02em", textAlign: "center" }}>
+              <span style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 20, color: "white", letterSpacing: "-0.02em", textAlign: "center" }}>
                 OhMyGAD!
               </span>
               <span style={{ fontSize: 10, color: "var(--cream)", textAlign: "center", marginTop: 3, lineHeight: 1.4, maxWidth: 200 }}>
