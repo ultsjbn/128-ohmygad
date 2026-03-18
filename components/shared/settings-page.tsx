@@ -126,7 +126,7 @@ export default function SharedSettingsPage() {
           </Button>
           <div>
             <h1 className="heading-lg lg:heading-xl leading-none">Account Settings</h1>
-            <p className="hidden md:block body text-[var(--gray)] mt-1">Manage your login credentials and security preferences.</p>
+            <p className="hidden md:block body text-[var(--gray)] mt-1">Manage your login credentials.</p>
           </div>
         </div>
       </div>
