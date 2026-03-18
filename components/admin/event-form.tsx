@@ -203,8 +203,8 @@ export default function EventForm({ initialData, mode }: EventFormProps) {
       return;
     }
 
-    if (capacity !== null && capacity > 9999) {
-      setError("Capacity must be at most 9999.");
+    if (capacity !== null && capacity > 300) {
+      setError("Capacity must be at most 300.");
       setIsLoading(false);
       return;
     }
@@ -322,8 +322,9 @@ export default function EventForm({ initialData, mode }: EventFormProps) {
                 <Input
                   label="Capacity *"
                   type="number"
-                  min={1}
-                  max={9999}
+                  // min={1}
+                  // max={300}
+                  // maxLength={3}
                   placeholder="e.g. 30"
                   required
                   prefixIcon={<Users size={15} />}

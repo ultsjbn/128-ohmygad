@@ -71,6 +71,13 @@ const STATUS_VARIANT: Record<string, "success" | "warning" | "error" | "dark" | 
   archived: "dark",
 };
 
+const CATEGORY_GRADIENT: Record<string, string> = {
+  "1st Semester": "linear-gradient(135deg, #F4A7B9 0%, #B8B5E8 100%)",
+  "2nd Semester": "linear-gradient(135deg, #F4A7B9 0%, #FAF8FF 100%)",
+  "Mid-Year": "linear-gradient(135deg, #B8B5E8 0%, #FAF8FF 100%)",
+};
+const DEFAULT_GRADIENT = "linear-gradient(135deg, #B8B5E8 0%, #2D2A4A 100%)";
+
 // --- Helper Component ---
 
 function CheckItem({ label, active, onToggle }: { label: string; active: boolean; onToggle: () => void }) {
@@ -99,7 +106,6 @@ export default function CoursesPage() {
   const [filters, setFilters] = useState<FilterState>({ status: new Set(), semester: new Set() });
   const [activeSemesterChip, setActiveSemesterChip] = useState("All Semesters");
   const [detailCourse, setDetailCourse] = useState<Course | null>(null);
-  const [toast, setToast] = useState<{ variant: "success" | "error" | "info"; title: string } | null>(null);
 
   // Fetch Logic
   useEffect(() => {
@@ -317,13 +323,65 @@ export default function CoursesPage() {
             <div className="flex items-center gap-2 text-sm"><GraduationCap size={16}/> Status: {detailCourse.status}</div>
             </div>
             </div>
+          
         )}
       </Modal>
 
-      {/* Toast Notification */}
-      {toast && (
-        <div className="fixed bottom-6 right-6 z-50">
-          <Toast variant={toast.variant} title={toast.title} onClose={() => setToast(null)} />
+      {detailCourse && (
+        <div className="flex flex-col min-h-0">
+          <div
+            className="h-[200px] sm:h-[180px] relative shrink-0 rounded-t-[var(--radius-xl)]"
+            style={{ background: CATEGORY_GRADIENT[detailCourse.semester ?? ""] ?? DEFAULT_GRADIENT }}
+          >
+            {/* detailCourse.banner_url ? `url(${detailCourse.banner_url}) center/cover no-repeat` : */}
+            {/* close button inside cover */}
+            <button
+              onClick={() => { setDetailCourse(null); }}
+              aria-label="Close"
+              className="absolute top-3 right-3 w-4 h-4 sm:w-6 sm:h-6 rounded-full border-none cursor-pointer flex items-center justify-center text-[var(--primary-dark)] z-10 backdrop-blur-sm bg-white/80"
+            >
+              <X size={14} />
+            </button>
+
+            {/* category and status badges bottom-left of cover */}
+            <div className="absolute bottom-3 left-3 flex gap-2 items-center">
+              <span className="badge badge-pink">{detailCourse.semester ?? "Uncategorized"}</span>
+              {detailCourse.status && (
+                <Badge variant={STATUS_VARIANT[detailCourse.status.toLowerCase().trim()] ?? "dark"}>
+                  <span className="capitalize">{detailCourse.status}</span>
+                </Badge>
+              )}
+            </div>
+          </div>
+
+          {/* body - overflow-y-auto here so only body scrolls, cover + footer stay fixed */}
+          <div className="flex flex-col gap-3 p-3 sm:p-5 overflow-y-auto">
+            {/* title */}
+            <h2 className="heading-md m-0">{detailCourse.title}</h2>
+
+            {/* details row */}
+            <div className="flex flex-col gap-1.5">
+              {/* ---------- date ---------- */}
+              <div className="flex items-start gap-3 caption sm:text-sm text-[var(--gray)]">
+                <Clock size={15} className="shrink-0 mt-0.5" />
+                <span>
+                  {detailCourse.start_time ? new Date(detailCourse.start_time).toLocaleDateString("en-PH", { weekday: "long", month: "long", day: "numeric", year: "numeric" }) : "—"}
+                  {detailCourse.end_time && detailCourse.end_time !== detailCourse.start_time && (
+                    <> — {new Date(detailCourse.end_time).toLocaleDateString("en-PH", { month: "long", day: "numeric", year: "numeric" })}</>
+                  )}
+                </span>
+              </div>
+            </div>
+
+            {/* divider */}
+            <div className="divider" />
+
+            {/* full description */}
+            <div className="flex flex-col gap-2 pb-2">
+              <p className="label">ABOUT THIS COURSE</p>
+              <p className="body whitespace-pre-wrap">{detailCourse.description || "No description provided."}</p>
+            </div>
+          </div>{/* end body */}
         </div>
       )}
     </div>

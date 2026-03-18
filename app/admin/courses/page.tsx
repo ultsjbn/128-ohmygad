@@ -36,7 +36,7 @@ function formatTime(time?: string) {
 // constants 
 const SEMESTERS = ["1st Semester", "2nd Semester", "Mid-Year"];
 const STATUSES = ["open", "closed"];
-const SORT_FIELDS = ["title", "semester", "status", "start_time"] as const;
+const SORT_FIELDS = ["title", "semester", "status"] as const;
 
 type SortField = typeof SORT_FIELDS[number];
 type SortDirection = "asc" | "desc";
