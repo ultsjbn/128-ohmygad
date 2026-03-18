@@ -542,7 +542,7 @@ export default function EventsPage() {
         {detailEvent && (
           <div className="flex flex-col min-h-0">
             <div
-              className="h-[180px] sm:h-[160px] relative shrink-0 rounded-t-[var(--radius-xl)]"
+              className="h-[200px] sm:h-[180px] relative shrink-0 rounded-t-[var(--radius-xl)]"
               style={{ background: detailEvent.banner_url ? `url(${detailEvent.banner_url}) center/cover no-repeat` : CATEGORY_GRADIENT[detailEvent.category ?? ""] ?? DEFAULT_GRADIENT }}
             >
               {/* close button inside cover */}
