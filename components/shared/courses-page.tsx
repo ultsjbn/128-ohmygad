@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
-import { createClient } from "@/lib/supabase/client";
 import { Typography, InputText } from "@snowball-tech/fractal";
 import { useSearchParams } from "next/navigation";
 import { 
@@ -120,21 +119,23 @@ export default function CoursesPage() {
   }, []);
 
   // Filter & Sort Logic
-  const semesters = useMemo(() => Array.from(new Set(courses.map((c) => c.semester).filter(Boolean))), [courses]);
-  const statuses = useMemo(() => Array.from(new Set(courses.map((c) => c.status).filter(Boolean))), [courses]);
+  const semesters = useMemo(() => Array.from(new Set(courses.map((c) => c.semester).filter(Boolean))) as string[], [courses]);
+  const statuses = useMemo(() => Array.from(new Set(courses.map((c) => c.status).filter(Boolean))) as string[], [courses]);
 
   const filteredAndSorted = useMemo(() => {
-    let result = courses.filter((c) => 
-      `${c.title} ${c.semester}`.toLowerCase().includes(search.toLowerCase()) &&
-      (filters.status.size === 0 || filters.status.has(c.status || "")) &&
-      (filters.semester.size === 0 || filters.semester.has(c.semester || ""))
-    );
-
-    return result.sort((a, b) => {
-      const aVal = (a[sort.field] || "").toString().toLowerCase();
-      const bVal = (b[sort.field] || "").toString().toLowerCase();
-      return sort.direction === "asc" ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
-    });
+    return courses
+      .filter((c) => {
+        const matchesSearch = `${c.title} ${c.semester}`.toLowerCase().includes(search.toLowerCase());
+        const matchesStatus = filters.status.size === 0 || filters.status.has(c.status || "");
+        const matchesSemester = filters.semester.size === 0 || filters.semester.has(c.semester || "");
+        
+        return matchesSearch && matchesStatus && matchesSemester;
+      })
+      .sort((a, b) => {
+        const aVal = (a[sort.field] || "").toString().toLowerCase();
+        const bVal = (b[sort.field] || "").toString().toLowerCase();
+        return sort.direction === "asc" ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+      });
   }, [courses, search, filters, sort]);
 
   // Handlers
@@ -142,14 +143,30 @@ export default function CoursesPage() {
     setFilters((prev) => {
       const next = new Set(prev[type]);
       next.has(value) ? next.delete(value) : next.add(value);
+      
+      // If we are modifying semesters via dropdown, reset the chip UI to "All" 
+      // if more than one is selected, otherwise sync it.
+      if (type === "semester") {
+        if (next.size === 1) {
+          setActiveSemesterChip(Array.from(next)[0]);
+        } else {
+          setActiveSemesterChip("All Semesters");
+        }
+      }
+
       return { ...prev, [type]: next };
     });
   };
 
   const handleSemesterChip = (sem: string) => {
     setActiveSemesterChip(sem);
-    setFilters(prev => ({ ...prev, semester: sem === "All Semesters" ? new Set() : new Set([sem]) }));
+    setFilters(prev => ({ 
+      ...prev, 
+      semester: sem === "All Semesters" ? new Set() : new Set([sem]) 
+    }));
   };
+
+  const totalActiveFilters = filters.status.size + filters.semester.size;
 
   return (
     <div className="flex flex-col gap-6">
@@ -162,11 +179,11 @@ export default function CoursesPage() {
       <div className="flex flex-col gap-3">
         <div className="flex items-center gap-3 flex-wrap">
           <SearchBar
-                      placeholder="Search…"
-                      value={search}
-                      onChange={(e) => setSearch(e.target.value)}
-                      containerStyle={{ flex: 1, minWidth: 120 }}
-                    />
+            placeholder="Search…"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            containerStyle={{ flex: 1, minWidth: 120 }}
+          />
 
           <div className="flex items-center gap-2">
             {/* Sort Dropdown */}
@@ -185,15 +202,50 @@ export default function CoursesPage() {
 
             {/* Filter Dropdown */}
             <Dropdown trigger={
-              <Button variant={filters.status.size > 0 ? "pink" : "ghost"}>
+              <Button variant={totalActiveFilters > 0 ? "pink" : "ghost"}>
                 <SlidersHorizontal size={15} />
                 <span className="hidden md:inline ml-2">Filter</span>
+                {totalActiveFilters > 0 && (
+                  <span className="ml-2 bg-white text-pink-600 px-1.5 rounded-full text-[10px] font-bold">
+                    {totalActiveFilters}
+                  </span>
+                )}
               </Button>
             }>
+              {/* Status Section */}
               <div className="px-3 py-2 font-bold text-xs uppercase opacity-50">Status</div>
-              {statuses.map(s => <CheckItem key={s} label={s} active={filters.status.has(s)} onToggle={() => toggleFilter("status", s)} />)}
+              {statuses.map(s => (
+                <CheckItem 
+                  key={s} 
+                  label={s} 
+                  active={filters.status.has(s)} 
+                  onToggle={() => toggleFilter("status", s)} 
+                />
+              ))}
+
               <DropdownDivider />
-              <DropdownItem onClick={() => setFilters({ status: new Set(), semester: new Set() })}>Reset Filters</DropdownItem>
+
+              {/* Semester Section */}
+              <div className="px-3 py-2 font-bold text-xs uppercase opacity-50">Semester</div>
+              {semesters.map(sem => (
+                <CheckItem 
+                  key={sem} 
+                  label={sem} 
+                  active={filters.semester.has(sem)} 
+                  onToggle={() => toggleFilter("semester", sem)} 
+                />
+              ))}
+
+              <DropdownDivider />
+              <DropdownItem 
+                className="text-red-500"
+                onClick={() => {
+                  setFilters({ status: new Set(), semester: new Set() });
+                  setActiveSemesterChip("All Semesters");
+                }}
+              >
+                Reset All Filters
+              </DropdownItem>
             </Dropdown>
           </div>
         </div>
@@ -211,7 +263,20 @@ export default function CoursesPage() {
           <Loader2 className="animate-spin mr-2" size={20} /> Loading catalog...
         </Card>
       ) : filteredAndSorted.length === 0 ? (
-        <Card className="py-20 text-center text-gray-500">No courses found matching your criteria.</Card>
+        <Card className="py-20 text-center text-gray-500">
+          <p>No courses found matching your criteria.</p>
+          <Button 
+            variant="ghost" 
+            className="mt-4 text-xs underline"
+            onClick={() => {
+              setFilters({ status: new Set(), semester: new Set() });
+              setSearch("");
+              setActiveSemesterChip("All Semesters");
+            }}
+          >
+            Clear all filters
+          </Button>
+        </Card>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {filteredAndSorted.map((course) => (
