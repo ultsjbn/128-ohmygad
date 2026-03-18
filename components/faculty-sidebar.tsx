@@ -97,8 +97,8 @@ export default function FacultySidebar() {
           <Image
             src="/kasarian_logo.jpg"
             alt="UPB Kasarian Gender Studies Program Logo"
-            width={isCollapsed ? 40 : 72}
-            height={isCollapsed ? 40 : 72}
+            width={isCollapsed ? 40 : 90}
+            height={isCollapsed ? 40 : 90}
             style={{ borderRadius: "50%", objectFit: "cover", border: "2px solid rgba(255,255,255,0.25)", transition: "all 0.3s ease" }}
           />
           {!isCollapsed && (
@@ -106,8 +106,8 @@ export default function FacultySidebar() {
               <span style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 15, color: "white", letterSpacing: "-0.02em", textAlign: "center" }}>
                 OhMyGAD!
               </span>
-              <span style={{ fontSize: 10, color: "rgba(255,255,255,0.5)", textAlign: "center", marginTop: 3, lineHeight: 1.4, maxWidth: 200 }}>
-                UPB Kasarian Gender Studies Program <br/> Event Management Platform
+              <span style={{ fontSize: 12, color: "var(--cream)", textAlign: "center", marginTop: 3, lineHeight: 1.4, maxWidth: 200 }}>
+                UPB Kasarian<br/>Gender Studies Program 
               </span>
             </div>
           )}
