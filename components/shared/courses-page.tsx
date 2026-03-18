@@ -161,13 +161,12 @@ export default function CoursesPage() {
       {/* Toolbar */}
       <div className="flex flex-col gap-3">
         <div className="flex items-center gap-3 flex-wrap">
-          <InputText
-            placeholder="Search courses..."
-            className="flex-1 min-w-[200px]"
-            prefix={<Search size={18} />}
-            value={search}
-            onChange={(_e, val) => setSearch(val)}
-          />
+          <SearchBar
+                      placeholder="Search…"
+                      value={search}
+                      onChange={(e) => setSearch(e.target.value)}
+                      containerStyle={{ flex: 1, minWidth: 120 }}
+                    />
 
           <div className="flex items-center gap-2">
             {/* Sort Dropdown */}
