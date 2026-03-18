@@ -323,7 +323,7 @@ export default function CoursesPage() {
             <div className="flex items-center gap-2 text-sm"><GraduationCap size={16}/> Status: {detailCourse.status}</div>
             </div>
             </div>
-          </div>
+          
         )}
       </Modal>
 
