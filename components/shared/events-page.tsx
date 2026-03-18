@@ -132,8 +132,6 @@ export default function EventsPage() {
   const hasActiveFilters = filters.status.size > 0 || filters.category.size > 0;
   const activeFilterCount = filters.status.size + filters.category.size;
 
-  
-
   // useEffect for fetching events
   useEffect(() => {
     async function fetchData() {
@@ -236,7 +234,6 @@ export default function EventsPage() {
     };
 
   // handle canceling registrations
-
     const handleCancelRegistration = async (eventId: string, e?: React.MouseEvent) => {
         e?.stopPropagation();
 

@@ -192,7 +192,7 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
       key: "actions",
       header: "Actions",
       render: (p) => (
-        <div style={{ display: "flex", justifyContent: "flex-end", gap: 4 }}>
+        <div style={{ display: "flex", justifyContent: "flex-start", gap: 4 }}>
           <Button variant="icon" title="Edit user" onClick={() => openEditModal(p.id)}>
             <Pencil size={14} />
           </Button>

@@ -288,7 +288,7 @@ export default function EventsPage() {
       key: "actions",
       header: "Actions",
       render: (event) => (
-        <div style={{ display: "flex", justifyContent: "flex-end", gap: 4 }}>
+        <div style={{ display: "flex", justifyContent: "flex-start", gap: 4 }}>
           <Button
             variant="icon"
             title="Edit event"
