@@ -318,6 +318,8 @@ export default function CoursesPage() {
               <p className="label">Course Description</p>
               <p className="body text-gray-600">{detailCourse.description || "No description provided."}</p>
             </div>
+            <div className="flex items-center gap-2"><Clock size={14}/> {detailCourse.start_time} - {detailCourse.end_time}</div>
+            <div className="flex items-center gap-2"><Calendar size={14}/> {detailCourse.days || "TBA"}</div>
             <div className="grid grid-cols-2 gap-4 mt-2">
             <div className="flex items-center gap-2 text-sm"><GraduationCap size={16}/> Status: {detailCourse.status}</div>
             </div>
