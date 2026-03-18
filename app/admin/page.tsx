@@ -22,7 +22,7 @@ import {
   Bar,
   Legend,
 } from "recharts";
-import { eventAttendanceData, TOOLTIP_STYLE } from "./dashboard.constants";
+import { eventAttendanceData } from "./dashboard.constants";
 
 import { useDashboardData } from "./hooks/use-dashboard-data";
 
@@ -93,10 +93,10 @@ export default function DashboardPage() {
         <h1 className="heading-xl mt-1">Admin</h1>
       </div>
 
-      {/* TOP ROW: Quick Actions (1/4) | Attendance (3/4) */}
+      {/*  quick Actions (1/4) | attendance (3/4) */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 lg:gap-6">
         
-        {/* 1. Quick Actions Panel (1/4 width) */}
+        {/* 1. panel */}
         <Card className="lg:col-span-1 flex flex-col p-5 lg:p-6 min-h-[350px]">
           <h2 className="heading-md mb-6 shrink-0">Quick Actions</h2>
           <div className="flex flex-col gap-3 flex-1 justify-center">
@@ -115,7 +115,7 @@ export default function DashboardPage() {
           </div>
         </Card>
 
-        {/* 2. Attendance Over Time (3/4 width) */}
+        {/* 2. attendance */}
         <Card className="lg:col-span-3 flex flex-col p-5 lg:p-6 min-h-[350px]">
           <h2 className="heading-md mb-6 shrink-0">Attendance Over Time</h2>
           <div className="flex-1 w-full min-h-[250px]">
@@ -133,10 +133,10 @@ export default function DashboardPage() {
 
       </div>
 
-      {/* SECONDARY ROW: College | Sex at Birth | Gender Identity (1/1/1 split) */}
+      {/* secondary row */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
         
-        {/* 1. Users per College (Filtered) */}
+        {/* 1. users per college */}
         <Card className="flex flex-col p-5 lg:p-6 min-h-[320px]">
           <h2 className="heading-md mb-6 shrink-0">Users per College</h2>
           <div className="flex-1 w-full min-h-[220px]">
@@ -156,7 +156,7 @@ export default function DashboardPage() {
           </div>
         </Card>
 
-        {/* 2. Sex at birth donut */}
+        {/* 2. sex at birth */}
         <Card className="flex flex-col p-5 lg:p-6 min-h-[320px]">
           <h2 className="heading-md mb-2 shrink-0">Sex at Birth</h2>
           <div className="flex-1 w-full min-h-[220px] relative">
@@ -191,7 +191,7 @@ export default function DashboardPage() {
           </div>
         </Card>
 
-        {/* 3. Gender identity donut (Filtered) */}
+        {/* 3. gender identity count */}
         <Card className="flex flex-col p-5 lg:p-6 min-h-[320px]">
           <h2 className="heading-md mb-2 shrink-0">Gender Identity</h2>
           <div className="flex-1 w-full min-h-[220px] relative">
@@ -230,7 +230,7 @@ export default function DashboardPage() {
 
       <div className="w-full h-[1px] bg-[rgba(45,42,74,0.08)] my-2" />
 
-      {/* KPI ROW: Anchored at the bottom */}
+      {/* KPI */}
       <div className="flex flex-col gap-3">
         <p className="text-xs font-bold tracking-widest uppercase text-[var(--gray)]">Metrics</p>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-6">

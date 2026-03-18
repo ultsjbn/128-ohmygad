@@ -42,11 +42,11 @@ export const initialSexAtBirthData = [
 Color array for the sex-at-birth pie chart cells.
 Used in: app/admin/page.tsx
 */
-export const sexAtBirthColors = [
-  "var(--color-decorative-blue-70)",
-  "var(--color-decorative-pink-70)",
-  "var(--color-decorative-yellow-70)",
-];
+// export const sexAtBirthColors = [
+//   "var(--color-decorative-blue-70)",
+//   "var(--color-decorative-pink-70)",
+//   "var(--color-decorative-yellow-70)",
+// ];
 
 // Gender Identity (Pie Chart) 
 
@@ -89,12 +89,12 @@ role bar colors
 
 Used in: app/admin/page.tsx (BarChart Cell fill)
 */
-export const roleColors = [
-  "var(--color-decorative-blue-70)",
-  "var(--color-decorative-green-70)",
-  "var(--color-decorative-purple-70)",
-  "var(--color-decorative-yellow-70)",
-];
+// export const roleColors = [
+//   "var(--color-decorative-blue-70)",
+//   "var(--color-decorative-green-70)",
+//   "var(--color-decorative-purple-70)",
+//   "var(--color-decorative-yellow-70)",
+// ];
 
 // College Breakdown (Bar Chart) 
 
@@ -114,13 +114,13 @@ Color array for each college bar (cycles if > 5 categories).
 
 Used in: app/admin/page.tsx (BarChart Cell fill)
 */
-export const collegeColors = [
-  "var(--color-decorative-purple-70)",
-  "var(--color-decorative-blue-70)",
-  "var(--color-decorative-green-70)",
-  "var(--color-decorative-yellow-70)",
-  "var(--color-decorative-pink-70)",
-];
+// export const collegeColors = [
+//   "var(--color-decorative-purple-70)",
+//   "var(--color-decorative-blue-70)",
+//   "var(--color-decorative-green-70)",
+//   "var(--color-decorative-yellow-70)",
+//   "var(--color-decorative-pink-70)",
+// ];
 
 // Shared Recharts Tooltip Style 
 

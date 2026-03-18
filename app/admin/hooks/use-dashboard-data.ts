@@ -13,6 +13,7 @@ import {
   initialGenderIdentityData,
   initialRoleDistributionData,
   initialBreakdownData,
+  eventAttendanceData,
 } from "../dashboard.constants";
 
 interface UserStats {
@@ -101,6 +102,7 @@ export function useDashboardData() {
   }, []);
 
   return {
+    eventAttendanceData,
     sexAtBirthData,
     genderIdentityData,
     roleDistributionData,
