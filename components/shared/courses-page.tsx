@@ -307,17 +307,20 @@ export default function CoursesPage() {
       {/* Detail Modal */}
       <Modal open={!!detailCourse} onClose={() => setDetailCourse(null)} hideCloseButton modalStyle={{ maxWidth: 500 }}>
         {detailCourse && (
-          <div className="flex flex-col gap-4 p-5">
+          <div className="flex flex-col gap-2 p-2">
             <div className="flex justify-between items-center">
               <Badge variant="pink">{detailCourse.semester}</Badge>
               <button onClick={() => setDetailCourse(null)}><X size={20}/></button>
             </div>
             <h2 className="heading-md">{detailCourse.title}</h2>
+            <div className="flex items-center gap-1 caption sm:text-sm text-[var(--gray)]"><Clock size={14}/> {detailCourse.start_time} - {detailCourse.end_time}</div>
+            <div className="flex items-center gap-1 caption sm:text-sm text-[var(--gray)]"><Calendar size={14}/> {detailCourse.days || "TBA"}</div>
             <div className="divider" />
             <div className="space-y-3">
               <p className="label">Course Description</p>
               <p className="body text-gray-600">{detailCourse.description || "No description provided."}</p>
             </div>
+            
             <div className="grid grid-cols-2 gap-4 mt-2">
             <div className="flex items-center gap-2 text-sm"><GraduationCap size={16}/> Status: {detailCourse.status}</div>
             </div>
@@ -360,16 +363,16 @@ export default function CoursesPage() {
 
             {/* details row */}
             <div className="flex flex-col gap-1.5">
-              {/* ---------- date ---------- */}
-              <div className="flex items-start gap-3 caption sm:text-sm text-[var(--gray)]">
-                <Clock size={15} className="shrink-0 mt-0.5" />
-                <span>
-                  {detailCourse.start_time ? new Date(detailCourse.start_time).toLocaleDateString("en-PH", { weekday: "long", month: "long", day: "numeric", year: "numeric" }) : "—"}
-                  {detailCourse.end_time && detailCourse.end_time !== detailCourse.start_time && (
-                    <> — {new Date(detailCourse.end_time).toLocaleDateString("en-PH", { month: "long", day: "numeric", year: "numeric" })}</>
-                  )}
-                </span>
-              </div>
+                {/* ---------- date ---------- */}
+                <div className="flex items-start gap-2 caption sm:text-sm text-[var(--gray)]">
+                    <Clock size={15} className="shrink-0 mt-0.5" />
+                        <span>
+                        {detailCourse.start_time ? new Date(detailCourse.start_time).toLocaleDateString("en-PH", { weekday: "long", month: "long", day: "numeric", year: "numeric" }) : "—"}
+                        {detailCourse.end_time && detailCourse.end_time !== detailCourse.start_time && (
+                            <> — {new Date(detailCourse.end_time).toLocaleDateString("en-PH", { month: "long", day: "numeric", year: "numeric" })}</>
+                        )}
+                        </span>
+                </div>
             </div>
 
             {/* divider */}
