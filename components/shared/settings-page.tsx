@@ -139,7 +139,7 @@ export default function SharedSettingsPage() {
           
           {/* description side */}
           <div className="w-full md:w-1/3 shrink-0">
-            <h2 className="heading-md mb-2">Email Address</h2>
+            <h2 className="heading-md mb-2">Change Email Address</h2>
             <p className="text-sm text-[var(--gray)] leading-relaxed">
               Update the email address associated with your account. We will send a verification link to your new address to confirm ownership.
             </p>

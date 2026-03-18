@@ -98,16 +98,16 @@ export default function AdminSidebar() {
           <Image
             src="/kasarian_logo.jpg"
             alt="UPB Kasarian Gender Studies Program Logo"
-            width={isCollapsed ? 40 : 72}
-            height={isCollapsed ? 40 : 72}
+            width={isCollapsed ? 40 : 90}
+            height={isCollapsed ? 40 : 90}
             style={{ borderRadius: "50%", objectFit: "cover", border: "2px solid rgba(255,255,255,0.25)", transition: "all 0.3s ease" }}
           />
           {!isCollapsed && (
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginTop: 8 }}>
-              <span style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 15, color: "white", letterSpacing: "-0.02em", textAlign: "center" }}>
+              <span style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 20, color: "white", letterSpacing: "-0.02em", textAlign: "center" }}>
                 OhMyGAD!
               </span>
-              <span style={{ fontSize: 10, color: "rgba(255,255,255,0.5)", textAlign: "center", marginTop: 3, lineHeight: 1.4, maxWidth: 200 }}>
+              <span style={{ fontSize: 10, color: "var(--cream)", textAlign: "center", marginTop: 3, lineHeight: 1.4, maxWidth: 200 }}>
                 UPB Kasarian Gender Studies Program <br/> Event Management Platform
               </span>
             </div>
