@@ -286,21 +286,20 @@ export default function CoursesPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {filteredAndSorted.map((course) => (
-            <Card 
-              key={course.id} 
-              className="cursor-pointer hover:shadow-md transition-shadow"
-              onClick={() => setDetailCourse(course)}
-            >
-              <div className="flex justify-between items-start mb-2">
-                <Badge variant={STATUS_VARIANT[course.status?.toLowerCase() || ""] || "dark"}>{course.status}</Badge>
-                <span className="caption text-gray-400">{course.semester}</span>
-              </div>
-              <h3 className="heading-sm mb-2">{course.title}</h3>
-              <div className="flex flex-col gap-1 text-sm text-gray-500">
-                <div className="flex items-center gap-2"><Clock size={14}/> {course.start_time} - {course.end_time}</div>
-                <div className="flex items-center gap-2"><Calendar size={14}/> {course.days || "TBA"}</div>
-              </div>
-            </Card>
+            <div
+                className="card cursor-pointer hover:shadow-md transition-shadow"
+                key={course.id} 
+                onClick={() => setDetailCourse(course)}>
+                <div className="flex justify-between items-start mb-2">
+                    <Badge variant={STATUS_VARIANT[course.status?.toLowerCase() || ""] || "dark"}>{course.status}</Badge>
+                    <span className="caption text-gray-400">{course.semester}</span>
+                </div>
+                <h3 className="heading-sm mb-2">{course.title}</h3>
+                <div className="flex flex-col gap-1 text-sm text-gray-500">
+                    <div className="flex items-center gap-2"><Clock size={14}/> {course.start_time} - {course.end_time}</div>
+                    <div className="flex items-center gap-2"><Calendar size={14}/> {course.days || "TBA"}</div>
+                </div>
+            </div>
           ))}
         </div>
       )}

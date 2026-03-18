@@ -93,6 +93,31 @@ export default function DashboardPage() {
         <h1 className="heading-xl mt-1">Admin</h1>
       </div>
 
+      {/* KPI */}
+      <div className="flex flex-col gap-3">
+        <p className="text-xs font-bold tracking-widest uppercase text-[var(--gray)]">Metrics</p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-6">
+          <StatCard
+            icon={<Users size={20} className="text-[var(--periwinkle)]" />}
+            iconBg="var(--periwinkle-light)"
+            value={userStats?.total || 0}
+            label="Total Registered Users"
+          />
+          <StatCard
+            icon={<UserCheck size={20} className="text-[var(--success)]" />}
+            iconBg="rgba(109, 197, 160, 0.15)"
+            value={userStats?.onboarded || 0}
+            label="Fully Onboarded Users"
+          />
+          <StatCard
+            icon={<CalendarCheck size={20} className="text-[var(--soft-pink)]" />}
+            iconBg="var(--pink-light)"
+            value={gadEventsCount || 0}
+            label="Total GAD Events"
+          />
+        </div>
+      </div>
+
       {/*  quick Actions (1/4) | attendance (3/4) */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 lg:gap-6">
         
@@ -230,30 +255,7 @@ export default function DashboardPage() {
 
       <div className="w-full h-[1px] bg-[rgba(45,42,74,0.08)] my-2" />
 
-      {/* KPI */}
-      <div className="flex flex-col gap-3">
-        <p className="text-xs font-bold tracking-widest uppercase text-[var(--gray)]">Metrics</p>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-6">
-          <StatCard
-            icon={<Users size={20} className="text-[var(--periwinkle)]" />}
-            iconBg="var(--periwinkle-light)"
-            value={userStats?.total || 0}
-            label="Total Registered Users"
-          />
-          <StatCard
-            icon={<UserCheck size={20} className="text-[var(--success)]" />}
-            iconBg="rgba(109, 197, 160, 0.15)"
-            value={userStats?.onboarded || 0}
-            label="Fully Onboarded Users"
-          />
-          <StatCard
-            icon={<CalendarCheck size={20} className="text-[var(--soft-pink)]" />}
-            iconBg="var(--pink-light)"
-            value={gadEventsCount || 0}
-            label="Total GAD Events"
-          />
-        </div>
-      </div>
+      
       
     </div>
   );
