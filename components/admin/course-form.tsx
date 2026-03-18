@@ -50,7 +50,6 @@ export default function CourseForm({ initialData, mode }: CourseFormProps) {
 
 
 
-
   const parseTime = (value?: string) => {
     if (!value) return "";
     const match = value.match(/(\d{1,2}:\d{2})/);
