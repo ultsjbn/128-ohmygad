@@ -323,10 +323,6 @@ export default function CoursesPage() {
             <div className="flex items-center gap-2 text-sm"><GraduationCap size={16}/> Status: {detailCourse.status}</div>
             </div>
             </div>
-            {/* Wag muna to lkjasdljasdlkj */}
-            {/* <Button className="w-full mt-4" onClick={() => setToast({ variant: "success", title: "Enrolled Successfully!" })}>
-              Enroll in Course
-            </Button> */}
           </div>
         )}
       </Modal>
