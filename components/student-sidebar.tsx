@@ -12,7 +12,7 @@ import { usePathname } from "next/navigation";
 const navItems = [
   { href: "/student",         label: "Dashboard", icon: LayoutDashboard, exact: true  },
   { href: "/student/events",  label: "Events",    icon: Calendar,        exact: false },
-  { href: "/student/courses", label: "Courses",   icon: BookOpen,        exact: false },
+  { href: "/student/courses", label: "I've GAD to Know",   icon: BookOpen,        exact: false },
   { href: "/student/surveys", label: "Surveys",   icon: ClipboardList,   exact: false },
 ];
 
