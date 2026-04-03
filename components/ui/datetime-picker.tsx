@@ -83,14 +83,14 @@ import { Calendar, Clock, ChevronLeft, ChevronRight, X, Check } from "lucide-rea
 // HELPERS
 // 
 const MONTHS = [
-  "January","February","March","April","May","June",
-  "July","August","September","October","November","December",
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December",
 ];
-const DOW = ["Su","Mo","Tu","We","Th","Fr","Sa"];
+const DOW = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
 
 function daysInMonth(y: number, m: number) { return new Date(y, m + 1, 0).getDate(); }
-function firstDOW(y: number, m: number)    { return new Date(y, m, 1).getDay(); }
-function pad(n: number)                    { return String(n).padStart(2, "0"); }
+function firstDOW(y: number, m: number) { return new Date(y, m, 1).getDay(); }
+function pad(n: number) { return String(n).padStart(2, "0"); }
 
 // 
 // TYPES
@@ -98,24 +98,24 @@ function pad(n: number)                    { return String(n).padStart(2, "0"); 
 export type DateTimeMode = "date" | "time" | "datetime";
 
 export interface DateTimePickerProps {
-  label?:       string;
-  mode?:        DateTimeMode;
+  label?: string;
+  mode?: DateTimeMode;
   placeholder?: string;
-  value?:       string;
-  onChange?:    (value: string) => void;
-  minDate?:     Date;
-  maxDate?:     Date;
-  required?:    boolean;
-  error?:       string;
+  value?: string;
+  onChange?: (value: string) => void;
+  minDate?: Date;
+  maxDate?: Date;
+  required?: boolean;
+  error?: string;
 }
 
 // 
 // SPINNER sub-component
 // 
 function Spinner({ value, onUp, onDn, format }: {
-  value:  number;
-  onUp:   () => void;
-  onDn:   () => void;
+  value: number;
+  onUp: () => void;
+  onDn: () => void;
   format: (v: number) => string;
 }) {
   return (
@@ -152,26 +152,42 @@ export function DateTimePicker({
   };
 
   const init = parseValue();
-  const [selDate,  setSelDate]  = useState<Date | null>(init.date);
-  const [hours,    setHours]    = useState(init.hours);
-  const [minutes,  setMinutes]  = useState(init.minutes);
-  const [ampm,     setAmpm]     = useState<"AM" | "PM">(init.ampm);
-  const [open,     setOpen]     = useState(false);
-  const [panel,    setPanel]    = useState<"cal" | "time">(mode === "time" ? "time" : "cal");
-  const [calYear,  setCalYear]  = useState(init.date?.getFullYear()  ?? new Date().getFullYear());
-  const [calMonth, setCalMonth] = useState(init.date?.getMonth()     ?? new Date().getMonth());
+  const [selDate, setSelDate] = useState<Date | null>(init.date);
+  const [hours, setHours] = useState(init.hours);
+  const [minutes, setMinutes] = useState(init.minutes);
+  const [ampm, setAmpm] = useState<"AM" | "PM">(init.ampm);
+  const [open, setOpen] = useState(false);
+  const [panel, setPanel] = useState<"cal" | "time">(mode === "time" ? "time" : "cal");
+  const [calYear, setCalYear] = useState(init.date?.getFullYear() ?? new Date().getFullYear());
+  const [calMonth, setCalMonth] = useState(init.date?.getMonth() ?? new Date().getMonth());
   const rootRef = useRef<HTMLDivElement>(null);
+
+  // sync internal state if `value` prop changes
+  useEffect(() => {
+    const p = parseValue();
+    setSelDate(p.date);
+    setHours(p.hours);
+    setMinutes(p.minutes);
+    setAmpm(p.ampm);
+    if (p.date) {
+      setCalYear(p.date.getFullYear());
+      setCalMonth(p.date.getMonth());
+    }
+  }, [value, mode]);
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (rootRef.current && !rootRef.current.contains(e.target as Node)) {
+        if (open) {
+          emit(selDate, hours, minutes, ampm);
+        }
         setOpen(false);
         setPanel(mode === "time" ? "time" : "cal");
       }
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
-  }, [mode]);
+  }, [mode, open, selDate, hours, minutes, ampm]);
 
   // emit
   function emit(date: Date | null, h: number, m: number, ap: "AM" | "PM") {
@@ -202,8 +218,13 @@ export function DateTimePicker({
   function pickDay(day: number) {
     const d = new Date(calYear, calMonth, day);
     setSelDate(d);
-    if (mode === "date") { emit(d, hours, minutes, ampm); setOpen(false); }
-    else setPanel("time");
+    if (mode === "date") {
+      emit(d, hours, minutes, ampm);
+      setOpen(false);
+    } else {
+      emit(d, hours, minutes, ampm);
+      setPanel("time");
+    }
   }
 
   function confirmTime() {
@@ -228,13 +249,13 @@ export function DateTimePicker({
 
   function isDis(day: number) {
     const d = new Date(calYear, calMonth, day);
-    if (minDate) { const mn = new Date(minDate); mn.setHours(0,0,0,0); if (d < mn) return true; }
-    if (maxDate) { const mx = new Date(maxDate); mx.setHours(23,59,59,999); if (d > mx) return true; }
+    if (minDate) { const mn = new Date(minDate); mn.setHours(0, 0, 0, 0); if (d < mn) return true; }
+    if (maxDate) { const mx = new Date(maxDate); mx.setHours(23, 59, 59, 999); if (d > mx) return true; }
     return false;
   }
   function isSel(day: number) {
     return !!selDate && selDate.getFullYear() === calYear
-        && selDate.getMonth() === calMonth && selDate.getDate() === day;
+      && selDate.getMonth() === calMonth && selDate.getDate() === day;
   }
   function isToday(day: number) {
     const t = new Date();
@@ -248,7 +269,7 @@ export function DateTimePicker({
     // Only show a value when the controlled `value` prop is set.
     displayVal = value ? timeStr : "";
   } else if (selDate) {
-    const ds = `${MONTHS[selDate.getMonth()].slice(0,3)} ${selDate.getDate()}, ${selDate.getFullYear()}`;
+    const ds = `${MONTHS[selDate.getMonth()].slice(0, 3)} ${selDate.getDate()}, ${selDate.getFullYear()}`;
     displayVal = mode === "datetime" ? `${ds}  ·  ${timeStr}` : ds;
   }
 
@@ -279,7 +300,7 @@ export function DateTimePicker({
         {/* Show chips when datetime has a full value */}
         {isDatetime && selDate ? (
           <div className="dtp-chip-row">
-            <span className="dtp-chip"><Calendar size={11} />&nbsp;{MONTHS[selDate.getMonth()].slice(0,3)} {selDate.getDate()}, {selDate.getFullYear()}</span>
+            <span className="dtp-chip"><Calendar size={11} />&nbsp;{MONTHS[selDate.getMonth()].slice(0, 3)} {selDate.getDate()}, {selDate.getFullYear()}</span>
             <span className="dtp-chip"><Clock size={11} />&nbsp;{timeStr}</span>
           </div>
         ) : (
@@ -323,10 +344,10 @@ export function DateTimePicker({
                     onClick={() => day && !isDis(day) && pickDay(day)}
                     className={[
                       "dtp-day",
-                      !day                           ? "empty"    : "",
-                      day && isSel(day)              ? "selected" : "",
-                      day && isToday(day) && !isSel(day) ? "today"    : "",
-                      day && isDis(day)              ? "disabled" : "",
+                      !day ? "empty" : "",
+                      day && isSel(day) ? "selected" : "",
+                      day && isToday(day) && !isSel(day) ? "today" : "",
+                      day && isDis(day) ? "disabled" : "",
                     ].filter(Boolean).join(" ")}
                   >
                     {day ?? ""}
@@ -357,7 +378,7 @@ export function DateTimePicker({
                 <button type="button" className="dtp-back-btn" onClick={() => setPanel("cal")}>
                   <ChevronLeft size={13} />
                   {selDate
-                    ? `${MONTHS[selDate.getMonth()].slice(0,3)} ${selDate.getDate()}, ${selDate.getFullYear()}`
+                    ? `${MONTHS[selDate.getMonth()].slice(0, 3)} ${selDate.getDate()}, ${selDate.getFullYear()}`
                     : "Back"}
                 </button>
               )}
@@ -365,12 +386,12 @@ export function DateTimePicker({
               <p className="dtp-time-heading">Select Time</p>
 
               <div className="dtp-spinner-row">
-                <Spinner value={hours}   onUp={() => setHours(h => h === 12 ? 1  : h + 1)} onDn={() => setHours(h => h === 1  ? 12 : h - 1)} format={pad} />
+                <Spinner value={hours} onUp={() => { const nh = hours === 12 ? 1 : hours + 1; setHours(nh); emit(selDate, nh, minutes, ampm); }} onDn={() => { const nh = hours === 1 ? 12 : hours - 1; setHours(nh); emit(selDate, nh, minutes, ampm); }} format={pad} />
                 <span className="dtp-colon">:</span>
-                <Spinner value={minutes} onUp={() => setMinutes(m => (m + 5) % 60)}         onDn={() => setMinutes(m => m === 0 ? 55 : m - 5)} format={pad} />
+                <Spinner value={minutes} onUp={() => { const nm = (minutes + 30) % 60; setMinutes(nm); emit(selDate, hours, nm, ampm); }} onDn={() => { const nm = minutes === 0 ? 55 : minutes - 5; setMinutes(nm); emit(selDate, hours, nm, ampm); }} format={pad} />
                 <div className="dtp-ampm-toggle">
-                  {(["AM","PM"] as const).map(ap => (
-                    <button type="button" key={ap} className={`dtp-ampm-btn${ampm === ap ? " active" : ""}`} onClick={() => setAmpm(ap)}>
+                  {(["AM", "PM"] as const).map(ap => (
+                    <button type="button" key={ap} className={`dtp-ampm-btn${ampm === ap ? " active" : ""}`} onClick={() => { setAmpm(ap); emit(selDate, hours, minutes, ap); }}>
                       {ap}
                     </button>
                   ))}
@@ -379,18 +400,18 @@ export function DateTimePicker({
 
               <div className="dtp-presets">
                 {[
-                  { label: "8:00 AM",  h: 8,  m: 0, ap: "AM" as const },
+                  { label: "8:00 AM", h: 8, m: 0, ap: "AM" as const },
                   { label: "10:00 AM", h: 10, m: 0, ap: "AM" as const },
                   { label: "12:00 PM", h: 12, m: 0, ap: "PM" as const },
-                  { label: "2:00 PM",  h: 2,  m: 0, ap: "PM" as const },
-                  { label: "5:00 PM",  h: 5,  m: 0, ap: "PM" as const },
-                  { label: "6:00 PM",  h: 6,  m: 0, ap: "PM" as const },
+                  { label: "2:00 PM", h: 2, m: 0, ap: "PM" as const },
+                  { label: "5:00 PM", h: 5, m: 0, ap: "PM" as const },
+                  { label: "6:00 PM", h: 6, m: 0, ap: "PM" as const },
                 ].map(p => (
                   <button
                     type="button"
                     key={p.label}
                     className={`dtp-preset${hours === p.h && minutes === p.m && ampm === p.ap ? " active" : ""}`}
-                    onClick={() => { setHours(p.h); setMinutes(p.m); setAmpm(p.ap); }}
+                    onClick={() => { setHours(p.h); setMinutes(p.m); setAmpm(p.ap); emit(selDate, p.h, p.m, p.ap); }}
                   >
                     {p.label}
                   </button>
