@@ -16,7 +16,7 @@ export type CourseFormData = {
   end_time: string;
   days: string;
   status: string;
-  banner_url: string;
+
 };
 
 type CourseFormProps = {
