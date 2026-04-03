@@ -32,8 +32,8 @@ interface UsersClientProps {
   fetchError: string | null;
 }
 
-const ROLE_VARIANT: Record<string, "pink" | "periwinkle" | "dark"> = {
-  admin: "dark",
+const ROLE_VARIANT: Record<string, "pink" | "periwinkle" | "success"> = {
+  admin: "success",
   faculty: "periwinkle",
   student: "pink",
 };
