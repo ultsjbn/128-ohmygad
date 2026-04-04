@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { Plus, ArrowUpDown, SlidersHorizontal, Pencil, Trash2, Loader2 } from "lucide-react";
+import { Plus, ArrowUpDown, SlidersHorizontal, Pencil, Trash2, Loader2, ChevronUp, ChevronDown } from "lucide-react";
 import type { SurveyFormData } from "@/components/admin/survey-form";
 import { paginate, totalPages, PER_PAGE } from "@/lib/pagination.utils";
 import { Pagination } from "@/components/pagination";
@@ -23,9 +23,9 @@ import {
 
 // constants
 const STATUSES = ["open", "closed"];
-const SORT_OPTIONS = ["Newest", "Oldest"] as const;
+const SORT_FIELDS = ["title", "status", "open_at"] as const;
 
-// variant helpers
+type SortField = typeof SORT_FIELDS[number];
 type BadgeVariant = "pink" | "periwinkle" | "dark" | "success" | "warning" | "error";
 
 const STATUS_VARIANT: Record<string, BadgeVariant> = {
@@ -79,7 +79,7 @@ export default function SurveysPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [modalContent, setModalContent] = useState<{ label: string; text: string } | null>(null);
-  const [sortOrder, setSortOrder] = useState<"Newest" | "Oldest">("Newest");
+  const [sort, setSort] = useState<{ field: SortField; direction: "asc" | "desc"}>({ field: "open_at", direction: "desc"});
   const [statusFilters, setStatusFilters] = useState<Set<string>>(new Set());
   const [page, setPage] = useState(1);
 
@@ -122,15 +122,33 @@ export default function SurveysPage() {
     if (statusFilters.size > 0)
       result = result.filter((s) => statusFilters.has(s.status ?? ""));
 
+    // sorting
     result = result.sort((a, b) => {
-      const da = new Date(a.open_at ?? "").getTime();
-      const db = new Date(b.open_at ?? "").getTime();
-      return sortOrder === "Newest" ? db - da : da - db;
+      let aVal: any = a[sort.field as keyof SurveyFormData];
+      let bVal: any = b[sort.field as keyof SurveyFormData];
+
+      if (aVal == null && bVal == null) return 0;
+      if (aVal == null) return sort.direction === "asc" ? 1 : -1;
+      if (bVal == null) return sort.direction === "asc" ? -1 : 1;
+
+      if (sort.field === "open_at") {
+        aVal = new Date(aVal).getTime();
+        bVal = new Date(bVal).getTime();
+      }
+
+      if (typeof aVal === "string" && typeof bVal === "string") {
+        aVal = aVal.toLowerCase();
+        bVal = bVal.toLowerCase();
+      }
+
+      if (aVal < bVal) return sort.direction === "asc" ? -1 : 1;
+      if (aVal > bVal) return sort.direction === "asc" ? 1 : -1;
+      return 0;
     });
 
     setFiltered(result);
     setPage(1);
-  }, [search, surveys, sortOrder, statusFilters]);
+  }, [search, surveys, sort, statusFilters]);
 
   // toggle helpers
   function toggleStatus(s: string) {
@@ -145,6 +163,18 @@ export default function SurveysPage() {
     setStatusFilters(new Set());
   }
 
+  const handleSort = (field: SortField) => {
+    setSort((prev) => ({
+      field,
+      direction: prev.field === field && prev.direction === "asc" ? "desc" : "asc",
+    }));
+    setPage(1);
+  };
+
+  function SortIcon({ field }: { field: SortField }) {
+    if (sort.field !== field) return <ArrowUpDown size={12} style={{ opacity: 0.35 }} />;
+    return sort.direction === "asc" ? <ChevronUp size={12} /> : <ChevronDown size={12} />;
+  }
   // delete execution logic triggered by the modal
   const confirmDelete = async () => {
     if (!deleteTarget) return;
@@ -268,15 +298,22 @@ export default function SurveysPage() {
           <Dropdown
             trigger={
               <Button variant="ghost">
-                <ArrowUpDown size={15} /> {sortOrder}
+                <ArrowUpDown size={15} /> Sort
               </Button>
             }
           >
-            {SORT_OPTIONS.map((opt) => (
-              <DropdownItem key={opt} onClick={() => setSortOrder(opt)}>
-                {sortOrder === opt ? <strong>{opt}</strong> : opt}
+            {SORT_FIELDS.map((field) => (
+              <DropdownItem key={field} onClick={() => handleSort(field)}>
+                <span className="flex items-center justify-between gap-6 w-full">
+                  <span className="capitalize">{field === "open_at" ? "Date" : field}</span>
+                  <SortIcon field={field} />
+                </span>
               </DropdownItem>
             ))}
+            <DropdownDivider />
+            <DropdownItem onClick={() => { setSort({ field: "open_at", direction: "desc" }); setPage(1); }}>
+              Reset sort
+            </DropdownItem>
           </Dropdown>
 
           {/* filter */}
