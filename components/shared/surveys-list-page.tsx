@@ -34,7 +34,7 @@ const SORT_OPTIONS: { label: string; field: SortField }[] = [
   { label: "Title",    field: "title"    },
   { label: "Status",   field: "status"   },
   { label: "Opens At", field: "open_at"  },
-  { label: "Closes",   field: "close_at" },
+  { label: "Closes At",   field: "close_at" },
 ];
 
 type BadgeVariant = "pink" | "periwinkle" | "dark" | "success" | "warning" | "error";
@@ -103,7 +103,8 @@ export default function SurveysListPage({ basePath }: SurveysListPageProps) {
     setTimeout(() => setToast(null), 3500);
   };
 
-  const statuses = Array.from(new Set(surveys.map((s) => s.status?.toLowerCase().trim()).filter(Boolean))) as string[];
+  const STATUSES = ["open", "closed"];
+  const statuses = STATUSES;
   const hasActiveFilters = statusFilters.size > 0;
   const activeFilterCount = statusFilters.size;
 
