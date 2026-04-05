@@ -12,15 +12,12 @@ const MONTHS = [
 interface MiniCalendarProps {
   /** Days in the current month that should show a dot indicator (1-based). */
   eventDays?: Set<number>;
-  /** Called when the user clicks "Add event". */
-  onAddEvent?: () => void;
   /** Called when the user clicks a specific day number. */
   onDayClick?: (date: Date) => void;
 }
 
 export function MiniCalendar({
   eventDays = new Set([3, 10, 14, 18, 22]),
-  onAddEvent,
   onDayClick,
 }: MiniCalendarProps) {
   const today = new Date();
@@ -107,14 +104,6 @@ export function MiniCalendar({
           </div>
         ))}
       </div>
-
-      {/* add event */}
-      <button
-        onClick={onAddEvent}
-        className="flex items-center justify-center gap-1.5 w-full py-2 rounded-[10px] bg-[var(--primary-dark)] text-white text-[12px] font-semibold hover:opacity-90 transition-opacity cursor-pointer border-none font-[var(--font-body)]"
-      >
-        <Plus size={13} /> Add event
-      </button>
     </div>
   );
 }
