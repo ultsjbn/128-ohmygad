@@ -12,7 +12,7 @@ import Image from "next/image";
 const NAV_ITEMS = [
   { href: "/faculty",         label: "Dashboard", icon: LayoutDashboard, exact: true  },
   { href: "/faculty/events",  label: "Events",    icon: Calendar,        exact: false },
-  { href: "/faculty/courses", label: "Courses",   icon: BookOpen,        exact: false },
+  { href: "/faculty/courses", label: "I've GAD to Know",   icon: BookOpen,        exact: false },
   { href: "/faculty/surveys", label: "Surveys",   icon: ClipboardList,   exact: false },
 ];
 

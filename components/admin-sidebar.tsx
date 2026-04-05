@@ -9,12 +9,12 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 
-const NAV_ITEMS = [
-  { href: "/admin",         label: "Dashboard", icon: Home,          exact: true  },
-  { href: "/admin/events",  label: "Events",    icon: Calendar,      exact: false },
-  { href: "/admin/users",   label: "Users",     icon: Users,         exact: false },
-  { href: "/admin/courses", label: "Courses",   icon: BookOpen,      exact: false },
-  { href: "/admin/surveys", label: "Surveys",   icon: ClipboardList, exact: false },
+const navItems = [
+  { href: "/admin",         label: "Dashboard", icon: LayoutDashboard, exact: true  },
+  { href: "/admin/users",   label: "Users",     icon: Users,           exact: false },
+  { href: "/admin/events",  label: "Events",    icon: Calendar,        exact: false },
+  { href: "/admin/courses", label: "I've GAD to Know",   icon: BookOpen,        exact: false },
+  { href: "/admin/surveys", label: "Surveys",   icon: ClipboardList,   exact: false },
 ];
 
 function isActive(pathname: string, href: string, exact = false) {

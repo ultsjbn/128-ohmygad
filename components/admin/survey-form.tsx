@@ -216,7 +216,7 @@ export default function SurveyForm({ mode, initialData, initialQuestions = [] }:
           question_text: q.question_text.trim(),
           question_type: q.question_type,
           options:       ["multiple_choice"].includes(q.question_type)
-            ? JSON.stringify(q.options.filter((o) => o.trim() !== ""))
+            ? q.options.filter((o) => o.trim() !== "")
             : null,
           is_required:   q.is_required,
           order_index:   i,
