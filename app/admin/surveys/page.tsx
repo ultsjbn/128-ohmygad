@@ -205,6 +205,7 @@ export default function SurveysPage() {
     {
       key: "title",
       header: "Title",
+      width: "40%",
       render: (survey) => (
         <button
           className="text-left font-semibold hover:underline underline-offset-4 max-w-[240px] truncate block"
@@ -219,6 +220,7 @@ export default function SurveysPage() {
     {
       key: "status",
       header: "Status",
+      width: "15%",
       render: (survey) => (
         <Badge variant={STATUS_VARIANT[survey.status ?? ""] ?? "dark"}>
           <span className="capitalize">{survey.status || "—"}</span>
@@ -228,6 +230,7 @@ export default function SurveysPage() {
     {
       key: "open_at",
       header: "Opens",
+      width: "16%",
       render: (survey) => (
         <span className="caption whitespace-nowrap">{formatDate(survey.open_at)}</span>
       ),
@@ -235,6 +238,7 @@ export default function SurveysPage() {
     {
       key: "close_at",
       header: "Closes",
+      width: "16%",
       render: (survey) => (
         <span className="caption whitespace-nowrap">{formatDate(survey.close_at)}</span>
       ),
@@ -242,6 +246,7 @@ export default function SurveysPage() {
     {
       key: "actions",
       header: "Actions",
+      width: "13%",
       render: (survey) => (
         <div style={{ display: "flex", justifyContent: "flex-start", gap: 4 }}>
           <Button
@@ -269,19 +274,6 @@ export default function SurveysPage() {
 
   return (
     <div className="flex flex-col gap-6">
-
-      {/* page header */}
-      <div className="flex items-start justify-between gap-4 flex-wrap mt-1">
-        <div>
-          <h1 className="heading-lg">Survey Management</h1>
-          <p className="caption mt-1">
-            {isLoading ? "Loading…" : `${filtered.length} survey${filtered.length !== 1 ? "s" : ""} total`}
-          </p>
-        </div>
-        <Button variant="primary" onClick={() => router.push("/admin/surveys/create")}>
-          <Plus size={16} /> Add Survey
-        </Button>
-      </div>
 
       {/* toolbar */}
       <div className="flex flex-col gap-3">
@@ -347,6 +339,10 @@ export default function SurveysPage() {
             <DropdownDivider />
             <DropdownItem onClick={clearAllFilters}>Clear all filters</DropdownItem>
           </Dropdown>
+
+            <Button variant="primary" onClick={() => router.push("/admin/surveys/create")}>
+                <Plus size={16} /> Add Survey
+            </Button>
         </div>
       </div>
 

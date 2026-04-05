@@ -13,6 +13,8 @@ export { Modal } from "./modal";
 export { Sidebar } from "./sidebar";
 export { DataTable } from "./data-table";
 export { DateTimePicker } from "./datetime-picker";
+export { MiniCalendar } from "./mini-calendar"
+export { TodayTimeline } from "./today-timeline"
 // export { SurveyQuestion, SurveyForm, SurveyBuilder } from "./survey-question";
 
 export type { EventCardProps } from "./card";

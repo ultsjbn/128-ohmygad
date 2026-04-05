@@ -1,262 +1,320 @@
 "use client";
 
-import React from "react";
+import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { Card, StatCard, Button } from "@/components/ui";
-import { 
-  Users, CalendarCheck, UserCheck, 
-  UserPlus, CalendarPlus, BookOpen, ClipboardList 
+import {
+  Users, Calendar, UserCheck, ClipboardList, BookOpen,
 } from "lucide-react";
 import {
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-  BarChart,
-  Bar,
-  Legend,
+  Card, StatCard, PeriodSelector, Button, MiniCalendar, TodayTimeline,
+} from "@/components/ui";
+import {
+  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  PieChart, Pie, Cell, Legend, BarChart, Bar,
 } from "recharts";
-import { eventAttendanceData } from "./dashboard.constants";
-
 import { useDashboardData } from "./hooks/use-dashboard-data";
+import GlobalSearch from "@/components/global-search";
 
-const BRAND_COLORS = [
-  "#B8B5E8", // periwinkle
-  "#F4A7B9", // soft-pink
-  "#6DC5A0", // success (green)
-  "#F4C97A", // warning (yellow)
-  "#9B9BB4", // gray
-  "#2D2A4A", // primary-dark
+// constants ------------------------------------------------
+const BRAND_COLORS = ["#B8B5E8", "#F4A7B9", "#6DC5A0", "#F4C97A", "#9B9BB4", "#2D2A4A"];
+const AXIS_COLOR   = "rgba(45,42,74,0.10)";
+const TICK_COLOR   = "rgba(45,42,74,0.45)";
+
+// quick actions ------------------------------------------------
+const QUICK_ACTIONS = [
+  { icon: <Calendar size={16} />, label: "New Event",   href: "/admin/events/create"  },
+  { icon: <Users size={16} />, label: "Create User", href: "/admin/users/create"   },
+  { icon: <BookOpen size={16} />, label: "Add Course",  href: "/admin/courses/create" },
+  { icon: <ClipboardList size={16} />, label: "New Survey",  href: "/admin/surveys/create" },
 ];
 
-const CustomTooltip = ({ active, payload, label }: any) => {
-  if (active && payload && payload.length) {
-    return (
-      <div className="bg-white/90 backdrop-blur-md border border-[rgba(45,42,74,0.08)] shadow-float rounded-xl p-3 min-w-[120px] animate-in fade-in zoom-in-95 duration-200">
-        {label && <p className="text-[11px] font-bold text-[var(--gray)] uppercase tracking-wider mb-1.5">{label}</p>}
-        {payload.map((entry: any, index: number) => (
-          <div key={index} className="flex items-center gap-2">
-            <span 
-              className="w-2.5 h-2.5 rounded-full shrink-0" 
-              style={{ backgroundColor: entry.color || entry.payload.fill }} 
-            />
-            <span className="text-[13px] font-semibold text-[var(--primary-dark)] capitalize">
-              {entry.name || entry.dataKey}: {entry.value}
-            </span>
-          </div>
-        ))}
-      </div>
-    );
-  }
-  return null;
+// timeline for today ------------------------------------------------
+const CATEGORY_COLORS: Record<string, string> = {
+  orientation: "var(--periwinkle)",
+  forum:       "var(--soft-pink)",
+  research:    "#9B9BB4",
+  training:    "var(--success)",
+  workshop:    "var(--warning)",
 };
 
-export default function DashboardPage() {
-  const router = useRouter();
-  const {
-    eventAttendanceData,
-    sexAtBirthData,
-    genderIdentityData,
-    breakdownData,
-    userStats,
-    gadEventsCount,
-  } = useDashboardData();
-
-  // ----- data filter -----
-  const validColleges = ["CS", "CAC", "CSS"];
-  const filteredColleges = breakdownData?.filter((item: any) => 
-    validColleges.some((c) => item.category?.toUpperCase().includes(c))
-  ) || [];
-
-  const validGenders = ["man", "woman", "self-describe", "non-binary", "prefer not to say", "not-specified"];
-  const filteredGenders = genderIdentityData?.filter((item: any) => {
-    const itemName = (item.name || item.category || "").toLowerCase();
-    return validGenders.some((vg) => itemName.includes(vg));
-  }) || [];
-  // ---------------------------------
-
-  const softAxisColor = "rgba(45,42,74,0.12)";
-  const tickColor = "rgba(45,42,74,0.5)";
-
+// tooltip ------------------------------------------------
+interface TooltipEntry { color?: string; payload?: { fill?: string }; name?: string; dataKey?: string; value?: number | string; }
+function CustomTooltip({ active, payload, label }: { active?: boolean; payload?: TooltipEntry[]; label?: string }) {
+  if (!active || !payload?.length) return null;
   return (
-    <div className="w-full flex flex-col gap-4 lg:gap-4 animate-in fade-in duration-500 pb-8 pl-1 pr-1">
-
-      {/* header section */}
-      <div className="flex flex-col animate-in slide-in-from-bottom-2 duration-500">
-        <p className="body text-[var(--gray)] font-medium">Welcome back,</p>
-        <h1 className="heading-xl mt-1">Admin</h1>
-      </div>
-
-      {/* KPI */}
-      <div className="flex flex-col gap-3">
-        <p className="text-xs font-bold tracking-widest uppercase text-[var(--gray)]">Metrics</p>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-6">
-          <StatCard
-            icon={<Users size={20} className="text-[var(--periwinkle)]" />}
-            iconBg="var(--periwinkle-light)"
-            value={userStats?.total || 0}
-            label="Total Registered Users"
-          />
-          <StatCard
-            icon={<UserCheck size={20} className="text-[var(--success)]" />}
-            iconBg="rgba(109, 197, 160, 0.15)"
-            value={userStats?.onboarded || 0}
-            label="Fully Onboarded Users"
-          />
-          <StatCard
-            icon={<CalendarCheck size={20} className="text-[var(--soft-pink)]" />}
-            iconBg="var(--pink-light)"
-            value={gadEventsCount || 0}
-            label="Total GAD Events"
-          />
+    <div className="bg-white/95 backdrop-blur-md border border-black/[0.07] shadow-[var(--shadow-float)] rounded-xl p-3 min-w-[120px]">
+      {label && (
+        <p className="text-[11px] font-bold text-[var(--gray)] uppercase tracking-wider mb-1.5">{label}</p>
+      )}
+      {payload.map((e: TooltipEntry, i: number) => (
+        <div key={i} className="flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full shrink-0" style={{ background: e.color ?? e.payload?.fill }} />
+          <span className="text-[13px] font-semibold text-[var(--primary-dark)] capitalize">
+            {e.name ?? e.dataKey}: {e.value}
+          </span>
         </div>
-      </div>
-
-      {/*  quick Actions (1/4) | attendance (3/4) */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 lg:gap-6">
-        
-        {/* 1. panel */}
-        <Card className="lg:col-span-1 flex flex-col p-5 lg:p-6 min-h-[350px]">
-          <h2 className="heading-md mb-6 shrink-0">Quick Actions</h2>
-          <div className="flex flex-col gap-3 flex-1 justify-center">
-            <Button variant="soft" onClick={() => router.push('/admin/users/create')} className="w-full justify-start py-5 shadow-soft">
-              <UserPlus size={18} className="mr-3 shrink-0" /> Create User
-            </Button>
-            <Button variant="soft" onClick={() => router.push('/admin/events/create')} className="w-full justify-start py-5 shadow-soft">
-              <CalendarPlus size={18} className="mr-3 shrink-0" /> New Event
-            </Button>
-            <Button variant="soft" onClick={() => router.push('/admin/courses/create')} className="w-full justify-start py-5 shadow-soft">
-              <BookOpen size={18} className="mr-3 shrink-0" /> Add Course
-            </Button>
-            <Button variant="soft" onClick={() => router.push('/admin/surveys/create')} className="w-full justify-start py-5 bg-white border border-[rgba(45,42,74,0.08)] shadow-soft">
-              <ClipboardList size={18} className="mr-3 shrink-0 text-[var(--primary-dark)]" /> New Survey
-            </Button>
-          </div>
-        </Card>
-
-        {/* 2. attendance */}
-        <Card className="lg:col-span-3 flex flex-col p-5 lg:p-6 min-h-[350px]">
-          <h2 className="heading-md mb-6 shrink-0">Attendance Over Time</h2>
-          <div className="flex-1 w-full min-h-[250px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={eventAttendanceData} margin={{ top: 5, right: 10, left: -25, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke={softAxisColor} vertical={false} />
-                <XAxis dataKey="month" stroke={softAxisColor} tick={{ fill: tickColor, fontSize: 11 }} tickLine={false} axisLine={false} dy={10} />
-                <YAxis stroke={softAxisColor} tick={{ fill: tickColor, fontSize: 11 }} tickLine={false} axisLine={false} />
-                <Tooltip content={<CustomTooltip />} cursor={{ stroke: softAxisColor, strokeWidth: 1, strokeDasharray: '4 4' }} />
-                <Area type="monotone" dataKey="attendees" name="Attendees" stroke="#B8B5E8" strokeWidth={3} fill="var(--periwinkle-light)" fillOpacity={0.6} activeDot={{ r: 6, fill: "var(--periwinkle)", stroke: "white", strokeWidth: 2 }} />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-        </Card>
-
-      </div>
-
-      {/* secondary row */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
-        
-        {/* 1. users per college */}
-        <Card className="flex flex-col p-5 lg:p-6 min-h-[320px]">
-          <h2 className="heading-md mb-6 shrink-0">Users per College</h2>
-          <div className="flex-1 w-full min-h-[220px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={filteredColleges} margin={{ top: 10, right: 0, left: -25, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={softAxisColor} />
-                <XAxis dataKey="category" stroke={softAxisColor} tick={{ fill: tickColor, fontSize: 11 }} tickLine={false} axisLine={false} dy={10} />
-                <YAxis stroke={softAxisColor} tick={{ fill: tickColor, fontSize: 11 }} tickLine={false} axisLine={false} />
-                <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(45,42,74,0.03)' }} />
-                <Bar dataKey="value" name="Users" stroke="transparent" radius={[4, 4, 0, 0]} barSize={38}>
-                  {filteredColleges.map((entry: any, idx: number) => (
-                    <Cell key={`cell-col-${idx}`} fill={BRAND_COLORS[idx % BRAND_COLORS.length]} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </Card>
-
-        {/* 2. sex at birth */}
-        <Card className="flex flex-col p-5 lg:p-6 min-h-[320px]">
-          <h2 className="heading-md mb-2 shrink-0">Sex at Birth</h2>
-          <div className="flex-1 w-full min-h-[220px] relative">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={sexAtBirthData}
-                  cx="50%"
-                  cy="45%"
-                  innerRadius="55%"
-                  outerRadius="80%"
-                  paddingAngle={2}
-                  dataKey="value"
-                  nameKey="name"
-                  stroke="white" 
-                  strokeWidth={2}
-                >
-                  {sexAtBirthData?.map((entry: any, index: number) => (
-                    <Cell key={`cell-${index}`} fill={BRAND_COLORS[index % BRAND_COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip content={<CustomTooltip />} />
-                <Legend
-                  verticalAlign="bottom"
-                  align="center"
-                  iconType="circle"
-                  wrapperStyle={{ paddingTop: '20px'}}
-                  formatter={(value) => <span className="text-[11px] font-bold text-[var(--gray)] uppercase tracking-wider">{value}</span>}
-                />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-        </Card>
-
-        {/* 3. gender identity count */}
-        <Card className="flex flex-col p-5 lg:p-6 min-h-[320px]">
-          <h2 className="heading-md mb-2 shrink-0">Gender Identity</h2>
-          <div className="flex-1 w-full min-h-[220px] relative">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={filteredGenders}
-                  cx="50%"
-                  cy="45%"
-                  innerRadius="55%"
-                  outerRadius="80%"
-                  paddingAngle={2}
-                  dataKey="value"
-                  nameKey="name"
-                  stroke="white"
-                  strokeWidth={2}
-                >
-                  {filteredGenders.map((entry: any, index: number) => (
-                    <Cell key={`cell-${index}`} fill={BRAND_COLORS[index % BRAND_COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip content={<CustomTooltip />} />
-                <Legend
-                  verticalAlign="bottom"
-                  align="center"
-                  iconType="circle"
-                  wrapperStyle={{ paddingTop: '20px'}}
-                  formatter={(value) => <span className="text-[11px] font-bold text-[var(--gray)] uppercase tracking-wider">{value}</span>}
-                />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-        </Card>
-
-      </div>
-
-      <div className="w-full h-[1px] bg-[rgba(45,42,74,0.08)] my-2" />
-
-      
-      
+      ))}
     </div>
   );
+}
+
+// ------------------------------------------------ DASHBOARD PAGE ------------------------------------------------
+export default function DashboardPage() {
+    const router = useRouter();
+    const [attendancePeriod, setAttendancePeriod] = useState<"D" | "W" | "M" | "Y">("M");
+
+    const {
+        eventAttendanceData,
+        sexAtBirthData,
+        genderIdentityData,
+        breakdownData,
+        userStats,
+        gadEventsCount,
+        surveysCount,
+        todayEvents,
+        loading,
+    } = useDashboardData();
+
+    const filteredColleges = useMemo(
+        () => (breakdownData ?? []).filter((item: { category?: string }) =>
+        ["CS", "CAC", "CSS"].some((c) => item.category?.toUpperCase().includes(c))
+        ),
+        [breakdownData],
+    );
+    const filteredGenders = useMemo(
+        () => (genderIdentityData ?? []).filter((item: { name?: string; category?: string }) =>
+        ["man", "woman", "self-describe", "non-binary", "prefer not to say", "not-specified"]
+            .some((g) => (item.name ?? item.category ?? "").toLowerCase().includes(g))
+        ),
+        [genderIdentityData],
+    );
+
+    return (
+        <div className="flex gap-5 w-full animate-in fade-in duration-500">
+
+        {/* ------------------------------------------------ MAIN CONTENT ------------------------------------------------*/}
+        <div className="flex flex-col gap-5 flex-1 min-w-0 pb-8">
+
+            {/* KPI section + greeting ------------------------------------------------ */}
+            <div className="flex flex-col gap-5">
+                <div className="flex items-center justify-between">
+                    <h2 className="heading-md">Welcome, Admin</h2>
+                </div>
+                <GlobalSearch role="student" placeholder="Search events, courses, surveys..." />
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                    <StatCard
+                        icon={<Users size={19} className="text-[var(--periwinkle)]"/>}
+                        iconBg="var(--periwinkle-light)"
+                        value={userStats?.total ?? 0}
+                        label="Registered Users"
+                    />
+                    <StatCard
+                        icon={<UserCheck size={19} className="text-[var(--success)]"/>}
+                        iconBg="rgba(109,197,160,0.15)"
+                        value={userStats?.onboarded ?? 0}
+                        label="Onboarded Users"
+                    />
+                    <StatCard
+                        icon={<Calendar size={19} className="text-[var(--soft-pink)]"/>}
+                        iconBg="var(--pink-light)"
+                        value={gadEventsCount ?? 0}
+                        label="GAD Events"
+                    />
+                    <StatCard
+                        icon={<ClipboardList size={19} className="text-[var(--warning)]"/>}
+                        iconBg="rgba(244,201,122,0.18)"
+                        value={surveysCount}
+                        label="Active Surveys"
+                    />
+                </div>
+            </div>
+
+            {/* attendance and quick actions ------------------------------------------------ */}
+            <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-4">
+
+              {/* attendance over time */}
+                <Card className="flex flex-col p-5 min-h-[320px]">
+                    <div className="flex flex-wrap items-start justify-between gap-3 mb-4 shrink-0">
+                    <div>
+                        <h2 className="heading-md">Attendance Over Time</h2>
+                        <p className="caption mt-0.5">Total event attendees per period</p>
+                    </div>
+                    <PeriodSelector defaultPeriod={attendancePeriod} onChange={setAttendancePeriod} />
+                    </div>
+                    <div className="flex-1 w-full min-h-[200px] cursor-default select-none">
+                    <ResponsiveContainer width="100%" height="100%">
+                        <AreaChart data={eventAttendanceData} margin={{ top: 5, right: 10, left: -25, bottom: 0 }}>
+                        <CartesianGrid strokeDasharray="3 3" stroke={AXIS_COLOR} vertical={false} />
+                        <XAxis
+                            dataKey="month"
+                            stroke={AXIS_COLOR}
+                            tick={{ fill: TICK_COLOR, fontSize: 11 }}
+                            tickLine={false} axisLine={false} dy={10}
+                        />
+                        <YAxis
+                            stroke={AXIS_COLOR}
+                            tick={{ fill: TICK_COLOR, fontSize: 11 }}
+                            tickLine={false} axisLine={false}
+                        />
+                        <Tooltip
+                            content={<CustomTooltip />}
+                            cursor={{ stroke: AXIS_COLOR, strokeWidth: 1, strokeDasharray: "4 4" }}
+                        />
+                        <Area
+                            type="linear"
+                            dataKey="attendees"
+                            name="Attendees"
+                            stroke="#B8B5E8"
+                            strokeWidth={2.5}
+                            fill="var(--periwinkle-light)"
+                            fillOpacity={0.55}
+                            activeDot={{ r: 5, fill: "var(--periwinkle)", stroke: "white", strokeWidth: 2 }}
+                            style={{ pointerEvents: "none" }}
+                        />
+                        </AreaChart>
+                    </ResponsiveContainer>
+                    </div>
+                </Card>
+
+              {/* quick actions */}
+                <Card className="flex flex-col p-5">
+                    <h2 className="heading-md mb-1">Quick Actions</h2>
+                    <p className="caption mb-4">Jump to common tasks</p>
+                    <div className="flex flex-col gap-2">
+                    {QUICK_ACTIONS.map((action) => (
+                        <Button
+                            key={action.label}
+                            variant="soft"
+                            onClick={() => router.push(action.href)}
+                            className="w-full justify-start"
+                        >
+                            {action.icon}
+                            {action.label}
+                        </Button>
+                    ))}
+                    </div>
+                </Card>
+            </div>
+
+            {/* other analytics */}
+            <div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+                    {/* users per college */}
+                    <Card className="flex flex-col p-5 min-h-[260px]">
+                    <h2 className="heading-md mb-0.5">Users per College</h2>
+                    <p className="caption mb-3">Registered student breakdown</p>
+                    <div className="flex-1 w-full min-h-[170px] cursor-default select-none">
+                        <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={filteredColleges} margin={{ top: 8, right: 0, left: -25, bottom: 0 }}>
+                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={AXIS_COLOR} />
+                            <XAxis
+                            dataKey="category"
+                            stroke={AXIS_COLOR}
+                            tick={{ fill: TICK_COLOR, fontSize: 11 }}
+                            tickLine={false} axisLine={false} dy={8}
+                            />
+                            <YAxis
+                            stroke={AXIS_COLOR}
+                            tick={{ fill: TICK_COLOR, fontSize: 11 }}
+                            tickLine={false} axisLine={false}
+                            />
+                            <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(45,42,74,0.03)" }} />
+                            <Bar dataKey="value" name="Users" radius={[6, 6, 0, 0]} barSize={36} style={{ pointerEvents: "none" }}>
+                            {filteredColleges.map((_: unknown, idx: number) => (
+                                <Cell key={`col-${idx}`} fill={BRAND_COLORS[idx % BRAND_COLORS.length]} />
+                            ))}
+                            </Bar>
+                        </BarChart>
+                        </ResponsiveContainer>
+                    </div>
+                    </Card>
+
+                    {/* sex at birth */}
+                    <Card className="flex flex-col p-5 min-h-[260px]">
+                    <h2 className="heading-md mb-1">Sex at Birth</h2>
+                    <div className="flex-1 w-full min-h-[190px] cursor-default select-none">
+                        <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                            <Pie
+                            data={sexAtBirthData}
+                            cx="50%" cy="45%"
+                            innerRadius="55%" outerRadius="78%"
+                            paddingAngle={2}
+                            dataKey="value" nameKey="name"
+                            stroke="white" strokeWidth={2}
+                            style={{ pointerEvents: "none" }}
+                            >
+                            {sexAtBirthData?.map((_: unknown, i: number) => (
+                                <Cell key={`sex-${i}`} fill={BRAND_COLORS[i % BRAND_COLORS.length]} />
+                            ))}
+                            </Pie>
+                            <Tooltip content={<CustomTooltip />} />
+                            <Legend
+                            verticalAlign="bottom" align="center" iconType="circle"
+                            wrapperStyle={{ paddingTop: 14 }}
+                            formatter={(v) => (
+                                <span className="text-[10px] font-bold text-[var(--gray)] uppercase tracking-wider">{v}</span>
+                            )}
+                            />
+                        </PieChart>
+                        </ResponsiveContainer>
+                    </div>
+                    </Card>
+
+                    {/* gender identity */}
+                    <Card className="flex flex-col p-5 min-h-[260px]">
+                    <h2 className="heading-md mb-1">Gender Identity</h2>
+                    <div className="flex-1 w-full min-h-[190px] cursor-default select-none">
+                        <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                            <Pie
+                            data={filteredGenders}
+                            cx="50%" cy="45%"
+                            innerRadius="55%" outerRadius="78%"
+                            paddingAngle={2}
+                            dataKey="value" nameKey="name"
+                            stroke="white" strokeWidth={2}
+                            style={{ pointerEvents: "none" }}
+                            >
+                            {filteredGenders.map((_: unknown, i: number) => (
+                                <Cell key={`gender-${i}`} fill={BRAND_COLORS[i % BRAND_COLORS.length]} />
+                            ))}
+                            </Pie>
+                            <Tooltip content={<CustomTooltip />} />
+                            <Legend
+                            verticalAlign="bottom" align="center" iconType="circle"
+                            wrapperStyle={{ paddingTop: 14 }}
+                            formatter={(v) => (
+                                <span className="text-[10px] font-bold text-[var(--gray)] uppercase tracking-wider">{v}</span>
+                            )}
+                            />
+                        </PieChart>
+                        </ResponsiveContainer>
+                    </div>
+                    </Card>
+
+                </div>
+            </div>
+        </div>
+
+        {/* right panel ------------------------------------------------------------------------------------------------ */}
+        <aside className="hidden xl:flex flex-col gap-4 w-[268px] shrink-0 pb-8">
+            {/* calendar */}
+            <Card className="p-4">
+                <MiniCalendar
+                    eventDays={new Set([3, 10, 14])}   // optional — defaults to a demo set
+                    onAddEvent={() => router.push("/admin/events/create")}
+                    onDayClick={(date) => console.log(date)}
+                />
+            </Card>
+
+            {/* timeline */}
+            <Card className="p-4">
+                <TodayTimeline events={todayEvents} loading={loading} />
+            </Card>
+        </aside>
+
+        </div>
+    );
 }

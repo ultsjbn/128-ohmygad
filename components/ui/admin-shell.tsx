@@ -3,29 +3,47 @@
 import { useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import {
-  LayoutDashboard, Calendar, BookOpen, ClipboardList,
-  LogOut, PanelLeftClose, PanelLeftOpen,
+  Home, Calendar, Users, BookOpen, ClipboardList,
+  LogOut, ArrowLeft, PanelLeftClose, PanelLeftOpen,
 } from "lucide-react";
-import Link from "next/link";
 import Image from "next/image";
+import Link from "next/link";
+import UserMenu from "@/components/user-menu";
+import { Button } from "./button";
 
+// navigation ------------------------------------------------
 const NAV_ITEMS = [
-  { href: "/faculty",         label: "Dashboard", icon: LayoutDashboard, exact: true  },
-  { href: "/faculty/events",  label: "Events",    icon: Calendar,        exact: false },
-  { href: "/faculty/courses", label: "I've GAD to Know",   icon: BookOpen,        exact: false },
-  { href: "/faculty/surveys", label: "Surveys",   icon: ClipboardList,   exact: false },
+  { href: "/admin",         label: "Dashboard", icon: Home,          exact: true  },
+  { href: "/admin/events",  label: "Events",    icon: Calendar,      exact: false },
+  { href: "/admin/users",   label: "Users",     icon: Users,         exact: false },
+  { href: "/admin/courses", label: "Courses",   icon: BookOpen,      exact: false },
+  { href: "/admin/surveys", label: "Surveys",   icon: ClipboardList, exact: false },
 ];
+
+const PAGE_LABELS: Record<string, string> = {
+  dashboard: "Dashboard",
+  events:    "Events Management",
+  users:     "Users Management",
+  courses:   "Courses Management",
+  surveys:   "Surveys Management",
+};
+
+function pathnameToNavId(pathname: string): string {
+  const segment = pathname.replace(/^\/admin\/?/, "").split("/")[0];
+  return segment === "" ? "dashboard" : segment;
+}
 
 function isActive(pathname: string, href: string, exact = false) {
   return exact ? pathname === href : pathname.startsWith(href);
 }
 
-function MobileNav() {
+// mobile nav ------------------------------------------------
+function AdminMobileNav() {
   const pathname = usePathname();
   return (
     <nav
       aria-label="Mobile navigation"
-      className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around"
+      className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around md:hidden"
       style={{
         background: "var(--primary-dark)",
         borderTop:  "1px solid rgba(255,255,255,0.10)",
@@ -59,13 +77,14 @@ function MobileNav() {
   );
 }
 
-export default function FacultySidebar() {
-  const pathname = usePathname();
+// shell ------------------------------------------------------------------------------------------------
+export default function AdminShell({ children }: { children: React.ReactNode }) {
   const router   = useRouter();
+  const pathname = usePathname();
 
-  const [open,        setOpen]        = useState(true);
+  const [open, setOpen] = useState(true);
   const [logoHovered, setLogoHovered] = useState(false);
-  const [isMobile,    setIsMobile]    = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     const check = () => {
@@ -78,20 +97,28 @@ export default function FacultySidebar() {
     return () => window.removeEventListener("resize", check);
   }, []);
 
-  if (isMobile) return <MobileNav />;
+  const activeId = pathnameToNavId(pathname);
+  const isDashboard = activeId === "dashboard";
+  const pageLabel = PAGE_LABELS[activeId] ?? activeId.charAt(0).toUpperCase() + activeId.slice(1);
 
   const state = open ? "expanded" : "collapsed";
 
   return (
+    <div className="flex h-screen w-full overflow-hidden" style={{ background: "linear-gradient(145deg,#f5f3ff 0%,#fce8ee 35%,#f0eefd 65%,#faf8ff 100%)" }} >
+      {/* blobs */}
+      <div className="pointer-events-none fixed -top-28 right-14 w-[420px] h-[420px] rounded-full blur-[56px] opacity-20 bg-[var(--soft-pink)] z-0" />
+      <div className="pointer-events-none fixed -bottom-16 left-20 w-[320px] h-[320px] rounded-full blur-[56px] opacity-[0.13] bg-[var(--periwinkle)] z-0" />
 
-    <div data-state={state} className={[ "group/sidebar relative shrink-0 hidden md:block", "w-[--sidebar-width] data-[state=collapsed]:w-[--sidebar-width-icon]", "transition-[width] duration-200 ease-linear", ].join(" ")} style={{ "--sidebar-width":      "224px", "--sidebar-width-icon": "64px", } as React.CSSProperties} >
+      {isMobile && <AdminMobileNav />}
+
       <aside
+        data-state={state}
         className={[
-          "fixed inset-y-0 left-0 z-10 flex flex-col",
+          "group/sidebar relative z-10 flex-col shrink-0 hidden md:flex",
           "my-2 ml-2 rounded-[18px] overflow-hidden",
           "bg-[var(--primary-dark)] shadow-[0_8px_40px_rgba(45,42,74,0.22)]",
-          "w-[--sidebar-width] group-data-[state=collapsed]/sidebar:w-[--sidebar-width-icon]",
-          "transition-[width] duration-200 ease-linear",
+          "w-[--sidebar-width] data-[state=collapsed]:w-[--sidebar-width-icon]",
+          "transition-[width] duration-200 ease-linear"
         ].join(" ")}
         style={{
           "--sidebar-width":      "224px",
@@ -110,7 +137,7 @@ export default function FacultySidebar() {
           >
             <Image
               src="/kasarian-upb-logo.svg"
-              alt="UPB Kasarian"
+              alt="Kasarian UP Baguio"
               width={44} height={44}
               style={{
                 opacity: open ? 1 : logoHovered ? 0.22 : 1,
@@ -129,7 +156,6 @@ export default function FacultySidebar() {
             </span>
           </button>
 
-          {/* Title — fades + clips via overflow on the sidebar itself */}
           <div
             className={[
               "flex flex-col justify-center overflow-hidden shrink-0",
@@ -138,11 +164,10 @@ export default function FacultySidebar() {
               "transition-[width,opacity] duration-200 ease-linear",
             ].join(" ")}
           >
-            <span className="caption-dark">UP BAGUIO</span>
-            <span className="heading-sm-dark uppercase">Kasarian</span>
+            <span className="caption-dark whitespace-nowrap">UP BAGUIO</span>
+            <span className="heading-sm-dark uppercase whitespace-nowrap">Kasarian</span>
           </div>
 
-          {/* Collapse button */}
           <button
             onClick={() => setOpen(false)}
             aria-label="Collapse sidebar"
@@ -150,7 +175,7 @@ export default function FacultySidebar() {
               "shrink-0 flex items-center justify-center cursor-pointer border-none bg-transparent",
               "text-white/40 hover:text-white/90",
               "opacity-100 group-data-[state=collapsed]/sidebar:opacity-0 group-data-[state=collapsed]/sidebar:pointer-events-none",
-              "transition-opacity duration-200 ease-linear",
+              "transition-opacity duration-200 ease-linear pr-1"
             ].join(" ")}
             style={{ marginLeft: "auto" }}
           >
@@ -158,7 +183,7 @@ export default function FacultySidebar() {
           </button>
         </div>
 
-        {/* Nav ------------------------------------------------ */}
+        {/* nav ------------------------------------------------ */}
         <nav className="flex flex-col flex-1 gap-1 px-2 py-2 overflow-y-auto overflow-x-hidden">
           {NAV_ITEMS.map(({ href, label, icon: Icon, exact }) => {
             const active = isActive(pathname, href, exact);
@@ -196,7 +221,7 @@ export default function FacultySidebar() {
           })}
         </nav>
 
-        {/* Logout ------------------------------------------------ */}
+        {/* logout ------------------------------------------------ */}
         <div className="shrink-0 flex flex-col gap-[2px] px-2 pb-2 pt-2 border-t border-white/[0.07]">
           <button
             onClick={() => router.push("/auth/login")}
@@ -223,6 +248,47 @@ export default function FacultySidebar() {
           </button>
         </div>
       </aside>
+
+      {/* main column ------------------------------------------------------------------------------------------------ */}
+      <div className="relative z-10 flex flex-col flex-1 min-w-0 overflow-hidden">
+
+        {/* page header ------------------------------------------------ */}
+        <header className="shrink-0 flex items-center justify-between gap-3 px-5 pt-2 pb-0 h-[78px]">
+          <div className="flex items-center gap-2 min-w-0">
+            {!isDashboard && (
+              <Button variant="icon" onClick={() => router.back()} aria-label="Go back">
+                <ArrowLeft size={16} />
+              </Button>
+            )}
+            <h1 className="heading-lg truncate">{pageLabel}</h1>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <UserMenu />
+          </div>
+        </header>
+
+        {/* scrollable content ------------------------------------------------ */}
+        <main
+          className="flex flex-col flex-1 min-h-0 overflow-y-auto px-5 pt-4 pb-0"
+          style={{ scrollbarGutter: "stable" }}
+        >
+          {children}
+          <footer className="static bottom-0 mt-8 mb-3 flex flex-wrap items-center justify-between gap-2 text-[10px] text-[var(--gray)]/60 border-t border-black/[0.05] pt-3">
+            <span className="flex flex-wrap items-center gap-x-1.5">
+              <strong className="font-semibold text-[var(--primary-dark)]/60">Kasarian / Gender Studies UP Baguio</strong>
+              <span className="opacity-30">·</span>
+              <span>University of the Philippines Baguio</span>
+              <span className="opacity-30">·</span>
+              <span>kasarian.upbaguio@up.edu.ph</span>
+              <span className="opacity-30">·</span>
+            </span>
+            <span className="flex items-center gap-3">
+              <span>© {new Date().getFullYear()} UP Baguio</span>
+            </span>
+          </footer>
+        </main>
+
+      </div>
     </div>
   );
 }
