@@ -87,7 +87,7 @@ export default function GlobalSearch({ role, placeholder = "Search events, users
   };
 
   return (
-    <div className="search-wrap" style={{ flex: 1, maxWidth: 360, position: "relative" }} ref={containerRef}>
+    <div className="search-wrap" style={{ width: "100%", position: "relative" }} ref={containerRef}>
       <span className="search-icon"><Search size={15} /></span>
       <input
         className="search-input"

@@ -224,6 +224,7 @@ export default function EventsPage() {
     {
       key: "title",
       header: "Title",
+      width: "22%",
       render: (event) => (
         <button
           className="text-left font-semibold hover:underline underline-offset-4 max-w-[200px] truncate block"
@@ -238,6 +239,7 @@ export default function EventsPage() {
     {
       key: "category",
       header: "Category",
+      width: "14%",
       render: (event) => (
         <Badge variant={CATEGORY_VARIANT[event.category ?? ""] ?? "dark"}>
           {event.category}
@@ -247,6 +249,7 @@ export default function EventsPage() {
     {
       key: "status",
       header: "Status",
+      width: "12%",
       render: (event) => (
         <Badge variant={STATUS_VARIANT[event.status ?? ""] ?? "dark"}>
           <span className="capitalize">{event.status}</span>
@@ -256,6 +259,7 @@ export default function EventsPage() {
     {
       key: "start_date",
       header: "Date",
+      width: "14%",
       render: (event) => (
         <span className="caption whitespace-nowrap">
           {event.start_date
@@ -269,11 +273,13 @@ export default function EventsPage() {
     {
       key: "capacity",
       header: "Capacity",
+      width: "10%",
       render: (event) => <span className="caption">{event.capacity}</span>,
     },
     {
       key: "location",
       header: "Location",
+      width: "17%",
       render: (event) => (
         <button
           className="caption text-left hover:underline underline-offset-4 max-w-[150px] truncate block"
@@ -287,6 +293,7 @@ export default function EventsPage() {
     {
       key: "actions",
       header: "Actions",
+      width: "11%",
       render: (event) => (
         <div style={{ display: "flex", justifyContent: "flex-start", gap: 4 }}>
           <Button
@@ -314,20 +321,6 @@ export default function EventsPage() {
 
   return (
     <div className="flex flex-col gap-6">
-
-      {/* page header */}
-      <div className="flex items-start justify-between gap-4 flex-wrap mt-1">
-        <div>
-          <h1 className="heading-lg">Events Management</h1>
-          <p className="caption mt-1">
-            {isLoading ? "Loading…" : `${filtered.length} event${filtered.length !== 1 ? "s" : ""} total`}
-          </p>
-        </div>
-        <Button variant="primary" onClick={() => router.push("/admin/events/create")}>
-          <Plus size={16} /> Add Event
-        </Button>
-      </div>
-
       {/* toolbar */}
       <div className="flex flex-col gap-3">
 
@@ -397,6 +390,10 @@ export default function EventsPage() {
               Clear all filters
             </DropdownItem>
           </Dropdown>
+
+            <Button variant="primary" onClick={() => router.push("/admin/events/create")}>
+                <Plus size={16} /> Add Event
+            </Button>
         </div>
 
         {/* category filter chips - single select */}

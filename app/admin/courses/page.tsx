@@ -321,20 +321,6 @@ export default function CoursesPage() {
   // 
   return (
     <div className="flex flex-col gap-6">
-
-      {/*  page header  */}
-      <div className="flex items-start justify-between gap-4 flex-wrap mt-1">
-        <div>
-          <h1 className="heading-lg">Courses Management</h1>
-          <p className="caption mt-1">
-            {isLoading ? "Loading…" : `${filtered.length} course${filtered.length !== 1 ? "s" : ""} total`}
-          </p>
-        </div>
-        <Button variant="primary" onClick={() => router.push("/admin/courses/create")}>
-          <Plus size={16} /> Add Course
-        </Button>
-      </div>
-
       {/*  toolbar  */}
       <div className="flex flex-col gap-3">
 
@@ -404,6 +390,10 @@ export default function CoursesPage() {
               Clear all filters
             </DropdownItem>
           </Dropdown>
+
+            <Button variant="primary" onClick={() => router.push("/admin/courses/create")}>
+                <Plus size={16} /> Add Course
+            </Button>
         </div>
 
         {/* semester filter chips - single select */}

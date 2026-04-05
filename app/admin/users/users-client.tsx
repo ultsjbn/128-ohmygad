@@ -161,6 +161,7 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
     {
       key: "full_name",
       header: "User",
+      width: "46%",
       render: (p) => (
         <div className="flex items-center gap-3">
           <div>
@@ -173,6 +174,7 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
     {
       key: "role",
       header: "Role",
+      width: "16%",
       render: (p) => (
         <Badge variant={ROLE_VARIANT[p.role?.toLowerCase() ?? ""] ?? "dark"}>
           <span className="capitalize">{p.role ?? "—"}</span>
@@ -182,6 +184,7 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
     {
       key: "gso_attended",
       header: "GSO",
+      width: "18%",
       render: (p) => (
         <Badge variant={p.gso_attended ? "success" : "warning"}>
           {p.gso_attended ? "Attended" : "Pending"}
@@ -191,6 +194,7 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
     {
       key: "actions",
       header: "Actions",
+      width: "20%",
       render: (p) => (
         <div style={{ display: "flex", justifyContent: "flex-start", gap: 4 }}>
           <Button variant="icon" title="Edit user" onClick={() => openEditModal(p.id)}>
@@ -211,18 +215,6 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
 
   return (
     <div className="flex flex-col gap-6">
-
-      {/* page header */}
-      <div className="flex items-start justify-between gap-4 flex-wrap mt-1">
-        <div>
-          <h1 className="heading-lg">Users Management</h1>
-          <p className="caption mt-1">{profiles.length} total users</p>
-        </div>
-        <Button variant="primary" onClick={() => router.push("/admin/users/create")}>
-          <UserPlus size={16} /> Add User
-        </Button>
-      </div>
-
       {/* toolbar */}
       <div className="flex flex-col gap-3">
         <div className="flex items-center gap-3 flex-wrap">
@@ -253,6 +245,10 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
               Reset sort
             </DropdownItem>
           </Dropdown>
+
+            <Button variant="primary" onClick={() => router.push("/admin/users/create")}>
+                <UserPlus size={16} /> Add User
+            </Button>
         </div>
 
         <Tabs

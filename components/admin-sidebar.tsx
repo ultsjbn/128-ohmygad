@@ -1,152 +1,239 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import {
-  LayoutDashboard, Calendar, Users, BookOpen,
-  ClipboardList, ChevronsLeft, ChevronsRight,
+  Home, Calendar, Users, BookOpen, ClipboardList,
+  LogOut, PanelLeftClose, PanelLeftOpen,
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
 
-const navItems = [
-  { href: "/admin",         label: "Dashboard", icon: LayoutDashboard, exact: true  },
-  { href: "/admin/events",  label: "Events",    icon: Calendar,        exact: false },
-  { href: "/admin/users",   label: "Users",     icon: Users,           exact: false },
-  { href: "/admin/courses", label: "Courses",   icon: BookOpen,        exact: false },
-  { href: "/admin/surveys", label: "Surveys",   icon: ClipboardList,   exact: false },
+const NAV_ITEMS = [
+  { href: "/admin",         label: "Dashboard", icon: Home,          exact: true  },
+  { href: "/admin/events",  label: "Events",    icon: Calendar,      exact: false },
+  { href: "/admin/users",   label: "Users",     icon: Users,         exact: false },
+  { href: "/admin/courses", label: "Courses",   icon: BookOpen,      exact: false },
+  { href: "/admin/surveys", label: "Surveys",   icon: ClipboardList, exact: false },
 ];
+
+function isActive(pathname: string, href: string, exact = false) {
+  return exact ? pathname === href : pathname.startsWith(href);
+}
+
+function AdminMobileNav() {
+  const pathname = usePathname();
+  return (
+    <nav
+      aria-label="Mobile navigation"
+      className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around md:hidden"
+      style={{
+        background: "var(--primary-dark)",
+        borderTop:  "1px solid rgba(255,255,255,0.10)",
+        padding:    "8px 4px",
+        boxShadow:  "0 -4px 24px rgba(45,42,74,0.18)",
+      }}
+    >
+      {NAV_ITEMS.map(({ href, label, icon: Icon, exact }) => {
+        const active = isActive(pathname, href, exact);
+        return (
+          <Link
+            key={href}
+            href={href}
+            className="relative flex flex-1 flex-col items-center gap-0.5 rounded-xl px-1 py-1.5 transition-all duration-200"
+            style={{ background: active ? "rgba(255,255,255,0.12)" : "transparent" }}
+          >
+            {active && (
+              <span
+                className="absolute left-1/2 top-0 h-0.5 w-6 -translate-x-1/2 rounded-b-full"
+                style={{ background: "var(--soft-pink)" }}
+              />
+            )}
+            <Icon size={22} style={{ color: active ? "white" : "rgba(255,255,255,0.45)" }} />
+            <span style={{ fontSize: 9, fontWeight: active ? 700 : 500, color: active ? "white" : "rgba(255,255,255,0.45)", lineHeight: 1, letterSpacing: "0.02em" }}>
+              {label}
+            </span>
+          </Link>
+        );
+      })}
+    </nav>
+  );
+}
 
 export default function AdminSidebar() {
   const pathname = usePathname();
-  const [isCollapsed, setIsCollapsed] = useState(false);
-  const [isMobile, setIsMobile]       = useState(false);
+  const router   = useRouter();
+
+  const [open,        setOpen]        = useState(true);
+  const [logoHovered, setLogoHovered] = useState(false);
+  const [isMobile,    setIsMobile]    = useState(false);
 
   useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth < 768) {
-        setIsCollapsed(true);
-        setIsMobile(true);
-      } else {
-        setIsMobile(false);
-      }
+    const check = () => {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      if (mobile) setOpen(false);
     };
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
   }, []);
 
-  function isActive(href: string, exact: boolean) {
-    return exact ? pathname === href : pathname.startsWith(href);
-  }
+  if (isMobile) return <AdminMobileNav />;
 
-  if (isMobile) {
-    return (
-      <nav
-        aria-label="Mobile navigation"
-        className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around"
-        style={{
-          background: "var(--primary-dark)",
-          borderTop:  "1px solid rgba(255,255,255,0.10)",
-          padding:    "8px 4px",
-          boxShadow:  "0 -4px 24px rgba(45,42,74,0.18)",
-        }}
-      >
-        {navItems.map(({ href, label, icon: Icon, exact }) => {
-          const active = isActive(href, exact);
-          return (
-            <Link
-              key={href}
-              href={href}
-              className="relative flex flex-1 flex-col items-center gap-0.5 rounded-xl px-1 py-1.5 transition-all duration-200"
-              style={{ background: active ? "rgba(255,255,255,0.12)" : "transparent" }}
-            >
-              {active && (
-                <span className="absolute left-1/2 top-0 h-0.5 w-6 -translate-x-1/2 rounded-b-full"
-                  style={{ background: "var(--soft-pink)" }} />
-              )}
-              <Icon size={22} style={{ color: active ? "white" : "rgba(255,255,255,0.45)" }} />
-              <span style={{ fontSize: 9, fontWeight: active ? 700 : 500, color: active ? "white" : "rgba(255,255,255,0.45)", lineHeight: 1, letterSpacing: "0.02em" }}>
-                {label}
-              </span>
-            </Link>
-          );
-        })}
-      </nav>
-    );
-  }
+  const state = open ? "expanded" : "collapsed";
 
   return (
-    <aside
-      style={{
-        width:         isCollapsed ? 72 : 240,
-        minWidth:      isCollapsed ? 72 : 240,
-        background:    "var(--primary-dark)",
-        display:       "flex",
-        flexDirection: "column",
-        alignSelf:     "stretch",
-        padding:       isCollapsed ? "20px 0" : "20px 16px",
-        gap:           8,
-        borderRadius:  "0 var(--radius-xl) var(--radius-xl) 0",
-        transition:    "width 0.3s ease, min-width 0.3s ease, padding 0.3s ease",
-        overflow:      "hidden",
-        flexShrink:    0,
-      }}
+    <div 
+      data-state={state} 
+      className={[ 
+        "group/sidebar relative shrink-0 hidden md:block", 
+        "w-[--sidebar-width] data-[state=collapsed]:w-[--sidebar-width-icon]", 
+        "transition-[width] duration-200 ease-linear", 
+      ].join(" ")} 
+      style={{ 
+        "--sidebar-width":      "224px", 
+        "--sidebar-width-icon": "64px", 
+      } as React.CSSProperties} 
     >
-      <div style={{ display: "flex", flexDirection: "column", flex: 1, overflowY: "auto", overflowX: "hidden", width: "100%" }}>
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%", paddingBottom: 20, paddingTop: 20, marginBottom: 8, borderBottom: "1px solid rgba(255,255,255,0.10)" }}>
-          <Image
-            src="/kasarian_logo.jpg"
-            alt="UPB Kasarian Gender Studies Program Logo"
-            width={isCollapsed ? 40 : 90}
-            height={isCollapsed ? 40 : 90}
-            style={{ borderRadius: "50%", objectFit: "cover", border: "2px solid rgba(255,255,255,0.25)", transition: "all 0.3s ease" }}
-          />
-          {!isCollapsed && (
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginTop: 8 }}>
-              <span style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 20, color: "white", letterSpacing: "-0.02em", textAlign: "center" }}>
-                OhMyGAD!
-              </span>
-              <span style={{ fontSize: 10, color: "var(--cream)", textAlign: "center", marginTop: 3, lineHeight: 1.4, maxWidth: 200 }}>
-                UPB Kasarian Gender Studies Program <br/> Event Management Platform
-              </span>
-            </div>
-          )}
+      <aside
+        className={[
+          "fixed inset-y-0 left-0 z-10 flex flex-col",
+          "my-2 ml-2 rounded-[18px] overflow-hidden",
+          "bg-[var(--primary-dark)] shadow-[0_8px_40px_rgba(45,42,74,0.22)]",
+          "w-[--sidebar-width] group-data-[state=collapsed]/sidebar:w-[--sidebar-width-icon]",
+          "transition-[width] duration-200 ease-linear",
+        ].join(" ")}
+        style={{
+          "--sidebar-width":      "224px",
+          "--sidebar-width-icon": "64px",
+        } as React.CSSProperties}
+      >
+        {/* logo ------------------------------------------------ */}
+        <div className="flex shrink-0 items-center border-b border-white/[0.07] h-[70px] px-[10px] gap-[6px] overflow-hidden">
+          <button
+            onClick={() => !open && setOpen(true)}
+            onMouseEnter={() => setLogoHovered(true)}
+            onMouseLeave={() => setLogoHovered(false)}
+            aria-label={open ? undefined : "Expand sidebar"}
+            className="relative shrink-0 flex items-center justify-center rounded-[10px] border-none bg-transparent"
+            style={{ width: 44, height: 44, cursor: open ? "default" : "pointer" }}
+          >
+            <Image
+              src="/kasarian-upb-logo.svg"
+              alt="UPB Kasarian"
+              width={44} height={44}
+              style={{
+                opacity: open ? 1 : logoHovered ? 0.22 : 1,
+                transition: "opacity 200ms ease-out",
+              }}
+            />
+            <span
+              className="absolute inset-0 flex items-center justify-center text-white/75"
+              style={{
+                opacity: !open && logoHovered ? 1 : 0,
+                transition: "opacity 200ms ease-out",
+                pointerEvents: "none",
+              }}
+            >
+              <PanelLeftOpen size={20} />
+            </span>
+          </button>
+
+          {/* Title — fades + clips via overflow on the sidebar itself */}
+          <div
+            className={[
+              "flex flex-col justify-center overflow-hidden shrink-0",
+              "w-[112px] opacity-100",
+              "group-data-[state=collapsed]/sidebar:w-0 group-data-[state=collapsed]/sidebar:opacity-0",
+              "transition-[width,opacity] duration-200 ease-linear",
+            ].join(" ")}
+          >
+            <span className="caption-dark">UP BAGUIO</span>
+            <span className="heading-sm-dark uppercase">Kasarian</span>
+          </div>
+
+          {/* Collapse button */}
+          <button
+            onClick={() => setOpen(false)}
+            aria-label="Collapse sidebar"
+            className={[
+              "shrink-0 flex items-center justify-center cursor-pointer border-none bg-transparent",
+              "text-white/40 hover:text-white/90",
+              "opacity-100 group-data-[state=collapsed]/sidebar:opacity-0 group-data-[state=collapsed]/sidebar:pointer-events-none",
+              "transition-opacity duration-200 ease-linear",
+            ].join(" ")}
+            style={{ marginLeft: "auto" }}
+          >
+            <PanelLeftClose size={18} />
+          </button>
         </div>
 
-        <nav style={{ display: "flex", flexDirection: "column", alignItems: isCollapsed ? "center" : "stretch", gap: 2, width: "100%", flex: 1 }}>
-          {!isCollapsed && (
-            <span style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.3)", textTransform: "uppercase", letterSpacing: "0.10em", padding: "4px 14px 8px" }}>
-              Menu
-            </span>
-          )}
-          {navItems.map(({ href, label, icon: Icon, exact }) => {
-            const active = isActive(href, exact);
+        {/* Nav ------------------------------------------------ */}
+        <nav className="flex flex-col flex-1 gap-1 px-2 py-2 overflow-y-auto overflow-x-hidden">
+          {NAV_ITEMS.map(({ href, label, icon: Icon, exact }) => {
+            const active = isActive(pathname, href, exact);
             return (
               <Link
                 key={href}
                 href={href}
-                title={isCollapsed ? label : ""}
-                className={`sidebar-item${isCollapsed ? "" : "-expanded"}${active ? " active" : ""}`}
+                title={!open ? label : undefined}
+                className={[
+                  "flex items-center w-full h-[40px] rounded-[10px]",
+                  "justify-start px-1 group-data-[state=collapsed]/sidebar:justify-center group-data-[state=collapsed]/sidebar:px-0",
+                  "text-[13px] font-medium transition-colors duration-150",
+                  active
+                    ? "bg-white/[0.18] text-white"
+                    : "text-white/50 hover:bg-white/[0.08] hover:text-white/80",
+                ].join(" ")}
               >
-                <Icon size={isCollapsed ? 20 : 18} />
-                {!isCollapsed && <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{label}</span>}
+                <div className="w-[24px] flex justify-center shrink-0">
+                  <Icon size={18} />
+                </div>
+                <span
+                  className={[
+                    "overflow-hidden",
+                    "w-[140px] opacity-100",
+                    "group-data-[state=collapsed]/sidebar:w-0 group-data-[state=collapsed]/sidebar:opacity-0",
+                    "transition-[width,opacity] duration-200 ease-linear",
+                  ].join(" ")}
+                >
+                  <span className="block truncate pl-[10px] whitespace-nowrap text-left">
+                    {label}
+                  </span>
+                </span>
               </Link>
             );
           })}
         </nav>
-      </div>
 
-      <div style={{ width: "100%", display: "flex", flexDirection: "column", alignItems: isCollapsed ? "center" : "stretch", gap: 2, borderTop: "1px solid rgba(255,255,255,0.10)", paddingTop: 8, marginTop: 8 }}>
-        <button
-          onClick={() => setIsCollapsed(!isCollapsed)}
-          className={`sidebar-item${isCollapsed ? "" : "-expanded"}`}
-          style={{ background: "none", border: "none", cursor: "pointer" }}
-          aria-label={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
-        >
-          {isCollapsed ? <ChevronsRight size={20} /> : <><ChevronsLeft size={18} /><span>Collapse</span></>}
-        </button>
-      </div>
-    </aside>
+        {/* Logout ------------------------------------------------ */}
+        <div className="shrink-0 flex flex-col gap-[2px] px-2 pb-2 pt-2 border-t border-white/[0.07]">
+          <button
+            onClick={() => router.push("/auth/login")}
+            title={!open ? "Log out" : undefined}
+            className={[
+              "flex items-center w-full h-[38px] rounded-[10px]",
+              "cursor-pointer border-none bg-transparent",
+              "font-[var(--font-body)] text-[13px] text-white/35 hover:text-white/70 hover:bg-white/[0.06]",
+              "justify-start pl-[10px] group-data-[state=collapsed]/sidebar:justify-center group-data-[state=collapsed]/sidebar:pl-0",
+              "transition-[padding,justify-content,background-color,color] duration-200 ease-linear",
+            ].join(" ")}
+          >
+            <LogOut size={17} className="shrink-0" />
+            <span
+              className={[
+                "overflow-hidden shrink-0",
+                "w-[140px] opacity-100",
+                "group-data-[state=collapsed]/sidebar:w-0 group-data-[state=collapsed]/sidebar:opacity-0",
+                "transition-[width,opacity] duration-200 ease-linear",
+              ].join(" ")}
+            >
+              <span className="block truncate pl-[10px] whitespace-nowrap">Log out</span>
+            </span>
+          </button>
+        </div>
+      </aside>
+    </div>
   );
 }

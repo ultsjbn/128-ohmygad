@@ -311,11 +311,25 @@ body {
   color: var(--primary-dark);
 }
 
+.heading-md-dark {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--cream);
+}
+
 .heading-sm {
   font-family: var(--font-display);
   font-size: 16px;
   font-weight: 600;
   color: var(--primary-dark);
+}
+
+.heading-sm-dark {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--cream);
 }
 
 .body {
@@ -324,9 +338,21 @@ body {
   line-height: 1.6;
 }
 
+.body-dark {
+  font-size: 15px;
+  color: var(--white);
+  line-height: 1.6;
+}
+
 .caption {
   font-size: 13px;
   color: var(--primary-dark);
+  opacity: 70%;
+}
+
+.caption-dark {
+  font-size: 10px;
+  color: var(--white);
   opacity: 70%;
 }
 
