@@ -131,6 +131,47 @@ export default function StudentProfilePage() {
 
   async function handleSave() {
     setSaving(true);
+
+    if (!profile.full_name.trim()) {
+      setToast({ type: "error", message: "Full name is required." });
+      setSaving(false);
+      return;
+    }
+
+    const fullnameRegex = /^[a-zA-Z\s.'-]+$/;
+    if (!fullnameRegex.test(profile.full_name)) {
+      setToast({ type: "error", message: "Full name can only contain letters, spaces, and basic punctuation." });
+      setSaving(false);
+      return;
+    }
+
+    if (profile.display_name) {
+      const displayNameRegex = /^[a-zA-Z\s.'-]+$/;
+      if (!displayNameRegex.test(profile.display_name)) {
+        setToast({ type: "error", message: "Display name can only contain letters, spaces, and basic punctuation." });
+        setSaving(false);
+        return;
+      }
+    }
+
+    if (profile.contact_num) {
+      const contactRegex = /^[0-9]{10,15}$/;
+      if (!contactRegex.test(profile.contact_num)) {
+        setToast({ type: "error", message: "Contact number must be 10-15 digits." });
+        setSaving(false);
+        return;
+      }
+    }
+
+    if (profile.student_num) {
+      const cleanStudentNum = String(profile.student_num).replace(/\D/g, "");
+      if (cleanStudentNum.length !== 9) {
+        setToast({ type: "error", message: "Student number must be exactly 9 digits." });
+        setSaving(false);
+        return;
+      }
+    }
+
     try {
       const { error } = await supabase
         .from("profile")

@@ -32,6 +32,21 @@ export function SignUpForm({
       return;
     }
 
+    if (full_name) {
+      const fullnameRegex = /^[a-zA-Z\s.'-]+$/;
+      if (!fullnameRegex.test(full_name)) {
+        setError("Full name can only contain letters, spaces, and basic punctuation.");
+        setIsLoading(false);
+        return;
+      }
+    }
+
+    if (password.length < 8) {
+      setError("Password must be at least 8 characters long.");
+      setIsLoading(false);
+      return;
+    }
+
     try {
       const { error } = await supabase.auth.signUp({
         email,

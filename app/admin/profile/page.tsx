@@ -50,8 +50,8 @@ export default function AdminProfilePage() {
   const router = useRouter();
 
   const [profile, setProfile] = useState<Profile>({
-    id: "", full_name: "", display_name: "", email: "", 
-    contact_num: "", address: "", pronouns: "", role: "admin", 
+    id: "", full_name: "", display_name: "", email: "",
+    contact_num: "", address: "", pronouns: "", role: "admin",
     office: "",
     sex_at_birth: "", gender_identity: "", gso_attended: null,
   });
@@ -99,11 +99,43 @@ export default function AdminProfilePage() {
 
   async function handleSave() {
     setSaving(true);
+
+    if (!profile.full_name.trim()) {
+      setToast({ type: "error", message: "Full name is required." });
+      setSaving(false);
+      return;
+    }
+
+    const fullnameRegex = /^[a-zA-Z\s.'-_]+$/;
+    if (!fullnameRegex.test(profile.full_name)) {
+      setToast({ type: "error", message: "Full name can only contain letters, spaces, and basic punctuation." });
+      setSaving(false);
+      return;
+    }
+
+    if (profile.display_name) {
+      const displayNameRegex = /^[a-zA-Z\s.'-_]+$/;
+      if (!displayNameRegex.test(profile.display_name)) {
+        setToast({ type: "error", message: "Display name can only contain letters, spaces, and basic punctuation." });
+        setSaving(false);
+        return;
+      }
+    }
+
+    if (profile.contact_num) {
+      const contactRegex = /^[0-9]{10,15}$/;
+      if (!contactRegex.test(profile.contact_num)) {
+        setToast({ type: "error", message: "Contact number must be 10-15 digits." });
+        setSaving(false);
+        return;
+      }
+    }
+
     try {
       const { error } = await supabase
         .from("profile")
         .upsert({ ...profile }, { onConflict: "id" });
-        
+
       if (error) throw error;
       setToast({ type: "success", message: "Profile saved successfully." });
     } catch {
@@ -148,7 +180,7 @@ export default function AdminProfilePage() {
         {/* left column: profile card */}
         <div className="w-full lg:w-[35%] flex flex-col shrink-0">
           <Card className="flex flex-col items-center text-center p-4 lg:p-6">
-            
+
             {/* user details */}
             <h2 className="heading-lg mb-1">{profile.full_name || "Your Name"}</h2>
             <p className="text-sm text-[var(--gray)] mb-4">
@@ -162,8 +194,8 @@ export default function AdminProfilePage() {
 
             {/* gso progress bar */}
             <div className="w-full text-left pt-6 border-t border-[rgba(45,42,74,0.08)]">
-              <ProgressBar 
-                value={profile.gso_attended === 2 ? 100 : profile.gso_attended === 1 ? 50 : 0} 
+              <ProgressBar
+                value={profile.gso_attended === 2 ? 100 : profile.gso_attended === 1 ? 50 : 0}
                 variant="dark"
                 label="GSO Attendance"
                 sublabel={`${profile.gso_attended ?? 0} / 2 completed`}
@@ -175,20 +207,20 @@ export default function AdminProfilePage() {
 
         {/* right column: wrapper for form card and save button */}
         <div className="w-full lg:w-[65%] flex flex-col gap-4 lg:flex-1 lg:min-h-0">
-          
+
           <Card className="flex flex-col lg:flex-1 lg:min-h-0 p-4 lg:p-6">
-            
+
             <div className="shrink-0 mb-4 lg:mb-6">
-              <Tabs 
-                tabs={TAB_OPTIONS} 
-                defaultTab={tab} 
-                onChange={setTab} 
+              <Tabs
+                tabs={TAB_OPTIONS}
+                defaultTab={tab}
+                onChange={setTab}
               />
             </div>
 
             {/* form area */}
             <div className="lg:flex-1 lg:min-h-0 custom-scrollbar lg:pr-2 lg:pb-4">
-              
+
               {tab === "Personal" && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 content-start">
                   <Input
