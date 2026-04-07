@@ -1,7 +1,7 @@
 import React from "react";
 import { Clock, MapPin } from "lucide-react";
 
-type CardVariant = "default" | "pink" | "periwinkle" | "dark" | "glass" | "no-shadow";
+type CardVariant = "default" | "pink" | "periwinkle" | "dark" | "glass" | "no-shadow" | "no-hover";
 
 interface CardProps {
   children: React.ReactNode;
@@ -18,6 +18,7 @@ export function Card({ children, variant = "default", className = "", style, noP
     : variant === "dark" ? "card-dark"
     : variant === "glass" ? "card-glass"
     : variant === "no-shadow" ? "card-no-shadow"
+    : variant === "no-hover" ? "card-no-hover"
     : "card";
 
   return (
@@ -131,11 +132,6 @@ export interface CourseCardProps {
   isRegistered?: boolean;
 }
 
-
-
-
-
-
 // participantcard
 interface ParticipantCardProps {
   name: string;
@@ -144,8 +140,6 @@ interface ParticipantCardProps {
   role: string;
   gsoCount: string;
 }
-
-
 
 export function ParticipantCard({ name, studentId, college, role, gsoCount }: ParticipantCardProps) {
   return (
