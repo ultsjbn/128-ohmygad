@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/client"; // using shared client
 import { useRouter } from "next/navigation";
 import {
   User, Phone, MapPin,
-  Save, ChevronLeft, Heart, Building2
+  Save, Heart, Building2
 } from "lucide-react";
 
 import { Card, Input, Select, Button, Badge, Tabs, ProgressBar, Toast } from "@/components/ui";
@@ -160,26 +160,13 @@ export default function FacultyProfilePage() {
 
   return (
     // main wrapper
-    <div className="w-full max-w-6xl mx-auto h-full flex flex-col gap-4 lg:gap-6 flex-1 min-h-0 animate-in fade-in duration-500">
+    <div className="w-full max-w-6xl mx-auto flex flex-col gap-4 lg:gap-6 animate-in fade-in duration-500 pb-[100px] lg:pb-6">
 
-      {/* top bar */}
-      <div className="shrink-0 flex items-center justify-between md:mt-2">
-        <div className="flex items-center gap-2 lg:gap-4">
-          <Button variant="icon" onClick={() => router.back()}>
-            <ChevronLeft size={16} />
-          </Button>
-          <div>
-            <h1 className="heading-lg lg:heading-xl leading-none">My Profile</h1>
-            <p className="hidden md:block body text-[var(--gray)] mt-1">Manage your personal and faculty details.</p>
-          </div>
-        </div>
-      </div>
-
-      {/* scrollable on mobile, two columns on desktop */}
-      <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 flex-1 min-h-0 overflow-y-auto lg:overflow-hidden custom-scrollbar pr-1 lg:pr-0 pb-[100px] lg:pb-0">
+      {/* two columns */}
+      <div className="flex flex-col lg:flex-row gap-4 lg:gap-6">
 
         {/* left column: profile card */}
-        <div className="w-full lg:w-[35%] flex flex-col shrink-0">
+        <div className="w-full lg:w-[35%] lg:min-w-[240px] shrink-0 flex flex-col">
           <Card className="flex flex-col items-center text-center p-4 lg:p-6">
 
             {/* user details */}

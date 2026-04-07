@@ -202,13 +202,13 @@ export default function StudentProfilePage() {
 
   return (
     // main wrapper
-    <div className="w-full max-w-6xl mx-auto h-full flex flex-col gap-4 lg:gap-6 flex-1 min-h-0 animate-in fade-in duration-500">
+    <div className="w-full max-w-6xl mx-auto flex flex-col gap-4 lg:gap-6 animate-in fade-in duration-500 pb-[100px] lg:pb-6">
 
-      {/* scrollable on mobile, two columns on desktop */}
-      <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 flex-1 min-h-0 overflow-y-auto lg:overflow-hidden custom-scrollbar pr-1 lg:pr-0 pb-[100px] lg:pb-0">
+      {/* two columns */}
+      <div className="flex flex-col lg:flex-row gap-4 lg:gap-6">
 
         {/* left column: profile card */}
-        <div className="w-full lg:w-[35%] flex flex-col shrink-0">
+        <div className="w-full lg:w-[35%] lg:min-w-[240px] shrink-0 flex flex-col">
           <Card className="flex flex-col items-center text-center p-4 lg:p-6">
             
             {/* user details */}
@@ -237,20 +237,20 @@ export default function StudentProfilePage() {
         </div>
 
         {/* right column: wrapper for form card and save button */}
-        <div className="w-full lg:w-[65%] flex flex-col gap-4 lg:flex-1 lg:min-h-0">
-          
-          <Card className="flex flex-col lg:flex-1 lg:min-h-0 p-4 lg:p-6">
-            
+        <div className="w-full lg:flex-1 min-w-0 flex flex-col gap-4">
+
+          <Card className="flex flex-col p-4 lg:p-6">
+
             <div className="shrink-0 mb-4 lg:mb-6">
-              <Tabs 
-                tabs={TAB_OPTIONS} 
-                defaultTab={tab} 
-                onChange={setTab} 
+              <Tabs
+                tabs={TAB_OPTIONS}
+                defaultTab={tab}
+                onChange={setTab}
               />
             </div>
 
             {/* form area */}
-            <div className="lg:flex-1 lg:min-h-0 custom-scrollbar lg:pr-2 lg:pb-4">
+            <div>
               
               {/* added content-start to prevent vertical stretching */}
               {tab === "Personal" && (
