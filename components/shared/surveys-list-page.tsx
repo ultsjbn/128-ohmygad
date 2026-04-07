@@ -210,11 +210,6 @@ export default function SurveysListPage({ basePath }: SurveysListPageProps) {
   return (
     <div className="flex flex-col gap-4">
 
-      {/* page header */}
-      <div className="hidden md:block">
-        <h1 className="heading-lg">Surveys</h1>
-      </div>
-
       {/* search, sort, filter */}
       <div className="flex flex-col gap-3">
         <div className="flex items-center gap-3 flex-wrap overflow-visible">

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 
-const DAYS   = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
+const DAYS   = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
 const MONTHS = [
   "January","February","March","April","May","June",
   "July","August","September","October","November","December",
@@ -34,7 +34,7 @@ export function MiniCalendar({
   }
 
   const firstDay    = new Date(year, month, 1).getDay();
-  const startOffset = (firstDay + 6) % 7;
+  const startOffset = firstDay;
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   const cells: (number | null)[] = [
     ...Array(startOffset).fill(null),

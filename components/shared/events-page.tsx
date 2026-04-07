@@ -325,12 +325,6 @@ export default function EventsPage() {
   // PAGE PROPER ----------------------------------------------------------------
   return (
     <div className="flex flex-col gap-4">
-
-      {/* page header - hidden on mobile, visible on md+ devices */}
-      <div className="hidden md:block">
-        <h1 className="heading-lg">Discover Events</h1>
-      </div>
-
       {/* search, sort, filter */}
       <div className="flex flex-col gap-3">
         <div className="flex items-center gap-3 flex-wrap overflow-visible">

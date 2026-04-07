@@ -204,19 +204,6 @@ export default function StudentProfilePage() {
     // main wrapper
     <div className="w-full max-w-6xl mx-auto h-full flex flex-col gap-4 lg:gap-6 flex-1 min-h-0 animate-in fade-in duration-500">
 
-      {/* top bar */}
-      <div className="shrink-0 flex items-center justify-between md:mt-2">
-        <div className="flex items-center gap-2 lg:gap-4">
-          <Button variant="icon" onClick={() => router.back()}>
-            <ChevronLeft size={16} />
-          </Button>
-          <div>
-            <h1 className="heading-lg lg:heading-xl leading-none">My Profile</h1>
-            <p className="hidden md:block body text-[var(--gray)] mt-1">Manage your personal and academic details.</p>
-          </div>
-        </div>
-      </div>
-
       {/* scrollable on mobile, two columns on desktop */}
       <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 flex-1 min-h-0 overflow-y-auto lg:overflow-hidden custom-scrollbar pr-1 lg:pr-0 pb-[100px] lg:pb-0">
 

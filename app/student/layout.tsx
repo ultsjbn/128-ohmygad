@@ -1,9 +1,17 @@
 import { Suspense } from 'react';
 import { redirect } from 'next/navigation';
-import Image from 'next/image';
 import StudentSidebar from '@/components/student-sidebar';
 import { getCurrentUserWithRole } from '@/lib/auth/get-current-user';
-import UserMenu from '@/components/user-menu';
+import DashboardHeader from '@/components/shared/dashboard-header';
+
+const PAGE_LABELS: Record<string, string> = {
+  dashboard: "Dashboard",
+  events:    "Discover Events",
+  courses:   "I've GAD to Know",
+  surveys:   "Surveys",
+  profile:   "Profile",
+  settings:  "Settings",
+};
 
 async function StudentAuthGuard({ children }: { children: React.ReactNode }) {
   const result = await getCurrentUserWithRole();
@@ -23,22 +31,24 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
       <StudentSidebar />
 
       <div style={{ position:'relative', zIndex:1, display:'flex', flexDirection:'column', flex:1, minWidth:0, overflow:'hidden' }}>
-        <header className="relative z-50 flex shrink-0 items-center gap-4 p-2 backdrop-blur-md">
-            <div className="flex md:hidden items-center gap-2 shrink-0">
-              <Image src="/kasarian-upb-logo.svg" alt="UPB Kasarian" width={60} height={60} />
-              <div className="flex flex-col justify-center">
-                <span className="caption">UP BAGUIO</span>
-                <span className="heading-md uppercase">Kasarian</span>
-              </div>
-            </div>
-            <div className="flex flex-1 gap-4 items-center justify-end">
-                <UserMenu />
-            </div>
-        </header>
-        <main className="px-5 pb-0 pt-4" style={{ flex:1, overflowY:'scroll'}}>
+        <DashboardHeader basePath="/student" pageLabels={PAGE_LABELS} />
+        <main className="flex flex-col px-5 pb-0 pt-4" style={{ flex:1, overflowY:'scroll'}}>
           <Suspense fallback={<div style={{ display:'flex', alignItems:'center', justifyContent:'center', height:'100%', color:'var(--gray)', fontSize:14 }}>Loading…</div>}>
             <StudentAuthGuard>{children}</StudentAuthGuard>
           </Suspense>
+          <footer className="static bottom-0 mt-8 mb-3 flex flex-wrap items-center justify-between gap-2 text-[10px] text-[var(--gray)]/60 border-t border-black/[0.05] pt-3">
+            <span className="flex flex-wrap items-center gap-x-1.5">
+              <strong className="font-semibold text-[var(--primary-dark)]/60">Kasarian / Gender Studies UP Baguio</strong>
+              <span className="opacity-30">·</span>
+              <span>University of the Philippines Baguio</span>
+              <span className="opacity-30">·</span>
+              <span>kasarian.upbaguio@up.edu.ph</span>
+              <span className="opacity-30">·</span>
+            </span>
+            <span className="flex items-center gap-3">
+              <span>© {new Date().getFullYear()} UP Baguio</span>
+            </span>
+          </footer>
         </main>
       </div>
     </div>
