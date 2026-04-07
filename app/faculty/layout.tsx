@@ -1,5 +1,6 @@
 import { Suspense } from 'react';
 import { redirect } from 'next/navigation';
+import Image from 'next/image';
 import GlobalSearch from '@/components/global-search';
 import FacultySidebar from '@/components/faculty-sidebar';
 import { getCurrentUserWithRole } from '@/lib/auth/get-current-user';
@@ -16,39 +17,31 @@ async function FacultyAuthGuard({ children }: { children: React.ReactNode }) {
 
 export default function FacultyLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ display:'flex', flexDirection:'row', height:'100vh', width:'100%', overflow:'hidden', background:'linear-gradient(145deg,#f5f3ff 0%,#fce8ee 35%,#f0eefd 65%,#faf8ff 100%)' }}>
-      <div className="blob blob-pink"      style={{ position:'fixed', top:-120, right:60, width:420, height:420, opacity:0.20, zIndex:0, pointerEvents:'none' }} />
-      <div className="blob blob-periwinkle" style={{ position:'fixed', bottom:0, left:80, width:320, height:320, opacity:0.15, zIndex:0, pointerEvents:'none' }} />
-
-      <FacultySidebar />
-
-      <div style={{ position:'relative', zIndex:1, display:'flex', flexDirection:'column', flex:1, minWidth:0, overflow:'hidden' }}>
-            <header style={{ 
-                position: 'relative', 
-                zIndex: 50,           
-                display:'flex', 
-                flexShrink:0, 
-                alignItems:'center', 
-                justifyContent:'space-between', 
-                gap:16, 
-                padding:'10px 24px', 
-                background:'rgba(255,255,255,0.45)', 
-                backdropFilter:'blur(16px)', 
-                WebkitBackdropFilter:'blur(16px)',
-                borderBottom:'1px solid rgba(45,42,74,0.07)' 
-            }}>
-          <GlobalSearch role="faculty" placeholder="Search events, courses, surveys..." />
-          <div style={{ display:'flex', alignItems:'center', gap:12 }}>
-
-            <UserMenu />
-          </div>
-        </header>
-        <main style={{ flex:1, overflowY:'scroll', padding:'24px', paddingBottom:'96px' }}>
-          <Suspense fallback={<div style={{ display:'flex', alignItems:'center', justifyContent:'center', height:'100%', color:'var(--gray)', fontSize:14 }}>Loading…</div>}>
-            <FacultyAuthGuard>{children}</FacultyAuthGuard>
-          </Suspense>
-        </main>
+      <div style={{ display:'flex', flexDirection:'row', height:'100vh', width:'100%', overflow:'hidden', background:'linear-gradient(145deg,#f5f3ff 0%,#fce8ee 35%,#f0eefd 65%,#faf8ff 100%)' }}>
+        <div className="blob blob-pink"      style={{ position:'fixed', top:-120, right:60, width:420, height:420, opacity:0.20, zIndex:0, pointerEvents:'none' }} />
+        <div className="blob blob-periwinkle" style={{ position:'fixed', bottom:0, left:80, width:320, height:320, opacity:0.15, zIndex:0, pointerEvents:'none' }} />
+  
+        <FacultySidebar />
+  
+        <div style={{ position:'relative', zIndex:1, display:'flex', flexDirection:'column', flex:1, minWidth:0, overflow:'hidden' }}>
+          <header className="relative z-50 flex shrink-0 items-center gap-4 p-2 backdrop-blur-md">
+              <div className="flex md:hidden items-center gap-2 shrink-0">
+                <Image src="/kasarian-upb-logo.svg" alt="UPB Kasarian" width={60} height={60} />
+                <div className="flex flex-col justify-center">
+                  <span className="caption">UP BAGUIO</span>
+                  <span className="heading-md uppercase">Kasarian</span>
+                </div>
+              </div>
+              <div className="flex flex-1 gap-4 items-center justify-end">
+                  <UserMenu />
+              </div>
+          </header>
+          <main className="px-5 pb-0 pt-4" style={{ flex:1, overflowY:'scroll'}}>
+            <Suspense fallback={<div style={{ display:'flex', alignItems:'center', justifyContent:'center', height:'100%', color:'var(--gray)', fontSize:14 }}>Loading…</div>}>
+              <FacultyAuthGuard>{children}</FacultyAuthGuard>
+            </Suspense>
+          </main>
+        </div>
       </div>
-    </div>
-  );
+    );
 }

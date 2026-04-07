@@ -1,5 +1,6 @@
 import { Suspense } from 'react';
 import { redirect } from 'next/navigation';
+import Image from 'next/image';
 import StudentSidebar from '@/components/student-sidebar';
 import { getCurrentUserWithRole } from '@/lib/auth/get-current-user';
 import UserMenu from '@/components/user-menu';
@@ -22,7 +23,14 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
       <StudentSidebar />
 
       <div style={{ position:'relative', zIndex:1, display:'flex', flexDirection:'column', flex:1, minWidth:0, overflow:'hidden' }}>
-        <header className="relative z-50 flex shrink-0 items-end gap-4 p-2 backdrop-blur-md">
+        <header className="relative z-50 flex shrink-0 items-center gap-4 p-2 backdrop-blur-md">
+            <div className="flex md:hidden items-center gap-2 shrink-0">
+              <Image src="/kasarian-upb-logo.svg" alt="UPB Kasarian" width={60} height={60} />
+              <div className="flex flex-col justify-center">
+                <span className="caption">UP BAGUIO</span>
+                <span className="heading-md uppercase">Kasarian</span>
+              </div>
+            </div>
             <div className="flex flex-1 gap-4 items-center justify-end">
                 <UserMenu />
             </div>
