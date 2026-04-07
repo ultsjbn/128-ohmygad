@@ -92,6 +92,33 @@ export function OnboardingForm({
       return;
     }
 
+    if (full_name) {
+      const fullnameRegex = /^[a-zA-Z\s.'-]+$/;
+      if (!fullnameRegex.test(full_name)) {
+        setError("Full name can only contain letters, spaces, and basic punctuation.");
+        setIsLoading(false);
+        return;
+      }
+    }
+
+    if (contact_num) {
+      const contactRegex = /^[0-9]{10,15}$/;
+      if (!contactRegex.test(contact_num)) {
+        setError("Contact number must be 10-15 digits.");
+        setIsLoading(false);
+        return;
+      }
+    }
+
+    if (role === "student" && student_num) {
+      const cleanStudentNum = student_num.replace(/\D/g, "");
+      if (cleanStudentNum.length !== 9) {
+        setError("Student number must be exactly 9 digits.");
+        setIsLoading(false);
+        return;
+      }
+    }
+
     const supabase = createClient();
 
     try {
