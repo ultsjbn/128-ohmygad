@@ -129,44 +129,88 @@ export default function AdminProfilePage() {
     // main wrapper
     <div className="w-full max-w-6xl mx-auto h-full flex flex-col gap-4 lg:gap-6 flex-1 min-h-0 animate-in fade-in duration-500">
 
-      {/* top bar */}
-      <div className="shrink-0 flex items-center justify-between md:mt-2">
-        <div className="flex items-center gap-2 lg:gap-4">
-          <Button variant="icon" onClick={() => router.back()}>
-            <ChevronLeft size={16} />
-          </Button>
-          <div>
-            <h1 className="heading-lg lg:heading-xl leading-none">My Profile</h1>
-            <p className="hidden md:block body text-[var(--gray)] mt-1">Manage your administrator details.</p>
-          </div>
-        </div>
-      </div>
-
       {/* scrollable on mobile, two columns on desktop */}
       <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 flex-1 min-h-0 overflow-y-auto lg:overflow-hidden custom-scrollbar pr-1 lg:pr-0 pb-[100px] lg:pb-0">
 
         {/* left column: profile card */}
+<<<<<<< Updated upstream
         <div className="w-full lg:w-[35%] flex flex-col shrink-0">
           <Card className="flex flex-col items-center text-center p-4 lg:p-6">
             
+=======
+        <div className="rounded-[var(--radius-lg)] w-full lg:w-[35%] flex flex-col shrink-0">
+          <Card variant="no-hover" className="flex flex-col items-center text-center p-4 lg:p-6">
+
+>>>>>>> Stashed changes
             {/* user details */}
             <h2 className="heading-lg mb-1">{profile.full_name || "Your Name"}</h2>
-            <p className="text-sm text-[var(--gray)] mb-4">
+            <p className="text-sm text-[var(--gray)] mb-2">
               {profile.display_name ? `@${profile.display_name}` : "No display name set"}
             </p>
 
-            <div className="flex flex-wrap justify-center gap-2 mb-6">
+            <div className="flex flex-wrap justify-center gap-2 mb-4">
               <Badge variant="dark" dot>Administrator</Badge>
               {profile.office && <Badge variant="pink">{profile.office}</Badge>}
             </div>
 
             {/* gso progress bar */}
+<<<<<<< Updated upstream
             <div className="w-full text-left pt-6 border-t border-[rgba(45,42,74,0.08)]">
               <ProgressBar 
                 value={profile.gso_attended === 2 ? 100 : profile.gso_attended === 1 ? 50 : 0} 
+=======
+            <div className="w-full text-left pt-3 border-t border-[rgba(45,42,74,0.08)]">
+              <ProgressBar
+                value={profile.gso_attended === 2 ? 100 : profile.gso_attended === 1 ? 50 : 0}
+>>>>>>> Stashed changes
                 variant="dark"
                 label="GSO Attendance"
                 sublabel={`${profile.gso_attended ?? 0} / 2 completed`}
+              />
+            </div>
+            {/* asho progress bar */}
+            <div className="w-full text-left pt-3 border-t border-[rgba(45,42,74,0.08)]">
+              <ProgressBar
+                value={profile.gso_attended === 2 ? 100 : profile.gso_attended === 1 ? 50 : 0}
+                variant="dark"
+                label="ASHO Attendance"
+                sublabel={`${profile.gso_attended ?? 0} / 2 completed`}
+              />
+            </div>
+            {/* forums progress bar */}
+            <div className="w-full text-left pt-3 border-t border-[rgba(45,42,74,0.08)]">
+              <ProgressBar
+                value={profile.gso_attended === 2 ? 100 : profile.gso_attended === 1 ? 50 : 0}
+                variant="dark"
+                label="Forums Attended"
+                sublabel={`${profile.gso_attended ?? 0} attended`}
+              />
+            </div>
+            {/* research progress bar */}
+            <div className="w-full text-left pt-3 border-t border-[rgba(45,42,74,0.08)]">
+              <ProgressBar
+                value={profile.gso_attended === 2 ? 100 : profile.gso_attended === 1 ? 50 : 0}
+                variant="dark"
+                label="Research Attended"
+                sublabel={`${profile.gso_attended ?? 0} attended`}
+              />
+            </div>
+            {/* training progress bar */}
+            <div className="w-full text-left pt-3 border-t border-[rgba(45,42,74,0.08)]">
+              <ProgressBar
+                value={profile.gso_attended === 2 ? 100 : profile.gso_attended === 1 ? 50 : 0}
+                variant="dark"
+                label="Trainings Attended"
+                sublabel={`${profile.gso_attended ?? 0} attended`}
+              />
+            </div>
+            {/* research progress bar */}
+            <div className="w-full text-left pt-3 border-t border-[rgba(45,42,74,0.08)]">
+              <ProgressBar
+                value={profile.gso_attended === 2 ? 100 : profile.gso_attended === 1 ? 50 : 0}
+                variant="dark"
+                label="Workshops Attended"
+                sublabel={`${profile.gso_attended ?? 0} attended`}
               />
             </div>
 
@@ -175,9 +219,15 @@ export default function AdminProfilePage() {
 
         {/* right column: wrapper for form card and save button */}
         <div className="w-full lg:w-[65%] flex flex-col gap-4 lg:flex-1 lg:min-h-0">
+<<<<<<< Updated upstream
           
           <Card className="flex flex-col lg:flex-1 lg:min-h-0 p-4 lg:p-6">
             
+=======
+
+          <Card variant="no-hover" className="flex flex-col lg:flex-1 lg:min-h-0 p-4 lg:p-6">
+
+>>>>>>> Stashed changes
             <div className="shrink-0 mb-4 lg:mb-6">
               <Tabs 
                 tabs={TAB_OPTIONS} 

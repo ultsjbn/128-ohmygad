@@ -569,6 +569,13 @@ body {
   transition: var(--transition);
 }
 
+.card-no-hover {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: 24px;
+}
+
 .card-no-shadow {
     background: var(--white);
     border-radius: var(--radius-lg);
