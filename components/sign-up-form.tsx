@@ -5,8 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import Image from "next/image";
-import { Mail, Lock, User } from "lucide-react";
+import { Mail, Lock, User, Eye, EyeOff } from "lucide-react";
 
 export function SignUpForm({
   className,
@@ -18,6 +17,8 @@ export function SignUpForm({
   const [repeatPassword, setRepeatPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showRepeatPassword, setShowRepeatPassword] = useState(false);
   const router = useRouter();
 
   const handleSignUp = async (e: React.FormEvent) => {
@@ -69,18 +70,9 @@ export function SignUpForm({
 
   return (
     <div className={cn("auth-card max-w-md w-full mx-auto", className)} {...props}>
-      <div className="flex flex-col items-center mb-4 text-center">
-        <Image
-          src="/kasarian_logo.jpg"
-          alt="UPB Kasarian Gender Studies Program Logo"
-          width={80}
-          height={80}
-          className="rounded-full object-cover mb-4 shadow-soft border-2 border-white"
-        />
-        <h2 className="heading-lg">Sign up</h2>
-        <p className="body text-[var(--gray)] mt-1">
-          Create an account to get started
-        </p>
+      <div className="mb-6 flex flex-col items-center text-center">
+        <h2 className="heading-lg m-1">Sign up</h2>
+        <p className="caption">Create an account to get started.</p>
       </div>
 
       <form onSubmit={handleSignUp} className="flex flex-col gap-3">
@@ -125,12 +117,20 @@ export function SignUpForm({
             <Lock className="input-prefix-icon w-2 h-2" />
             <input
               id="password"
-              type="password"
+              type={showPassword ? "text" : "password"}
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="input"
             />
+            <button
+              type="button"
+              onClick={() => setShowPassword((prev) => !prev)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--gray)] hover:text-[var(--text)] transition-colors"
+              tabIndex={-1}
+            >
+              {showPassword ? <EyeOff className="w-2 h-2" /> : <Eye className="w-2 h-2" />}
+            </button>
           </div>
         </div>
 
@@ -141,7 +141,7 @@ export function SignUpForm({
             <Lock className="input-prefix-icon w-2 h-2" />
             <input
               id="repeat-password"
-              type="password"
+              type={showRepeatPassword ? "text" : "password"}
               required
               value={repeatPassword}
               onChange={(e) => setRepeatPassword(e.target.value)}
@@ -150,6 +150,14 @@ export function SignUpForm({
                 password && repeatPassword && password !== repeatPassword && "input-error"
               )}
             />
+            <button
+              type="button"
+              onClick={() => setShowRepeatPassword((prev) => !prev)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--gray)] hover:text-[var(--text)] transition-colors"
+              tabIndex={-1}
+            >
+              {showRepeatPassword ? <EyeOff className="w-2 h-2" /> : <Eye className="w-2 h-2" />}
+            </button>
           </div>
         </div>
 

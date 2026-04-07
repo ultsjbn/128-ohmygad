@@ -5,8 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import Image from "next/image";
-import { Mail, Lock } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 
 export function LoginForm({
   className,
@@ -16,6 +15,7 @@ export function LoginForm({
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -77,19 +77,10 @@ export function LoginForm({
   };
 
   return (
-    <div className={cn("auth-card max-w-md w-full mx-auto", className)} {...props}>
-      <div className="flex flex-col items-center mb-6 text-center">
-        <Image
-          src="/kasarian_logo.jpg"
-          alt="UPB Kasarian Gender Studies Program Logo"
-          width={80}
-          height={80}
-          className="rounded-full object-cover mb-4 shadow-soft border-2 border-white"
-        />
-        <h2 className="heading-lg">Welcome Back!</h2>
-        <p className="body text-[var(--gray)] mt-1">
-          Sign in to your account to continue
-        </p>
+    <div className={cn("auth-card w-full", className)} {...props}>
+      <div className="mb-6 flex flex-col items-center text-center">
+        <h2 className="heading-lg m-1">Welcome!</h2>
+        <p className="caption">Sign in to your account to continue.</p>
       </div>
 
       <form onSubmit={handleLogin} className="flex flex-col gap-5">
@@ -113,25 +104,33 @@ export function LoginForm({
 
         {/* Password Input */}
         <div className="input-wrap">
-          <div className="flex items-center justify-between">
-            <label htmlFor="password" className="label">Password</label>
+          <label htmlFor="password" className="label">Password</label>
+          <div className="input-icon-wrap">
+            <Lock className="input-prefix-icon w-2 h-2" />
+            <input
+              id="password"
+              type={showPassword ? "text" : "password"}
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="input"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((prev) => !prev)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--gray)] hover:text-[var(--text)] transition-colors"
+              tabIndex={-1}
+            >
+              {showPassword ? <EyeOff className="w-2 h-2" /> : <Eye className="w-2 h-2" />}
+            </button>
+          </div>
+          <div className="flex justify-end">
             <Link
               href="/auth/forgot-password"
               className="caption hover:text-[var(--primary-dark)] hover:underline underline-offset-4 transition-colors"
             >
               Forgot password?
             </Link>
-          </div>
-          <div className="input-icon-wrap">
-            <Lock className="input-prefix-icon w-2 h-2" />
-            <input
-              id="password"
-              type="password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="input"
-            />
           </div>
         </div>
 
