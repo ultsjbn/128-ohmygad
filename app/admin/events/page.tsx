@@ -125,7 +125,7 @@ export default function EventsPage() {
           full_name:         r.profile?.full_name    ?? null,
           email:             r.profile?.email        ?? null,
           registration_date: r.registration_date,
-          status:            r.status || "registered",
+          status:            "registered",
         }))
       );
     }
