@@ -15,7 +15,6 @@
 */
 
 import { useEffect, useState, useMemo } from "react";
-import { createClient } from "@/lib/supabase/client";
 import {
   X,
   Loader2,
@@ -41,6 +40,7 @@ import {
 } from "recharts";
 import { Card, Badge } from "@/components/ui";
 import type { SurveyFormData } from "@/components/admin/survey-form";
+import { getSurveyAnalytics } from "@/app/admin/surveys/actions";
 import {
   BRAND_COLORS,
   AXIS_COLOR,
@@ -95,6 +95,7 @@ export default function SurveyAnalyticsModal({ survey, open, onClose }: Props) {
   const [questions, setQuestions] = useState<QuestionRow[]>([]);
   const [responses, setResponses] = useState<ResponseRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   // fetch questions + responses on mount / survey change
   useEffect(() => {
@@ -103,31 +104,25 @@ export default function SurveyAnalyticsModal({ survey, open, onClose }: Props) {
 
     async function fetchData() {
       setLoading(true);
-      const supabase = createClient();
+      setError(null);
 
-      const [qRes, rRes] = await Promise.all([
-        supabase
-          .from("survey_questions")
-          .select("id, question_text, question_type, options, is_required, order_index")
-          .eq("survey_id", survey.id!)
-          .order("order_index", { ascending: true }),
-        supabase
-          .from("survey_responses")
-          .select("question_id, response_value, response_token")
-          .eq("survey_id", survey.id!),
-      ]);
+      const result = await getSurveyAnalytics(survey.id!);
 
       if (!cancelled) {
-        const qs = (qRes.data ?? []).map((q) => ({
-          ...q,
-          options: Array.isArray(q.options)
-            ? q.options
-            : typeof q.options === "string"
-              ? JSON.parse(q.options)
-              : null,
-        }));
-        setQuestions(qs);
-        setResponses(rRes.data ?? []);
+        if (result.error) {
+          setError(result.error);
+        } else {
+          const qs = (result.questions ?? []).map((q) => ({
+            ...q,
+            options: Array.isArray(q.options)
+              ? q.options
+              : typeof q.options === "string"
+                ? JSON.parse(q.options)
+                : null,
+          }));
+          setQuestions(qs);
+          setResponses(result.responses ?? []);
+        }
         setLoading(false);
       }
     }
@@ -208,6 +203,13 @@ export default function SurveyAnalyticsModal({ survey, open, onClose }: Props) {
                 <Loader2 size={22} className="animate-spin text-[var(--gray)]" />
                 <span className="caption">Loading analytics…</span>
               </div>
+            ) : error ? (
+              <Card className="border-[var(--error)] bg-red-50/50">
+                <div className="flex flex-col items-center justify-center gap-3 py-12">
+                  <p className="caption text-[var(--error)] font-semibold">Failed to load analytics</p>
+                  <p className="text-[12px] text-[var(--error)] opacity-80">{error}</p>
+                </div>
+              </Card>
             ) : (
               <>
                 {/* ── Survey description section ── */}
@@ -348,9 +350,9 @@ function QuestionCard({
   );
 }
 
-// ═══════════════════════════════════════════════════════
-//  Multiple Choice → Horizontal Bar Chart
-// ═══════════════════════════════════════════════════════
+/*
+Multiple Choice → Horizontal Bar Chart
+*/
 function MultipleChoiceChart({
   question,
   responses,
@@ -412,9 +414,9 @@ function MultipleChoiceChart({
   );
 }
 
-// ═══════════════════════════════════════════════════════
-//  Yes / No → Donut Pie Chart
-// ═══════════════════════════════════════════════════════
+/*
+Yes / No → Donut Pie Chart
+*/
 function YesNoChart({ responses }: { responses: ResponseRow[] }) {
   const data = useMemo(() => {
     let yes = 0;
@@ -470,9 +472,9 @@ function YesNoChart({ responses }: { responses: ResponseRow[] }) {
   );
 }
 
-// ═══════════════════════════════════════════════════════
-//  Likert Scale → Stacked Horizontal Bar + Statistics
-// ═══════════════════════════════════════════════════════
+/*
+Likert Scale → Stacked Horizontal Bar + Statistics
+*/
 function LikertChart({ responses }: { responses: ResponseRow[] }) {
   const { chartData, stats } = useMemo(() => {
     const counts = [0, 0, 0, 0, 0]; // index 0→rating 1, etc.
@@ -576,9 +578,9 @@ function StatBox({ label, value }: { label: string; value: string }) {
   );
 }
 
-// ═══════════════════════════════════════════════════════
-//  Text (Open-ended) → Paginated List
-// ═══════════════════════════════════════════════════════
+/*
+Text (Open-ended) → Paginated List
+*/
 function TextResponses({ responses }: { responses: ResponseRow[] }) {
   const [page, setPage] = useState(1);
 
@@ -603,12 +605,6 @@ function TextResponses({ responses }: { responses: ResponseRow[] }) {
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="flex items-center gap-2 mb-1">
-        <MessageSquareText size={14} className="text-[var(--gray)]" />
-        <span className="caption font-semibold">
-          {nonEmpty.length} text response{nonEmpty.length !== 1 ? "s" : ""}
-        </span>
-      </div>
 
       {/* response cards */}
       {pageItems.map((r, i) => (
