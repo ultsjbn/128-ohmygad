@@ -65,16 +65,26 @@ const UPB_PROGRAMS: Record<string, { value: string; label: string }[]> = {
     { value: "BS Computer Science", label: "BS Computer Science" },
     { value: "BS Mathematics", label: "BS Mathematics" },
     { value: "BS Physics", label: "BS Physics" },
+    { value: "MS Conservation and Restoration Ecology", label: "MS Conservation and Restoration Ecology" },
+    { value: "MS Mathematics", label: "MS Mathematics" },
+    { value: "Doctor of Philosophy in Mathematics", label: "Doctor of Philosophy in Mathematics" },
   ],
   CAC: [
     { value: "BA Communication", label: "BA Communication" },
     { value: "BA Fine Arts", label: "BA Fine Arts" },
     { value: "BA Language and Literature", label: "BA Language and Literature" },
     { value: "Certificate in Fine Arts", label: "Certificate in Fine Arts" },
+    { value: "MA Language and Literature", label: "MA Language and Literature" },
   ],
   CSS: [
-    { value: "BA Social Sciences", label: "BA Social Sciences" },
+    { value: "BA Social Sciences (History)", label: "BA Social Sciences (History)" },
+    { value: "BA Social Sciences (Economics)", label: "BA Social Sciences (Economics)" },
+    { value: "BA Social Sciences (Anthropology)", label: "BA Social Sciences (Anthropology)" },
     { value: "BS Management Economics", label: "BS Management Economics" },
+    { value: "MA History (Ethnohistory and Local History)", label: "MA History (Ethnohistory and Local History)" },
+    { value: "MA Social and Development Studies", label: "MA Social and Development Studies" },
+    { value: "Master of Management", label: "Master of Management" },
+    { value: "Doctor of Philosophy in Indigenous Studies", label: "Doctor of Philosophy in Indigenous Studies" },
   ],
 };
 
@@ -202,7 +212,7 @@ export default function StudentProfilePage() {
 
   return (
     // main wrapper
-    <div className="w-full max-w-6xl mx-auto flex flex-col gap-4 lg:gap-6 animate-in fade-in duration-500 pb-[100px] lg:pb-6">
+    <div className="w-full max-w-8xl mx-auto flex flex-col gap-4 lg:gap-6 animate-in fade-in duration-500 pb-[100px] lg:pb-6">
 
       {/* two columns */}
       <div className="flex flex-col lg:flex-row gap-4 lg:gap-6">
