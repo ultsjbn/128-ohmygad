@@ -297,17 +297,6 @@ export default function SurveyTakePage() {
     );
   }
 
-  // Closed
-  if (survey?.status === "closed") {
-    return (
-      <div className="flex flex-col items-center justify-center gap-4 min-h-[60vh]">
-        <p className="heading-md">Survey Closed</p>
-        <p className="caption text-[var(--gray)]">This survey is no longer accepting responses.</p>
-        <Button variant="ghost" onClick={() => router.back()}>Go back</Button>
-      </div>
-    );
-  }
-
   // ── No questions ──
   if (!isLoading && questions.length === 0) {
     return (
