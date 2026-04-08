@@ -244,7 +244,7 @@ export default function EventsPage() {
 
         const { error } = await supabase
             .from("event_registration")
-            .update({ status: "cancelled" })
+            .delete()
             .eq("event_id", eventId)
             .eq("user_id", currentUserId);
 
