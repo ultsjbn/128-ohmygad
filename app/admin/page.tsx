@@ -103,25 +103,29 @@ export default function DashboardPage() {
                 <GlobalSearch role="student" placeholder="Search events, courses, surveys..." />
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                     <StatCard
-                        icon={<Users size={19} className="text-[var(--periwinkle)]"/>}
+                        variant="no-hover"
+                        icon={<Users size={20} className="text-[var(--periwinkle)]"/>}
                         iconBg="var(--periwinkle-light)"
                         value={userStats?.total ?? 0}
                         label="Registered Users"
                     />
                     <StatCard
-                        icon={<UserCheck size={19} className="text-[var(--success)]"/>}
+                        variant="no-hover"
+                        icon={<UserCheck size={20} className="text-[var(--success)]"/>}
                         iconBg="rgba(109,197,160,0.15)"
                         value={userStats?.onboarded ?? 0}
                         label="Onboarded Users"
                     />
                     <StatCard
-                        icon={<Calendar size={19} className="text-[var(--soft-pink)]"/>}
+                        variant="no-hover"
+                        icon={<Calendar size={20} className="text-[var(--soft-pink)]"/>}
                         iconBg="var(--pink-light)"
                         value={gadEventsCount ?? 0}
                         label="GAD Events"
                     />
                     <StatCard
-                        icon={<ClipboardList size={19} className="text-[var(--warning)]"/>}
+                        variant="no-hover"
+                        icon={<ClipboardList size={20} className="text-[var(--warning)]"/>}
                         iconBg="rgba(244,201,122,0.18)"
                         value={surveysCount}
                         label="Active Surveys"
@@ -133,7 +137,7 @@ export default function DashboardPage() {
             <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-4">
 
               {/* attendance over time */}
-                <Card className="flex flex-col p-5 min-h-[320px]">
+                <Card variant="no-hover" className="flex flex-col p-5 min-h-[320px]">
                     <div className="flex flex-wrap items-start justify-between gap-3 mb-4 shrink-0">
                     <div>
                         <h2 className="heading-md">Attendance Over Time</h2>
@@ -177,7 +181,7 @@ export default function DashboardPage() {
                 </Card>
 
               {/* quick actions */}
-                <Card className="flex flex-col p-5">
+                <Card variant="no-hover" className="flex flex-col p-5">
                     <h2 className="heading-md mb-1">Quick Actions</h2>
                     <p className="caption mb-4">Jump to common tasks</p>
                     <div className="flex flex-col gap-2">
@@ -201,7 +205,7 @@ export default function DashboardPage() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 
                     {/* users per college */}
-                    <Card className="flex flex-col p-5 min-h-[260px]">
+                    <Card variant="no-hover" className="flex flex-col p-5 min-h-[260px]">
                     <h2 className="heading-md mb-0.5">Users per College</h2>
                     <p className="caption mb-3">Registered student breakdown</p>
                     <div className="flex-1 w-full min-h-[170px] cursor-default select-none">
@@ -231,7 +235,7 @@ export default function DashboardPage() {
                     </Card>
 
                     {/* sex at birth */}
-                    <Card className="flex flex-col p-5 min-h-[260px]">
+                    <Card variant="no-hover" className="flex flex-col p-5 min-h-[260px]">
                     <h2 className="heading-md mb-1">Sex at Birth</h2>
                     <div className="flex-1 w-full min-h-[190px] cursor-default select-none">
                         <ResponsiveContainer width="100%" height="100%">
@@ -263,7 +267,7 @@ export default function DashboardPage() {
                     </Card>
 
                     {/* gender identity */}
-                    <Card className="flex flex-col p-5 min-h-[260px]">
+                    <Card variant="no-hover" className="flex flex-col p-5 min-h-[260px]">
                     <h2 className="heading-md mb-1">Gender Identity</h2>
                     <div className="flex-1 w-full min-h-[190px] cursor-default select-none">
                         <ResponsiveContainer width="100%" height="100%">
