@@ -29,7 +29,7 @@ export default function LoginPage() {
                 </div>
             </div>
             <p className="caption text-center md:text-left md:block text-[var(--text-muted)] max-w-xs pl-3 md:pl-4">
-               A centralized platform for GSO-related events and activities.
+               A centralized platform for GSO-related events, activities, and guidelines.
             </p>
         </div>
 
