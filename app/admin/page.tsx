@@ -26,7 +26,7 @@ const TICK_COLOR   = "rgba(45,42,74,0.45)";
 const QUICK_ACTIONS = [
   { icon: <Calendar size={16} />, label: "New Event",   href: "/admin/events/create"  },
   { icon: <Users size={16} />, label: "Create User", href: "/admin/users/create"   },
-  { icon: <BookOpen size={16} />, label: "Add Course",  href: "/admin/courses/create" },
+  { icon: <BookOpen size={16} />, label: "Add Guideline",  href: "/admin/courses/create" },
   { icon: <ClipboardList size={16} />, label: "New Survey",  href: "/admin/surveys/create" },
 ];
 

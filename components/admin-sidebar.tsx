@@ -10,11 +10,11 @@ import Link from "next/link";
 import Image from "next/image";
 
 const navItems = [
-  { href: "/admin",         label: "Dashboard", icon: LayoutDashboard, exact: true  },
-  { href: "/admin/users",   label: "Users",     icon: Users,           exact: false },
-  { href: "/admin/events",  label: "Events",    icon: Calendar,        exact: false },
-  { href: "/admin/courses", label: "I've GAD to Know",   icon: BookOpen,        exact: false },
-  { href: "/admin/surveys", label: "Surveys",   icon: ClipboardList,   exact: false },
+  { href: "/admin",         label: "Dashboard",   icon: LayoutDashboard, exact: true  },
+  { href: "/admin/users",   label: "Users",       icon: Users,           exact: false },
+  { href: "/admin/events",  label: "Events",      icon: Calendar,        exact: false },
+  { href: "/admin/courses", label: "Guidelines",  icon: BookOpen,        exact: false },
+  { href: "/admin/surveys", label: "Surveys",     icon: ClipboardList,   exact: false },
 ];
 
 function isActive(pathname: string, href: string, exact = false) {

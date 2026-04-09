@@ -16,7 +16,7 @@ const NAV_ITEMS = [
   { href: "/admin",         label: "Dashboard", icon: LayoutDashboard,          exact: true  },
   { href: "/admin/events",  label: "Events",    icon: Calendar,      exact: false },
   { href: "/admin/users",   label: "Users",     icon: Users,         exact: false },
-  { href: "/admin/courses", label: "Courses",   icon: BookOpen,      exact: false },
+  { href: "/admin/courses", label: "Guidelines",   icon: BookOpen,      exact: false },
   { href: "/admin/surveys", label: "Surveys",   icon: ClipboardList, exact: false },
 ];
 
@@ -24,7 +24,7 @@ const PAGE_LABELS: Record<string, string> = {
   dashboard: "Dashboard",
   events:    "Events Management",
   users:     "Users Management",
-  courses:   "Courses Management",
+  courses:   "Guidelines Management",
   surveys:   "Surveys Management",
 };
 
