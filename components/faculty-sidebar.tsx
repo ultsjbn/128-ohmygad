@@ -83,23 +83,21 @@ export default function FacultySidebar() {
   const state = open ? "expanded" : "collapsed";
 
   return (
-
-    <div data-state={state} className={[ "group/sidebar relative shrink-0 hidden md:block", "w-[--sidebar-width] data-[state=collapsed]:w-[--sidebar-width-icon]", "transition-[width] duration-200 ease-linear", ].join(" ")} style={{ "--sidebar-width":      "224px", "--sidebar-width-icon": "64px", } as React.CSSProperties} >
-      <aside
-        className={[
-          "fixed inset-y-0 left-0 z-10 flex flex-col",
-          "my-2 ml-2 rounded-[18px] overflow-hidden",
-          "bg-[var(--primary-dark)] shadow-[0_8px_40px_rgba(45,42,74,0.22)]",
-          "w-[--sidebar-width] group-data-[state=collapsed]/sidebar:w-[--sidebar-width-icon]",
-          "transition-[width] duration-200 ease-linear",
-        ].join(" ")}
-        style={{
-          "--sidebar-width":      "224px",
-          "--sidebar-width-icon": "64px",
-        } as React.CSSProperties}
-      >
+    <aside
+      data-state={state}
+      className={[
+        "group/sidebar relative shrink-0 hidden md:flex flex-col",
+        "w-[--sidebar-width] data-[state=collapsed]:w-[--sidebar-width-icon]",
+        "transition-[width] duration-200 ease-linear",
+        "bg-[var(--primary-dark)] overflow-hidden md:pr-2",
+      ].join(" ")}
+      style={{
+        "--sidebar-width":      "224px",
+        "--sidebar-width-icon": "64px",
+      } as React.CSSProperties}
+    >
         {/* logo ------------------------------------------------ */}
-        <div className="flex shrink-0 items-center border-b border-white/[0.07] h-[70px] px-[10px] gap-[6px] overflow-hidden">
+        <div className="flex shrink-0 items-center border-b border-white/[0.07] h-[70px] gap-[6px] overflow-hidden">
           <button
             onClick={() => !open && setOpen(true)}
             onMouseEnter={() => setLogoHovered(true)}
@@ -129,7 +127,7 @@ export default function FacultySidebar() {
             </span>
           </button>
 
-          {/* Title — fades + clips via overflow on the sidebar itself */}
+          {/* title fades + clips via overflow on the sidebar itself */}
           <div
             className={[
               "flex flex-col justify-center overflow-hidden shrink-0",
@@ -142,7 +140,7 @@ export default function FacultySidebar() {
             <span className="heading-sm-dark uppercase">Kasarian</span>
           </div>
 
-          {/* Collapse button */}
+          {/* collapse button */}
           <button
             onClick={() => setOpen(false)}
             aria-label="Collapse sidebar"
@@ -158,8 +156,8 @@ export default function FacultySidebar() {
           </button>
         </div>
 
-        {/* Nav ------------------------------------------------ */}
-        <nav className="flex flex-col flex-1 gap-1 px-2 py-2 overflow-y-auto overflow-x-hidden">
+        {/* nav ------------------------------------------------ */}
+        <nav className="flex flex-col flex-1 gap-1 py-2 overflow-y-auto overflow-x-hidden">
           {NAV_ITEMS.map(({ href, label, icon: Icon, exact }) => {
             const active = isActive(pathname, href, exact);
             return (
@@ -196,7 +194,7 @@ export default function FacultySidebar() {
           })}
         </nav>
 
-        {/* Logout ------------------------------------------------ */}
+        {/* logout ------------------------------------------------ */}
         <div className="shrink-0 flex flex-col gap-[2px] px-2 pb-2 pt-2 border-t border-white/[0.07]">
           <button
             onClick={() => router.push("/auth/login")}
@@ -222,7 +220,6 @@ export default function FacultySidebar() {
             </span>
           </button>
         </div>
-      </aside>
-    </div>
+    </aside>
   );
 }

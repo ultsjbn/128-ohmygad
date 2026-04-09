@@ -24,32 +24,35 @@ async function StudentAuthGuard({ children }: { children: React.ReactNode }) {
 
 export default function StudentLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ display:'flex', flexDirection:'row', height:'100vh', width:'100%', overflow:'hidden', background:'linear-gradient(145deg,#f5f3ff 0%,#fce8ee 35%,#f0eefd 65%,#faf8ff 100%)' }}>
-      <div className="blob blob-pink"      style={{ position:'fixed', top:-120, right:60, width:420, height:420, opacity:0.20, zIndex:0, pointerEvents:'none' }} />
-      <div className="blob blob-periwinkle" style={{ position:'fixed', bottom:0, left:80, width:320, height:320, opacity:0.15, zIndex:0, pointerEvents:'none' }} />
+    <div className="flex h-screen w-full p-2 bg-[var(--primary-dark)]">
 
-      <StudentSidebar />
+      {/* outer card that hugs sidebar + content */}
+      <div className="bg-[var(--primary-dark)]" style={{ position:'relative', zIndex:1, display:'flex', flex:1, overflow:'hidden', borderRadius:'16px' }}>
+        <StudentSidebar />
 
-      <div style={{ position:'relative', zIndex:1, display:'flex', flexDirection:'column', flex:1, minWidth:0, overflow:'hidden' }}>
-        <DashboardHeader basePath="/student" pageLabels={PAGE_LABELS} />
-        <main className="flex flex-col px-5 pb-0 pt-4" style={{ flex:1, overflowY:'scroll'}}>
-          <Suspense fallback={<div style={{ display:'flex', alignItems:'center', justifyContent:'center', height:'100%', color:'var(--gray)', fontSize:14 }}>Loading…</div>}>
-            <StudentAuthGuard>{children}</StudentAuthGuard>
-          </Suspense>
-          <footer className="static bottom-0 mt-8 mb-3 flex flex-wrap items-center justify-between gap-2 text-[10px] text-[var(--gray)]/60 border-t border-black/[0.05] pt-3">
-            <span className="flex flex-wrap items-center gap-x-1.5">
-              <strong className="font-semibold text-[var(--primary-dark)]/60">Kasarian / Gender Studies UP Baguio</strong>
-              <span className="opacity-30">·</span>
-              <span>University of the Philippines Baguio</span>
-              <span className="opacity-30">·</span>
-              <span>kasarian.upbaguio@up.edu.ph</span>
-              <span className="opacity-30">·</span>
-            </span>
-            <span className="flex items-center gap-3">
-              <span>© {new Date().getFullYear()} UP Baguio</span>
-            </span>
-          </footer>
-        </main>
+        <div style={{ position:'relative', display:'flex', flexDirection:'column', flex:1, minWidth:0, overflow:'hidden', background:'linear-gradient(145deg,#f5f3ff 0%,#fce8ee 35%,#f0eefd 65%,#faf8ff 100%)' }}>
+          <div className="blob blob-pink"      style={{ position:'absolute', top:-120, right:60, width:420, height:420, opacity:0.20, zIndex:0, pointerEvents:'none' }} />
+          <div className="blob blob-periwinkle" style={{ position:'absolute', bottom:0, left:80, width:320, height:320, opacity:0.15, zIndex:0, pointerEvents:'none' }} />
+          <DashboardHeader basePath="/student" pageLabels={PAGE_LABELS} />
+          <main className="flex flex-col px-3 md:px-5 pb-0" style={{ position:'relative', zIndex:1, flex:1, overflowY:'scroll'}}>
+            <Suspense fallback={<div style={{ display:'flex', alignItems:'center', justifyContent:'center', height:'100%', color:'var(--gray)', fontSize:14 }}>Loading…</div>}>
+              <StudentAuthGuard>{children}</StudentAuthGuard>
+            </Suspense>
+            <footer className="static bottom-0 mt-6 mb-3 flex flex-wrap items-center justify-between gap-2 text-[10px] text-[var(--gray)]/60 border-t border-black/[0.05] pt-3">
+              <span className="flex flex-wrap items-center gap-x-1.5">
+                <strong className="font-semibold text-[var(--primary-dark)]/60">Kasarian / Gender Studies UP Baguio</strong>
+                <span className="opacity-30">·</span>
+                <span>University of the Philippines Baguio</span>
+                <span className="opacity-30">·</span>
+                <span>kasarian.upbaguio@up.edu.ph</span>
+                <span className="opacity-30">·</span>
+              </span>
+              <span className="flex items-center gap-3">
+                <span>© {new Date().getFullYear()} UP Baguio</span>
+              </span>
+            </footer>
+          </main>
+        </div>
       </div>
     </div>
   );
