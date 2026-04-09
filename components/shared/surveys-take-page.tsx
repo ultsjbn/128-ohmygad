@@ -136,7 +136,7 @@ function YesNoQuestion({
   );
 }
 
-// ── Main page ──────────────────────────────────────────────────────────────
+// Main page
 
 export default function SurveyTakePage() {
   const { id } = useParams<{ id: string }>();
@@ -156,10 +156,34 @@ export default function SurveyTakePage() {
   useEffect(() => {
     if (!id) return;
     const fetchSurvey = async () => {
+
+      // check browser memory for submit
+      // survives hard refresh and log out
+      if (typeof window !== "undefined" && localStorage.getItem(`survey_${id}_submitted`)) {
+        setSubmitted(true);
+        setIsLoading(false);
+        return;
+      }
+
       const supabase = createClient();
 
       const { data: { user } } = await supabase.auth.getUser();
-      if (user) setCurrentUserId(user.id);
+      if (user) {
+            setCurrentUserId(user.id);
+            
+            const { data: existingResponse } = await supabase
+              .from("survey_responses")
+              .select("id")
+              .eq("survey_id", id)
+              .eq("response_token", user.id) 
+              .limit(1);
+
+            if (existingResponse && existingResponse.length > 0) {
+              setSubmitted(true); // Automatically show the Thank You page
+              setIsLoading(false);
+              return;
+            }
+          }
 
       const [surveyResult, questionsResult] = await Promise.all([
         supabase
@@ -249,7 +273,7 @@ export default function SurveyTakePage() {
     setError(null);
 
     const supabase = createClient();
-    const responseToken = crypto.randomUUID();
+    const responseToken = currentUserId ?? crypto.randomUUID();
 
     const responseRows = questions.map((q) => ({
       survey_id:      id,
@@ -271,6 +295,11 @@ export default function SurveyTakePage() {
       return;
     }
 
+    // save completion flag to browser memory
+    if (typeof window !== "undefined") {
+      localStorage.setItem(`survey_${id}_submitted`, "true");
+    }
+    
     setSubmitted(true);
     setIsSubmitting(false);
   };
@@ -297,16 +326,6 @@ export default function SurveyTakePage() {
     );
   }
 
-  // ── No questions ──
-  if (!isLoading && questions.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center gap-4 min-h-[60vh]">
-        <p className="caption text-[var(--gray)]">This survey has no questions yet.</p>
-        <Button variant="ghost" onClick={() => router.back()}>Go back</Button>
-      </div>
-    );
-  }
-
   // Submit
   if (submitted) {
     return (
@@ -323,17 +342,21 @@ export default function SurveyTakePage() {
     );
   }
 
+  // No questions
+  if (!isLoading && questions.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center gap-4 min-h-[60vh]">
+        <p className="caption text-[var(--gray)]">This survey has no questions yet.</p>
+        <Button variant="ghost" onClick={() => router.back()}>Go back</Button>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-6 max-w-2xl mx-auto w-full">
 
       {/* Survey header */}
       <div>
-        <button
-          onClick={() => router.back()}
-          className="flex items-center gap-1 caption text-[var(--gray)] hover:text-[var(--primary-dark)] transition-colors mb-3"
-        >
-          <ChevronLeft size={15} /> Back
-        </button>
         <h1 className="heading-lg">{survey?.title}</h1>
         {survey?.description && (
           <p className="body text-[var(--gray)] mt-1">{survey.description}</p>

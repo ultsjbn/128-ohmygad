@@ -141,10 +141,6 @@ export default function SurveysListPage({ basePath }: SurveysListPageProps) {
   return (
     <div className="flex flex-col gap-4">
 
-      <div className="hidden md:block">
-        <h1 className="heading-lg">Surveys</h1>
-      </div>
-
       {/* search + sort only */}
       <div className="flex items-center gap-3 flex-wrap overflow-visible">
         <SearchBar
