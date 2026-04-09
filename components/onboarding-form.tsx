@@ -8,6 +8,7 @@ import Image from "next/image";
 import { User, Hash, Phone, MapPin, MessageSquare } from "lucide-react";
 import { Input, Select } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { validateFullName, validateContactNum, validateStudentNum } from "@/lib/validation";
 
 const UPB_PROGRAMS: Record<string, { value: string; label: string }[]> = {
   CS: [
@@ -103,27 +104,27 @@ export function OnboardingForm({
     }
 
     if (full_name) {
-      const fullnameRegex = /^[a-zA-Z\s.'-]+$/;
-      if (!fullnameRegex.test(full_name)) {
-        setError("Full name can only contain letters, spaces, and basic punctuation.");
+      const nameErr = validateFullName(full_name);
+      if (nameErr) {
+        setError(nameErr);
         setIsLoading(false);
         return;
       }
     }
 
     if (contact_num) {
-      const contactRegex = /^[0-9]{10,15}$/;
-      if (!contactRegex.test(contact_num)) {
-        setError("Contact number must be 10-15 digits.");
+      const contactErr = validateContactNum(contact_num);
+      if (contactErr) {
+        setError(contactErr);
         setIsLoading(false);
         return;
       }
     }
 
     if (role === "student" && student_num) {
-      const cleanStudentNum = student_num.replace(/\D/g, "");
-      if (cleanStudentNum.length !== 9) {
-        setError("Student number must be exactly 9 digits.");
+      const studentErr = validateStudentNum(student_num);
+      if (studentErr) {
+        setError(studentErr);
         setIsLoading(false);
         return;
       }
