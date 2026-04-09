@@ -124,7 +124,7 @@ export default function DashboardPage() {
                         options={filterOptions}
                     />
                 </div>
-                <GlobalSearch role="student" placeholder="Search events, courses, surveys..." />
+                <GlobalSearch role="admin" placeholder="Search events, courses, surveys..." />
                 <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
                     <StatCard
                         variant="no-hover"

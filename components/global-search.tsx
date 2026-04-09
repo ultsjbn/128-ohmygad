@@ -91,11 +91,19 @@ export default function GlobalSearch({ role, placeholder = "Search events, users
       <span className="search-icon"><Search size={15} /></span>
       <input
         className="search-input"
+        maxLength={64}
         placeholder={placeholder}
         value={query}
         onChange={(e) => {
           setQuery(e.target.value);
           if (!open && e.target.value.trim().length >= 2) setOpen(true);
+        }}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" && query.trim().length >= 2) {
+            e.preventDefault();
+            setOpen(false);
+            router.push(`/${role}/search?q=${encodeURIComponent(query.trim())}`);
+          }
         }}
         onFocus={() => { if (query.trim().length >= 2) setOpen(true); }}
       />
