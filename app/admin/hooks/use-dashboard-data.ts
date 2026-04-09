@@ -132,7 +132,8 @@ const STATIC_OPTIONS: FilterOptions = {
   sexAtBirth:     ["Male", "Female", "Intersex", "Prefer not to say"],
 };
 
-/** Returns null (no filter) or an array of matching profile IDs. Empty array = no matches. */
+/** returns null (no filter) or an array of matching profile IDs.
+ * empty array no matches */
 async function resolveFilteredIds(
   supabase: ReturnType<typeof createClient>,
   filters: DashboardFilters,
@@ -170,7 +171,8 @@ export function useDashboardData(dateRange?: DateRange, filters?: DashboardFilte
   const [attendanceLoading,   setAttendanceLoading]   = useState(true);
   const [error,               setError]               = useState<string | null>(null);
 
-  // global data: GAD events, surveys, today's timeline — not filter-dependent, runs once on mount
+  // global data: GAD events, surveys, today's timeline not filter-dependent
+  // runs once on mount
   useEffect(() => {
     let cancelled = false;
 

@@ -11,8 +11,9 @@ import {
 } from "@/components/ui";
 import type { DateRange, DashboardFilters } from "@/components/ui";
 import {
-  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Legend, BarChart, Bar,
+  Label,
 } from "recharts";
 import { useDashboardData } from "./hooks/use-dashboard-data";
 import GlobalSearch from "@/components/global-search";
@@ -35,14 +36,14 @@ interface TooltipEntry { color?: string; payload?: { fill?: string }; name?: str
 function CustomTooltip({ active, payload, label }: { active?: boolean; payload?: TooltipEntry[]; label?: string }) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="bg-white/95 backdrop-blur-md border border-black/[0.07] shadow-[var(--shadow-float)] rounded-xl p-3 min-w-[120px]">
+    <div className="bg-white/90 backdrop-blur-md border border-black/[0.07] shadow-[var(--shadow-float)] rounded-xl p-2 min-w-[120px]">
       {label && (
-        <p className="text-[11px] font-bold text-[var(--gray)] uppercase tracking-wider mb-1.5">{label}</p>
+        <p className="body uppercase tracking-wider mb-1.5">{label}</p>
       )}
       {payload.map((e: TooltipEntry, i: number) => (
         <div key={i} className="flex items-center gap-2">
           <span className="w-2 h-2 rounded-full shrink-0" style={{ background: e.color ?? e.payload?.fill }} />
-          <span className="text-[13px] font-semibold text-[var(--primary-dark)] capitalize">
+          <span className="caption capitalize">
             {e.name ?? e.dataKey}: {e.value}
           </span>
         </div>
@@ -50,6 +51,21 @@ function CustomTooltip({ active, payload, label }: { active?: boolean; payload?:
     </div>
   );
 }
+
+// dummy data for line chart to see
+const DUMMY_ATTENDANCE = [
+  { month: "Aug", attendees: 24 },
+  { month: "Sep", attendees: 61 },
+  { month: "Oct", attendees: 45 },
+  { month: "Nov", attendees: 78 },
+  { month: "Dec", attendees: 32 },
+  { month: "Jan", attendees: 55 },
+  { month: "Feb", attendees: 90 },
+  { month: "Mar", attendees: 67 },
+  { month: "Apr", attendees: 41 },
+  { month: "May", attendees: 83 },
+];
+
 
 // ------------------------------------------------ DASHBOARD PAGE ------------------------------------------------
 export default function DashboardPage() {
@@ -144,52 +160,68 @@ export default function DashboardPage() {
             {/* attendance and quick actions ------------------------------------------------ */}
             <div className="grid grid-cols-1 xl:grid-cols-[1fr_280px] gap-4">
 
-              {/* attendance over time */}
+                {/* attendance over time */}
                 <Card variant="no-hover" className="flex flex-col p-5 min-h-[320px]">
                     <div className="flex flex-wrap items-start justify-between gap-3 mb-4 shrink-0">
-                    <div>
-                        <h2 className="heading-md">Attendance Over Time</h2>
-                        <p className="caption mt-0.5">Total event attendees per period</p>
-                    </div>
-                    <DateRangePicker value={attendanceRange} onChange={setAttendanceRange} />
+                        <div>
+                            <h2 className="heading-md">Attendance Over Time</h2>
+                            <p className="caption mt-0.5">Total event attendees per period</p>
+                        </div>
+                        <DateRangePicker value={attendanceRange} onChange={setAttendanceRange} />
                     </div>
                     <div className="flex-1 w-full min-h-[200px] cursor-default select-none relative">
-                    {attendanceLoading && (
-                        <div className="absolute inset-0 flex items-center justify-center bg-white/60 backdrop-blur-sm rounded-xl z-10">
-                            <span className="caption animate-pulse">Loading…</span>
-                        </div>
-                    )}
-                    <ResponsiveContainer width="100%" height="100%">
-                        <AreaChart data={eventAttendanceData} margin={{ top: 5, right: 10, left: -25, bottom: 0 }}>
-                        <CartesianGrid strokeDasharray="3 3" stroke={AXIS_COLOR} vertical={false} />
-                        <XAxis
-                            dataKey="month"
-                            stroke={AXIS_COLOR}
-                            tick={{ fill: TICK_COLOR, fontSize: 11 }}
-                            tickLine={false} axisLine={false} dy={10}
-                        />
-                        <YAxis
-                            stroke={AXIS_COLOR}
-                            tick={{ fill: TICK_COLOR, fontSize: 11 }}
-                            tickLine={false} axisLine={false}
-                        />
-                        <Tooltip
-                            content={<CustomTooltip />}
-                            cursor={{ stroke: AXIS_COLOR, strokeWidth: 1, strokeDasharray: "4 4" }}
-                        />
-                        <Area
-                            type="linear"
-                            dataKey="attendees"
-                            name="Attendees"
-                            stroke="#B8B5E8"
-                            strokeWidth={2.5}
-                            fill="var(--periwinkle-light)"
-                            fillOpacity={0.55}
-                            activeDot={{ r: 5, fill: "var(--periwinkle)", stroke: "white", strokeWidth: 2 }}
-                            style={{ pointerEvents: "none" }}
-                        />
-                        </AreaChart>
-                    </ResponsiveContainer>
+                        {attendanceLoading && (
+                            <div className="absolute inset-0 flex items-center justify-center bg-white/60 backdrop-blur-sm rounded-xl z-10">
+                                <span className="caption animate-pulse">Loading…</span>
+                            </div>
+                        )}
+                        <ResponsiveContainer width="100%" height="100%">
+                            <LineChart
+                                data={DUMMY_ATTENDANCE}
+                                margin={{ top: 0, right: 5, left: 10, bottom: 25 }}
+                            >
+                                <CartesianGrid strokeDasharray="3 3" stroke={AXIS_COLOR} vertical={false} />
+                                <XAxis
+                                    dataKey="month"
+                                    stroke={AXIS_COLOR}
+                                    tick={{ fill: TICK_COLOR, fontSize: 11 }}
+                                    tickLine={false} axisLine={false} dy={10}
+                                    label={{
+                                        value: "Month",
+                                        position: "insideBottom",
+                                        offset: -25,
+                                        fill: "var(--primary-dark)",
+                                        fontSize: 13,
+                                    }}
+                                />
+                                <YAxis
+                                    stroke={AXIS_COLOR}
+                                    tick={{ fill: TICK_COLOR, fontSize: 11 }}
+                                    tickLine={false} axisLine={false}
+                                    label={{
+                                        value: "Attendees",
+                                        angle: -90,
+                                        position: "insideLeft",
+                                        offset: 1,
+                                        fill: "var(--primary-dark)",
+                                        fontSize: 13,
+                                    }}
+                                />
+                                <Tooltip
+                                    content={<CustomTooltip />}
+                                    cursor={{ stroke: AXIS_COLOR, strokeWidth: 1, strokeDasharray: "4 4" }}
+                                />
+                                <Line
+                                    type="monotone"
+                                    dataKey="attendees"
+                                    name="Attendees"
+                                    stroke="var(--periwinkle)"
+                                    strokeWidth={2.5}
+                                    dot={{ fill: "var(--periwinkle)", stroke: "var(--periwinkle)", strokeWidth: 2, r: 3 }}
+                                    activeDot={{ r: 5, fill: "var(--primary-dark)", stroke: "white", strokeWidth: 2 }}
+                                />
+                            </LineChart>
+                        </ResponsiveContainer>
                     </div>
                 </Card>
 
@@ -238,7 +270,7 @@ export default function DashboardPage() {
                                     tickLine={false} axisLine={false}
                                     />
                                     <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(45,42,74,0.03)" }} />
-                                    <Bar dataKey="value" name="Users" radius={[6, 6, 0, 0]} barSize={36} style={{ pointerEvents: "none" }}>
+                                    <Bar dataKey="value" name="Users" radius={[6, 6, 0, 0]} barSize={36}>
                                     {filteredColleges.map((_: unknown, idx: number) => (
                                         <Cell key={`col-${idx}`} fill={BRAND_COLORS[idx % BRAND_COLORS.length]} />
                                     ))}
@@ -260,7 +292,6 @@ export default function DashboardPage() {
                                     innerRadius="55%" outerRadius="78%"
                                     paddingAngle={2}
                                     dataKey="value" nameKey="name"
-                                    stroke="white" strokeWidth={2}
                                     >
                                     {sexAtBirthData?.map((_: unknown, i: number) => (
                                         <Cell key={`sex-${i}`} fill={BRAND_COLORS[i % BRAND_COLORS.length]} />
@@ -291,7 +322,6 @@ export default function DashboardPage() {
                                     innerRadius="55%" outerRadius="78%"
                                     paddingAngle={2}
                                     dataKey="value" nameKey="name"
-                                    stroke="white" strokeWidth={2}
                                     >
                                     {filteredGenders.map((_: unknown, i: number) => (
                                         <Cell key={`gender-${i}`} fill={BRAND_COLORS[i % BRAND_COLORS.length]} />
