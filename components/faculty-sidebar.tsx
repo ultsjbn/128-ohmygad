@@ -168,9 +168,9 @@ export default function FacultySidebar() {
                 className={[
                   "flex items-center w-full h-[40px] rounded-[10px]",
                   "justify-start px-1 group-data-[state=collapsed]/sidebar:justify-center group-data-[state=collapsed]/sidebar:px-0",
-                  "text-[13px] font-medium transition-colors duration-150",
+                  "text- font-medium transition-colors duration-150",
                   active
-                    ? "bg-white/[0.18] text-white"
+                    ? "bg-white/[0.18] text-[var(--white)]"
                     : "text-white/50 hover:bg-white/[0.08] hover:text-white/80",
                 ].join(" ")}
               >
