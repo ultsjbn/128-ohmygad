@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { Search, Loader2 } from "lucide-react";
+import { Search, Loader2, ChevronUp, ExternalLink, X, MoveUp, MoveDown } from "lucide-react";
 import { Badge } from "@/components/ui";
 
 interface GlobalSearchProps {
@@ -25,6 +25,14 @@ export default function GlobalSearch({ role, placeholder = "Search events, users
   const [open, setOpen] = useState(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
+
+  const AVAILABLE_CATEGORIES = [
+    { id: "Events", type: "Event" },
+    ...(role === "admin" ? [{ id: "Users", type: "User" }] : []),
+    { id: "Guidelines", type: "Course" },
+    { id: "Surveys", type: "Survey" },
+  ];
+
 
   // debouncing
   useEffect(() => {
@@ -107,6 +115,14 @@ export default function GlobalSearch({ role, placeholder = "Search events, users
         }}
         onFocus={() => { if (query.trim().length >= 2) setOpen(true); }}
       />
+      {query && (
+        <button
+          onClick={() => { setQuery(""); setOpen(false); }}
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--gray)] hover:text-[var(--primary-dark)] bg-transparent border-none cursor-pointer"
+        >
+          <X size={15} />
+        </button>
+      )}
 
       {open && query.trim().length >= 2 && (
         <div style={{
@@ -123,44 +139,71 @@ export default function GlobalSearch({ role, placeholder = "Search events, users
           overflow: "hidden",
           display: "flex",
           flexDirection: "column",
-          maxHeight: 400,
+          maxHeight: "85vh",
         }}>
+          {/* Results Area */}
           {loading ? (
-            <div style={{ padding: 16, display: "flex", alignItems: "center", justifyItems: "center", justifyContent: "center", gap: 8, color: "var(--gray)", fontSize: 13 }}>
+            <div style={{ padding: 24, display: "flex", alignItems: "center", justifyContent: "center", gap: 8, color: "var(--gray)", fontSize: 13 }}>
               <Loader2 size={16} className="animate-spin" /> Searching...
             </div>
           ) : results.length > 0 ? (
-            <div style={{ padding: "8px 0", overflowY: "auto" }}>
-              {results.map(r => (
-                <div
-                  key={r.id + r.type}
-                  onClick={() => handleSelect(r)}
-                  className="global-search-item"
-                  style={{
-                    padding: "10px 16px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    cursor: "pointer",
-                    transition: "background 0.2s"
-                  }}
-                  onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(45,42,74,0.04)")}
-                  onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
-                >
-                  <span style={{ fontSize: 14, color: "var(--primary-dark)", fontWeight: 500, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "70%" }}>
-                    {r.title}
-                  </span>
-                  <Badge variant={r.type === "User" ? "pink" : r.type === "Course" ? "periwinkle" : r.type === "Survey" ? "pink" : "dark"}>
-                    {r.type}
-                  </Badge>
-                </div>
-              ))}
+            <div style={{ overflowY: "auto", flex: 1, paddingBottom: 8 }}>
+              {AVAILABLE_CATEGORIES.map(c => {
+                const catResults = results.filter(r => r.type === c.type);
+                if (catResults.length === 0) return null;
+
+                return (
+                  <div key={c.id} className="border-b border-black/[0.05] last:border-0 pb-2">
+                    <div className="px-4 py-2 flex items-center gap-2 mt-1">
+                      <span className="text-[13px] font-semibold text-[var(--primary-dark)]">{c.id}</span>
+                      <span className="bg-black/5 px-1.5 py-0.5 rounded text-[10px] text-[var(--gray)] font-medium leading-none">{catResults.length}</span>
+                    </div>
+                    <div className="flex flex-col">
+                      {catResults.slice(0, 3).map(r => (
+                        <div
+                          key={r.id + r.type}
+                          onClick={() => handleSelect(r)}
+                          className="px-4 py-2 flex items-center justify-between hover:bg-black/[0.03] cursor-pointer group"
+                        >
+                          <span className="text-[13px] text-[var(--primary-dark)] font-medium truncate group-hover:underline">{r.title}</span>
+                        </div>
+                      ))}
+                    </div>
+                    {catResults.length >= 4 && (
+                      <div className="px-4 pt-1">
+                        <button
+                          onClick={() => {
+                            setOpen(false);
+                            if (c.id === "Guidelines") router.push(`/${role}/courses?search=${encodeURIComponent(query)}`);
+                            else if (c.id === "Events") router.push(`/${role}/events?search=${encodeURIComponent(query)}`);
+                            else if (c.id === "Users") router.push(`/admin/users?search=${encodeURIComponent(query)}`);
+                            else if (c.id === "Surveys") router.push(`/${role}/surveys?search=${encodeURIComponent(query)}`);
+                          }}
+                          className="text-[12px] font-medium text-blue-600 hover:underline bg-transparent border-none cursor-pointer"
+                        >
+                          See all results
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           ) : (
-            <div style={{ padding: 16, textAlign: "center", color: "var(--gray)", fontSize: 13 }}>
+            <div style={{ padding: 24, textAlign: "center", color: "var(--gray)", fontSize: 13 }}>
               No results found.
             </div>
           )}
+
+          {/* Footer Area */}
+          <div className="px-4 py-2.5 border-t border-black/[0.05] flex items-center justify-between bg-[rgba(240,240,245,0.4)]">
+            <button
+              onClick={() => { setOpen(false); router.push(`/${role}/search?q=${encodeURIComponent(query)}`); }}
+              className="flex items-center gap-1.5 text-[12px] font-medium text-blue-600 hover:underline bg-transparent border-none cursor-pointer"
+            >
+              {/* <ExternalLink size={13} /> Open search page */}
+            </button>
+          </div>
         </div>
       )}
     </div>

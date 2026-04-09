@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Loader2, Search } from "lucide-react";
-import { Card, Badge, Button } from "@/components/ui";
+import { Card, Badge, Button, Tabs } from "@/components/ui";
 import { Pagination } from "@/components/pagination";
 import { paginate, totalPages } from "@/lib/pagination.utils";
 
@@ -18,9 +18,18 @@ function SearchResultsContent({ role }: { role: string }) {
   const searchParams = useSearchParams();
   const query = searchParams.get("q") || "";
 
+  const categoryTabs = [
+    "Events",
+    ...(role === "admin" ? ["Users"] : []),
+    "Guidelines",
+    "Surveys",
+  ];
+  const availableTabs = ["All", ...categoryTabs];
+
   const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
+  const [activeFilters, setActiveFilters] = useState<string[]>(categoryTabs);
   const PER_PAGE_SEARCH = 10;
 
   useEffect(() => {
@@ -59,8 +68,32 @@ function SearchResultsContent({ role }: { role: string }) {
     }
   };
 
-  const paginatedResults = paginate(results, page, PER_PAGE_SEARCH);
-  const total = totalPages(results.length, PER_PAGE_SEARCH);
+  const filteredResults = results.filter((r) => {
+    if (activeFilters.includes("Events") && r.type === "Event") return true;
+    if (activeFilters.includes("Users") && r.type === "User") return true;
+    if (activeFilters.includes("Guidelines") && r.type === "Course") return true;
+    if (activeFilters.includes("Surveys") && r.type === "Survey") return true;
+    return false;
+  });
+
+  const paginatedResults = paginate(filteredResults, page, PER_PAGE_SEARCH);
+  const total = totalPages(filteredResults.length, PER_PAGE_SEARCH);
+
+  const toggleFilter = (c: string) => {
+    if (c === "All") {
+      if (activeFilters.length === categoryTabs.length) {
+        setActiveFilters([]);
+      } else {
+        setActiveFilters(categoryTabs);
+      }
+    } else {
+      setActiveFilters((prev) => {
+        if (prev.includes(c)) return prev.filter((f) => f !== c);
+        return [...prev, c];
+      });
+    }
+    setPage(1);
+  };
 
   return (
     <div className="flex flex-col gap-6">
@@ -68,6 +101,27 @@ function SearchResultsContent({ role }: { role: string }) {
         <h2 className="heading-md" style={{ color: "var(--primary-dark)" }}>
           Search Results for "{query}"
         </h2>
+        
+        {!loading && results.length > 0 && (
+          <div className="pt-2">
+            <div className="tabs">
+              {availableTabs.map((c) => {
+                const isActive = c === "All" 
+                  ? activeFilters.length === categoryTabs.length 
+                  : activeFilters.includes(c);
+                return (
+                  <button
+                    key={c}
+                    className={`tab${isActive ? " active" : ""}`}
+                    onClick={() => toggleFilter(c)}
+                  >
+                    {c}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
 
       {loading ? (
@@ -85,6 +139,13 @@ function SearchResultsContent({ role }: { role: string }) {
             <Button variant={"outline"} size="sm" onClick={() => router.back()}>
               Go back
             </Button>
+          </div>
+        </Card>
+      ) : filteredResults.length === 0 ? (
+        <Card>
+          <div className="flex flex-col items-center justify-center gap-3 py-12">
+            <Search size={32} style={{ opacity: 0.2 }} />
+            <p className="caption">No {activeFilters.length > 0 ? activeFilters.join(", ").toLowerCase() : "results"} found for your search.</p>
           </div>
         </Card>
       ) : (
@@ -116,7 +177,7 @@ function SearchResultsContent({ role }: { role: string }) {
           {total > 0 && (
             <div className="flex items-center justify-between flex-wrap gap-3 mt-2">
               <span className="caption">
-                Showing {Math.min((page - 1) * PER_PAGE_SEARCH + 1, results.length)}–{Math.min(page * PER_PAGE_SEARCH, results.length)} of {results.length} results
+                Showing {Math.min((page - 1) * PER_PAGE_SEARCH + 1, filteredResults.length)}–{Math.min(page * PER_PAGE_SEARCH, filteredResults.length)} of {filteredResults.length} results
               </span>
               <Pagination
                 page={page}
