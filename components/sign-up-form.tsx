@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Mail, Lock, User, Eye, EyeOff } from "lucide-react";
+import { validateFullName, validatePassword } from "@/lib/validation";
 
 export function SignUpForm({
   className,
@@ -34,16 +35,17 @@ export function SignUpForm({
     }
 
     if (full_name) {
-      const fullnameRegex = /^[a-zA-Z\s.'-]+$/;
-      if (!fullnameRegex.test(full_name)) {
-        setError("Full name can only contain letters, spaces, and basic punctuation.");
+      const nameErr = validateFullName(full_name);
+      if (nameErr) {
+        setError(nameErr);
         setIsLoading(false);
         return;
       }
     }
 
-    if (password.length < 8) {
-      setError("Password must be at least 8 characters long.");
+    const pwErr = validatePassword(password);
+    if (pwErr) {
+      setError(pwErr);
       setIsLoading(false);
       return;
     }

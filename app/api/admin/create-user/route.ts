@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
+import { validateFullName, validateEmail, validatePassword, validateContactNum, validateStudentNum } from "@/lib/validation";
 
 export async function POST(req: Request) {
     try {
@@ -18,47 +19,29 @@ export async function POST(req: Request) {
             );
         }
 
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
-            return NextResponse.json(
-                { error: "Please provide a valid email address." },
-                { status: 400 },
-            );
+        const emailErr = validateEmail(email);
+        if (emailErr) {
+            return NextResponse.json({ error: emailErr }, { status: 400 });
         }
 
-        if (password.length < 8) {
-            return NextResponse.json(
-                { error: "Password must be at least 8 characters long." },
-                { status: 400 },
-            );
+        const pwErr = validatePassword(password);
+        if (pwErr) {
+            return NextResponse.json({ error: pwErr }, { status: 400 });
         }
 
-        const fullnameRegex = /^[a-zA-Z\s.'-]+$/;
-        if (!fullnameRegex.test(full_name)) {
-            return NextResponse.json(
-                { error: "Full name can only contain letters, spaces, and basic punctuation." },
-                { status: 400 },
-            );
+        const nameErr = validateFullName(full_name);
+        if (nameErr) {
+            return NextResponse.json({ error: nameErr }, { status: 400 });
         }
 
-        if (contact_num) {
-            const contactRegex = /^[0-9]{10,15}$/;
-            if (!contactRegex.test(contact_num)) {
-                return NextResponse.json(
-                    { error: "Contact number must be 10-15 digits." },
-                    { status: 400 },
-                );
-            }
+        const contactErr = validateContactNum(contact_num);
+        if (contactErr) {
+            return NextResponse.json({ error: contactErr }, { status: 400 });
         }
 
-        if (student_num) {
-            const cleanStudentNum = String(student_num).replace(/\D/g, "");
-            if (cleanStudentNum.length !== 9) {
-                return NextResponse.json(
-                    { error: "Student number must be exactly 9 digits." },
-                    { status: 400 },
-                );
-            }
+        const studentErr = validateStudentNum(student_num);
+        if (studentErr) {
+            return NextResponse.json({ error: studentErr }, { status: 400 });
         }
 
         // 1. Create the auth user with email auto-confirmed

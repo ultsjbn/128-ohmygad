@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 
 import { Card, Input, Select, Button, Badge, Tabs, ProgressBar, Toast } from "@/components/ui";
+import { validateFullName, validateDisplayName, validateContactNum } from "@/lib/validation";
 
 type Profile = {
   id: string;
@@ -100,35 +101,25 @@ export default function AdminProfilePage() {
   async function handleSave() {
     setSaving(true);
 
-    if (!profile.full_name.trim()) {
-      setToast({ type: "error", message: "Full name is required." });
+    const nameErr = validateFullName(profile.full_name);
+    if (nameErr) {
+      setToast({ type: "error", message: nameErr });
       setSaving(false);
       return;
     }
 
-    const fullnameRegex = /^[a-zA-Z\s.'-_]+$/;
-    if (!fullnameRegex.test(profile.full_name)) {
-      setToast({ type: "error", message: "Full name can only contain letters, spaces, and basic punctuation." });
+    const displayErr = validateDisplayName(profile.display_name);
+    if (displayErr) {
+      setToast({ type: "error", message: displayErr });
       setSaving(false);
       return;
     }
 
-    if (profile.display_name) {
-      const displayNameRegex = /^[a-zA-Z\s.'-_]+$/;
-      if (!displayNameRegex.test(profile.display_name)) {
-        setToast({ type: "error", message: "Display name can only contain letters, spaces, and basic punctuation." });
-        setSaving(false);
-        return;
-      }
-    }
-
-    if (profile.contact_num) {
-      const contactRegex = /^[0-9]{10,15}$/;
-      if (!contactRegex.test(profile.contact_num)) {
-        setToast({ type: "error", message: "Contact number must be 10-15 digits." });
-        setSaving(false);
-        return;
-      }
+    const contactErr = validateContactNum(profile.contact_num);
+    if (contactErr) {
+      setToast({ type: "error", message: contactErr });
+      setSaving(false);
+      return;
     }
 
     try {

@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { User, Mail, Lock, Phone, MapPin, Hash, Loader2 } from "lucide-react";
 import { Button, Input, Select, Toast, Toggle, Card } from "@/components/ui";
+import { validateFullName, validateDisplayName, validateContactNum, validateStudentNum, validatePassword, validateGsoSessions } from "@/lib/validation";
 
 // types
 interface CreateUserData {
@@ -103,42 +104,27 @@ export default function UserForm({ initialData, onSuccess, layout = "modal" }: U
         throw new Error("Please fill in all required fields.");
       }
 
-      if (password && password.length < 8) {
-        throw new Error("Password must be at least 8 characters long.");
+      const nameErr = validateFullName(full_name);
+      if (nameErr) throw new Error(nameErr);
+
+      const displayErr = validateDisplayName(display_name);
+      if (displayErr) throw new Error(displayErr);
+
+      if (password) {
+        const pwErr = validatePassword(password);
+        if (pwErr) throw new Error(pwErr);
       }
 
-      if (contact_num) {
-        const contactRegex = /^[0-9]{10,15}$/;
-        if (!contactRegex.test(contact_num)) {
-          throw new Error("Contact number must be 10-15 digits.");
-        }
-      }
+      const contactErr = validateContactNum(contact_num);
+      if (contactErr) throw new Error(contactErr);
 
-      if(full_name.length) {
-        const fullnameRegex = /^[a-zA-Z\s.'-]+$/;
-        if (!fullnameRegex.test(full_name)) {
-          throw new Error("Full name can only contain letters, spaces, and basic punctuation.");
-        }
-      }
+      const studentErr = validateStudentNum(student_num);
+      if (studentErr) throw new Error(studentErr);
 
-      if(display_name) {
-        const displayNameRegex = /^[a-zA-Z\s.'-]+$/;
-        if (!displayNameRegex.test(display_name)) {
-          throw new Error("Display name can only contain letters, spaces, and basic punctuation.");
-        }
-      }
-
-      if (student_num) {
-        const cleanStudentNum = student_num.replace(/\D/g, "");
-        if (cleanStudentNum.length !== 9) {
-          throw new Error("Student number must be exactly 9 digits.");
-        }
-      }
+      const gsoErr = validateGsoSessions(gso_attended);
+      if (gsoErr) throw new Error(gsoErr);
 
       const gsoNum = gso_attended === "" ? 0 : Number(gso_attended);
-      if (gsoNum < 0 || gsoNum > 5) {
-        throw new Error("GSO Sessions Attended must be between 0 and 5.");
-      }
 
       const cleanStudentNum = student_num ? student_num.replace(/\D/g, "") : undefined;
 

@@ -1,0 +1,64 @@
+/*
+ok i put all the validation into one file just so that its easierto keep track of and just in case
+we want ot use it in another new file
+
+Used by:
+components/admin/user-form.tsx       (admin create/edit user)
+components/onboarding-form.tsx       (user onboarding)
+components/sign-up-form.tsx          (user sign-up)
+app/admin/profile/page.tsx           (admin profile save)
+app/faculty/profile/page.tsx         (faculty profile save)
+app/student/profile/page.tsx         (student profile save)
+app/api/admin/create-user/route.ts   (server-side create user)
+*/
+
+// ── regex patterns ──────────────────────────────────────────────────────────
+const NAME_REGEX = /^[a-zA-Z\s.'-]+$/;
+const CONTACT_REGEX = /^[0-9]{10,15}$/;
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+// ── individual validators ───────────────────────────────────────────────────
+// Each returns an error message string if invalid, or null if valid.
+
+export function validateFullName(name: string): string | null {
+  if (!name || !name.trim()) return "Full name is required.";
+  if (!NAME_REGEX.test(name)) return "Full name can only contain letters, spaces, and basic punctuation.";
+  return null;
+}
+
+export function validateDisplayName(name: string): string | null {
+  if (!name) return null; // optional field
+  if (!NAME_REGEX.test(name)) return "Display name can only contain letters, spaces, and basic punctuation.";
+  return null;
+}
+
+export function validateContactNum(num: string): string | null {
+  if (!num) return null; // optional field
+  if (!CONTACT_REGEX.test(num)) return "Contact number must be 10-15 digits.";
+  return null;
+}
+
+export function validateStudentNum(num: string | number): string | null {
+  if (!num) return null; // optional field
+  const clean = String(num).replace(/\D/g, "");
+  if (clean.length !== 9) return "Student number must be exactly 9 digits.";
+  return null;
+}
+
+export function validatePassword(password: string): string | null {
+  if (!password) return "Password is required.";
+  if (password.length < 8) return "Password must be at least 8 characters long.";
+  return null;
+}
+
+export function validateEmail(email: string): string | null {
+  if (!email) return "Email is required.";
+  if (!EMAIL_REGEX.test(email)) return "Please provide a valid email address.";
+  return null;
+}
+
+export function validateGsoSessions(value: string | number): string | null {
+  const num = value === "" ? 0 : Number(value);
+  if (isNaN(num) || num < 0 || num > 5) return "GSO Sessions Attended must be between 0 and 5.";
+  return null;
+}
