@@ -48,7 +48,6 @@ type RegisteredUser = {
   full_name: string | null;
   email: string | null;
   registration_date: string | null;
-  // status: string | null;
 };
 
 function CheckItem({
@@ -87,8 +86,12 @@ export default function EventsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [sort, setSort] = useState<{ field: SortField; direction: "asc" | "desc" }>({ field: "start_date", direction: "desc" });
-  const [categoryFilter, setCategoryFilter] = useState<string>("All");
+  
+  // Updated filter states to use Sets for multi-select
+  const [categoryFilters, setCategoryFilters] = useState<Set<string>>(new Set());
   const [statusFilters, setStatusFilters] = useState<Set<string>>(new Set());
+  const [activeChip, setActiveChip] = useState("All");
+  
   const [page, setPage] = useState(1);
   
   // for the delete confirmation modal
@@ -116,7 +119,6 @@ export default function EventsPage() {
         )
       `)
       .eq("event_id", eventId);
-      // .neq("status", "cancelled");
 
       if (data) {
       setRegistrations(
@@ -185,8 +187,8 @@ export default function EventsPage() {
     );
 
     // category filter
-    if (categoryFilter !== "All") {
-      result = result.filter((e) => e.category === categoryFilter);
+    if (categoryFilters.size > 0) {
+      result = result.filter((e) => categoryFilters.has(e.category ?? ""));
     }
 
     // status filter
@@ -220,7 +222,7 @@ export default function EventsPage() {
 
     setFiltered(result);
     setPage(1);
-  }, [search, events, sort, categoryFilter, statusFilters]);
+  }, [search, events, sort, categoryFilters, statusFilters]);
 
   // toggle helpers 
   function toggleStatus(s: string) {
@@ -231,10 +233,30 @@ export default function EventsPage() {
     });
   }
 
-  function clearAllFilters() {
-    setCategoryFilter("All");
-    setStatusFilters(new Set());
+  function toggleCategory(c: string) {
+    setCategoryFilters((prev) => {
+      const next = new Set(prev);
+      next.has(c) ? next.delete(c) : next.add(c);
+      return next;
+    });
+    // Reset chip visual if multiple or different selected
+    setActiveChip("All");
   }
+
+  function clearAllFilters() {
+    setCategoryFilters(new Set());
+    setStatusFilters(new Set());
+    setActiveChip("All");
+  }
+
+  const handleChipChange = (chip: string) => {
+    setActiveChip(chip);
+    if (chip === "All") {
+      setCategoryFilters(new Set());
+    } else {
+      setCategoryFilters(new Set([chip]));
+    }
+  };
 
   const handleSort = (field: SortField) => {
     setSort((prev) => ({
@@ -268,7 +290,7 @@ export default function EventsPage() {
     setDeleteTarget(null);
   };
 
-  const activeFilterCount = (categoryFilter !== "All" ? 1 : 0) + statusFilters.size;
+  const activeFilterCount = categoryFilters.size + statusFilters.size;
   const hasActiveFilters = activeFilterCount > 0;
 
   // datatable columns 
@@ -399,7 +421,7 @@ export default function EventsPage() {
             </DropdownItem>
           </Dropdown>
 
-          {/* filter status only */}
+          {/* Filter dropdown */}
           <Dropdown
             trigger={
             <Button variant={hasActiveFilters ? "pink" : "ghost"}>
@@ -429,6 +451,20 @@ export default function EventsPage() {
             ))}
 
             <DropdownDivider />
+            
+            <div style={{ padding: "6px 12px 4px" }}>
+              <p className="label" style={{ marginBottom: 4 }}>Category</p>
+            </div>
+            {CATEGORIES.map((c) => (
+              <CheckItem
+                key={c}
+                label={c}
+                active={categoryFilters.has(c)}
+                onToggle={() => toggleCategory(c)}
+              />
+            ))}
+
+            <DropdownDivider />
             <DropdownItem onClick={clearAllFilters}>
               Clear all filters
             </DropdownItem>
@@ -442,8 +478,8 @@ export default function EventsPage() {
         {/* category filter chips - single select */}
         <FilterChips
           chips={["All", ...CATEGORIES]}
-          defaultActive={categoryFilter}
-          onChange={(active) => setCategoryFilter(active)}
+          defaultActive={activeChip}
+          onChange={handleChipChange}
         />
       </div>
 
@@ -452,25 +488,17 @@ export default function EventsPage() {
         <div className="flex items-center gap-2 flex-wrap -mt-2">
           <span className="caption">Active filters:</span>
 
-          {categoryFilter !== "All" && (
-            <Badge variant="pink" dot>
-              {categoryFilter}
-              <button
-                onClick={() => setCategoryFilter("All")}
-                aria-label={`Remove ${categoryFilter} filter`}
-                style={{ marginLeft: 6 }}
-              >×</button>
-            </Badge>
-          )}
-
           {[...statusFilters].map((s) => (
             <Badge key={s} variant="warning" dot>
               <span className="capitalize">{s}</span>
-              <button
-                onClick={() => toggleStatus(s)}
-                aria-label={`Remove ${s} filter`}
-                style={{ marginLeft: 6 }}
-              >×</button>
+              <button onClick={() => toggleStatus(s)} style={{ marginLeft: 6 }}>×</button>
+            </Badge>
+          ))}
+
+          {[...categoryFilters].map((c) => (
+            <Badge key={c} variant="pink" dot>
+              {c}
+              <button onClick={() => { toggleCategory(c); setActiveChip("All"); }} style={{ marginLeft: 6 }}>×</button>
             </Badge>
           ))}
 
