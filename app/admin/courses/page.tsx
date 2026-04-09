@@ -248,15 +248,7 @@ export default function CoursesPage() {
         </button>
       ),
     },
-    {
-      key: "semester",
-      header: "Semester",
-      render: (course) => (
-        <Badge variant={SEMESTER_VARIANT[course.semester ?? ""] ?? "dark"}>
-          {course.semester}
-        </Badge>
-      ),
-    },
+
     {
       key: "status",
       header: "Status",
@@ -334,74 +326,15 @@ export default function CoursesPage() {
             containerStyle={{ flex: 1, minWidth: 220 }}
           />
 
-          {/* sort multi-field */}
-          <Dropdown
-            trigger={
-              <Button variant="ghost">
-                <ArrowUpDown size={15} /> Sort
-              </Button>
-            }
-          >
-            {SORT_FIELDS.map((field) => (
-              <DropdownItem key={field} onClick={() => handleSort(field)}>
-                <span className="flex items-center justify-between gap-6 w-full">
-                  <span className="capitalize">{field === "start_time" ? "Time" : field}</span>
-                  <SortIcon field={field} />
-                </span>
-              </DropdownItem>
-            ))}
-            <DropdownDivider />
-            <DropdownItem onClick={() => { setSort({ field: "start_time", direction: "desc" }); setPage(1); }}>
-              Reset sort
-            </DropdownItem>
-          </Dropdown>
+        
 
-          {/* filter status only */}
-          <Dropdown
-            trigger={
-              <Button variant={hasActiveFilters ? "pink" : "ghost"}>
-                <SlidersHorizontal size={15} /> Filter
-                {hasActiveFilters && (
-                  <span
-                    className="inline-flex items-center justify-center w-4 h-4 rounded-full text-[10px] font-bold text-white"
-                    style={{ background: "var(--primary-dark)", marginLeft: 2 }}
-                  >
-                    {activeFilterCount}
-                  </span>
-                )}
-              </Button>
-            }
-          >
-            <div style={{ padding: "4px 12px 6px" }}>
-              <p className="label" style={{ marginBottom: 4 }}>Status</p>
-            </div>
-            {STATUSES.map((s) => (
-              <CheckItem
-                key={s}
-                label={s}
-                active={statusFilters.has(s)}
-                onToggle={() => toggleStatus(s)}
-                capitalize
-              />
-            ))}
-
-            <DropdownDivider />
-            <DropdownItem onClick={clearAllFilters}>
-              Clear all filters
-            </DropdownItem>
-          </Dropdown>
 
             <Button variant="primary" onClick={() => router.push("/admin/courses/create")}>
                 <Plus size={16} /> Add Guideline
             </Button>
         </div>
 
-        {/* semester filter chips - single select */}
-        <FilterChips
-          chips={["All", ...SEMESTERS]}
-          defaultActive={semesterFilter}
-          onChange={(active) => setSemesterFilter(active)}
-        />
+     
       </div>
 
       {/*  active filter pills  */}
