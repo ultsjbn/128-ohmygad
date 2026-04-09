@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { User, Mail, Lock, Phone, MapPin, Hash, Loader2 } from "lucide-react";
 import { Button, Input, Select, Toast, Toggle, Card } from "@/components/ui";
-import { validateFullName, validateDisplayName, validateContactNum, validateStudentNum, validatePassword, validateGsoSessions } from "@/lib/validation";
+import { validateFullName, validateDisplayName, validateContactNum, validateStudentNum, validatePassword, validateGsoSessions, validateAddress } from "@/lib/validation";
 
 // types
 interface CreateUserData {
@@ -80,7 +80,7 @@ export default function UserForm({ initialData, onSuccess, layout = "modal" }: U
   // helpers
   const handleStudentNumChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const digits = e.target.value.replace(/\D/g, "").slice(0, 9);
-    setStudentNum(digits.length > 4 ? `${digits.slice(0, 4)}-${digits.slice(4)}` : digits);
+    setStudentNum(digits);
   };
 
   const handleContactNumChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -123,6 +123,9 @@ export default function UserForm({ initialData, onSuccess, layout = "modal" }: U
 
       const gsoErr = validateGsoSessions(gso_attended);
       if (gsoErr) throw new Error(gsoErr);
+
+      const addressErr = validateAddress(address || "");
+      if (addressErr) throw new Error(addressErr);
 
       const gsoNum = gso_attended === "" ? 0 : Number(gso_attended);
 
