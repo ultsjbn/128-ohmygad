@@ -93,6 +93,7 @@ export function UpdatePasswordForm({
               type="password"
               placeholder="Enter new password"
               required
+              maxLength={128}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="input"
