@@ -185,26 +185,30 @@ export default function EventsPage() {
 
   // Toggle attended 
   const handleToggleAttendance = async (registrationId: string, newValue: boolean) => {
-
     setRegistrations((prev) =>
       prev.map((r) => r.registration_id === registrationId ? { ...r, attended: newValue } : r)
     );
     setTogglingId(registrationId);
 
     const supabase = createClient();
-    const { error } = await supabase
-      .from("event_registration")
-      .update({ attended: newValue })
-      .eq("id", registrationId);
 
-    if (error) {
-      // Revert on failure
+    try {
+      const { data, error } = await supabase
+        .from("event_registration")
+        .update({ attended: newValue })
+        .eq("id", registrationId)
+        .select();
+
+    } catch (err: any) {
+      console.error("Attendance update failed:", err.message);
+      
+      // Rollback UI state on failure
       setRegistrations((prev) =>
         prev.map((r) => r.registration_id === registrationId ? { ...r, attended: !newValue } : r)
       );
-      console.error("Failed to update attendance:", error.message);
+    } finally {
+      setTogglingId(null);
     }
-    setTogglingId(null);
   };
 
   const openDetail = (event: EventFormData) => {
@@ -654,8 +658,8 @@ export default function EventsPage() {
         </div>
       )}
 
-      {/* ── Event detail modal ── */}
-      <Modal open={!!detailEvent} onClose={() => setDetailEvent(null)} title={detailEvent?.title} modalClassName="!max-w-xl !h-[50vh] flex flex-col items-center">
+      {/* Event detail modal */}
+      <Modal open={!!detailEvent} onClose={() => setDetailEvent(null)} title={detailEvent?.title} modalClassName="!max-w-xl !h-[50vh] items-center">
         {detailEvent && (
           <div className="flex flex-col gap-4">
 
