@@ -33,13 +33,12 @@ export default function DashboardPage({ rightPanel }: DashboardPageProps) {
   }, []);
 
   return (
-    <div className="w-full flex flex-col gap-3 md:gap-6 animate-in fade-in duration-500 md:py-2">
+    <div className="w-full flex flex-col gap-3 md:gap-4 animate-in fade-in duration-500 md:py-2">
       {/* dashboard header */}
-        <div className="shrink-0 animate-in slide-in-from-bottom-2 duration-500 mt-2 w-full flex justify-center">
-            <div className="w-full max-w-[1100px] md:px-2">
-                <p className="body font-medium">Welcome,</p>
-                <h1 className="heading-xl mt-0.5">{displayName}</h1>
-                <div className="mt-3">
+        <div className="shrink-0 animate-in slide-in-from-bottom-2 duration-500 w-full flex justify-center">
+            <div className="flex flex-col gap-2 md:gap-1 w-full max-w-[1600px]">
+                <p className="heading-md">Good day, {displayName}!</p>
+                <div>
                     <GlobalSearch role="student" placeholder="Search events, courses, surveys..." />
                 </div>
             </div>
@@ -49,9 +48,9 @@ export default function DashboardPage({ rightPanel }: DashboardPageProps) {
         <div className="flex gap-4 md:gap-6 flex-1 min-h-0 justify-center">
 
             {/* centered inner wrapper */}
-            <div className="flex gap-4 md:gap-6 flex-1 min-h-0 w-full md:px-2 max-w-[1100px]">
+            <div className="flex gap-4 md:gap-6 flex-1 min-h-0 w-full max-w-[1700px]">
 
-                <Card className="flex flex-col p-0 overflow-hidden min-h-0 flex-1 min-w-0">
+                <Card variant="no-hover" className="flex flex-col overflow-y-auto min-h-0 flex-1 min-w-0">
                     <EventPanel />  
                 </Card>
 
