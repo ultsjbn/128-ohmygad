@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import {
-  Home, Calendar, Users, BookOpen, ClipboardList,
+  LayoutDashboard, Calendar, Users, BookOpen, ClipboardList,
   LogOut, ArrowLeft, PanelLeftClose, PanelLeftOpen,
 } from "lucide-react";
 import Image from "next/image";
@@ -13,7 +13,7 @@ import { Button } from "./button";
 
 // navigation ------------------------------------------------
 const NAV_ITEMS = [
-  { href: "/admin",         label: "Dashboard", icon: Home,          exact: true  },
+  { href: "/admin",         label: "Dashboard", icon: LayoutDashboard,          exact: true  },
   { href: "/admin/events",  label: "Events",    icon: Calendar,      exact: false },
   { href: "/admin/users",   label: "Users",     icon: Users,         exact: false },
   { href: "/admin/courses", label: "Courses",   icon: BookOpen,      exact: false },
@@ -194,7 +194,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
                 className={[
                   "flex items-center w-full h-[40px] rounded-[10px]",
                   "justify-start px-1 group-data-[state=collapsed]/sidebar:justify-center group-data-[state=collapsed]/sidebar:px-0",
-                  "text-[13px] font-medium transition-colors duration-150",
+                  "text-[15px] font-medium transition-colors duration-150",
                   active
                     ? "bg-white/[0.18] text-white"
                     : "text-white/50 hover:bg-white/[0.08] hover:text-white/80",
@@ -221,7 +221,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
         </nav>
 
         {/* logout ------------------------------------------------ */}
-        <div className="shrink-0 flex flex-col gap-[2px] px-2 pb-2 pt-2 border-t border-white/[0.07]">
+        <div className="shrink-0 flex flex-col gap-[2px] px-1 pb-1 pt-2 border-t border-white/[0.07]">
           <button
             onClick={() => router.push("/auth/login")}
             title={!open ? "Log out" : undefined}
