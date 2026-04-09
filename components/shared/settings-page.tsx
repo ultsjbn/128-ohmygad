@@ -195,6 +195,7 @@ export default function SharedSettingsPage() {
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
               required
+              maxLength={128}
               prefixIcon={<KeyRound size={15} />}
             />
             <Input
@@ -204,6 +205,7 @@ export default function SharedSettingsPage() {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
+              maxLength={128}
               prefixIcon={<KeyRound size={15} />}
             />
             

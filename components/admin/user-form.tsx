@@ -174,7 +174,7 @@ export default function UserForm({ initialData, onSuccess, layout = "modal" }: U
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 w-full">
               <Input label="Full Name" required prefixIcon={<User size={15} />} maxLength={64} placeholder="e.g. Maria Santos" value={full_name} onChange={(e) => setFullName(e.target.value)} />
               <Input label="Email" type="email" required prefixIcon={<Mail size={15} />} placeholder="m@up.edu.ph" value={email} onChange={(e) => setEmail(e.target.value)} />
-              <Input label={isEdit ? "Password (leave blank to keep)" : "Password"} type="password" required={!isEdit} prefixIcon={<Lock size={15} />} placeholder={isEdit ? "Leave blank to keep current" : "Min. 8 characters"} value={password} onChange={(e) => setPassword(e.target.value)} />
+              <Input label={isEdit ? "Password (leave blank to keep)" : "Password"} type="password" required={!isEdit} maxLength={128} prefixIcon={<Lock size={15} />} placeholder={isEdit ? "Leave blank to keep current" : "Min. 8 characters"} value={password} onChange={(e) => setPassword(e.target.value)} />
               <Select label="Role" required value={role} onChange={(e) => setRole(e.target.value)} options={ROLE_OPTIONS} />
             </div>
 
@@ -235,7 +235,7 @@ export default function UserForm({ initialData, onSuccess, layout = "modal" }: U
         <SectionLabel>Account Information</SectionLabel>
         <Input label="Full Name" required prefixIcon={<User size={15} />} maxLength={64} placeholder="e.g. Maria Santos" value={full_name} onChange={(e) => setFullName(e.target.value)} />
         <Input label="Email" type="email" required prefixIcon={<Mail size={15} />} placeholder="m@up.edu.ph" value={email} onChange={(e) => setEmail(e.target.value)} />
-        <Input label={isEdit ? "Password (leave blank to keep)" : "Password"} type="password" required={!isEdit} prefixIcon={<Lock size={15} />} placeholder={isEdit ? "Leave blank to keep current" : "Min. 8 characters"} value={password} onChange={(e) => setPassword(e.target.value)} />
+        <Input label={isEdit ? "Password (leave blank to keep)" : "Password"} type="password" required={!isEdit} maxLength={128} prefixIcon={<Lock size={15} />} placeholder={isEdit ? "Leave blank to keep current" : "Min. 8 characters"} value={password} onChange={(e) => setPassword(e.target.value)} />
         <Select label="Role" required value={role} onChange={(e) => setRole(e.target.value)} options={ROLE_OPTIONS} />
       </div>
 
