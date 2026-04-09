@@ -1,7 +1,7 @@
 "use client";
 
 import {
-  SlidersHorizontal, GraduationCap, Heart, Hash, BookOpen, Shield, User,
+  SlidersHorizontal, GraduationCap, Heart, Hash, BookOpen, Shield, User, VenusAndMars,
 } from "lucide-react";
 import { Button } from "./button";
 import { Badge } from "./badge";
@@ -48,7 +48,7 @@ export interface FilterOptions {
 const ROW1_KEYS: { key: keyof DashboardFilters; label: string; icon: React.ReactNode }[] = [
   { key: "yearLevel",      label: "Year Level",      icon: <Hash size={15} /> },
   { key: "college",        label: "College",          icon: <GraduationCap size={15} /> },
-  { key: "sexAtBirth",     label: "Sex at Birth",     icon: <User size={15} /> },
+  { key: "sexAtBirth",     label: "Sex at Birth",     icon: <VenusAndMars size={15} /> },
   { key: "genderIdentity", label: "Gender Identity",  icon: <Heart size={15} /> },
 ];
 

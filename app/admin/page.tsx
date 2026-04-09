@@ -84,10 +84,11 @@ export default function DashboardPage() {
         [breakdownData],
     );
     const filteredGenders = useMemo(
-        () => (genderIdentityData ?? []).filter((item: { name?: string; category?: string }) =>
-        ["Man", "Woman", "Self-describe", "Non-binary", "Prefer not to say"]
-            .some((g) => (item.name ?? item.category ?? "").toLowerCase().includes(g))
-        ),
+        () => (genderIdentityData ?? []).filter((item: { name?: string; category?: string }) => {
+            const label = (item.name ?? item.category ?? "");
+            return ["Man", "Woman", "Genderqueer", "Genderfluid", "Agender", "Self-describe", "Non-binary", "Prefer not to say"]
+            .some((g) => label.includes(g));
+        }),
         [genderIdentityData],
     );
 
@@ -260,7 +261,6 @@ export default function DashboardPage() {
                                     paddingAngle={2}
                                     dataKey="value" nameKey="name"
                                     stroke="white" strokeWidth={2}
-                                    style={{ pointerEvents: "none" }}
                                     >
                                     {sexAtBirthData?.map((_: unknown, i: number) => (
                                         <Cell key={`sex-${i}`} fill={BRAND_COLORS[i % BRAND_COLORS.length]} />
@@ -271,7 +271,7 @@ export default function DashboardPage() {
                                     verticalAlign="bottom" align="center" iconType="circle"
                                     wrapperStyle={{ paddingTop: 14 }}
                                     formatter={(v) => (
-                                        <span className="text-[10px] font-bold text-[var(--gray)] uppercase tracking-wider">{v}</span>
+                                        <span className="caption tracking-wider">{v}</span>
                                     )}
                                     />
                                 </PieChart>
@@ -292,7 +292,6 @@ export default function DashboardPage() {
                                     paddingAngle={2}
                                     dataKey="value" nameKey="name"
                                     stroke="white" strokeWidth={2}
-                                    style={{ pointerEvents: "none" }}
                                     >
                                     {filteredGenders.map((_: unknown, i: number) => (
                                         <Cell key={`gender-${i}`} fill={BRAND_COLORS[i % BRAND_COLORS.length]} />
@@ -303,7 +302,7 @@ export default function DashboardPage() {
                                     verticalAlign="bottom" align="center" iconType="circle"
                                     wrapperStyle={{ paddingTop: 14 }}
                                     formatter={(v) => (
-                                        <span className="text-[10px] font-bold text-[var(--gray)] uppercase tracking-wider">{v}</span>
+                                        <span className="caption tracking-wider">{v}</span>
                                     )}
                                     />
                                 </PieChart>

@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { User, Hash, Phone, MapPin, MessageSquare } from "lucide-react";
+import { User, Hash, Phone, MapPin, } from "lucide-react";
 import { Input, Select } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { validateFullName, validateContactNum, validateStudentNum } from "@/lib/validation";
@@ -309,13 +309,20 @@ export function OnboardingForm({
               autoComplete="off"
             />
 
-            <Input
-              label="Pronouns (optional)"
-              placeholder="e.g. she/her, he/him..."
-              prefixIcon={<MessageSquare size={15} />}
-              value={pronouns}
-              onChange={(e) => setPronouns(e.target.value)}
-              autoComplete="off"
+            <Select
+                label="Pronouns (optional)"
+                value={pronouns}
+                onChange={(e) => setPronouns(e.target.value)}
+                options={[
+                { value: "", label: "Select pronouns" },
+                { value: "he/him", label: "he/him" },
+                { value: "she/her", label: "she/her" },
+                { value: "they/them", label: "they/them" },
+                { value: "he/they", label: "he/they" },
+                { value: "she/they", label: "she/they" },
+                { value: "any/all", label: "any/all" },
+                { value: "prefer not to say", label: "Prefer not to say" },
+                ]}
             />
 
             <div className="md:col-span-2">
