@@ -6,8 +6,10 @@ import {
   Users, Calendar, UserCheck, ClipboardList, BookOpen,
 } from "lucide-react";
 import {
-  Card, StatCard, PeriodSelector, Button, MiniCalendar, TodayTimeline,
+  Card, StatCard, Button, MiniCalendar, TodayTimeline, DateRangePicker,
+  DashboardFilter, EMPTY_FILTERS,
 } from "@/components/ui";
+import type { DateRange, DashboardFilters } from "@/components/ui";
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Legend, BarChart, Bar,
@@ -27,15 +29,6 @@ const QUICK_ACTIONS = [
   { icon: <BookOpen size={16} />, label: "Add Guideline",  href: "/admin/courses/create" },
   { icon: <ClipboardList size={16} />, label: "New Survey",  href: "/admin/surveys/create" },
 ];
-
-// timeline for today ------------------------------------------------
-const CATEGORY_COLORS: Record<string, string> = {
-  orientation: "var(--periwinkle)",
-  forum:       "var(--soft-pink)",
-  research:    "#9B9BB4",
-  training:    "var(--success)",
-  workshop:    "var(--warning)",
-};
 
 // tooltip ------------------------------------------------
 interface TooltipEntry { color?: string; payload?: { fill?: string }; name?: string; dataKey?: string; value?: number | string; }
@@ -61,7 +54,14 @@ function CustomTooltip({ active, payload, label }: { active?: boolean; payload?:
 // ------------------------------------------------ DASHBOARD PAGE ------------------------------------------------
 export default function DashboardPage() {
     const router = useRouter();
-    const [attendancePeriod, setAttendancePeriod] = useState<"D" | "W" | "M" | "Y">("M");
+    const [attendanceRange, setAttendanceRange] = useState<DateRange>(() => {
+        const now   = new Date();
+        const start = new Date(now.getFullYear(), now.getMonth(), 1);
+        const end   = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+        const iso   = (d: Date) => d.toISOString().split("T")[0];
+        return { from: iso(start), to: iso(end) };
+    });
+    const [filters, setFilters] = useState<DashboardFilters>(EMPTY_FILTERS);
 
     const {
         eventAttendanceData,
@@ -72,8 +72,10 @@ export default function DashboardPage() {
         gadEventsCount,
         surveysCount,
         todayEvents,
+        filterOptions,
         loading,
-    } = useDashboardData();
+        attendanceLoading,
+    } = useDashboardData(attendanceRange, filters);
 
     const filteredColleges = useMemo(
         () => (breakdownData ?? []).filter((item: { category?: string }) =>
@@ -83,7 +85,7 @@ export default function DashboardPage() {
     );
     const filteredGenders = useMemo(
         () => (genderIdentityData ?? []).filter((item: { name?: string; category?: string }) =>
-        ["man", "woman", "self-describe", "non-binary", "prefer not to say", "not-specified"]
+        ["Man", "Woman", "Self-describe", "Non-binary", "Prefer not to say"]
             .some((g) => (item.name ?? item.category ?? "").toLowerCase().includes(g))
         ),
         [genderIdentityData],
@@ -97,8 +99,13 @@ export default function DashboardPage() {
 
             {/* KPI section + greeting ------------------------------------------------ */}
             <div className="flex flex-col gap-3">
-                <div className="flex items-center justify-between">
+                <div className="flex items-start justify-between gap-4">
                     <h2 className="heading-md">Welcome, Admin</h2>
+                    <DashboardFilter
+                        value={filters}
+                        onChange={setFilters}
+                        options={filterOptions}
+                    />
                 </div>
                 <GlobalSearch role="student" placeholder="Search events, courses, surveys..." />
                 <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
@@ -143,9 +150,14 @@ export default function DashboardPage() {
                         <h2 className="heading-md">Attendance Over Time</h2>
                         <p className="caption mt-0.5">Total event attendees per period</p>
                     </div>
-                    <PeriodSelector defaultPeriod={attendancePeriod} onChange={setAttendancePeriod} />
+                    <DateRangePicker value={attendanceRange} onChange={setAttendanceRange} />
                     </div>
-                    <div className="flex-1 w-full min-h-[200px] cursor-default select-none">
+                    <div className="flex-1 w-full min-h-[200px] cursor-default select-none relative">
+                    {attendanceLoading && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-white/60 backdrop-blur-sm rounded-xl z-10">
+                            <span className="caption animate-pulse">Loading…</span>
+                        </div>
+                    )}
                     <ResponsiveContainer width="100%" height="100%">
                         <AreaChart data={eventAttendanceData} margin={{ top: 5, right: 10, left: -25, bottom: 0 }}>
                         <CartesianGrid strokeDasharray="3 3" stroke={AXIS_COLOR} vertical={false} />
@@ -184,7 +196,6 @@ export default function DashboardPage() {
                 <Card variant="no-hover" className="flex flex-col p-5 gap-3">
                     <div>
                         <h2 className="heading-sm">Quick Actions</h2>
-                        <p className="caption">Jump to common tasks</p>
                     </div>
                     <div className="flex flex-col gap-2">
                     {QUICK_ACTIONS.map((action) => (
@@ -192,7 +203,7 @@ export default function DashboardPage() {
                             key={action.label}
                             variant="soft"
                             onClick={() => router.push(action.href)}
-                            className="w-full justify-start"
+                            className="w-full justify-between"
                         >
                             {action.icon}
                             {action.label}

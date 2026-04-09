@@ -33,30 +33,36 @@ export function Tabs({ tabs, defaultTab, onChange }: TabsProps) {
 }
 
 // PeriodSelector
-type Period = "D" | "W" | "M" | "Y";
+export type AttendancePeriod = "M" | "S" | "Y";
+
+const PERIOD_LABELS: Record<AttendancePeriod, string> = {
+  M: "Monthly",
+  S: "Semester",
+  Y: "Annual",
+};
 
 interface PeriodSelectorProps {
-  defaultPeriod?: Period;
-  onChange?: (period: Period) => void;
+  defaultPeriod?: AttendancePeriod;
+  onChange?: (period: AttendancePeriod) => void;
 }
 
 export function PeriodSelector({ defaultPeriod = "M", onChange }: PeriodSelectorProps) {
-  const [period, setPeriod] = useState<Period>(defaultPeriod);
+  const [period, setPeriod] = useState<AttendancePeriod>(defaultPeriod);
 
-  function handleClick(p: Period) {
+  function handleClick(p: AttendancePeriod) {
     setPeriod(p);
     onChange?.(p);
   }
 
   return (
     <div className="period-selector">
-      {(["D", "W", "M", "Y"] as Period[]).map((p) => (
+      {(["M", "S", "Y"] as AttendancePeriod[]).map((p) => (
         <button
           key={p}
           className={`period-btn${period === p ? " active" : ""}`}
           onClick={() => handleClick(p)}
         >
-          {p}
+          {PERIOD_LABELS[p]}
         </button>
       ))}
     </div>
