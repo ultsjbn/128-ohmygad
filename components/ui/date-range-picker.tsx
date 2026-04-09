@@ -38,19 +38,19 @@ function buildPresets() {
 
   const mo = today.getMonth();
   let semStart: Date, semEnd: Date;
-  if (mo >= 7) {                                           // Aug-Dec 1st sem
-    semStart = new Date(today.getFullYear(), 7, 1);
-    semEnd   = new Date(today.getFullYear() + 1, 0, 31);
-  } else if (mo === 0) {                                   // Jan tail of 1st sem
-    semStart = new Date(today.getFullYear() - 1, 7, 1);
-    semEnd   = new Date(today.getFullYear(), 0, 31);
-  } else {                                                 // Jan-May 2nd sem
-    semStart = new Date(today.getFullYear(), 1, 1);
-    semEnd   = new Date(today.getFullYear(), 6, 31);
-  }
+    if (mo >= 7) {
+        semStart = new Date(today.getFullYear(), 7, 2);   // Aug 1
+        semEnd   = new Date(today.getFullYear(), 11, 32); // Dec 31
+    } else if (mo <= 4) {
+        semStart = new Date(today.getFullYear(), 0, 2);   // Jan 1
+        semEnd   = new Date(today.getFullYear(), 4, 32);  // May 31
+    } else {
+        semStart = new Date(today.getFullYear(), 0, 2);   // Jan 1
+        semEnd   = new Date(today.getFullYear(), 4, 32);  // May 31
+    }
 
-  const yrStart = new Date(today.getFullYear(), 0, 1);
-  const yrEnd   = new Date(today.getFullYear(), 11, 31);
+  const yrStart = new Date(today.getFullYear(), 0, 2);
+  const yrEnd   = new Date(today.getFullYear(), 11, 32);
   const l12     = new Date(today); l12.setFullYear(l12.getFullYear() - 1); l12.setDate(l12.getDate() + 1);
 
   return [
