@@ -13,20 +13,21 @@ interface BadgeProps {
 export function Badge({ children, variant = "pink", dot = false }: BadgeProps) {
   return (
     <span className={`badge badge-${variant}`}>
-      {dot && <span className="notif-dot" style={{ width: 6, height: 6 }} />}
       {children}
     </span>
   );
 }
 
-// FilterChips 
+// FilterChips
 interface FilterChipsProps {
   chips: string[];
   defaultActive?: string;
   onChange?: (active: string) => void;
+  /** Maps chip labels to a color variant class suffix, e.g. { Upcoming: "success", Past: "periwinkle" } */
+  colorMap?: Record<string, string>;
 }
 
-export function FilterChips({ chips, defaultActive, onChange }: FilterChipsProps) {
+export function FilterChips({ chips, defaultActive, onChange, colorMap }: FilterChipsProps) {
   const [active, setActive] = useState(defaultActive ?? chips[0]);
 
   function handleClick(c: string) {
@@ -36,15 +37,15 @@ export function FilterChips({ chips, defaultActive, onChange }: FilterChipsProps
 
   return (
     <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-      {chips.map((c) => (
-        <button
-          key={c}
-          className={`chip${active === c ? " active" : ""}`}
-          onClick={() => handleClick(c)}
-        >
-          {c}
-        </button>
-      ))}
+      {chips.map((c) => {
+        const colorVariant = colorMap?.[c];
+        const className = ["chip", colorVariant ? `chip-${colorVariant}` : "", active === c ? "active" : ""].filter(Boolean).join(" ");
+        return (
+          <button key={c} className={className} onClick={() => handleClick(c)}>
+            {c}
+          </button>
+        );
+      })}
     </div>
   );
 }

@@ -93,15 +93,15 @@ export default function DashboardPage() {
         <div className="flex gap-5 w-full animate-in fade-in duration-500">
 
         {/* ------------------------------------------------ MAIN CONTENT ------------------------------------------------*/}
-        <div className="flex flex-col gap-5 flex-1 min-w-0 pb-8">
+        <div className="flex flex-col gap-5 flex-1 min-w-0 pb-8 mt-1">
 
             {/* KPI section + greeting ------------------------------------------------ */}
-            <div className="flex flex-col gap-5">
+            <div className="flex flex-col gap-3">
                 <div className="flex items-center justify-between">
                     <h2 className="heading-md">Welcome, Admin</h2>
                 </div>
                 <GlobalSearch role="student" placeholder="Search events, courses, surveys..." />
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
                     <StatCard
                         variant="no-hover"
                         icon={<Users size={20} className="text-[var(--periwinkle)]"/>}
@@ -134,7 +134,7 @@ export default function DashboardPage() {
             </div>
 
             {/* attendance and quick actions ------------------------------------------------ */}
-            <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-4">
+            <div className="grid grid-cols-1 xl:grid-cols-[1fr_280px] gap-4">
 
               {/* attendance over time */}
                 <Card variant="no-hover" className="flex flex-col p-5 min-h-[320px]">
@@ -181,9 +181,11 @@ export default function DashboardPage() {
                 </Card>
 
               {/* quick actions */}
-                <Card variant="no-hover" className="flex flex-col p-5">
-                    <h2 className="heading-md mb-1">Quick Actions</h2>
-                    <p className="caption mb-4">Jump to common tasks</p>
+                <Card variant="no-hover" className="flex flex-col p-5 gap-3">
+                    <div>
+                        <h2 className="heading-sm">Quick Actions</h2>
+                        <p className="caption">Jump to common tasks</p>
+                    </div>
                     <div className="flex flex-col gap-2">
                     {QUICK_ACTIONS.map((action) => (
                         <Button
@@ -206,115 +208,127 @@ export default function DashboardPage() {
 
                     {/* users per college */}
                     <Card variant="no-hover" className="flex flex-col p-5 min-h-[260px]">
-                    <h2 className="heading-md mb-0.5">Users per College</h2>
-                    <p className="caption mb-3">Registered student breakdown</p>
-                    <div className="flex-1 w-full min-h-[170px] cursor-default select-none">
-                        <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={filteredColleges} margin={{ top: 8, right: 0, left: -25, bottom: 0 }}>
-                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={AXIS_COLOR} />
-                            <XAxis
-                            dataKey="category"
-                            stroke={AXIS_COLOR}
-                            tick={{ fill: TICK_COLOR, fontSize: 11 }}
-                            tickLine={false} axisLine={false} dy={8}
-                            />
-                            <YAxis
-                            stroke={AXIS_COLOR}
-                            tick={{ fill: TICK_COLOR, fontSize: 11 }}
-                            tickLine={false} axisLine={false}
-                            />
-                            <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(45,42,74,0.03)" }} />
-                            <Bar dataKey="value" name="Users" radius={[6, 6, 0, 0]} barSize={36} style={{ pointerEvents: "none" }}>
-                            {filteredColleges.map((_: unknown, idx: number) => (
-                                <Cell key={`col-${idx}`} fill={BRAND_COLORS[idx % BRAND_COLORS.length]} />
-                            ))}
-                            </Bar>
-                        </BarChart>
-                        </ResponsiveContainer>
-                    </div>
+                        <h2 className="heading-md mb-0.5">Users per College</h2>
+                        <p className="caption mb-3">Registered student breakdown</p>
+                        <div className="flex-1 w-full min-h-[170px] cursor-default select-none">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <BarChart data={filteredColleges} margin={{ top: 8, right: 0, left: -25, bottom: 0 }}>
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={AXIS_COLOR} />
+                                    <XAxis
+                                    dataKey="category"
+                                    stroke={AXIS_COLOR}
+                                    tick={{ fill: TICK_COLOR, fontSize: 11 }}
+                                    tickLine={false} axisLine={false} dy={8}
+                                    />
+                                    <YAxis
+                                    stroke={AXIS_COLOR}
+                                    tick={{ fill: TICK_COLOR, fontSize: 11 }}
+                                    tickLine={false} axisLine={false}
+                                    />
+                                    <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(45,42,74,0.03)" }} />
+                                    <Bar dataKey="value" name="Users" radius={[6, 6, 0, 0]} barSize={36} style={{ pointerEvents: "none" }}>
+                                    {filteredColleges.map((_: unknown, idx: number) => (
+                                        <Cell key={`col-${idx}`} fill={BRAND_COLORS[idx % BRAND_COLORS.length]} />
+                                    ))}
+                                    </Bar>
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </div>
                     </Card>
 
                     {/* sex at birth */}
                     <Card variant="no-hover" className="flex flex-col p-5 min-h-[260px]">
-                    <h2 className="heading-md mb-1">Sex at Birth</h2>
-                    <div className="flex-1 w-full min-h-[190px] cursor-default select-none">
-                        <ResponsiveContainer width="100%" height="100%">
-                        <PieChart>
-                            <Pie
-                            data={sexAtBirthData}
-                            cx="50%" cy="45%"
-                            innerRadius="55%" outerRadius="78%"
-                            paddingAngle={2}
-                            dataKey="value" nameKey="name"
-                            stroke="white" strokeWidth={2}
-                            style={{ pointerEvents: "none" }}
-                            >
-                            {sexAtBirthData?.map((_: unknown, i: number) => (
-                                <Cell key={`sex-${i}`} fill={BRAND_COLORS[i % BRAND_COLORS.length]} />
-                            ))}
-                            </Pie>
-                            <Tooltip content={<CustomTooltip />} />
-                            <Legend
-                            verticalAlign="bottom" align="center" iconType="circle"
-                            wrapperStyle={{ paddingTop: 14 }}
-                            formatter={(v) => (
-                                <span className="text-[10px] font-bold text-[var(--gray)] uppercase tracking-wider">{v}</span>
-                            )}
-                            />
-                        </PieChart>
-                        </ResponsiveContainer>
-                    </div>
+                        <h2 className="heading-md mb-0.5">Sex at Birth</h2>
+                        <div className="flex-1 w-full min-h-[190px] cursor-default select-none">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <PieChart>
+                                    <Pie
+                                    data={sexAtBirthData}
+                                    cx="50%" cy="45%"
+                                    innerRadius="55%" outerRadius="78%"
+                                    paddingAngle={2}
+                                    dataKey="value" nameKey="name"
+                                    stroke="white" strokeWidth={2}
+                                    style={{ pointerEvents: "none" }}
+                                    >
+                                    {sexAtBirthData?.map((_: unknown, i: number) => (
+                                        <Cell key={`sex-${i}`} fill={BRAND_COLORS[i % BRAND_COLORS.length]} />
+                                    ))}
+                                    </Pie>
+                                    <Tooltip content={<CustomTooltip />} />
+                                    <Legend
+                                    verticalAlign="bottom" align="center" iconType="circle"
+                                    wrapperStyle={{ paddingTop: 14 }}
+                                    formatter={(v) => (
+                                        <span className="text-[10px] font-bold text-[var(--gray)] uppercase tracking-wider">{v}</span>
+                                    )}
+                                    />
+                                </PieChart>
+                            </ResponsiveContainer>
+                        </div>
                     </Card>
 
                     {/* gender identity */}
                     <Card variant="no-hover" className="flex flex-col p-5 min-h-[260px]">
-                    <h2 className="heading-md mb-1">Gender Identity</h2>
-                    <div className="flex-1 w-full min-h-[190px] cursor-default select-none">
-                        <ResponsiveContainer width="100%" height="100%">
-                        <PieChart>
-                            <Pie
-                            data={filteredGenders}
-                            cx="50%" cy="45%"
-                            innerRadius="55%" outerRadius="78%"
-                            paddingAngle={2}
-                            dataKey="value" nameKey="name"
-                            stroke="white" strokeWidth={2}
-                            style={{ pointerEvents: "none" }}
-                            >
-                            {filteredGenders.map((_: unknown, i: number) => (
-                                <Cell key={`gender-${i}`} fill={BRAND_COLORS[i % BRAND_COLORS.length]} />
-                            ))}
-                            </Pie>
-                            <Tooltip content={<CustomTooltip />} />
-                            <Legend
-                            verticalAlign="bottom" align="center" iconType="circle"
-                            wrapperStyle={{ paddingTop: 14 }}
-                            formatter={(v) => (
-                                <span className="text-[10px] font-bold text-[var(--gray)] uppercase tracking-wider">{v}</span>
-                            )}
-                            />
-                        </PieChart>
-                        </ResponsiveContainer>
-                    </div>
+                        <h2 className="heading-md mb-0.5">Gender Identity</h2>
+                        <div className="flex-1 w-full min-h-[190px] cursor-default select-none">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <PieChart>
+                                    <Pie
+                                    data={filteredGenders}
+                                    cx="50%" cy="45%"
+                                    innerRadius="55%" outerRadius="78%"
+                                    paddingAngle={2}
+                                    dataKey="value" nameKey="name"
+                                    stroke="white" strokeWidth={2}
+                                    style={{ pointerEvents: "none" }}
+                                    >
+                                    {filteredGenders.map((_: unknown, i: number) => (
+                                        <Cell key={`gender-${i}`} fill={BRAND_COLORS[i % BRAND_COLORS.length]} />
+                                    ))}
+                                    </Pie>
+                                    <Tooltip content={<CustomTooltip />} />
+                                    <Legend
+                                    verticalAlign="bottom" align="center" iconType="circle"
+                                    wrapperStyle={{ paddingTop: 14 }}
+                                    formatter={(v) => (
+                                        <span className="text-[10px] font-bold text-[var(--gray)] uppercase tracking-wider">{v}</span>
+                                    )}
+                                    />
+                                </PieChart>
+                            </ResponsiveContainer>
+                        </div>
                     </Card>
 
                 </div>
+            </div>
+
+            {/* calendar + timeline — visible on md/lg only (xl uses the sidebar) */}
+            <div className="hidden md:grid xl:hidden grid-cols-2 gap-4 pb-8">
+                <Card variant="no-hover" className="p-4">
+                    <MiniCalendar
+                        eventDays={new Set([3, 10, 14])}
+                        onDayClick={(date) => console.log(date)}
+                    />
+                </Card>
+                <Card variant="no-hover" className="p-4">
+                    <TodayTimeline events={todayEvents} loading={loading} />
+                </Card>
             </div>
         </div>
 
         {/* right panel ------------------------------------------------------------------------------------------------ */}
         <aside className="hidden xl:flex flex-col gap-4 w-[268px] shrink-0 pb-8">
             {/* calendar */}
-            <Card className="p-4">
+            <Card variant="no-hover" className="p-4">
                 <MiniCalendar
-                    eventDays={new Set([3, 10, 14])}   // optional — defaults to a demo set
-                    onAddEvent={() => router.push("/admin/events/create")}
+                    eventDays={new Set([3, 10, 14])}
                     onDayClick={(date) => console.log(date)}
                 />
             </Card>
 
             {/* timeline */}
-            <Card className="p-4">
+            <Card variant="no-hover" className="p-4">
                 <TodayTimeline events={todayEvents} loading={loading} />
             </Card>
         </aside>

@@ -1,6 +1,6 @@
 "use client";
 
-import { Clock } from "lucide-react";
+import { MapPin } from "lucide-react";
 
 export interface TimelineEvent {
   time: string;
@@ -37,10 +37,10 @@ export function TodayTimeline({ events, loading }: TodayTimelineProps) {
       {/* header */}
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-[13px] font-bold text-[var(--primary-dark)]">{todayLabel}</p>
-          <p className="text-[10px] text-[var(--gray)]">Today&apos;s timeline</p>
+          <p className="heading-sm font-bold">{todayLabel}</p>
+          <p className="caption">Today&apos;s events</p>
         </div>
-        <span className="px-2 py-0.5 rounded-full bg-[var(--periwinkle-light)] text-[var(--periwinkle)] text-[10px] font-bold">
+        <span className="px-2 py-1 rounded-full bg-[var(--periwinkle-light)] caption-bold">
           {loading ? "…" : events.length}
         </span>
       </div>
@@ -59,7 +59,7 @@ export function TodayTimeline({ events, loading }: TodayTimelineProps) {
 
       /* empty state */
       ) : events.length === 0 ? (
-        <p className="text-[11px] text-[var(--gray)] text-center py-4">
+        <p className="caption text-center py-4">
           No events scheduled today
         </p>
 
@@ -68,16 +68,16 @@ export function TodayTimeline({ events, loading }: TodayTimelineProps) {
         <div className="flex flex-col gap-2">
           {events.map((item, i) => (
             <div key={i} className="flex items-start gap-2.5">
-              <span className="text-[10px] font-semibold text-[var(--gray)] w-[34px] shrink-0 pt-[3px]">
+              <span className="caption w-[34px] shrink-0 pt-1">
                 {item.time}
               </span>
               <div className="flex-1 min-w-0 rounded-[8px] border border-black/[0.06] bg-white/60 px-2.5 py-2">
-                <p className="text-[11px] font-semibold text-[var(--primary-dark)] truncate">
+                <p className="caption-bold truncate">
                   {item.title}
                 </p>
                 {item.location && (
-                  <p className="text-[10px] text-[var(--gray)] flex items-center gap-1 mt-0.5">
-                    <Clock size={9} className="shrink-0" />
+                  <p className="caption flex items-center gap-1 mt-0.5">
+                    <MapPin size={12} className="shrink-0" />
                     <span className="truncate">{item.location}</span>
                   </p>
                 )}

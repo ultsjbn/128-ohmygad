@@ -220,7 +220,7 @@ const config = {
       },
       fontFamily: {
         // Automatically applied as the default sans-serif font
-        sans: ['var(--font-family-normal)'], 
+        sans: ['var(--font-body)'], 
         wide: ['var(--font-family-wide)'],
       },
       fontWeight: {

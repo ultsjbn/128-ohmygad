@@ -1,4 +1,4 @@
-
+/* @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap'); */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -22,11 +22,6 @@
     font-family: Clash-Display;
     font-weight: 700;
     src: url('/fonts/ClashDisplay-Bold.woff2') format('woff2');
-}
-@font-face {
-    font-family: Plus-Jakarta-Sans;
-    font-weight: 300;
-    src: url('/fonts/Plus-Jakarta-Sans.woff2') format('woff2');
 }
 
 @layer base {
@@ -88,7 +83,7 @@
 
   /* Typography */
   --font-display: 'Clash-Display', sans-serif;
-  --font-body: 'Plus-Jakarta-Sans', sans-serif;
+  --font-body: 'Plus Jakarta Sans', sans-serif;
 
   /* Motion */
   --transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
@@ -185,6 +180,12 @@ body {
   font-size: 13px;
   color: var(--primary-dark);
   opacity: 70%;
+}
+
+.caption-bold {
+  font-size: 13px;
+  color: var(--primary-dark);
+  font-weight: 600;
 }
 
 .caption-dark {
@@ -972,6 +973,16 @@ body {
 .chip.active {
   background: var(--primary-dark);
   color: white;
+}
+
+.chip.chip-success.active {
+  background: var(--success);
+  color: white;
+}
+
+.chip.chip-periwinkle.active {
+  background: var(--periwinkle);
+  color: var(--primary-dark);
 }
 
 .chip:hover:not(.active) {
