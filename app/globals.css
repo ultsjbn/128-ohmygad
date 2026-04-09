@@ -1,195 +1,27 @@
-@import "@snowball-tech/design-tokens/dist/web/css/variables-px.css";
-@import url('https://fonts.googleapis.com/css2?family=Clash+Display:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-
-@layer base {
-  :root {
-    /* shadcn/ui tokens */
-    --background: 0 0% 100%;
-    --foreground: 0 0% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 3.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 3.9%;
-    --primary: 0 0% 9%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 0 0% 96.1%;
-    --secondary-foreground: 0 0% 9%;
-    --muted: 0 0% 96.1%;
-    --muted-foreground: 0 0% 45.1%;
-    --accent: 0 0% 96.1%;
-    --accent-foreground: 0 0% 9%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 89.8%;
-    --input: 0 0% 89.8%;
-    --ring: 0 0% 3.9%;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
-    --radius: 0.5rem;
-
-    /* Design tokens */
-    --color-background-body-black: #000000;
-    --color-background-body-dark: #000000;
-    --color-background-body-default: #fffbf4;
-    --color-background-body-light: #fffbf4;
-    --color-background-body-primary: #ff8acd;
-    --color-background-body-secondary: #000000;
-    --color-background-body-white: #ffffff;
-    --color-background-disabled: #ddd9d4;
-    --color-base-black: #000000;
-    --color-base-grey-30: #7e7c78;
-    --color-base-grey-50: #b7b1a6;
-    --color-base-grey-70: #ddd9d4;
-    --color-base-grey-90: #f5f1ec;
-    --color-base-white: #ffffff;
-    --color-base-transparent: rgba(0, 0, 0, 0);
-    --color-border-dark: #ff8acd;
-    --color-border-default: #000000;
-    --color-border-disabled: #b7b1a6;
-    --color-border-light: #ffffff;
-    --color-border-primary: #ff8acd;
-    --color-border-primary-dark: #ff8acd;
-    --color-border-primary-light: #ff8acd;
-    --color-border-secondary: #000000;
-    --color-border-secondary-dark: #ffffff;
-    --color-border-secondary-light: #000000;
-    --color-brand-body-dark: #000000;
-    --color-brand-body-light: #fffbf4;
-    --color-brand-highlight: #ffe2f3;
-    --color-brand-primary: #ff8acd;
-    --color-brand-primary-dark: #ff8acd;
-    --color-brand-primary-light: #ff8acd;
-    --color-brand-secondary: #000000;
-    --color-brand-secondary-dark: #ffffff;
-    --color-brand-secondary-light: #000000;
-    --color-brand-separator: #ddd9d4;
-    --color-decorative-blue-50: #8af1ff;
-    --color-decorative-blue-70: #b3f6ff;
-    --color-decorative-blue-90: #d6faff;
-    --color-decorative-green-50: #76f7ae;
-    --color-decorative-green-70: #adface;
-    --color-decorative-green-90: #cffce3;
-    --color-decorative-pink-70: #ffc6e7;
-    --color-decorative-pink-90: #ffe2f3;
-    --color-decorative-purple-50: #b37dff;
-    --color-decorative-purple-70: #d9beff;
-    --color-decorative-purple-90: #f0e5ff;
-    --color-decorative-yellow-50: #ffe959;
-    --color-decorative-yellow-70: #fff29b;
-    --color-decorative-yellow-90: #fff8c5;
-    --color-feedback-danger-50: #ff5454;
-    --color-feedback-danger-90: #ffd6d6;
-    --color-feedback-error-50: #ff5454;
-    --color-feedback-error-90: #ffd6d6;
-    --color-feedback-success-50: #3cd39d;
-    --color-feedback-success-90: #cffce3;
-    --color-feedback-warning-50: #ff9f69;
-    --color-feedback-warning-90: #ffead1;
-    --color-icon-dark: #000000;
-    --color-icon-default: #000000;
-    --color-icon-light: #ffffff;
-    --color-icon-primary: #ff8acd;
-    --color-icon-primary-dark: #ff8acd;
-    --color-icon-primary-light: #ff8acd;
-    --color-icon-secondary: #000000;
-    --color-icon-secondary-dark: #ffffff;
-    --color-icon-secondary-light: #000000;
-    --color-icon-disabled: #b7b1a6;
-    --color-icon-error: #ff5454;
-    --color-icon-success: #3cd39d;
-    --color-icon-warning: #ff9f69;
-    --color-stroke-separator: #ddd9d4;
-    --color-text-dark: #000000;
-    --color-text-default: #000000;
-    --color-text-light: #ffffff;
-    --color-text-primary: #ff8acd;
-    --color-text-primary-dark: #ff8acd;
-    --color-text-primary-light: #ff8acd;
-    --color-text-secondary: #000000;
-    --color-text-secondary-dark: #ffffff;
-    --color-text-secondary-light: #000000;
-    --color-text-disabled: #b7b1a6;
-    --color-text-placeholder: #7e7c78;
-    --color-text-error: #ff5454;
-    --color-text-success: #3cd39d;
-    --color-text-warning: #ff9f69;
-    --size-border-1: 1px;
-    --size-border-2: 2px;
-    --size-radius-0: 0px;
-    --size-radius-xs: 4px;
-    --size-radius-s: 8px;
-    --size-radius-m: 16px;
-    --size-radius-rounded: 9999px;
-    --size-spacing-0: 0px;
-    --size-spacing-1: 8px;
-    --size-spacing-2: 16px;
-    --size-spacing-3: 24px;
-    --size-spacing-4: 32px;
-    --size-spacing-5: 40px;
-    --size-spacing-6: 48px;
-    --size-spacing-7: 56px;
-    --size-spacing-8: 64px;
-    --size-spacing-9: 72px;
-    --size-spacing-10: 80px;
-    --size-spacing-11: 88px;
-    --size-spacing-12: 96px;
-    --size-spacing-13: 104px;
-    --size-spacing-14: 112px;
-    --size-spacing-15: 120px;
-    --size-spacing-16: 128px;
-    --size-spacing-17: 136px;
-    --size-spacing-18: 144px;
-    --size-spacing-19: 152px;
-    --size-spacing-20: 160px;
-    --size-spacing-px: 1px;
-    --size-spacing-quarter: 2px;
-    --size-spacing-half: 4px;
-    --shadow-none: none;
-    --shadow-brutal-1: -2px 2px 0 0 rgba(0, 0, 0, 1);
-    --shadow-brutal-2: -2px 4px 0 0 rgba(0, 0, 0, 1);
-    --shadow-brutal-1-dark: -2px 2px 0 0 #ff8acd;
-    --shadow-brutal-1-light: -2px 2px 0 0 rgba(0, 0, 0, 1);
-    --shadow-brutal-1-primary: -2px 2px 0 0 #ff8acd;
-    --shadow-brutal-1-secondary: -2px 2px 0 0 #000000;
-    --shadow-brutal-2-dark: -2px 4px 0 0 #ff8acd;
-    --shadow-brutal-2-light: -2px 4px 0 0 rgba(0, 0, 0, 1);
-    --shadow-brutal-2-primary: -2px 4px 0 0 #ff8acd;
-    --shadow-brutal-2-secondary: -2px 4px 0 0 #000000;
-  }
-
-  .dark {
-    --background: 0 0% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 0 0% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 0 0% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 0 0% 9%;
-    --secondary: 0 0% 14.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 14.9%;
-    --muted-foreground: 0 0% 63.9%;
-    --accent: 0 0% 14.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 14.9%;
-    --input: 0 0% 14.9%;
-    --ring: 0 0% 83.1%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
-  }
+@font-face {
+    font-family: Clash-Display;
+    font-weight: 400;
+    src: url('/fonts/ClashDisplay-Regular.woff2') format('woff2');
+}
+@font-face {
+    font-family: Clash-Display;
+    font-weight: 500;
+    src: url('/fonts/ClashDisplay-Medium.woff2') format('woff2');
+}
+@font-face {
+    font-family: Clash-Display;
+    font-weight: 600;
+    src: url('/fonts/ClashDisplay-Semibold.woff2') format('woff2');
+}
+@font-face {
+    font-family: Clash-Display;
+    font-weight: 700;
+    src: url('/fonts/ClashDisplay-Bold.woff2') format('woff2');
 }
 
 @layer base {
@@ -250,7 +82,7 @@
   --radius-full: 9999px;
 
   /* Typography */
-  --font-display: 'Clash Display', sans-serif;
+  --font-display: 'Clash-Display', sans-serif;
   --font-body: 'Plus Jakarta Sans', sans-serif;
 
   /* Motion */
