@@ -65,10 +65,9 @@ function SearchResultsContent({ role }: { role: string }) {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-2">
-        <h2 className="heading-md" style={{ color: "var(--primary-dark)" }}>Search Results</h2>
-        <p className="caption">
-          {loading ? "Searching..." : `Found ${results.length} results for "${query}"`}
-        </p>
+        <h2 className="heading-md" style={{ color: "var(--primary-dark)" }}>
+          Search Results for "{query}"
+        </h2>
       </div>
 
       {loading ? (
