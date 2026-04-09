@@ -226,11 +226,20 @@ export default function EventsPage() {
     }
   };
 
-  const handleCopyEmails = () => {
-    const emails = registrations.map((r) => r.email).filter(Boolean).join(", ");
-    navigator.clipboard.writeText(emails);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  const handleCopyEmails = (targetUsers?: RegisteredUser[]) => {
+    // registrations or attended (targeted users)
+    const listToCopy = targetUsers || registrations;
+    
+    const emails = listToCopy
+      .map((r) => r.email)
+      .filter(Boolean)
+      .join(", ");
+
+    if (emails) {
+      navigator.clipboard.writeText(emails);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
   };
 
   const getEvents = async () => {
@@ -669,7 +678,7 @@ export default function EventsPage() {
             </div>
 
             {/* tab switcher*/}
-            <div className="flex rounded-xl overflow-hidden border border-[rgba(45,42,74,0.10)] w-fit">
+            <div className="flex rounded-xl overflow-hidden border border-[rgba(45,42,74,0.10)] w-fit items-center">
               <button
                 onClick={() => handleTabChange("info")}
                 className={`flex items-center gap-1.5 px-4 py-2 text-sm font-medium transition-colors ${detailTab === "info" ? "bg-[var(--primary-dark)] text-white" : "text-[var(--gray)] hover:bg-[var(--lavender)]"}`}
@@ -760,7 +769,7 @@ export default function EventsPage() {
                   </div>
 
                   {!loadingRegs && registrations.length > 0 && (
-                    <Button variant="soft" size="sm" onClick={handleCopyEmails} title="Copy all emails to clipboard">
+                    <Button variant="soft" size="sm" onClick={() => handleCopyEmails(registrations)} title="Copy all emails to clipboard">
                       {copied ? <><Check size={13} /> Copied!</> : <><Copy size={13} /> Copy emails</>}
                     </Button>
                   )}
@@ -798,16 +807,22 @@ export default function EventsPage() {
             {detailTab === "attendance" && (
               <div className="flex flex-col gap-3">
                 {/* count */}
-                <div className="flex items-center gap-2">
-                  <ClipboardCheck size={15} className="text-[var(--gray)]" />
-                  {loadingRegs
-                    ? <span className="caption text-[var(--gray)]">Loading…</span>
-                    : (
-                      <span className="caption">
-                        <strong>{attendanceCount}</strong> attended out of <strong>{registrations.length}</strong> registered
-                      </span>
-                    )
-                  }
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2">
+                    <ClipboardCheck size={15} className="text-[var(--gray)]" />
+                    {loadingRegs
+                      ? <span className="caption text-[var(--gray)]">Loading…</span>
+                      : (
+                        <span className="caption">
+                          <strong>{attendanceCount}</strong> attended out of <strong>{registrations.length}</strong> registered
+                        </span>
+                      )}
+                  </div>
+                  {!loadingRegs && attendedUsers.length > 0 && (
+                    <Button variant="soft" size="sm" onClick={() => handleCopyEmails(attendedUsers)} title="Copy all emails to clipboard">
+                      {copied ? <><Check size={13} /> Copied!</> : <><Copy size={13} /> Copy emails</>}
+                    </Button>
+                  )}
                 </div>
 
                 {loadingRegs ? (
