@@ -62,14 +62,6 @@ const STATUS_VARIANT: Record<string, BadgeVariant> = {
   past: "periwinkle",
 };
 
-const CATEGORY_VARIANT: Record<string, BadgeVariant> = {
-  Orientation: "success",
-  Forum: "pink",
-  Research: "periwinkle",
-  Training: "success",
-  Workshop: "dark",
-};
-
 // checkbox item used inside filter dropdown (multi-select)
 function CheckItem({
   label,
