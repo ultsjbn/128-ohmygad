@@ -328,7 +328,7 @@ export default function CoursesPage() {
         <div className="flex items-center gap-3 flex-wrap">
 
           <SearchBar
-            placeholder="Search by title, semester or schedule"
+            placeholder="Search by Title"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             containerStyle={{ flex: 1, minWidth: 220 }}
@@ -392,7 +392,7 @@ export default function CoursesPage() {
           </Dropdown>
 
             <Button variant="primary" onClick={() => router.push("/admin/courses/create")}>
-                <Plus size={16} /> Add Course
+                <Plus size={16} /> Add Guideline
             </Button>
         </div>
 
@@ -442,7 +442,7 @@ export default function CoursesPage() {
         <Card>
           <div className="flex items-center justify-center gap-3 py-10" style={{ color: "var(--gray)" }}>
             <Loader2 size={20} className="animate-spin" />
-            <span className="caption">Loading courses…</span>
+            <span className="caption">Loading guidelines…</span>
           </div>
         </Card>
 
