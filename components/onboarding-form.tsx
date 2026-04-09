@@ -227,6 +227,7 @@ export function OnboardingForm({
                 value={full_name}
                 onChange={(e) => setFullName(e.target.value)}
                 autoComplete="off"
+                maxLength={64}
               />
             </div>
             <div className="md: col-span-2">
@@ -237,6 +238,7 @@ export function OnboardingForm({
                 value={display_name}
                 onChange={(e) => setDisplayName(e.target.value)}
                 autoComplete="off"
+                maxLength={32}
               />
             </div>
 

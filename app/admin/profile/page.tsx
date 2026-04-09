@@ -257,6 +257,7 @@ export default function AdminProfilePage() {
                     placeholder="e.g. Juan Dela Cruz"
                     value={profile.full_name}
                     onChange={set("full_name")}
+                    maxLength={64}
                   />
                   <Input
                     label="Display Name"
@@ -264,6 +265,7 @@ export default function AdminProfilePage() {
                     placeholder="e.g. juandc"
                     value={profile.display_name}
                     onChange={set("display_name")}
+                    maxLength={32}
                   />
                   <Select
                     label="Pronouns"
@@ -280,6 +282,7 @@ export default function AdminProfilePage() {
                       const val = e.target.value.replace(/\D/g, '');
                       setProfile(p => ({ ...p, contact_num: val }));
                     }}
+                    maxLength={15}
                   />
                   <div className="md:col-span-2">
                     <Input

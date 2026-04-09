@@ -78,7 +78,7 @@ export function SignUpForm({
       </div>
 
       <form onSubmit={handleSignUp} className="flex flex-col gap-3">
-        
+
         {/* Full Name Input */}
         <div className="input-wrap">
           <label htmlFor="full_name" className="label">Full Name</label>
@@ -91,6 +91,7 @@ export function SignUpForm({
               value={full_name}
               onChange={(e) => setFullName(e.target.value)}
               className="input"
+              maxLength={64}
             />
           </div>
         </div>

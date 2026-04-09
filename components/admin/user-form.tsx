@@ -172,7 +172,7 @@ export default function UserForm({ initialData, onSuccess, layout = "modal" }: U
             <h2 className="text-xl font-bold mb-1" style={{ color: "var(--primary-dark)" }}>Account Information</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 w-full">
-              <Input label="Full Name" required prefixIcon={<User size={15} />} maxLength={100} placeholder="e.g. Maria Santos" value={full_name} onChange={(e) => setFullName(e.target.value)} />
+              <Input label="Full Name" required prefixIcon={<User size={15} />} maxLength={64} placeholder="e.g. Maria Santos" value={full_name} onChange={(e) => setFullName(e.target.value)} />
               <Input label="Email" type="email" required prefixIcon={<Mail size={15} />} placeholder="m@up.edu.ph" value={email} onChange={(e) => setEmail(e.target.value)} />
               <Input label={isEdit ? "Password (leave blank to keep)" : "Password"} type="password" required={!isEdit} prefixIcon={<Lock size={15} />} placeholder={isEdit ? "Leave blank to keep current" : "Min. 8 characters"} value={password} onChange={(e) => setPassword(e.target.value)} />
               <Select label="Role" required value={role} onChange={(e) => setRole(e.target.value)} options={ROLE_OPTIONS} />
@@ -181,7 +181,7 @@ export default function UserForm({ initialData, onSuccess, layout = "modal" }: U
             <hr className="border-gray-100 my-2" />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 w-full">
-              <Input label="Display Name" placeholder="Nickname or preferred name" value={display_name} onChange={(e) => setDisplayName(e.target.value)} />
+              <Input label="Display Name" placeholder="Nickname or preferred name" value={display_name} onChange={(e) => setDisplayName(e.target.value)} maxLength={32} />
               <Input label="Student Number" prefixIcon={<Hash size={15} />} placeholder="e.g. 2021-12345" value={student_num} onChange={handleStudentNumChange} />
               <Select label="Year Level" value={year_level} onChange={(e) => setYearLevel(e.target.value)} options={YEAR_OPTIONS} />
               <Select label="College" value={college} onChange={(e) => setCollege(e.target.value)} options={COLLEGE_OPTIONS} />
@@ -233,7 +233,7 @@ export default function UserForm({ initialData, onSuccess, layout = "modal" }: U
     <form onSubmit={handleSubmit} className="flex flex-col gap-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-4 items-start">
         <SectionLabel>Account Information</SectionLabel>
-        <Input label="Full Name" required prefixIcon={<User size={15} />} placeholder="e.g. Maria Santos" value={full_name} onChange={(e) => setFullName(e.target.value)} />
+        <Input label="Full Name" required prefixIcon={<User size={15} />} maxLength={64} placeholder="e.g. Maria Santos" value={full_name} onChange={(e) => setFullName(e.target.value)} />
         <Input label="Email" type="email" required prefixIcon={<Mail size={15} />} placeholder="m@up.edu.ph" value={email} onChange={(e) => setEmail(e.target.value)} />
         <Input label={isEdit ? "Password (leave blank to keep)" : "Password"} type="password" required={!isEdit} prefixIcon={<Lock size={15} />} placeholder={isEdit ? "Leave blank to keep current" : "Min. 8 characters"} value={password} onChange={(e) => setPassword(e.target.value)} />
         <Select label="Role" required value={role} onChange={(e) => setRole(e.target.value)} options={ROLE_OPTIONS} />
@@ -241,7 +241,7 @@ export default function UserForm({ initialData, onSuccess, layout = "modal" }: U
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-4 items-start">
         <SectionLabel>Profile Details</SectionLabel>
-        <Input label="Display Name" placeholder="Nickname or preferred name" value={display_name} onChange={(e) => setDisplayName(e.target.value)} />
+        <Input label="Display Name" placeholder="Nickname or preferred name" value={display_name} onChange={(e) => setDisplayName(e.target.value)} maxLength={32} />
         <Input label="Student Number" prefixIcon={<Hash size={15} />} placeholder="e.g. 2021-12345" value={student_num} onChange={handleStudentNumChange} />
         <Select label="Year Level" value={year_level} onChange={(e) => setYearLevel(e.target.value)} options={YEAR_OPTIONS} />
         <Select label="College" value={college} onChange={(e) => setCollege(e.target.value)} options={COLLEGE_OPTIONS} />
