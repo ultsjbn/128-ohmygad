@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 
 import { Card, Input, Select, Button, Badge, Tabs, ProgressBar, Toast } from "@/components/ui";
-import { validateFullName, validateDisplayName, validateContactNum } from "@/lib/validation";
+import { validateFullName, validateDisplayName, validateContactNum, validateAddress } from "@/lib/validation";
 
 type Profile = {
   id: string;
@@ -123,6 +123,13 @@ export default function FacultyProfilePage() {
       return;
     }
 
+    const addressErr = validateAddress(profile.address);
+    if (addressErr) {
+      setToast({ type: "error", message: addressErr });
+      setSaving(false);
+      return;
+    }
+
     try {
       const { error } = await supabase
         .from("profile")
@@ -208,6 +215,7 @@ export default function FacultyProfilePage() {
                     placeholder="e.g. Juan Dela Cruz"
                     value={profile.full_name}
                     onChange={set("full_name")}
+                    maxLength={64}
                   />
                   <Input
                     label="Display Name"
@@ -215,6 +223,7 @@ export default function FacultyProfilePage() {
                     placeholder="e.g. juandc"
                     value={profile.display_name}
                     onChange={set("display_name")}
+                    maxLength={32}
                   />
                   <Select
                     label="Pronouns"
@@ -227,7 +236,11 @@ export default function FacultyProfilePage() {
                     prefixIcon={<Phone size={15} />}
                     placeholder="e.g. 09XX XXX XXXX"
                     value={profile.contact_num}
-                    onChange={set("contact_num")}
+                    onChange={(e) => {
+                      const val = e.target.value.replace(/\D/g, '');
+                      setProfile(p => ({ ...p, contact_num: val }));
+                    }}
+                    maxLength={15}
                   />
                   <div className="md:col-span-2">
                     <Input
@@ -236,6 +249,7 @@ export default function FacultyProfilePage() {
                       placeholder="Street, Barangay, City, Province"
                       value={profile.address}
                       onChange={set("address")}
+                      maxLength={100}
                     />
                   </div>
                 </div>
