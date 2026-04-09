@@ -48,7 +48,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
                 <span className="opacity-30">·</span>
               </span>
               <span className="flex items-center gap-3">
-                <span>© {new Date().getFullYear()} UP Baguio</span>
+                <span>© 2026 UP Baguio</span>
               </span>
             </footer>
           </main>
