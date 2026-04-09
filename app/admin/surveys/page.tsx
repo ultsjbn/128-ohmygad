@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { Plus, ArrowUpDown, SlidersHorizontal, Pencil, Trash2, Loader2, ChevronUp, ChevronDown } from "lucide-react";
+import { Plus, ArrowUpDown, SlidersHorizontal, Pencil, Trash2, Loader2, ChevronUp, ChevronDown, BarChart3 } from "lucide-react";
+import SurveyAnalyticsModal from "@/components/admin/survey-analytics-modal";
 import type { SurveyFormData } from "@/components/admin/survey-form";
 import { paginate, totalPages, PER_PAGE } from "@/lib/pagination.utils";
 import { Pagination } from "@/components/pagination";
@@ -78,7 +79,7 @@ export default function SurveysPage() {
   const [search, setSearch] = useState(searchParams.get("search") || "");
   const [isLoading, setIsLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [modalContent, setModalContent] = useState<{ label: string; text: string } | null>(null);
+  const [analyticsTarget, setAnalyticsTarget] = useState<SurveyFormData | null>(null);
   const [sort, setSort] = useState<{ field: SortField; direction: "asc" | "desc"}>({ field: "open_at", direction: "desc"});
   const [statusFilters, setStatusFilters] = useState<Set<string>>(new Set());
   const [page, setPage] = useState(1);
@@ -210,8 +211,8 @@ export default function SurveysPage() {
         <button
           className="text-left font-semibold hover:underline underline-offset-4 max-w-[240px] truncate block"
           style={{ color: "var(--primary-dark)", fontSize: 13 }}
-          onClick={() => setModalContent({ label: survey.title, text: survey.description ?? "No description provided." })}
-          title="Click to view description"
+          onClick={() => setAnalyticsTarget(survey)}
+          title="Click to view analytics"
         >
           {survey.title}
         </button>
@@ -249,6 +250,13 @@ export default function SurveysPage() {
       width: "13%",
       render: (survey) => (
         <div style={{ display: "flex", justifyContent: "flex-start", gap: 4 }}>
+          <Button
+            variant="icon"
+            title="View analytics"
+            onClick={() => setAnalyticsTarget(survey)}
+          >
+            <BarChart3 size={14} />
+          </Button>
           <Button
             variant="icon"
             title="Edit survey"
@@ -415,16 +423,14 @@ export default function SurveysPage() {
         </div>
       )}
 
-      {/* detail modal */}
-      <Modal
-        open={!!modalContent}
-        onClose={() => setModalContent(null)}
-        title={modalContent?.label}
-      >
-        <p style={{ fontSize: 14, lineHeight: 1.8, color: "var(--primary-dark)", whiteSpace: "pre-wrap" }}>
-          {modalContent?.text || "No description provided."}
-        </p>
-      </Modal>
+      {/* analytics modal */}
+      {analyticsTarget && (
+        <SurveyAnalyticsModal
+          survey={analyticsTarget}
+          open={!!analyticsTarget}
+          onClose={() => setAnalyticsTarget(null)}
+        />
+      )}
 
       {/* confirm delete modal */}
         <Modal
