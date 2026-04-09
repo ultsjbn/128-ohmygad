@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/client"; // using shared client
 import { useRouter } from "next/navigation";
 import {
   User, Phone, MapPin,
-  Save, ChevronLeft, Heart, Building2
+  Save, Heart, Building2
 } from "lucide-react";
 
 import { Card, Input, Select, Button, Badge, Tabs, ProgressBar, Toast } from "@/components/ui";

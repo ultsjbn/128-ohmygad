@@ -263,7 +263,7 @@ export function OnboardingForm({
                     { value: "2nd Year", label: "2nd Year" },
                     { value: "3rd Year", label: "3rd Year" },
                     { value: "4th Year", label: "4th Year" },
-                    { value: "5th Year", label: "5th Year" },
+                    { value: "Extendee", label: "Extendee" },
                   ]}
                 />
 

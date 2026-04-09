@@ -112,19 +112,21 @@ function toCounts(values: (string | null)[]): { name: string; value: number }[] 
 // static filter options
 const STATIC_OPTIONS: FilterOptions = {
   college:        ["CS", "CAC", "CSS"],
-  genderIdentity: ["Man", "Woman", "Non-binary", "Prefer not to say", "Self-describe"],
+  genderIdentity: ["Man", "Woman", "Non-binary", "Prefer not to say"],
   yearLevel:      ["1st Year", "2nd Year", "3rd Year", "4th Year", "Extendee"],
   degreeProgram:  [
-    // CS
-    "BS Biology", "BS Computer Science", "BS Mathematics", "BS Physics",
-    "MS Conservation and Restoration Ecology", "MS Mathematics", "Doctor of Philosophy in Mathematics",
-    // CAC
-    "BA Communication", "BA Fine Arts", "BA Language and Literature",
-    "Certificate in Fine Arts", "MA Language and Literature",
-    // CSS
-    "BASS (History)", "BASS (Economics)", "BASS (Anthropology)",
-    "BS Management Economics", "MA History",
-    "MA Social and Development Studies", "Master of Management", "Doctor of Philosophy in Indigenous Studies",
+    // CS — bachelor
+    "BS Biology", "BS Com Sci", "BS Math", "BS Physics",
+    // CAC — bachelor
+    "BA Comm", "BA Fine Arts", "BA LL", "Certificate in FA",
+    // CSS — bachelor
+    "BASS (Hist)", "BASS (Econ)", "BASS (Anthro)", "BS ME",
+    // CS — graduate
+    "MS CaRE", "MS Math", "PhD in Math",
+    // CAC — graduate
+    "MA LL",
+    // CSS — graduate
+    "MA History", "MA SDS", "MMgt", "PhD in Indigenous Studies",
   ],
   role:           ["Admin", "Student", "Faculty"],
   sexAtBirth:     ["Male", "Female", "Intersex", "Prefer not to say"],

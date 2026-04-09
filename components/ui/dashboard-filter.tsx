@@ -128,7 +128,7 @@ export function DashboardFilter({ value, onChange, options }: DashboardFilterPro
             <span className="text-[var(--periwinkle)]"><BookOpen size={15} /></span>
             Degree Program
           </p>
-          <div className="grid grid-cols-4 gap-1">
+          <div className="grid grid-cols-4 grid-rows-5 grid-flow-col">
             {options.degreeProgram.map((opt) => (
               <Checkbox
                 key={opt}
@@ -145,8 +145,8 @@ export function DashboardFilter({ value, onChange, options }: DashboardFilterPro
 
       {/* row 3: role options in a single horizontal row */}
       {options.role?.length > 0 && (
-        <div className="p-2">
-          <p className="flex items-center gap-1 label mb-2">
+        <div className="p-2 flex flex-row gap-4">
+          <p className="flex items-center gap-1 label">
             <span className="text-[var(--periwinkle)]"><Shield size={15} /></span>
             Role
           </p>
