@@ -52,21 +52,21 @@ export function MiniCalendar({
     <div className="flex flex-col gap-3">
       {/* header */}
       <div className="flex items-center justify-between">
-        <span className="text-[13px] font-bold text-[var(--primary-dark)]">
+        <span className="heading-sm">
           {MONTHS[month]} {year}
         </span>
         <div className="flex items-center gap-1">
           <button
             onClick={prevMonth}
             aria-label="Previous month"
-            className="w-6 h-6 rounded-full flex items-center justify-center text-[var(--gray)] hover:bg-[var(--periwinkle-light)] hover:text-[var(--primary-dark)] transition-colors cursor-pointer border-none bg-transparent"
+            className="w-4 h-4 rounded-full flex items-center justify-center text-[var(--gray)] hover:bg-[var(--periwinkle-light)] hover:text-[var(--primary-dark)] transition-colors cursor-pointer border-none bg-transparent"
           >
             <ChevronLeft size={13} />
           </button>
           <button
             onClick={nextMonth}
             aria-label="Next month"
-            className="w-6 h-6 rounded-full flex items-center justify-center text-[var(--gray)] hover:bg-[var(--periwinkle-light)] hover:text-[var(--primary-dark)] transition-colors cursor-pointer border-none bg-transparent"
+            className="w-4 h-4 rounded-full flex items-center justify-center text-[var(--gray)] hover:bg-[var(--periwinkle-light)] hover:text-[var(--primary-dark)] transition-colors cursor-pointer border-none bg-transparent"
           >
             <ChevronRight size={13} />
           </button>

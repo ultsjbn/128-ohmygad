@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import {
-  Home, Calendar, Users, BookOpen, ClipboardList,
+  LayoutDashboard, Calendar, Users, BookOpen, ClipboardList,
   LogOut, ArrowLeft, PanelLeftClose, PanelLeftOpen,
 } from "lucide-react";
 import Image from "next/image";
@@ -13,7 +13,7 @@ import { Button } from "./button";
 
 // navigation ------------------------------------------------
 const NAV_ITEMS = [
-  { href: "/admin",         label: "Dashboard", icon: Home,          exact: true  },
+  { href: "/admin",         label: "Dashboard", icon: LayoutDashboard,          exact: true  },
   { href: "/admin/events",  label: "Events",    icon: Calendar,      exact: false },
   { href: "/admin/users",   label: "Users",     icon: Users,         exact: false },
   { href: "/admin/courses", label: "Guidelines",   icon: BookOpen,      exact: false },
@@ -104,19 +104,18 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
   const state = open ? "expanded" : "collapsed";
 
   return (
-    <div className="flex h-screen w-full overflow-hidden" style={{ background: "linear-gradient(145deg,#f5f3ff 0%,#fce8ee 35%,#f0eefd 65%,#faf8ff 100%)" }} >
-      {/* blobs */}
-      <div className="pointer-events-none fixed -top-28 right-14 w-[420px] h-[420px] rounded-full blur-[56px] opacity-20 bg-[var(--soft-pink)] z-0" />
-      <div className="pointer-events-none fixed -bottom-16 left-20 w-[320px] h-[320px] rounded-full blur-[56px] opacity-[0.13] bg-[var(--periwinkle)] z-0" />
+    <div className="flex h-screen w-full p-2 bg-[var(--primary-dark)]">
 
       {isMobile && <AdminMobileNav />}
+
+      {/* outer card that hugs sidebar + content */}
+      <div style={{ position: "relative", zIndex: 1, display: "flex", flex: 1, overflow: "hidden", borderRadius: "16px", background: "var(--primary-dark)" }}>
 
       <aside
         data-state={state}
         className={[
           "group/sidebar relative z-10 flex-col shrink-0 hidden md:flex",
-          "my-2 ml-2 rounded-[18px] overflow-hidden",
-          "bg-[var(--primary-dark)] shadow-[0_8px_40px_rgba(45,42,74,0.22)]",
+          "bg-[var(--primary-dark)] overflow-hidden md:pr-2",
           "w-[--sidebar-width] data-[state=collapsed]:w-[--sidebar-width-icon]",
           "transition-[width] duration-200 ease-linear"
         ].join(" ")}
@@ -126,7 +125,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
         } as React.CSSProperties}
       >
         {/* logo ------------------------------------------------ */}
-        <div className="flex shrink-0 items-center border-b border-white/[0.07] h-[70px] px-[10px] gap-[6px] overflow-hidden">
+        <div className="flex shrink-0 items-center border-b border-white/[0.07] h-[70px] gap-[6px] overflow-hidden">
           <button
             onClick={() => !open && setOpen(true)}
             onMouseEnter={() => setLogoHovered(true)}
@@ -184,7 +183,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
         </div>
 
         {/* nav ------------------------------------------------ */}
-        <nav className="flex flex-col flex-1 gap-1 px-2 py-2 overflow-y-auto overflow-x-hidden">
+        <nav className="flex flex-col flex-1 gap-1 py-2 overflow-y-auto overflow-x-hidden">
           {NAV_ITEMS.map(({ href, label, icon: Icon, exact }) => {
             const active = isActive(pathname, href, exact);
             return (
@@ -195,7 +194,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
                 className={[
                   "flex items-center w-full h-[40px] rounded-[10px]",
                   "justify-start px-1 group-data-[state=collapsed]/sidebar:justify-center group-data-[state=collapsed]/sidebar:px-0",
-                  "text-[13px] font-medium transition-colors duration-150",
+                  "text-[15px] font-medium transition-colors duration-150",
                   active
                     ? "bg-white/[0.18] text-white"
                     : "text-white/50 hover:bg-white/[0.08] hover:text-white/80",
@@ -222,7 +221,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
         </nav>
 
         {/* logout ------------------------------------------------ */}
-        <div className="shrink-0 flex flex-col gap-[2px] px-2 pb-2 pt-2 border-t border-white/[0.07]">
+        <div className="shrink-0 flex flex-col gap-[2px] px-1 pb-1 pt-2 border-t border-white/[0.07]">
           <button
             onClick={() => router.push("/auth/login")}
             title={!open ? "Log out" : undefined}
@@ -250,10 +249,13 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
       </aside>
 
       {/* main column ------------------------------------------------------------------------------------------------ */}
-      <div className="relative z-10 flex flex-col flex-1 min-w-0 overflow-hidden">
+      <div style={{ position: "relative", display: "flex", flexDirection: "column", flex: 1, minWidth: 0, overflow: "hidden", background: "linear-gradient(145deg,#f5f3ff 0%,#fce8ee 35%,#f0eefd 65%,#faf8ff 100%)" }}>
+        {/* blobs */}
+        <div className="pointer-events-none absolute -top-28 right-14 w-[420px] h-[420px] rounded-full blur-[56px] opacity-20 bg-[var(--soft-pink)] z-0" />
+        <div className="pointer-events-none absolute -bottom-16 left-20 w-[320px] h-[320px] rounded-full blur-[56px] opacity-[0.13] bg-[var(--periwinkle)] z-0" />
 
         {/* page header ------------------------------------------------ */}
-        <header className="shrink-0 flex items-center justify-between gap-3 px-5 pt-2 pb-0 h-[78px]">
+        <header className="shrink-0 flex items-center justify-between gap-3 px-3 md:px-5 pb-0 h-[78px]" style={{ position: "relative", zIndex: 10 }}>
           <div className="flex items-center gap-2 min-w-0">
             <div className="flex md:hidden items-center gap-2 shrink-0 mr-1">
               <Image src="/kasarian-upb-logo.svg" alt="UPB Kasarian" width={36} height={36} />
@@ -276,8 +278,8 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
 
         {/* scrollable content ------------------------------------------------ */}
         <main
-          className="flex flex-col flex-1 min-h-0 overflow-y-auto px-5 pt-4 pb-0"
-          style={{ scrollbarGutter: "stable" }}
+          className="flex flex-col flex-1 min-h-0 overflow-y-auto px-3 md:px-5 pb-0"
+          style={{ scrollbarGutter: "stable", position: "relative", zIndex: 1 }}
         >
           {children}
           <footer className="static bottom-0 mt-8 mb-3 flex flex-wrap items-center justify-between gap-2 text-[10px] text-[var(--gray)]/60 border-t border-black/[0.05] pt-3">
@@ -296,6 +298,8 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
         </main>
 
       </div>
+
+      </div>{/* end inner card */}
     </div>
   );
 }

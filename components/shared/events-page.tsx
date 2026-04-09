@@ -58,9 +58,8 @@ const DEFAULT_GRADIENT = "linear-gradient(135deg, #B8B5E8 0%, #2D2A4A 100%)";
 // status badge variants
 type BadgeVariant = "pink" | "periwinkle" | "dark" | "success" | "warning" | "error";
 const STATUS_VARIANT: Record<string, BadgeVariant> = {
-  upcoming: "pink",
-  past: "dark",
-  ongoing: "success",
+  upcoming: "success",
+  past: "periwinkle",
 };
 
 // checkbox item used inside filter dropdown (multi-select)
@@ -413,7 +412,7 @@ export default function EventsPage() {
             </Badge>
           ))}
           {[...filters.category].map((cat) => (
-            <Badge key={cat} variant="pink" dot>
+            <Badge key={cat} variant="pink">
               {cat}
               <button onClick={() => { toggleFilter("category", cat); setActiveChip("All"); }} className="ml-1.5" aria-label={`Remove ${cat} filter`}>×</button>
             </Badge>
@@ -567,7 +566,7 @@ export default function EventsPage() {
                 <div className="flex items-start gap-3 caption sm:text-sm text-[var(--gray)]">
                   <CalendarDays size={15} className="shrink-0 mt-0.5" />
                   <span>
-                    {detailEvent.start_date ? new Date(detailEvent.start_date).toLocaleDateString("en-PH", { weekday: "long", month: "long", day: "numeric", year: "numeric" }) : "—"}
+                    {detailEvent.start_date ? new Date(detailEvent.start_date).toLocaleDateString("en-PH", { month: "long", day: "numeric", year: "numeric" }) : "—"}
                     {detailEvent.end_date && detailEvent.end_date !== detailEvent.start_date && (
                       <> — {new Date(detailEvent.end_date).toLocaleDateString("en-PH", { month: "long", day: "numeric", year: "numeric" })}</>
                     )}

@@ -1,5 +1,5 @@
 import React from "react";
-import { Clock, MapPin } from "lucide-react";
+import { CalendarDays, MapPin } from "lucide-react";
 
 type CardVariant = "default" | "pink" | "periwinkle" | "dark" | "glass" | "no-shadow" | "no-hover";
 
@@ -88,7 +88,7 @@ export function EventCard({
         <div className="event-title">{title}</div>
         <div className="event-meta" style={{ marginBottom: 12 }}>
           <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
-            <Clock size={12} color="var(--gray)" /> {date}
+            <CalendarDays size={12} color="var(--gray)" /> {date}
           </span>
           <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
             <MapPin size={12} color="var(--gray)" /> {location}

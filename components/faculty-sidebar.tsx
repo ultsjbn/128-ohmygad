@@ -168,7 +168,7 @@ export default function FacultySidebar() {
                 className={[
                   "flex items-center w-full h-[40px] rounded-[10px]",
                   "justify-start px-1 group-data-[state=collapsed]/sidebar:justify-center group-data-[state=collapsed]/sidebar:px-0",
-                  "text- font-medium transition-colors duration-150",
+                  "text-[15px] font-medium transition-colors duration-150",
                   active
                     ? "bg-white/[0.18] text-[var(--white)]"
                     : "text-white/50 hover:bg-white/[0.08] hover:text-white/80",
@@ -195,7 +195,7 @@ export default function FacultySidebar() {
         </nav>
 
         {/* logout ------------------------------------------------ */}
-        <div className="shrink-0 flex flex-col gap-[2px] px-2 pb-2 pt-2 border-t border-white/[0.07]">
+        <div className="shrink-0 flex flex-col gap-[2px] px-1 pb-1 pt-2 border-t border-white/[0.07]">
           <button
             onClick={() => router.push("/auth/login")}
             title={!open ? "Log out" : undefined}
