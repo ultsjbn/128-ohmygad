@@ -608,17 +608,7 @@ function TextResponses({ responses }: { responses: ResponseRow[] }) {
 
       {/* response cards */}
       {pageItems.map((r, i) => (
-        <div
-          key={`${r.response_token}-${i}`}
-          className="px-4 py-3 rounded-[var(--radius-md)] bg-[var(--lavender)] border border-[rgba(45,42,74,0.06)]"
-        >
-          <p
-            className="body text-[var(--primary-dark)]"
-            style={{ whiteSpace: "pre-wrap", lineHeight: 1.7, fontStyle: "italic" }}
-          >
-            &ldquo;{r.response_value}&rdquo;
-          </p>
-        </div>
+        <TextResponseItem key={`${r.response_token}-${i}`} text={r.response_value || ""} />
       ))}
 
       {/* pagination controls */}
@@ -646,6 +636,36 @@ function TextResponses({ responses }: { responses: ResponseRow[] }) {
             </button>
           </div>
         </div>
+      )}
+    </div>
+  );
+}
+
+// function for displaying the full text responses for any text response more than 20(?) words
+function TextResponseItem({ text }: { text: string }) {
+  const [expanded, setExpanded] = useState(false);
+  const words = text.trim().split(/\s+/);
+  const isLong = words.length > 20;
+
+  const displayText = !isLong || expanded ? text : words.slice(0, 20).join(" ") + "...";
+
+  return (
+    <div
+      className={`px-4 py-3 rounded-[var(--radius-md)] bg-[var(--lavender)] border border-[rgba(45,42,74,0.06)] ${isLong ? "cursor-pointer transition-colors hover:bg-[rgba(45,42,74,0.04)]" : ""}`}
+      onClick={() => {
+        if (isLong) setExpanded(!expanded);
+      }}
+    >
+      <p
+        className="body text-[var(--primary-dark)]"
+        style={{ whiteSpace: "pre-wrap", lineHeight: 1.7, fontStyle: "italic" }}
+      >
+        &ldquo;{displayText}&rdquo;
+      </p>
+      {isLong && (
+        <p className="text-[12px] text-[var(--periwinkle)] mt-1.5 font-medium hover:underline w-fit">
+          {expanded ? "Show less" : "Read more"}
+        </p>
       )}
     </div>
   );
