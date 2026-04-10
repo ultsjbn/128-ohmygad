@@ -45,7 +45,7 @@ import { Plus, Calendar } from "lucide-react";
 
 import React from "react";
 
-type ButtonVariant = "primary" | "pink" | "periwinkle" | "ghost" | "soft" | "icon" | "icon-sm" | "icon-dark";
+type ButtonVariant = "primary" | "pink" | "periwinkle" | "ghost" | "soft" | "icon" | "icon-dark";
 type ButtonSize    = "sm" | "md" | "lg";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -64,7 +64,6 @@ export function Button({
 }: ButtonProps) {
   const variantClass = variant === "icon-dark" ? "btn-icon-dark"
                      : variant === "icon"      ? "btn-icon"
-                     : variant === "icon-sm"   ? "btn-icon-sm"
                      : `btn-${variant}`;
 
   const sizeClass = size === "sm" ? "btn-sm"

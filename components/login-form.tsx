@@ -111,7 +111,6 @@ export function LoginForm({
               id="password"
               type={showPassword ? "text" : "password"}
               required
-              maxLength={128}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="input"

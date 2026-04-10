@@ -8,11 +8,10 @@ import ScrollToTop from "../ui/scroll-to-top";
 import GlobalSearch from "../global-search";
 
 interface DashboardPageProps {
-  role?: "admin" | "faculty" | "student";
   rightPanel?: React.ReactNode;
 }
 
-export default function DashboardPage({ role = "student", rightPanel }: DashboardPageProps) {
+export default function DashboardPage({ rightPanel }: DashboardPageProps) {
   const [displayName, setDisplayName] = useState<string>("...");
 
   useEffect(() => {
@@ -40,7 +39,7 @@ export default function DashboardPage({ role = "student", rightPanel }: Dashboar
             <div className="flex flex-col gap-1 md:gap-2 w-full max-w-[1600px]">
                 <p className="heading-md">Good day, {displayName}!</p>
                 <div>
-                    <GlobalSearch role={role} placeholder="Search events, courses, surveys..." />
+                    <GlobalSearch role="student" placeholder="Search events, courses, surveys..." />
                 </div>
             </div>
         </div>

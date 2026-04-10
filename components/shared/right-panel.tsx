@@ -1,13 +1,17 @@
 "use client";
 
+import { Suspense, useState } from "react";
+import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
 import { Card } from "@/components/ui";
 import { CheckCircle2, ClipboardList } from "lucide-react";
 
 export default function RightPanel() {
+  const [selected, setSelected] = useState<Date | undefined>();
 
   return (
-    <aside className="flex flex-col gap-4 w-full shrink-0 pb-8">
+    <aside className="flex flex-col gap-4 w-full">
+
       {/* GSOs attended */}
       <Card variant="no-hover" className="flex flex-col gap-2 p-4 cursor-pointer transition-all" >
         <div className="flex items-center justify-between">
@@ -19,7 +23,7 @@ export default function RightPanel() {
         </p>
         <p className="caption">Sessions completed</p>
       </Card>
-      
+
       {/* pending surveys */}
       <Card variant="no-hover" className="flex flex-col gap-2 p-4 transition-all"
       >
@@ -34,7 +38,5 @@ export default function RightPanel() {
       </Card>
 
     </aside>
-
-    
   );
 }

@@ -117,7 +117,7 @@ export default function SurveyAnalyticsModal({ survey, open, onClose }: Props) {
         {/* ── Sticky header ── */}
         <div
           className="shrink-0 flex items-center justify-between gap-4 px-6 md:px-10 py-5 border-b border-[rgba(45,42,74,0.08)]"
-          style={{ background: "var(--white)", position: "sticky", top: 0, zIndex: 10 }}
+          style={{ background: "var(--white)" }}
         >
           <div className="flex items-center gap-3 min-w-0">
             <BarChart3 size={22} className="text-[var(--periwinkle)] shrink-0" />

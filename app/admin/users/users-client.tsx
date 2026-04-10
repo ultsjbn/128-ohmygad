@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ArrowUpDown, UserPlus, Pencil, Trash2, ChevronUp, ChevronDown, Loader2, SlidersHorizontal } from "lucide-react";
+import { ArrowUpDown, UserPlus, Pencil, Trash2, ChevronUp, ChevronDown, Loader2 } from "lucide-react";
 import type { Profile, SortState } from "./profile.types";
 import { sortProfiles, paginate, totalPages } from "./profile.utils";
 import { PER_PAGE } from "@/lib/pagination.utils";
@@ -20,10 +20,12 @@ import {
   Dropdown,
   DropdownItem,
   DropdownDivider,
-  FilterChips,
+  Tabs,
   Modal,
   Toast,
 } from "@/components/ui";
+
+type TabKey = "all" | "admin" | "faculty" | "student";
 
 interface UsersClientProps {
   initialProfiles: Profile[];
@@ -36,32 +38,13 @@ const ROLE_VARIANT: Record<string, "pink" | "periwinkle" | "success"> = {
   student: "pink",
 };
 
-const ROLES = ["student", "faculty", "admin"];
-const GSO_STATUSES = ["attended", "pending"];
-
-function CheckItem({
-  label, active, onToggle, capitalize = false,
-}: { label: string; active: boolean; onToggle: () => void; capitalize?: boolean; }) {
-  return (
-    <DropdownItem onClick={onToggle}>
-      <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
-        <span style={{
-          width: 14, height: 14, borderRadius: 4, flexShrink: 0,
-          border: `1.5px solid ${active ? "var(--primary-dark)" : "rgba(45,42,74,0.20)"}`,
-          background: active ? "var(--primary-dark)" : "transparent",
-          display: "inline-flex", alignItems: "center", justifyContent: "center",
-        }}>
-          {active && (
-            <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
-              <path d="M1 4l2 2 4-4" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          )}
-        </span>
-        <span className={capitalize ? "capitalize" : ""}>{active ? <strong>{label}</strong> : label}</span>
-      </span>
-    </DropdownItem>
-  );
-}
+const TABS = ["all", "student", "faculty", "admin"];
+const TAB_LABELS: Record<string, string> = {
+  all: "All Users",
+  student: "Students",
+  faculty: "Faculty",
+  admin: "Admin",
+};
 
 export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) => {
   const router = useRouter();
@@ -69,15 +52,10 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
 
   const [profiles, setProfiles] = useState<Profile[]>(initialProfiles);
   const [page, setPage] = useState(1);
+  const [activeTab, setActiveTab] = useState<TabKey>("all");
   const [search, setSearch] = useState(searchParams.get("search") || "");
   const [sort, setSort] = useState<SortState>({ field: "created_at", direction: "desc" });
 
-  // Filters
-  const [roleFilters, setRoleFilters] = useState<Set<string>>(new Set());
-  const [gsoFilters, setGsoFilters] = useState<Set<string>>(new Set());
-  const [activeChip, setActiveChip] = useState("All");
-
-  const [createModalOpen, setCreateModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editUser, setEditUser] = useState<any>(null);
   const [editLoading, setEditLoading] = useState(false);
@@ -96,7 +74,7 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
 
   const filtered = useMemo(() => {
     let result = profiles;
-    
+    if (activeTab !== "all") result = result.filter((p) => p.role?.toLowerCase() === activeTab);
     if (search.trim()) {
       result = result.filter((p) =>
         `${p.full_name ?? ""} ${p.email ?? ""} ${p.role ?? ""}`
@@ -104,60 +82,13 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
           .includes(search.toLowerCase())
       );
     }
-
-    if (roleFilters.size > 0) {
-      result = result.filter((p) => roleFilters.has(p.role?.toLowerCase() ?? ""));
-    }
-
-    if (gsoFilters.size > 0) {
-      result = result.filter((p) => {
-        const status = p.gso_attended ? "attended" : "pending";
-        return gsoFilters.has(status);
-      });
-    }
-
     return sortProfiles(result, sort.field, sort.direction);
-  }, [profiles, sort, roleFilters, gsoFilters, search]);
+  }, [profiles, sort, activeTab, search]);
 
   const paginatedProfiles = paginate(filtered, page, PER_PAGE);
   const pageCount = totalPages(filtered.length, PER_PAGE);
 
-  // Filter toggle helpers
-  function toggleRole(r: string) {
-    setRoleFilters((prev) => {
-      const next = new Set(prev);
-      next.has(r) ? next.delete(r) : next.add(r);
-      return next;
-    });
-    setActiveChip("All");
-    setPage(1);
-  }
-
-  function toggleGso(g: string) {
-    setGsoFilters((prev) => {
-      const next = new Set(prev);
-      next.has(g) ? next.delete(g) : next.add(g);
-      return next;
-    });
-    setPage(1);
-  }
-
-  function clearAllFilters() {
-    setRoleFilters(new Set());
-    setGsoFilters(new Set());
-    setActiveChip("All");
-    setPage(1);
-  }
-
-  const handleChipChange = (chip: string) => {
-    setActiveChip(chip);
-    if (chip === "All") {
-      setRoleFilters(new Set());
-    } else {
-      setRoleFilters(new Set([chip.toLowerCase()]));
-    }
-    setPage(1);
-  };
+  const handleTabChange = (tab: string) => { setActiveTab(tab as TabKey); setPage(1); };
 
   const handleSort = (field: SortState["field"]) => {
     setSort((prev) => ({
@@ -226,9 +157,6 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
     return sort.direction === "asc" ? <ChevronUp size={12} /> : <ChevronDown size={12} />;
   }
 
-  const activeFilterCount = roleFilters.size + gsoFilters.size;
-  const hasActiveFilters = activeFilterCount > 0;
-
   const columns: Column<Profile>[] = [
     {
       key: "full_name",
@@ -286,7 +214,7 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
   ];
 
   return (
-    <div className="flex flex-col gap-6 py-2">
+    <div className="flex flex-col gap-6">
       {/* toolbar */}
       <div className="flex flex-col gap-3">
         <div className="flex items-center gap-3 flex-wrap">
@@ -304,7 +232,7 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
               </Button>
             }
           >
-            {(["full_name", "email", "role"] as SortState["field"][]).map((field) => (
+            {(["full_name", "email", "role", "created_at"] as SortState["field"][]).map((field) => (
               <DropdownItem key={field} onClick={() => handleSort(field)}>
                 <span className="flex items-center justify-between gap-6 w-full">
                   <span className="capitalize">{field === "created_at" ? "Date joined" : field.replace("_", " ")}</span>
@@ -318,89 +246,17 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
             </DropdownItem>
           </Dropdown>
 
-          <Dropdown
-            trigger={
-              <Button variant={hasActiveFilters ? "pink" : "ghost"}>
-                <SlidersHorizontal size={15} /> Filter
-                {hasActiveFilters && (
-                  <span
-                    className="inline-flex items-center justify-center w-2 h-2 rounded-full text-[10px] font-bold text-white"
-                    style={{ background: "var(--primary-dark)", marginLeft: 2 }}
-                  >
-                    {activeFilterCount}
-                  </span>
-                )}
-              </Button>
-            }
-          >
-            <div style={{ padding: "4px 12px 6px" }}>
-              <p className="label" style={{ marginBottom: 4 }}>Role</p>
-            </div>
-            {ROLES.map((r) => (
-              <CheckItem
-                key={r}
-                label={r}
-                active={roleFilters.has(r)}
-                onToggle={() => toggleRole(r)}
-                capitalize
-              />
-            ))}
-
-            <DropdownDivider />
-            
-            <div style={{ padding: "6px 12px 4px" }}>
-              <p className="label" style={{ marginBottom: 4 }}>GSO Attended</p>
-            </div>
-            {GSO_STATUSES.map((g) => (
-              <CheckItem
-                key={g}
-                label={g === "attended" ? "Attended" : "Pending"}
-                active={gsoFilters.has(g)}
-                onToggle={() => toggleGso(g)}
-              />
-            ))}
-
-            <DropdownDivider />
-            <DropdownItem onClick={clearAllFilters}>
-              Clear all filters
-            </DropdownItem>
-          </Dropdown>
-
-          <Button variant="primary" onClick={() => setCreateModalOpen(true)}>
-            <UserPlus size={16} /> Add User
-          </Button>
+            <Button variant="primary" onClick={() => router.push("/admin/users/create")}>
+                <UserPlus size={16} /> Add User
+            </Button>
         </div>
 
-        <FilterChips
-          chips={["All", "Student", "Faculty", "Admin"]}
-          defaultActive={activeChip}
-          onChange={handleChipChange}
+        <Tabs
+          tabs={TABS.map((t) => TAB_LABELS[t])}
+          defaultTab={TAB_LABELS[activeTab]}
+          onChange={(label) => handleTabChange(TABS.find((t) => TAB_LABELS[t] === label) ?? "all")}
         />
       </div>
-
-      {hasActiveFilters && (
-        <div className="flex items-center gap-2 flex-wrap -mt-2">
-          <span className="caption">Active filters:</span>
-
-          {[...roleFilters].map((r) => (
-            <Badge key={r} variant="pink">
-              <span className="capitalize">{r}</span>
-              <button onClick={() => { toggleRole(r); setActiveChip("All"); }} style={{ marginLeft: 6 }}>×</button>
-            </Badge>
-          ))}
-
-          {[...gsoFilters].map((g) => (
-            <Badge key={g} variant="warning">
-              <span className="capitalize">{g === "attended" ? "Attended" : "Pending"}</span>
-              <button onClick={() => toggleGso(g)} style={{ marginLeft: 6 }}>×</button>
-            </Badge>
-          ))}
-
-          <Button variant="soft" size="sm" onClick={clearAllFilters}>
-            Clear all
-          </Button>
-        </div>
-      )}
 
       {fetchError && <Toast variant="error" title="Failed to load users" message={fetchError} />}
 
@@ -410,11 +266,11 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
           <Card>
             <div className="flex flex-col items-center justify-center gap-3 py-12">
               <p className="caption">
-                {search || hasActiveFilters ? "No users match your search or filters." : "No users found."}
+                {search ? "No users match your search." : "No users found."}
               </p>
-              {(search || hasActiveFilters) && (
-                <Button variant="ghost" size="sm" onClick={() => { setSearch(""); clearAllFilters(); }}>
-                  Clear search & filters
+              {search && (
+                <Button variant="ghost" size="sm" onClick={() => setSearch("")}>
+                  Clear search
                 </Button>
               )}
             </div>
@@ -441,20 +297,6 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
           />
         </div>
       )}
-
-      {/* create modal */}
-      <Modal
-        open={createModalOpen}
-        onClose={() => setCreateModalOpen(false)}
-        title="Add User"
-      >
-        <UserForm
-          onSuccess={() => {
-            setCreateModalOpen(false);
-            router.refresh();
-          }}
-        />
-      </Modal>
 
       {/* edit modal */}
       <Modal

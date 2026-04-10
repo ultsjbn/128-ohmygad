@@ -26,8 +26,6 @@ export type EventFormData = {
 type EventFormProps = {
   initialData?: EventFormData;
   mode: "create" | "edit";
-  onSuccess?: () => void;
-  onCancel?: () => void;
 };
 
 const CATEGORY_OPTIONS = [
@@ -43,7 +41,7 @@ const STATUS_OPTIONS = [
   { value: "past", label: "Past" },
 ];
 
-export default function EventForm({ initialData, mode, onSuccess, onCancel }: EventFormProps) {
+export default function EventForm({ initialData, mode }: EventFormProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -231,12 +229,8 @@ export default function EventForm({ initialData, mode, onSuccess, onCancel }: Ev
     const result = await submitFormData("event", payload, mode, initialData?.id);
 
     if (result.success) {
-      if (onSuccess) {
-        onSuccess();
-      } else {
-        router.push("/admin/events");
-        router.refresh();
-      }
+      router.push("/admin/events");
+      router.refresh();
     } else {
       setError(result.error || "An error occurred");
     }
@@ -248,7 +242,7 @@ export default function EventForm({ initialData, mode, onSuccess, onCancel }: Ev
     <form onSubmit={handleSubmit} className="flex flex-col h-full lg:h-auto w-full min-h-0 relative">
 
       {/* scrollable wrapper for mobile, fully expanded on desktop */}
-      <div className="flex-1 overflow-y-auto custom-scrollbar pr-1 pb-4 min-h-0">
+      <div className="flex-1 overflow-y-auto lg:overflow-visible custom-scrollbar pr-1 lg:pr-0 pb-4 lg:pb-0 min-h-0">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
           {/* left column: basic information */}
@@ -439,7 +433,7 @@ export default function EventForm({ initialData, mode, onSuccess, onCancel }: Ev
         <Button
           type="button"
           variant="ghost"
-          onClick={() => onCancel ? onCancel() : router.push("/admin/events")}
+          onClick={() => router.push("/admin/events")}
         >
           Cancel
         </Button>

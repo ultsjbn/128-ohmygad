@@ -1,21 +1,24 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { Plus, ArrowUpDown, Pencil, Trash2, Loader2, ChevronUp, ChevronDown } from "lucide-react";
-import CourseForm, { type CourseFormData } from "@/components/admin/course-form";
+import { Plus, ArrowUpDown, SlidersHorizontal, Pencil, Trash2, Loader2, ChevronUp, ChevronDown } from "lucide-react";
+import type { CourseFormData } from "@/components/admin/course-form";
 import { paginate, totalPages, PER_PAGE } from "@/lib/pagination.utils";
 import { Pagination } from "@/components/pagination";
 
 import {
   Button,
   Badge,
+  FilterChips,
   SearchBar,
   Card,
   DataTable,
   type Column,
+  Dropdown,
   DropdownItem,
+  DropdownDivider,
   Modal,
 } from "@/components/ui";
 
@@ -30,12 +33,22 @@ function formatTime(time?: string) {
   return `${hour12}:${minute} ${suffix}`
 }
 
-const SORT_FIELDS = ["title", "status", "semester", "start_time"] as const;
+// constants 
+const SEMESTERS = ["1st Semester", "2nd Semester", "Mid-Year"];
+const STATUSES = ["open", "closed"];
+const SORT_FIELDS = ["title"] as const;
+
 type SortField = typeof SORT_FIELDS[number];
 type SortDirection = "asc" | "desc";
 
 // variant helpers 
 type BadgeVariant = "pink" | "periwinkle" | "dark" | "success" | "warning" | "error";
+
+const SEMESTER_VARIANT: Record<string, BadgeVariant> = {
+  "1st Semester": "pink",
+  "2nd Semester": "periwinkle",
+  "Mid-Year": "dark",
+};
 
 
 const STATUS_VARIANT: Record<string, BadgeVariant> = {
@@ -43,8 +56,46 @@ const STATUS_VARIANT: Record<string, BadgeVariant> = {
   closed: "dark",
 };
 
+// checkbox
+function CheckItem({
+  label,
+  active,
+  onToggle,
+  capitalize = false,
+}: {
+  label: string;
+  active: boolean;
+  onToggle: () => void;
+  capitalize?: boolean;
+}) {
+  return (
+    <DropdownItem onClick={onToggle}>
+      <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
+        {/* mini checkbox */}
+        <span style={{
+          width: 14, height: 14, borderRadius: 4, flexShrink: 0,
+          border: `1.5px solid ${active ? "var(--primary-dark)" : "rgba(45,42,74,0.20)"}`,
+          background: active ? "var(--primary-dark)" : "transparent",
+          display: "inline-flex", alignItems: "center", justifyContent: "center",
+        }}>
+          {active && (
+            <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
+              <path d="M1 4l2 2 4-4" stroke="white" strokeWidth="1.5"
+                strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          )}
+        </span>
+        <span className={capitalize ? "capitalize" : ""}>
+          {active ? <strong>{label}</strong> : label}
+        </span>
+      </span>
+    </DropdownItem>
+  );
+}
+
 // courses page proper
 export default function CoursesPage() {
+  const router = useRouter();
   const searchParams = useSearchParams();
 
   const [courses, setCourses] = useState<CourseFormData[]>([]);
@@ -53,8 +104,6 @@ export default function CoursesPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [modalContent, setModalContent] = useState<{ label: string; text: string } | null>(null);
-  const [createModalOpen, setCreateModalOpen] = useState(false);
-  const [editTarget, setEditTarget] = useState<CourseFormData | null>(null);
   const [sort, setSort] = useState<{ field: SortField; direction: SortDirection }>({ field: "start_time", direction: "desc" });
 
   const [semesterFilter, setSemesterFilter] = useState<string>("All");
@@ -200,38 +249,17 @@ export default function CoursesPage() {
       ),
     },
 
+
     {
-      key: "status",
-      header: "Status",
+      key: "description",
+      header: "Description",
       render: (course) => (
-        <Badge variant={STATUS_VARIANT[course.status ?? ""] ?? "dark"}>
-          <span className="capitalize">{course.status}</span>
-        </Badge>
+        <span className="text-sm text-[var(--primary-dark)] opacity-90 max-w-[300px] truncate block">
+          {course.description || "—"}
+        </span>
       ),
     },
 
-    {
-    key: "schedule",
-    header: "Schedule",
-    render: (course) => {
-        const start = formatTime(course.start_time)
-        const end = formatTime(course.end_time)
-
-        return (
-        <div className="flex flex-col leading-tight">
-            <span className="caption text-[12px] opacity-80">
-            {course.days || "—"}
-            </span>
-
-            <span className="caption whitespace-nowrap">
-            {start !== "—" && end !== "—"
-                ? `${start} – ${end}`
-                : "—"}
-            </span>
-        </div>
-        )
-    },
-    },
 
     {
       key: "actions",
@@ -241,7 +269,7 @@ export default function CoursesPage() {
           <Button
             variant="icon"
             title="Edit course"
-            onClick={() => setEditTarget(course)}
+            onClick={() => router.push(`/admin/courses/${course.id}/edit`)}
           >
             <Pencil size={14} />
           </Button>
@@ -263,7 +291,7 @@ export default function CoursesPage() {
 
   // 
   return (
-    <div className="flex flex-col gap-6 py-2">
+    <div className="flex flex-col gap-6">
       {/*  toolbar  */}
       <div className="flex flex-col gap-3">
 
@@ -271,21 +299,38 @@ export default function CoursesPage() {
         <div className="flex items-center gap-3 flex-wrap">
 
           <SearchBar
-            placeholder="Search by Title"
+            placeholder="Search by title"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             containerStyle={{ flex: 1, minWidth: 220 }}
           />
 
-        
+          {/* sort multi-field */}
+          <Dropdown
+            trigger={
+              <Button variant="ghost">
+                <ArrowUpDown size={15} /> Sort
+              </Button>
+            }
+          >
+            {SORT_FIELDS.map((field) => (
+              <DropdownItem key={field} onClick={() => handleSort(field)}>
+                <span className="flex items-center justify-between gap-6 w-full">
+                  <span className="capitalize">{field === "start_time" ? "Time" : field}</span>
+                  <SortIcon field={field} />
+                </span>
+              </DropdownItem>
+            ))}
+            <DropdownDivider />
+            <DropdownItem onClick={() => { setSort({ field: "start_time", direction: "desc" }); setPage(1); }}>
+              Reset sort
+            </DropdownItem>
+          </Dropdown>
 
-
-            <Button variant="primary" onClick={() => setCreateModalOpen(true)}>
+            <Button variant="primary" onClick={() => router.push("/admin/courses/create")}>
                 <Plus size={16} /> Add Guideline
             </Button>
         </div>
-
-     
       </div>
 
       {/*  active filter pills  */}
@@ -371,39 +416,6 @@ export default function CoursesPage() {
           />
         </div>
       )}
-
-      {/* create modal */}
-      <Modal
-        open={createModalOpen}
-        onClose={() => setCreateModalOpen(false)}
-        title="Add Guideline"
-        modalStyle={{ maxWidth: 860 }}
-      >
-        <CourseForm
-          mode="create"
-          onSuccess={() => { setCreateModalOpen(false); getCourses(); }}
-          onCancel={() => setCreateModalOpen(false)}
-        />
-      </Modal>
-
-      {/* edit modal */}
-      <Modal
-        open={!!editTarget}
-        onClose={() => setEditTarget(null)}
-        title="Edit Guideline"
-        subtitle={editTarget?.title}
-        modalStyle={{ maxWidth: 860 }}
-      >
-        {editTarget && (
-          <CourseForm
-            key={editTarget.id}
-            mode="edit"
-            initialData={editTarget}
-            onSuccess={() => { setEditTarget(null); getCourses(); }}
-            onCancel={() => setEditTarget(null)}
-          />
-        )}
-      </Modal>
 
       {/*  detail modal  */}
       <Modal

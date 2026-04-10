@@ -13,7 +13,8 @@ app/api/admin/create-user/route.ts   (server-side create user)
 */
 
 // ── regex patterns ──────────────────────────────────────────────────────────
-const NAME_REGEX = /^[\p{L}\s.'\-_]+$/u;
+const NAME_REGEX = /^[a-zA-Z\s.'-]+$/;
+const CONTACT_REGEX = /^[0-9]{10,15}$/;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 // ── individual validators ───────────────────────────────────────────────────
@@ -33,23 +34,20 @@ export function validateDisplayName(name: string): string | null {
 
 export function validateContactNum(num: string): string | null {
   if (!num) return null; // optional field
-  if (!/^\d+$/.test(num)) return "Contact number can only contain digits.";
-  if (num.length < 10 || num.length > 15) return "Contact number must be 10-15 digits.";
+  if (!CONTACT_REGEX.test(num)) return "Contact number must be 10-15 digits.";
   return null;
 }
 
 export function validateStudentNum(num: string | number): string | null {
   if (!num) return null; // optional field
-  const str = String(num);
-  if (!/^\d+$/.test(str)) return "Student number can only contain digits.";
-  if (str.length !== 9) return "Student number must be exactly 9 digits.";
+  const clean = String(num).replace(/\D/g, "");
+  if (clean.length !== 9) return "Student number must be exactly 9 digits.";
   return null;
 }
 
 export function validatePassword(password: string): string | null {
   if (!password) return "Password is required.";
   if (password.length < 8) return "Password must be at least 8 characters long.";
-  if (password.length > 128) return "Password cannot exceed 128 characters.";
   return null;
 }
 
@@ -62,10 +60,5 @@ export function validateEmail(email: string): string | null {
 export function validateGsoSessions(value: string | number): string | null {
   const num = value === "" ? 0 : Number(value);
   if (isNaN(num) || num < 0 || num > 5) return "GSO Sessions Attended must be between 0 and 5.";
-  return null;
-}
-
-export function validateAddress(address: string): string | null {
-  if (address && address.length > 100) return "Address cannot exceed 100 characters.";
   return null;
 }

@@ -226,7 +226,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
         {/* scrollable content ------------------------------------------------ */}
         <main
           className="flex flex-col flex-1 min-h-0 overflow-y-auto px-3 md:px-5 pb-0"
-          style={{ scrollbarGutter: "stable", position: "relative" }}
+          style={{ scrollbarGutter: "stable", position: "relative", zIndex: 1 }}
         >
           {children}
           <footer className="static bottom-0 mt-8 mb-3 flex flex-wrap items-center justify-between gap-2 text-[10px] text-[var(--gray)]/60 border-t border-black/[0.05] pt-3">

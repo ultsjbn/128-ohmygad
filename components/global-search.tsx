@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { Search, Loader2, ChevronUp, ExternalLink, X, MoveUp, MoveDown } from "lucide-react";
+import { Search, Loader2, ExternalLink } from "lucide-react";
 import { Badge } from "@/components/ui";
 
 interface GlobalSearchProps {
@@ -30,9 +30,8 @@ export default function GlobalSearch({ role, placeholder = "Search events, users
     { id: "Events", type: "Event" },
     ...(role === "admin" ? [{ id: "Users", type: "User" }] : []),
     { id: "Guidelines", type: "Course" },
-    { id: "Surveys", type: "Survey" },
+    { id: "Surveys", type: "Survey" }
   ];
-
 
   // debouncing
   useEffect(() => {
@@ -99,36 +98,20 @@ export default function GlobalSearch({ role, placeholder = "Search events, users
       <span className="search-icon"><Search size={15} /></span>
       <input
         className="search-input"
-        maxLength={64}
         placeholder={placeholder}
         value={query}
         onChange={(e) => {
           setQuery(e.target.value);
           if (!open && e.target.value.trim().length >= 2) setOpen(true);
         }}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" && query.trim().length >= 2) {
-            e.preventDefault();
-            setOpen(false);
-            router.push(`/${role}/search?q=${encodeURIComponent(query.trim())}`);
-          }
-        }}
         onFocus={() => { if (query.trim().length >= 2) setOpen(true); }}
       />
-      {query && (
-        <button
-          onClick={() => { setQuery(""); setOpen(false); }}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--gray)] hover:text-[var(--primary-dark)] bg-transparent border-none cursor-pointer"
-        >
-          <X size={15} />
-        </button>
-      )}
 
       {open && query.trim().length >= 2 && (
         <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-[var(--radius-lg)] shadow-[var(--shadow-float)] border border-black/[0.05] z-[100] overflow-hidden flex flex-col max-h-[85vh]">
           {/* Results Area */}
           {loading ? (
-            <div style={{ padding: 24, display: "flex", alignItems: "center", justifyContent: "center", gap: 8, color: "var(--gray)", fontSize: 13 }}>
+            <div style={{ padding: 16, display: "flex", alignItems: "center", justifyItems: "center", justifyContent: "center", gap: 8, color: "var(--gray)", fontSize: 13 }}>
               <Loader2 size={16} className="animate-spin" /> Searching...
             </div>
           ) : results.length > 0 ? (
@@ -176,20 +159,10 @@ export default function GlobalSearch({ role, placeholder = "Search events, users
               })}
             </div>
           ) : (
-            <div style={{ padding: 24, textAlign: "center", color: "var(--gray)", fontSize: 13 }}>
+            <div style={{ padding: 16, textAlign: "center", color: "var(--gray)", fontSize: 13 }}>
               No results found.
             </div>
           )}
-
-          {/* Footer Area */}
-          <div className="px-4 py-2.5 border-t border-black/[0.05] flex items-center justify-between bg-[rgba(240,240,245,0.4)]">
-            <button
-              onClick={() => { setOpen(false); router.push(`/${role}/search?q=${encodeURIComponent(query)}`); }}
-              className="flex items-center gap-1.5 text-[12px] font-medium text-blue-600 hover:underline bg-transparent border-none cursor-pointer"
-            >
-              {/* <ExternalLink size={13} /> Open search page */}
-            </button>
-          </div>
         </div>
       )}
     </div>

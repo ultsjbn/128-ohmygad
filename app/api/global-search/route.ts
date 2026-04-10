@@ -16,8 +16,6 @@ export async function GET(request: Request) {
 
     const url = new URL(request.url);
     const query = url.searchParams.get("q") || "";
-    const isAll = url.searchParams.get("all") === "true";
-    const limitAmount = isAll ? 1000 : 5;
 
     if (!query || query.length < 2) {
       return NextResponse.json({ results: [] });
@@ -27,19 +25,19 @@ export async function GET(request: Request) {
       .from("course")
       .select("id, title")
       .ilike("title", `%${query}%`)
-      .limit(limitAmount);
+      .limit(5);
 
     const { data: events } = await supabaseAdmin
       .from("event")
       .select("id, title")
       .ilike("title", `%${query}%`)
-      .limit(limitAmount);
+      .limit(5);
 
     const { data: surveys } = await supabaseAdmin
       .from("survey")
       .select("id, title")
       .ilike("title", `%${query}%`)
-      .limit(limitAmount);
+      .limit(5);
       
     let users: any[] = [];
     if (role === "admin") {
@@ -47,7 +45,7 @@ export async function GET(request: Request) {
         .from("profile")
         .select("id, full_name, email")
         .or(`full_name.ilike.%${query}%,email.ilike.%${query}%`)
-        .limit(limitAmount);
+        .limit(5);
       users = data || [];
     }
 

@@ -13,10 +13,6 @@ export { Modal } from "./modal";
 export { Sidebar } from "./sidebar";
 export { DataTable } from "./data-table";
 export { DateTimePicker } from "./datetime-picker";
-export { DateRangePicker } from "./date-range-picker";
-export type { DateRange } from "./date-range-picker";
-export { DashboardFilter, EMPTY_FILTERS, hasActiveFilters } from "./dashboard-filter";
-export type { DashboardFilters, FilterOptions } from "./dashboard-filter";
 export { MiniCalendar } from "./mini-calendar"
 export { TodayTimeline } from "./today-timeline"
 // export { SurveyQuestion, SurveyForm, SurveyBuilder } from "./survey-question";

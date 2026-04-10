@@ -53,7 +53,6 @@ export default function ListToolbar({
       <InputText
         placeholder={searchPlaceholder}
         fullWidth
-        maxLength={64}
         prefix={<Search size={18} />}
         onChange={onSearchChange}
         value={searchValue}

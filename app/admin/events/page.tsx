@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { Plus, ArrowUpDown, SlidersHorizontal, Pencil, Trash2, Loader2, ChevronUp, ChevronDown, Copy, Check, Users, AlignLeft, ClipboardCheck, MapPin, Clock } from "lucide-react";
-import EventForm, { type EventFormData } from "@/components/admin/event-form";
+import { Plus, ArrowUpDown, SlidersHorizontal, Pencil, Trash2, Loader2, ChevronUp, ChevronDown, Copy, Check, Users, AlignLeft } from "lucide-react";
+import type { EventFormData } from "@/components/admin/event-form";
 import { paginate, totalPages, PER_PAGE } from "@/lib/pagination.utils";
 import { Pagination } from "@/components/pagination";
 
@@ -22,7 +22,7 @@ import {
   Modal,
 } from "@/components/ui";
 
-// constants
+// constants 
 const CATEGORIES = ["Orientation", "Forum", "Research", "Training", "Workshop"];
 const STATUSES = ["upcoming", "past"];
 const SORT_FIELDS = ["title", "category", "status", "start_date"] as const;
@@ -44,12 +44,11 @@ const STATUS_VARIANT: Record<string, BadgeVariant> = {
 };
 
 type RegisteredUser = {
-  registration_id: string;       // event_registration.id — needed to update attended
   display_name: string | null;
   full_name: string | null;
   email: string | null;
   registration_date: string | null;
-  attended: boolean;             // from event_registration.attended column
+  // status: string | null;
 };
 
 function CheckItem({
@@ -77,52 +76,9 @@ function CheckItem({
   );
 }
 
-// Attendance checkbox
-function AttendanceCheckbox({
-  registrationId,
-  attended,
-  onToggle,
-}: {
-  registrationId: string;
-  attended: boolean;
-  onToggle: (id: string, newValue: boolean) => void;
-}) {
-  return (
-    <div 
-      className="flex items-center justify-center" 
-      onClick={(e) => e.stopPropagation()}
-    >
-      <button
-        type="button"
-        onClick={() => onToggle(registrationId, !attended)}
-        className="flex items-center justify-center transition-all active:scale-95"
-        style={{
-          width: 18, // Slightly larger than dropdown mini-checkbox for better click target in tables
-          height: 18,
-          borderRadius: 5,
-          flexShrink: 0,
-          cursor: "pointer",
-          border: `1.5px solid ${attended ? "var(--primary-dark)" : "rgba(45,42,74,0.20)"}`,
-          background: attended ? "var(--primary-dark)" : "transparent",
-        }}
-      >
-        {attended && (
-          <svg width="10" height="10" viewBox="0 0 8 8" fill="none">
-            <path 
-              d="M1 4l2 2 4-4" 
-              stroke="white" 
-              strokeWidth="1.8" 
-              strokeLinecap="round" 
-              strokeLinejoin="round" 
-            />
-          </svg>
-        )}
-      </button>
-    </div>
-  );
-}
-
+// events page proper
 export default function EventsPage() {
+  const router = useRouter();
   const searchParams = useSearchParams();
 
   const [events, setEvents] = useState<EventFormData[]>([]);
@@ -131,27 +87,19 @@ export default function EventsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [sort, setSort] = useState<{ field: SortField; direction: "asc" | "desc" }>({ field: "start_date", direction: "desc" });
-  
-  // Updated filter states to use Sets for multi-select
-  const [categoryFilters, setCategoryFilters] = useState<Set<string>>(new Set());
+  const [categoryFilter, setCategoryFilter] = useState<string>("All");
   const [statusFilters, setStatusFilters] = useState<Set<string>>(new Set());
-  const [activeChip, setActiveChip] = useState("All");
-  
   const [page, setPage] = useState(1);
   
-  const [createModalOpen, setCreateModalOpen] = useState(false);
-  const [editTarget, setEditTarget] = useState<EventFormData | null>(null);
-
   // for the delete confirmation modal
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; title: string } | null>(null);
 
   // ── Event detail modal ──
   const [detailEvent, setDetailEvent] = useState<EventFormData | null>(null);
-  const [detailTab, setDetailTab] = useState<"info" | "registrations" | "attendance">("info");
+  const [detailTab, setDetailTab] = useState<"info" | "registrations">("info");
   const [registrations, setRegistrations] = useState<RegisteredUser[]>([]);
   const [loadingRegs, setLoadingRegs] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [togglingId, setTogglingId] = useState<string | null>(null); // tracks which row is being saved
 
   const fetchRegistrations = async (eventId: string) => {
     setLoadingRegs(true);
@@ -159,9 +107,8 @@ export default function EventsPage() {
     const { data } = await supabase
       .from("event_registration")
       .select(`
-        id,
+        status,
         registration_date,
-        attended,
         profile:user_id (
           display_name,
           full_name,
@@ -169,48 +116,20 @@ export default function EventsPage() {
         )
       `)
       .eq("event_id", eventId);
+      // .neq("status", "cancelled");
 
-    if (data) {
+      if (data) {
       setRegistrations(
         data.map((r: any) => ({
-          registration_id:   r.id,
           display_name:      r.profile?.display_name ?? null,
           full_name:         r.profile?.full_name    ?? null,
           email:             r.profile?.email        ?? null,
           registration_date: r.registration_date,
-          attended:          r.attended ?? false,
+          status:            "registered",
         }))
       );
     }
     setLoadingRegs(false);
-  };
-
-  // Toggle attended 
-  const handleToggleAttendance = async (registrationId: string, newValue: boolean) => {
-    setRegistrations((prev) =>
-      prev.map((r) => r.registration_id === registrationId ? { ...r, attended: newValue } : r)
-    );
-    setTogglingId(registrationId);
-
-    const supabase = createClient();
-
-    try {
-      const { data, error } = await supabase
-        .from("event_registration")
-        .update({ attended: newValue })
-        .eq("id", registrationId)
-        .select();
-
-    } catch (err: any) {
-      console.error("Attendance update failed:", err.message);
-      
-      // Rollback UI state on failure
-      setRegistrations((prev) =>
-        prev.map((r) => r.registration_id === registrationId ? { ...r, attended: !newValue } : r)
-      );
-    } finally {
-      setTogglingId(null);
-    }
   };
 
   const openDetail = (event: EventFormData) => {
@@ -220,28 +139,18 @@ export default function EventsPage() {
     setCopied(false);
   };
 
-  const handleTabChange = (tab: "info" | "registrations" | "attendance") => {
+  const handleTabChange = (tab: "info" | "registrations") => {
     setDetailTab(tab);
-    // Fetch registrations for both registrations and attendance tabs
-    if ((tab === "registrations" || tab === "attendance") && detailEvent && registrations.length === 0) {
+    if (tab === "registrations" && detailEvent && registrations.length === 0) {
       fetchRegistrations(detailEvent.id!);
     }
   };
 
-  const handleCopyEmails = (targetUsers?: RegisteredUser[]) => {
-    // registrations or attended (targeted users)
-    const listToCopy = targetUsers || registrations;
-    
-    const emails = listToCopy
-      .map((r) => r.email)
-      .filter(Boolean)
-      .join(", ");
-
-    if (emails) {
-      navigator.clipboard.writeText(emails);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }
+  const handleCopyEmails = () => {
+    const emails = registrations.map((r) => r.email).filter(Boolean).join(", ");
+    navigator.clipboard.writeText(emails);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   const getEvents = async () => {
@@ -276,8 +185,8 @@ export default function EventsPage() {
     );
 
     // category filter
-    if (categoryFilters.size > 0) {
-      result = result.filter((e) => categoryFilters.has(e.category ?? ""));
+    if (categoryFilter !== "All") {
+      result = result.filter((e) => e.category === categoryFilter);
     }
 
     // status filter
@@ -311,7 +220,7 @@ export default function EventsPage() {
 
     setFiltered(result);
     setPage(1);
-  }, [search, events, sort, categoryFilters, statusFilters]);
+  }, [search, events, sort, categoryFilter, statusFilters]);
 
   // toggle helpers 
   function toggleStatus(s: string) {
@@ -322,30 +231,10 @@ export default function EventsPage() {
     });
   }
 
-  function toggleCategory(c: string) {
-    setCategoryFilters((prev) => {
-      const next = new Set(prev);
-      next.has(c) ? next.delete(c) : next.add(c);
-      return next;
-    });
-    // Reset chip visual if multiple or different selected
-    setActiveChip("All");
-  }
-
   function clearAllFilters() {
-    setCategoryFilters(new Set());
+    setCategoryFilter("All");
     setStatusFilters(new Set());
-    setActiveChip("All");
   }
-
-  const handleChipChange = (chip: string) => {
-    setActiveChip(chip);
-    if (chip === "All") {
-      setCategoryFilters(new Set());
-    } else {
-      setCategoryFilters(new Set([chip]));
-    }
-  };
 
   const handleSort = (field: SortField) => {
     setSort((prev) => ({
@@ -379,13 +268,10 @@ export default function EventsPage() {
     setDeleteTarget(null);
   };
 
-  const activeFilterCount = categoryFilters.size + statusFilters.size;
+  const activeFilterCount = (categoryFilter !== "All" ? 1 : 0) + statusFilters.size;
   const hasActiveFilters = activeFilterCount > 0;
 
-  // Derived lists for attendance tab
-  const attendedUsers  = registrations.filter((r) => r.attended);
-  const attendanceCount = attendedUsers.length;
-
+  // datatable columns 
   const columns: Column<EventFormData>[] = [
     {
       key: "title",
@@ -455,7 +341,7 @@ export default function EventsPage() {
           <Button
             variant="icon"
             title="Edit event"
-            onClick={() => setEditTarget(event)}
+            onClick={() => router.push(`/admin/events/${event.id}/edit`)}
           >
             <Pencil size={14} />
           </Button>
@@ -475,28 +361,8 @@ export default function EventsPage() {
     },
   ];
 
-  // Shared user row renderer used in both registrations and attendance tabs
-  const UserRow = ({ user, i, showCheckbox }: { user: RegisteredUser; i: number; showCheckbox: boolean }) => (
-    <div
-      key={user.registration_id}
-      className={`grid gap-3 px-3 py-2.5 rounded-lg hover:bg-[var(--lavender)] transition-colors items-center ${showCheckbox ? "grid-cols-[1fr_1fr_44px]" : "grid-cols-[1fr_1fr]"} ${i % 2 !== 0 ? "bg-[rgba(45,42,74,0.02)]" : ""}`}
-    >
-      <span className="body truncate font-medium">
-        {user.display_name || user.full_name || <span className="text-[var(--gray)]">—</span>}
-      </span>
-      <span className="caption truncate text-[var(--gray)]">{user.email || "—"}</span>
-      {showCheckbox && (
-        <AttendanceCheckbox
-          registrationId={user.registration_id}
-          attended={user.attended}
-          onToggle={handleToggleAttendance}
-        />
-      )}
-    </div>
-  );
-
   return (
-    <div className="flex flex-col gap-6 py-2">
+    <div className="flex flex-col gap-6">
 
       {/* toolbar */}
       <div className="flex flex-col gap-3">
@@ -528,17 +394,19 @@ export default function EventsPage() {
               </DropdownItem>
             ))}
             <DropdownDivider />
-            <DropdownItem onClick={() => { setSort({ field: "start_date", direction: "desc" }); setPage(1); }}>Reset sort</DropdownItem>
+            <DropdownItem onClick={() => { setSort({ field: "start_date", direction: "desc" }); setPage(1); }}>
+              Reset sort
+            </DropdownItem>
           </Dropdown>
 
-          {/* Filter dropdown */}
+          {/* filter status only */}
           <Dropdown
             trigger={
-            <Button type="button" variant={hasActiveFilters ? "pink" : "ghost"}>
+            <Button variant={hasActiveFilters ? "pink" : "ghost"}>
               <SlidersHorizontal size={15} /> Filter
               {hasActiveFilters && (
                   <span
-                    className="inline-flex items-center justify-center w-2 h-2 rounded-full text-[10px] font-bold text-white"
+                    className="inline-flex items-center justify-center w-4 h-4 rounded-full text-[10px] font-bold text-white"
                     style={{ background: "var(--primary-dark)", marginLeft: 2 }}
                   >
                   {activeFilterCount}
@@ -561,26 +429,12 @@ export default function EventsPage() {
             ))}
 
             <DropdownDivider />
-            
-            <div style={{ padding: "6px 12px 4px" }}>
-              <p className="label" style={{ marginBottom: 4 }}>Category</p>
-            </div>
-            {CATEGORIES.map((c) => (
-              <CheckItem
-                key={c}
-                label={c}
-                active={categoryFilters.has(c)}
-                onToggle={() => toggleCategory(c)}
-              />
-            ))}
-
-            <DropdownDivider />
             <DropdownItem onClick={clearAllFilters}>
               Clear all filters
             </DropdownItem>
           </Dropdown>
 
-          <Button variant="primary" onClick={() => setCreateModalOpen(true)}>
+          <Button variant="primary" onClick={() => router.push("/admin/events/create")}>
             <Plus size={16} /> Add Event
           </Button>
         </div>
@@ -588,8 +442,8 @@ export default function EventsPage() {
         {/* category filter chips - single select */}
         <FilterChips
           chips={["All", ...CATEGORIES]}
-          defaultActive={activeChip}
-          onChange={handleChipChange}
+          defaultActive={categoryFilter}
+          onChange={(active) => setCategoryFilter(active)}
         />
       </div>
 
@@ -598,17 +452,25 @@ export default function EventsPage() {
         <div className="flex items-center gap-2 flex-wrap -mt-2">
           <span className="caption">Active filters:</span>
 
+          {categoryFilter !== "All" && (
+            <Badge variant="pink" dot>
+              {categoryFilter}
+              <button
+                onClick={() => setCategoryFilter("All")}
+                aria-label={`Remove ${categoryFilter} filter`}
+                style={{ marginLeft: 6 }}
+              >×</button>
+            </Badge>
+          )}
+
           {[...statusFilters].map((s) => (
             <Badge key={s} variant="warning" dot>
               <span className="capitalize">{s}</span>
-              <button onClick={() => toggleStatus(s)} style={{ marginLeft: 6 }}>×</button>
-            </Badge>
-          ))}
-
-          {[...categoryFilters].map((c) => (
-            <Badge key={c} variant="pink" dot>
-              {c}
-              <button onClick={() => { toggleCategory(c); setActiveChip("All"); }} style={{ marginLeft: 6 }}>×</button>
+              <button
+                onClick={() => toggleStatus(s)}
+                aria-label={`Remove ${s} filter`}
+                style={{ marginLeft: 6 }}
+              >×</button>
             </Badge>
           ))}
 
@@ -669,51 +531,13 @@ export default function EventsPage() {
         </div>
       )}
 
-      {/* create modal */}
-      <Modal
-        open={createModalOpen}
-        onClose={() => setCreateModalOpen(false)}
-        title="Add Event"
-        modalStyle={{ maxWidth: 900 }}
-      >
-        <EventForm
-          mode="create"
-          onSuccess={() => { setCreateModalOpen(false); getEvents(); }}
-          onCancel={() => setCreateModalOpen(false)}
-        />
-      </Modal>
-
-      {/* edit modal */}
-      <Modal
-        open={!!editTarget}
-        onClose={() => setEditTarget(null)}
-        title="Edit Event"
-        subtitle={editTarget?.title}
-        modalStyle={{ maxWidth: 900 }}
-      >
-        {editTarget && (
-          <EventForm
-            key={editTarget.id}
-            mode="edit"
-            initialData={editTarget}
-            onSuccess={() => { setEditTarget(null); getEvents(); }}
-            onCancel={() => setEditTarget(null)}
-          />
-        )}
-      </Modal>
-
-      {/* Event detail modal */}
-      <Modal open={!!detailEvent} onClose={() => setDetailEvent(null)} title={detailEvent?.title} modalClassName="!max-w-xl !h-[50vh] items-center">
+      {/* ── Event detail modal ── */}
+      <Modal open={!!detailEvent} onClose={() => setDetailEvent(null)} title={detailEvent?.title}>
         {detailEvent && (
           <div className="flex flex-col gap-4">
 
-            <div className="flex flex-wrap gap-2">
-              {detailEvent.category && <Badge variant={CATEGORY_VARIANT[detailEvent.category] ?? "dark"}>{detailEvent.category}</Badge>}
-              {detailEvent.status && <Badge variant={STATUS_VARIANT[detailEvent.status] ?? "dark"}><span className="capitalize">{detailEvent.status}</span></Badge>}
-            </div>
-
-            {/* tab switcher*/}
-            <div className="flex rounded-xl overflow-hidden border border-[rgba(45,42,74,0.10)] w-fit items-center">
+            {/* tab switcher */}
+            <div className="flex rounded-xl overflow-hidden border border-[rgba(45,42,74,0.10)] w-fit">
               <button
                 onClick={() => handleTabChange("info")}
                 className={`flex items-center gap-1.5 px-4 py-2 text-sm font-medium transition-colors ${detailTab === "info" ? "bg-[var(--primary-dark)] text-white" : "text-[var(--gray)] hover:bg-[var(--lavender)]"}`}
@@ -726,53 +550,39 @@ export default function EventsPage() {
               >
                 <Users size={14} /> Registrations
               </button>
-              <button
-                onClick={() => handleTabChange("attendance")}
-                className={`flex items-center gap-1.5 px-4 py-2 text-sm font-medium transition-colors ${detailTab === "attendance" ? "bg-[var(--primary-dark)] text-white" : "text-[var(--gray)] hover:bg-[var(--lavender)]"}`}
-              >
-                <ClipboardCheck size={14} /> Attendance
-              </button>
             </div>
 
             {/* Info tab */}
             {detailTab === "info" && (
               <div className="flex flex-col gap-3">
+                <div className="flex flex-wrap gap-2">
+                  {detailEvent.category && <Badge variant={CATEGORY_VARIANT[detailEvent.category] ?? "dark"}>{detailEvent.category}</Badge>}
+                  {detailEvent.status && <Badge variant={STATUS_VARIANT[detailEvent.status] ?? "dark"}><span className="capitalize">{detailEvent.status}</span></Badge>}
+                </div>
 
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   {detailEvent.start_date && (
                     <div>
-                      <div className="flex items-center gap-1.5">
-                        <Clock size={14} className="text-[var(--gray)] shrink-0" />
-                        <p className="label !m-0">Start</p>
-                      </div>
-                      <p className="body ml-0.5">{new Date(detailEvent.start_date).toLocaleDateString("en-PH", { month: "long", day: "numeric", year: "numeric" })}</p>
+                      <p className="label mb-0.5">Start</p>
+                      <p className="body">{new Date(detailEvent.start_date).toLocaleDateString("en-PH", { month: "long", day: "numeric", year: "numeric" })}</p>
                     </div>
                   )}
                   {detailEvent.end_date && (
                     <div>
-                      <div className="flex items-center gap-1.5">
-                        <Clock size={14} className="text-[var(--gray)] shrink-0" />
-                        <p className="label !m-0">End</p>
-                      </div>
-                      <p className="body ml-0.5">{new Date(detailEvent.end_date).toLocaleDateString("en-PH", { month: "long", day: "numeric", year: "numeric" })}</p>
+                      <p className="label mb-0.5">End</p>
+                      <p className="body">{new Date(detailEvent.end_date).toLocaleDateString("en-PH", { month: "long", day: "numeric", year: "numeric" })}</p>
                     </div>
                   )}
                   {detailEvent.location && (
                     <div>
-                      <div className="flex items-center gap-1.5">
-                        <MapPin size={14} className="text-[var(--gray)] shrink-0" />
-                        <p className="label !m-0">Location</p>
-                      </div>
-                      <p className="body ml-0.5">{detailEvent.location}</p>
+                      <p className="label mb-0.5">Location</p>
+                      <p className="body">{detailEvent.location}</p>
                     </div>
                   )}
                   {detailEvent.capacity != null && (
                     <div>
-                      <div className="flex items-center gap-1.5">
-                        <Users size={14} className="text-[var(--gray)] shrink-0" />
-                        <p className="label !m-0">Capacity</p>
-                      </div>
-                      <p className="body ml-0.5">{detailEvent.capacity}</p>
+                      <p className="label mb-0.5">Capacity</p>
+                      <p className="body">{detailEvent.capacity}</p>
                     </div>
                   )}
                 </div>
@@ -804,7 +614,7 @@ export default function EventsPage() {
                   </div>
 
                   {!loadingRegs && registrations.length > 0 && (
-                    <Button variant="soft" size="sm" onClick={() => handleCopyEmails(registrations)} title="Copy all emails to clipboard">
+                    <Button variant="soft" size="sm" onClick={handleCopyEmails} title="Copy all emails to clipboard">
                       {copied ? <><Check size={13} /> Copied!</> : <><Copy size={13} /> Copy emails</>}
                     </Button>
                   )}
@@ -823,62 +633,21 @@ export default function EventsPage() {
                   </div>
                 ) : (
                   <div className="flex flex-col gap-1 max-h-[320px] overflow-y-auto pr-1">
-                    {/* column headers */}
-                    <div className="grid grid-cols-[1fr_1fr_44px] gap-3 px-3 py-1.5">
-                      <span className="label">Name</span>
-                      <span className="label">Email</span>
-                      <span className="label text-center">Present</span>
-                    </div>
-                    <div className="divider my-0" />
-                    {registrations.map((user, i) => (
-                      <UserRow key={user.registration_id} user={user} i={i} showCheckbox />
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Attendance tab */}
-            {detailTab === "attendance" && (
-              <div className="flex flex-col gap-3">
-                {/* count */}
-                <div className="flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-2">
-                    <ClipboardCheck size={15} className="text-[var(--gray)]" />
-                    {loadingRegs
-                      ? <span className="caption text-[var(--gray)]">Loading…</span>
-                      : (
-                        <span className="caption">
-                          <strong>{attendanceCount}</strong> attended out of <strong>{registrations.length}</strong> registered
-                        </span>
-                      )}
-                  </div>
-                  {!loadingRegs && attendedUsers.length > 0 && (
-                    <Button variant="soft" size="sm" onClick={() => handleCopyEmails(attendedUsers)} title="Copy all emails to clipboard">
-                      {copied ? <><Check size={13} /> Copied!</> : <><Copy size={13} /> Copy emails</>}
-                    </Button>
-                  )}
-                </div>
-
-                {loadingRegs ? (
-                  <div className="flex items-center justify-center gap-2 py-8 text-[var(--gray)]">
-                    <Loader2 size={18} className="animate-spin" /><span className="caption">Loading…</span>
-                  </div>
-                ) : attendedUsers.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center gap-2 py-8 rounded-xl border border-dashed border-[rgba(45,42,74,0.12)]">
-                    <ClipboardCheck size={24} className="text-[var(--gray)] opacity-40" />
-                    <p className="caption text-[var(--gray)]">No attendees marked yet.</p>
-                    <p className="caption text-[var(--gray)] text-center max-w-[220px]">Mark attendance in the Registrations tab using the checkboxes.</p>
-                  </div>
-                ) : (
-                  <div className="flex flex-col gap-1 max-h-[320px] overflow-y-auto pr-1">
                     <div className="grid grid-cols-[1fr_1fr] gap-3 px-3 py-1.5">
                       <span className="label">Name</span>
                       <span className="label">Email</span>
                     </div>
                     <div className="divider my-0" />
-                    {attendedUsers.map((user, i) => (
-                      <UserRow key={user.registration_id} user={user} i={i} showCheckbox={false} />
+                    {registrations.map((user, i) => (
+                      <div
+                        key={i}
+                        className={`grid grid-cols-[1fr_1fr] gap-3 px-3 py-2.5 rounded-lg hover:bg-[var(--lavender)] transition-colors ${i % 2 !== 0 ? "bg-[rgba(45,42,74,0.02)]" : ""}`}
+                      >
+                        <span className="body truncate font-medium">
+                          {user.display_name || user.full_name || <span className="text-[var(--gray)]">—</span>}
+                        </span>
+                        <span className="caption truncate text-[var(--gray)]">{user.email || "—"}</span>
+                      </div>
                     ))}
                   </div>
                 )}
@@ -897,7 +666,9 @@ export default function EventsPage() {
         subtitle="This action cannot be undone. All registrations and data tied to this event will be permanently removed."
         footer={
           <div className="flex gap-3 w-full">
-            <Button variant="ghost" className="flex-1" onClick={() => setDeleteTarget(null)} disabled={!!deletingId}>Cancel</Button>
+            <Button variant="ghost" className="flex-1" onClick={() => setDeleteTarget(null)} disabled={!!deletingId}>
+              Cancel
+            </Button>
             <Button variant="primary" className="flex-1 !bg-[var(--error)]" onClick={confirmDelete} disabled={!!deletingId}>
               {deletingId ? "Deleting..." : "Yes, Delete"}
             </Button>

@@ -85,59 +85,28 @@ export function DropdownDivider() {
 interface DropdownProps {
   trigger: React.ReactNode;
   children: React.ReactNode;
-  menuStyle?: React.CSSProperties;
 }
 
-export function Dropdown({ trigger, children, menuStyle }: DropdownProps) {
+export function Dropdown({ trigger, children }: DropdownProps) {
   const [open, setOpen] = useState(false);
-  const [pos, setPos] = React.useState<{ top: number; right: number; maxWidth: number } | null>(null);
   const ref = React.useRef<HTMLDivElement>(null);
 
+  // close on outside click so menu never stays open. pushes layout also
   React.useEffect(() => {
     function handleOutside(e: MouseEvent) {
       if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
     }
-    function handleResize() { setOpen(false); }
-    if (open) {
-      document.addEventListener("mousedown", handleOutside);
-      window.addEventListener("resize", handleResize);
-    }
-    return () => {
-      document.removeEventListener("mousedown", handleOutside);
-      window.removeEventListener("resize", handleResize);
-    };
+    if (open) document.addEventListener("mousedown", handleOutside);
+    return () => document.removeEventListener("mousedown", handleOutside);
   }, [open]);
-
-  function handleClick() {
-    if (!open && ref.current) {
-      const rect = ref.current.getBoundingClientRect();
-      const rightFromEdge = Math.max(0, window.innerWidth - rect.right);
-      setPos({
-        top: rect.bottom + 8,
-        right: rightFromEdge,
-        // max width that keeps the left edge ≥ 8px from the viewport
-        maxWidth: window.innerWidth - rightFromEdge - 8,
-      });
-    }
-    setOpen(o => !o);
-  }
 
   return (
     <div className="dropdown" ref={ref}>
-      <div onClick={handleClick}>{trigger}</div>
-      {open && pos && (
+      <div onClick={() => setOpen(!open)}>{trigger}</div>
+      {open && (
         <div
           className="dropdown-menu"
-          style={{
-            position: "fixed",
-            top: pos.top,
-            right: pos.right,
-            left: "auto",
-            width: "max-content",
-            ...menuStyle,
-            // enforce viewport-safe maxWidth regardless of what menuStyle requests
-            maxWidth: pos.maxWidth,
-          }}
+          style={{ left: "auto", right: 0, width: "max-content", maxWidth: "min(260px, 90vw)" }}
         >
           {children}
         </div>

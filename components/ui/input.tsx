@@ -227,19 +227,16 @@ import { Check } from "lucide-react";
 
 interface CheckboxProps {
   label: string;
-  checked?: boolean;
   defaultChecked?: boolean;
   onChange?: (checked: boolean) => void;
 }
 
-export function Checkbox({ label, checked: controlledChecked, defaultChecked = false, onChange }: CheckboxProps) {
-  const [internalChecked, setInternalChecked] = useState(defaultChecked);
-  const isControlled = controlledChecked !== undefined;
-  const checked = isControlled ? controlledChecked : internalChecked;
+export function Checkbox({ label, defaultChecked = false, onChange }: CheckboxProps) {
+  const [checked, setChecked] = useState(defaultChecked);
 
   function handleClick() {
     const next = !checked;
-    if (!isControlled) setInternalChecked(next);
+    setChecked(next);
     onChange?.(next);
   }
 

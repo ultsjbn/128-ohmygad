@@ -43,8 +43,6 @@ type SurveyFormProps = {
   mode: "create" | "edit";
   initialData?: SurveyFormData;
   initialQuestions?: SurveyQuestion[];
-  onSuccess?: () => void;
-  onCancel?: () => void;
 };
 
 const toLocalTimestamp = (val: string) => {
@@ -61,7 +59,7 @@ const newQuestion = (order: number): SurveyQuestion => ({
   order_index: order,
 });
 
-export default function SurveyForm({ mode, initialData, initialQuestions = [], onSuccess, onCancel }: SurveyFormProps) {
+export default function SurveyForm({ mode, initialData, initialQuestions = [] }: SurveyFormProps) {
   const router = useRouter();
   const isEdit = mode === "edit";
 
@@ -227,12 +225,8 @@ export default function SurveyForm({ mode, initialData, initialQuestions = [], o
         if (qError) throw qError;
       }
 
-      if (onSuccess) {
-        onSuccess();
-      } else {
-        router.push("/admin/surveys");
-        router.refresh();
-      }
+      router.push("/admin/surveys");
+      router.refresh();
     } catch (err: unknown) {
       console.error("Survey submit error:", err);
       const message = err instanceof Error ? err.message : (err as any)?.message ?? JSON.stringify(err);
@@ -430,11 +424,11 @@ export default function SurveyForm({ mode, initialData, initialQuestions = [], o
           </Card>
 
           {/* footer actions */}
-          <div className="mt-4 flex gap-3 justify-end shrink-0 z-10">
+          <div className="lg:static mt-4 flex gap-3 justify-end shrink-0 z-10">
             <Button
               type="button"
               variant="ghost"
-              onClick={() => onCancel ? onCancel() : router.push("/admin/surveys")}
+              onClick={() => router.push("/admin/surveys")}
             >
               Cancel
             </Button>

@@ -2,5 +2,5 @@ import DashboardPage from "@/components/shared/dashboard-page";
 import RightPanel from "@/components/shared/right-panel";
 
 export default function StudentDashboardPage() {
-  return <DashboardPage role="student" rightPanel={<RightPanel />} />;
+  return <DashboardPage rightPanel={<RightPanel />} />;
 }

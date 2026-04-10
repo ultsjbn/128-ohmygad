@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Plus, ArrowUpDown, SlidersHorizontal, Pencil, Trash2, Loader2, ChevronUp, ChevronDown, BarChart3 } from "lucide-react";
 import SurveyAnalyticsModal from "@/components/admin/survey-analytics-modal";
-import SurveyForm, { type SurveyFormData, type SurveyQuestion } from "@/components/admin/survey-form";
+import type { SurveyFormData } from "@/components/admin/survey-form";
 import { paginate, totalPages, PER_PAGE } from "@/lib/pagination.utils";
 import { Pagination } from "@/components/pagination";
 
@@ -71,6 +71,7 @@ function CheckItem({
 }
 
 export default function SurveysPage() {
+  const router = useRouter();
   const searchParams = useSearchParams();
 
   const [surveys, setSurveys] = useState<SurveyFormData[]>([]);
@@ -83,13 +84,8 @@ export default function SurveysPage() {
   const [statusFilters, setStatusFilters] = useState<Set<string>>(new Set());
   const [page, setPage] = useState(1);
 
-  const [createModalOpen, setCreateModalOpen] = useState(false);
-  const [editTarget, setEditTarget] = useState<SurveyFormData | null>(null);
-  const [editQuestions, setEditQuestions] = useState<SurveyQuestion[]>([]);
-  const [editQuestionsLoading, setEditQuestionsLoading] = useState(false);
-
   // for the delete confirmation modal
-  const [deleteTarget, setDeleteTarget] = useState<{ id: string; title: string } | null>(null);
+    const [deleteTarget, setDeleteTarget] = useState<{ id: string; title: string } | null>(null);
 
   // Fetch
   const getSurveys = async () => {
@@ -287,7 +283,7 @@ export default function SurveysPage() {
           <Button
             variant="icon"
             title="Edit survey"
-            onClick={() => openEditModal(survey)}
+            onClick={() => router.push(`/admin/surveys/${survey.id}/edit`)}
           >
             <Pencil size={14} />
           </Button>
@@ -308,7 +304,7 @@ export default function SurveysPage() {
   ];
 
   return (
-    <div className="flex flex-col gap-6 py-2">
+    <div className="flex flex-col gap-6">
 
       {/* toolbar */}
       <div className="flex flex-col gap-3">
@@ -350,7 +346,7 @@ export default function SurveysPage() {
                 <SlidersHorizontal size={15} /> Filter
                 {hasActiveFilters && (
                   <span
-                    className="inline-flex items-center justify-center w-2 h-2 rounded-full text-[10px] font-bold text-white"
+                    className="inline-flex items-center justify-center w-4 h-4 rounded-full text-[10px] font-bold text-white"
                     style={{ background: "var(--primary-dark)", marginLeft: 2 }}
                   >
                     {activeFilterCount}
@@ -375,7 +371,7 @@ export default function SurveysPage() {
             <DropdownItem onClick={clearAllFilters}>Clear all filters</DropdownItem>
           </Dropdown>
 
-            <Button variant="primary" onClick={() => setCreateModalOpen(true)}>
+            <Button variant="primary" onClick={() => router.push("/admin/surveys/create")}>
                 <Plus size={16} /> Add Survey
             </Button>
         </div>
@@ -449,47 +445,6 @@ export default function SurveysPage() {
           />
         </div>
       )}
-
-      {/* create modal */}
-      <Modal
-        open={createModalOpen}
-        onClose={() => setCreateModalOpen(false)}
-        title="Add Survey"
-        modalStyle={{ maxWidth: 780 }}
-      >
-        <SurveyForm
-          mode="create"
-          onSuccess={() => { setCreateModalOpen(false); getSurveys(); }}
-          onCancel={() => setCreateModalOpen(false)}
-        />
-      </Modal>
-
-      {/* edit modal */}
-      <Modal
-        open={!!editTarget}
-        onClose={() => setEditTarget(null)}
-        title="Edit Survey"
-        subtitle={editTarget?.title}
-        modalStyle={{ maxWidth: 780 }}
-      >
-        {editTarget && (
-          editQuestionsLoading ? (
-            <div className="flex items-center justify-center gap-3 py-10" style={{ color: "var(--gray)" }}>
-              <Loader2 size={20} className="animate-spin" />
-              <span className="caption">Loading survey…</span>
-            </div>
-          ) : (
-            <SurveyForm
-              key={editTarget.id}
-              mode="edit"
-              initialData={editTarget}
-              initialQuestions={editQuestions}
-              onSuccess={() => { setEditTarget(null); getSurveys(); }}
-              onCancel={() => setEditTarget(null)}
-            />
-          )
-        )}
-      </Modal>
 
       {/* analytics modal */}
       {analyticsTarget && (
