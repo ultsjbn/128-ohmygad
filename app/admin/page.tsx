@@ -106,7 +106,7 @@ export default function DashboardPage() {
     );
 
     return (
-        <div className="flex gap-5 w-full animate-in fade-in duration-500">
+        <div className="flex flex-col xl:flex-row gap-5 w-full animate-in fade-in duration-500">
 
         {/* ------------------------------------------------ MAIN CONTENT ------------------------------------------------*/}
         <div className="flex flex-col gap-5 flex-1 min-w-0 pb-8 mt-1">
@@ -342,22 +342,10 @@ export default function DashboardPage() {
                 </div>
             </div>
 
-            {/* calendar + timeline — visible on md/lg only (xl uses the sidebar) */}
-            <div className="hidden md:grid xl:hidden grid-cols-2 gap-4 pb-8">
-                <Card variant="no-hover" className="p-4">
-                    <MiniCalendar
-                        eventDays={new Set([3, 10, 14])}
-                        onDayClick={(date) => console.log(date)}
-                    />
-                </Card>
-                <Card variant="no-hover" className="p-4">
-                    <TodayTimeline events={todayEvents} loading={loading} />
-                </Card>
-            </div>
         </div>
 
         {/* right panel ------------------------------------------------------------------------------------------------ */}
-        <aside className="hidden xl:flex flex-col gap-4 w-[268px] shrink-0 pb-8">
+        <aside className="flex flex-col gap-4 xl:w-[268px] shrink-0 pb-8">
             {/* calendar */}
             <Card variant="no-hover" className="p-4">
                 <MiniCalendar
