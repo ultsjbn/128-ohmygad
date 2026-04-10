@@ -213,7 +213,7 @@ export default function CoursesPage() {
       key: "description",
       header: "Description",
       render: (course) => (
-          <span className="capitalize">{course.description}</span>
+          <span className="capitalize truncate">{course.description}</span>
       ),
     },
 
