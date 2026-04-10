@@ -22,6 +22,8 @@ export type CourseFormData = {
 type CourseFormProps = {
   initialData?: CourseFormData;
   mode: "create" | "edit";
+  onSuccess?: () => void;
+  onCancel?: () => void;
 };
 
 const SEMESTER_OPTIONS = [
@@ -35,7 +37,7 @@ const STATUS_OPTIONS = [
    { value: "closed", label: "Closed" },
  ];
 
-export default function CourseForm({ initialData, mode }: CourseFormProps) {
+export default function CourseForm({ initialData, mode, onSuccess, onCancel }: CourseFormProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -118,13 +120,17 @@ export default function CourseForm({ initialData, mode }: CourseFormProps) {
 
     const result = await submitFormData("course", payload, mode, initialData?.id);
 
-        if (result.success) {
-      router.push("/admin/courses");
-      router.refresh();
+    if (result.success) {
+      if (onSuccess) {
+        onSuccess();
       } else {
-        console.error("Submit error:", result);
-        setError(JSON.stringify(result));
+        router.push("/admin/courses");
+        router.refresh();
       }
+    } else {
+      console.error("Submit error:", result);
+      setError(JSON.stringify(result));
+    }
 
     setIsLoading(false);
   };
@@ -133,9 +139,9 @@ export default function CourseForm({ initialData, mode }: CourseFormProps) {
     <form onSubmit={handleSubmit} className="flex flex-col h-full lg:h-auto w-full min-h-0 relative">
       
       {/* scrollable wrapper for mobile, fully expanded on desktop */}
-      <div className="flex-1 overflow-y-auto lg:overflow-visible custom-scrollbar pr-1 lg:pr-0 pb-4 lg:pb-0 min-h-0">
+      <div className="flex-1 overflow-y-auto custom-scrollbar pr-1 pb-4 min-h-0">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
+            
           {/* left column: basic information */}
           <div className="flex flex-col gap-6">
             <Card className="flex flex-col gap-4 p-3 h-full">
@@ -237,11 +243,11 @@ export default function CourseForm({ initialData, mode }: CourseFormProps) {
       </div>
 
       {/* sticky footer actions on mobile, standard footer flow on desktop */}
-      <div className= "lg:static mt-2 flex gap-3 justify-end shrink-0 z-10">
+      <div className="mt-2 flex gap-3 justify-end shrink-0 z-10">
         <Button
           type="button"
           variant="ghost"
-          onClick={() => router.push("/admin/courses")}
+          onClick={() => onCancel ? onCancel() : router.push("/admin/courses")}
         >
           Cancel
         </Button>
