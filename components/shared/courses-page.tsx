@@ -205,9 +205,6 @@ export default function CoursesPage() {
                 </DropdownItem>
               ))}
             </Dropdown>
-
-            {/* Filter Dropdown */}
-
           </div>
         </div>
 
@@ -233,6 +230,7 @@ export default function CoursesPage() {
           >
             Clear all filters
           </Button>
+
         </Card>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -247,8 +245,7 @@ export default function CoursesPage() {
                 </div>
                 <h3 className="heading-sm mb-2">{course.title}</h3>
                 <div className="flex flex-col gap-1 text-sm text-gray-500">
-                    <div className="flex items-center gap-2"><Clock size={14}/> {course.start_time} - {course.end_time}</div>
-                    <div className="flex items-center gap-2"><Calendar size={14}/> {course.days || "TBA"}</div>
+                    <div className="flex items-center gap-2">{course.description || "TBA"}</div>
                 </div>
             </div>
           ))}
@@ -256,25 +253,20 @@ export default function CoursesPage() {
       )}
 
       {/* Detail Modal */}
-      <Modal open={!!detailCourse} onClose={() => setDetailCourse(null)} hideCloseButton modalStyle={{ maxWidth: 500 }}>
+      <Modal open={!!detailCourse} onClose={() => setDetailCourse(null)} hideCloseButton modalStyle={{ maxWidth: 1000 }}>
         {detailCourse && (
           <div className="flex flex-col gap-2 p-2">
-            <div className="flex justify-between items-center">
-              <Badge variant="pink">{detailCourse.semester}</Badge>
+            <div className="flex justify-end items-center">
               <button onClick={() => setDetailCourse(null)}><X size={20}/></button>
             </div>
             <h2 className="heading-md">{detailCourse.title}</h2>
-            <div className="flex items-center gap-1 caption sm:text-sm text-[var(--gray)]"><Clock size={14}/> {detailCourse.start_time} - {detailCourse.end_time}</div>
-            <div className="flex items-center gap-1 caption sm:text-sm text-[var(--gray)]"><Calendar size={14}/> {detailCourse.days || "TBA"}</div>
             <div className="divider" />
             <div className="space-y-3">
               <p className="label">Description</p>
               <p className="body text-gray-600">{detailCourse.description || "No description provided."}</p>
             </div>
             
-            <div className="grid grid-cols-2 gap-4 mt-2">
-            <div className="flex items-center gap-2 text-sm"><GraduationCap size={16}/> Status: {detailCourse.status}</div>
-            </div>
+
             </div>
           
         )}
