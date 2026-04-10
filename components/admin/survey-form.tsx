@@ -204,7 +204,14 @@ export default function SurveyForm({ mode, initialData, initialQuestions = [], o
       if (isEdit) {
         const { error } = await supabase.from("survey").update(surveyPayload).eq("id", surveyId!);
         if (error) throw error;
-        const { error: delError } = await supabase.from("survey_questions").delete().eq("survey_id", surveyId!);
+
+        // Selective delete: only remove questions that are no longer in the form
+        const currentIds = questions.map((q) => q.id).filter(Boolean) as string[];
+        let deleteQuery = supabase.from("survey_questions").delete().eq("survey_id", surveyId!);
+        if (currentIds.length > 0) {
+          deleteQuery = deleteQuery.not("id", "in", `(${currentIds.join(",")})`);
+        }
+        const { error: delError } = await deleteQuery;
         if (delError) throw delError;
       } else {
         const { data, error } = await supabase.from("survey").insert(surveyPayload).select("id").single();
@@ -214,6 +221,7 @@ export default function SurveyForm({ mode, initialData, initialQuestions = [], o
 
       if (questions.length > 0) {
         const questionsPayload = questions.map((q, i) => ({
+          ...(q.id ? { id: q.id } : {}),
           survey_id:     surveyId,
           question_text: q.question_text.trim(),
           question_type: q.question_type,
@@ -223,7 +231,7 @@ export default function SurveyForm({ mode, initialData, initialQuestions = [], o
           is_required:   q.is_required,
           order_index:   i,
         }));
-        const { error: qError } = await supabase.from("survey_questions").insert(questionsPayload);
+        const { error: qError } = await supabase.from("survey_questions").upsert(questionsPayload);
         if (qError) throw qError;
       }
 
