@@ -329,7 +329,7 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
 
           <Dropdown
             trigger={
-              <Button variant={hasActiveFilters ? "pink" : "ghost"}>
+              <Button variant={hasActiveFilters ? "pink-light" : "ghost"}>
                 <SlidersHorizontal size={15} /> Filter
                 {hasActiveFilters && (
                   <span
@@ -392,7 +392,7 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
           <span className="caption">Active filters:</span>
 
           {[...roleFilters].map((r) => (
-            <Badge key={r} variant="pink">
+            <Badge key={r} variant="pink-light">
               <span className="capitalize">{r}</span>
               <button onClick={() => { toggleRole(r); setActiveChip("All"); }} style={{ marginLeft: 6 }}>×</button>
             </Badge>

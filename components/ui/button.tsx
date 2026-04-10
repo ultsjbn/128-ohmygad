@@ -1,7 +1,7 @@
 /* How to use this component?
 
 PROPS
- * variant   "primary"|"pink"|"periwinkle"|"ghost"|"soft"       default "primary"
+ * variant   "primary"|"pink-light"|"periwinkle"|"ghost"|"soft"       default "primary"
              "icon"|"icon-dark"
  * size      "sm" | "md" | "lg"                                 default "md"
  * disabled  boolean                                            default false
@@ -21,7 +21,7 @@ VARIANTS
 SAMPLE USAGE
 // Basic
 <Button>Primary</Button>
-<Button variant="pink" size="lg">Register Now</Button>
+<Button variant="pink-light" size="lg">Register Now</Button>
 <Button variant="ghost" disabled>Unavailable</Button>
 
 // With Lucide icon

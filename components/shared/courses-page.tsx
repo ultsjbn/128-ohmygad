@@ -61,7 +61,7 @@ const SORT_OPTIONS: { label: string; field: SortField }[] = [
   { label: "Title", field: "title" },
 ];
 
-const STATUS_VARIANT: Record<string, "success" | "warning" | "error" | "dark" | "pink"> = {
+const STATUS_VARIANT: Record<string, "success" | "warning" | "error" | "dark" | "pink-light"> = {
   open: "success",
   closed: "error",
   ongoing: "warning",

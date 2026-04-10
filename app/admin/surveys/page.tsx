@@ -28,7 +28,7 @@ const STATUSES = ["open", "closed"];
 const SORT_FIELDS = ["title", "status", "open_at"] as const;
 
 type SortField = typeof SORT_FIELDS[number];
-type BadgeVariant = "pink" | "periwinkle" | "dark" | "success" | "warning" | "error";
+type BadgeVariant = "pink-light" | "periwinkle" | "dark" | "success" | "warning" | "error";
 
 const STATUS_VARIANT: Record<string, BadgeVariant> = {
   open: "success",
@@ -355,7 +355,7 @@ export default function SurveysPage() {
           {/* filter */}
           <Dropdown
             trigger={
-              <Button variant={hasActiveFilters ? "pink" : "ghost"}>
+              <Button variant={hasActiveFilters ? "pink-light" : "ghost"}>
                 <SlidersHorizontal size={15} /> Filter
                 {hasActiveFilters && (
                   <span

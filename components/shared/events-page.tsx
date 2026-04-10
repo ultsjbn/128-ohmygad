@@ -363,7 +363,7 @@ export default function EventsPage() {
 
             {/* filter is icon only on mobile, text on md+ devices */}
             <Dropdown trigger={
-              <Button variant={hasActiveFilters ? "pink" : "ghost"}>
+              <Button variant={hasActiveFilters ? "pink-light" : "ghost"}>
                 <SlidersHorizontal size={15} />
                 <span className="hidden md:inline">Filter</span>
                 {hasActiveFilters && (
@@ -411,7 +411,7 @@ export default function EventsPage() {
             </Badge>
           ))}
           {[...filters.category].map((cat) => (
-            <Badge key={cat} variant="pink">
+            <Badge key={cat} variant="pink-light">
               {cat}
               <button onClick={() => { toggleFilter("category", cat); setActiveChip("All"); }} className="ml-1.5" aria-label={`Remove ${cat} filter`}>×</button>
             </Badge>

@@ -236,7 +236,7 @@ export default function StudentProfilePage() {
 
             <div className="flex flex-wrap justify-center gap-2 mb-4">
               <Badge variant="periwinkle" dot>Student</Badge>
-              {profile.student_num && <Badge variant="pink">#{profile.student_num}</Badge>}
+              {profile.student_num && <Badge variant="pink-light">#{profile.student_num}</Badge>}
               {profile.program && <Badge variant="dark">{profile.program}</Badge>}
             </div>
 

@@ -49,7 +49,7 @@ export function MiniCalendar({
     year === today.getFullYear();
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-1">
       {/* header */}
       <div className="flex items-center justify-between">
         <span className="heading-sm">

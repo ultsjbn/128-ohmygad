@@ -193,7 +193,7 @@ export default function AdminProfilePage() {
             <div className="flex flex-wrap justify-center gap-2 mb-6">
               <Badge variant="dark" dot>Administrator</Badge>
               {profile.office && (
-                <Badge variant="pink" className="whitespace-normal break-all h-auto py-1.5 px-3 text-center leading-tight max-w-[200px]">
+                <Badge variant="pink-light" className="whitespace-normal break-all h-auto py-1.5 px-3 text-center leading-tight max-w-[200px]">
                   {profile.office}
                 </Badge>
               )}

@@ -536,7 +536,7 @@ export default function EventsPage() {
           {/* Filter dropdown */}
           <Dropdown
             trigger={
-            <Button type="button" variant={hasActiveFilters ? "pink" : "ghost"}>
+            <Button type="button" variant={hasActiveFilters ? "pink-light" : "ghost"}>
               <SlidersHorizontal size={15} /> Filter
               {hasActiveFilters && (
                   <span
@@ -608,7 +608,7 @@ export default function EventsPage() {
           ))}
 
           {[...categoryFilters].map((c) => (
-            <Badge key={c} variant="pink" dot>
+            <Badge key={c} variant="pink-light" dot>
               {c}
               <button onClick={() => { toggleCategory(c); setActiveChip("All"); }} style={{ marginLeft: 6 }}>×</button>
             </Badge>

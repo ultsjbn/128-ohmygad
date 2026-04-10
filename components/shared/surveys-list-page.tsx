@@ -34,7 +34,7 @@ const SORT_OPTIONS: { label: string; field: SortField }[] = [
   { label: "Closes At", field: "close_at" },
 ];
 
-type BadgeVariant = "pink" | "periwinkle" | "dark" | "success" | "warning" | "error";
+type BadgeVariant = "pink-light" | "periwinkle" | "dark" | "success" | "warning" | "error";
 const STATUS_VARIANT: Record<string, BadgeVariant> = {
   open:   "success",
   closed: "dark",
