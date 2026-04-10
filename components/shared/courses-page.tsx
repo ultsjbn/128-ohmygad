@@ -233,19 +233,41 @@ export default function CoursesPage() {
 
         </Card>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-          {filteredAndSorted.map((course) => (
-            <div
-                className="card cursor-pointer hover:shadow-md transition-shadow"
-                key={course.id} 
-                onClick={() => setDetailCourse(course)}>
-                <h3 className="heading-sm mb-2">{course.title}</h3>
-                <div className="flex flex-col gap-1 text-sm text-gray-500">
-                    <div className="flex items-center gap-2 line-clamp-2 leading-snug">{course.description || "No Description Available"}</div>
-                </div>
-            </div>
-          ))}
+<div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+  {filteredAndSorted.map((course) => (
+    <div
+      className="group card relative cursor-pointer hover:shadow-md transition-shadow flex flex-col h-full overflow-hidden"
+      key={course.id}
+      onClick={() => setDetailCourse(course)}
+    >
+      {/* Category Badge - positioned top right */}
+      {course.category && (
+        <span className="absolute top-3 right-3 bg-blue-100 text-blue-700 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+          {course.category}
+        </span>
+      )}
+
+      <h3 className="heading-sm mb-2 pr-12 line-clamp-1" title={course.title}>
+        {course.title}
+      </h3>
+      
+      <div className="flex flex-col gap-2 text-sm text-gray-500 mt-1">
+        <div className="line-clamp-2 leading-snug min-h-[2.5rem] break-words" title={course.description}>
+          {course.description || "No Description Available"}
         </div>
+        
+        {/* Read More Indicator */}
+        <div className="text-black-600 font-medium flex items-center gap-1 group-hover:underline text-xs mt-auto">
+          Read more
+          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+        </div>
+      </div>
+    </div>
+  ))}
+</div>
+
       )}
 
       {/* Detail Modal */}
