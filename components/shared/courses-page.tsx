@@ -245,7 +245,7 @@ export default function CoursesPage() {
                 </div>
                 <h3 className="heading-sm mb-2">{course.title}</h3>
                 <div className="flex flex-col gap-1 text-sm text-gray-500">
-                    <div className="flex items-center gap-2">{course.description || "TBA"}</div>
+                    <div className="flex items-center gap-2 line-clamp-2 leading-snug">{course.description || "No Description Available"}</div>
                 </div>
             </div>
           ))}
