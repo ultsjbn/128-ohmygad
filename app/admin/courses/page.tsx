@@ -17,6 +17,7 @@ import {
   type Column,
   DropdownItem,
   Modal,
+  Toast,
 } from "@/components/ui";
 
 function formatTime(time?: string) {
@@ -62,7 +63,14 @@ export default function CoursesPage() {
   const [page, setPage] = useState(1);
 
   // for the delete confirmation modal
-    const [deleteTarget, setDeleteTarget] = useState<{ id: string; title: string } | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; title: string } | null>(null);
+
+  const [toast, setToast] = useState<{ variant: "success"|"error"; title: string; message?: string } | null>(null);
+
+  const showToast = (variant: "success"|"error", title: string, message?: string) => {
+    setToast({ variant, title, message });
+    setTimeout(() => setToast(null), 3000);
+  };
 
   //  Fetch 
   const getCourses = async () => {
@@ -171,9 +179,10 @@ export default function CoursesPage() {
     const { error } = await supabase.from("course").delete().eq("id", deleteTarget.id);
     
     if (error) {
-      alert("Failed to delete course: " + error.message);
+      showToast("error", "Failed to delete guideline", error.message);
     } else {
       setCourses((prev) => prev.filter((e) => e.id !== deleteTarget.id));
+      showToast("success", "Guideline deleted successfully");
     }
     
     setDeletingId(null);
@@ -440,6 +449,13 @@ export default function CoursesPage() {
             </div>
             )}
         </Modal>
+
+      {/* floating toast notification */}
+      {toast && (
+        <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999 }}>
+          <Toast variant={toast.variant} title={toast.title} message={toast.message} />
+        </div>
+      )}
 
     </div>
   );

@@ -165,7 +165,7 @@ export default function GlobalSearch({ role, placeholder = "Search events, users
                             else if (c.id === "Users") router.push(`/admin/users?search=${encodeURIComponent(query)}`);
                             else if (c.id === "Surveys") router.push(`/${role}/surveys?search=${encodeURIComponent(query)}`);
                           }}
-                          className="text-[13px] font-semibold text-blue-600 hover:text-blue-700 hover:underline bg-transparent border-none cursor-pointer flex items-center gap-1 mt-1 transition-colors"
+                          className="text-[13px] font-semibold text-black-600 hover:text-black-700 hover:underline bg-transparent border-none cursor-pointer flex items-center gap-1 mt-1 transition-colors"
                         >
                           See all {c.id} results <ExternalLink size={12} />
                         </button>

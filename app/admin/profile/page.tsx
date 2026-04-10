@@ -174,7 +174,7 @@ export default function AdminProfilePage() {
       <div className="flex flex-col lg:flex-row gap-4 lg:gap-6">
 
         {/* left column: profile card */}
-       <div className="w-full lg:w-[35%] lg:min-w-[240px] shrink-0 flex flex-col">
+        <div className="w-full lg:w-[35%] lg:min-w-[240px] shrink-0 flex flex-col">
           <Card variant="no-hover" className="flex flex-col items-center text-center p-4 lg:p-6">
 
             {/* user details */}
@@ -303,6 +303,7 @@ export default function AdminProfilePage() {
                       placeholder="Street, Barangay, City, Province"
                       value={profile.address}
                       onChange={set("address")}
+                      maxLength={100}
                     />
                   </div>
                 </div>

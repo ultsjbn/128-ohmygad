@@ -88,6 +88,13 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
+  const [toast, setToast] = useState<{ variant: "success"|"error"; title: string; message?: string } | null>(null);
+
+  const showToast = (variant: "success"|"error", title: string, message?: string) => {
+    setToast({ variant, title, message });
+    setTimeout(() => setToast(null), 3000);
+  };
+
   // sync the URL search param to local search 
   useEffect(() => {
     const s = searchParams.get("search");
@@ -213,9 +220,11 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
         setProfiles((prev) => prev.filter((p) => p.id !== deleteTarget.id));
         router.refresh();
         closeDeleteModal();
+        showToast("success", "User deleted successfully");
       }
     } catch (err: any) {
       setDeleteError(err.message || "Failed to delete user.");
+      showToast("error", "Failed to delete user", err.message);
     } finally {
       setIsDeleting(false);
     }
@@ -506,6 +515,13 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
           {deleteError && <Toast variant="error" title="Deletion failed" message={deleteError} />}
         </div>
       </Modal>
+
+      {/* floating toast notification */}
+      {toast && (
+        <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999 }}>
+          <Toast variant={toast.variant} title={toast.title} message={toast.message} />
+        </div>
+      )}
 
     </div>
   );
