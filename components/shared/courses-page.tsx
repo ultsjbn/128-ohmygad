@@ -3,16 +3,16 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { Typography, InputText } from "@snowball-tech/fractal";
 import { useSearchParams } from "next/navigation";
-import { 
-  SlidersHorizontal, 
-  Loader2, 
-  BookOpen, 
-  Clock, 
-  X, 
-  ArrowUpDown, 
-  Search, 
-  Calendar, 
-  GraduationCap 
+import {
+  SlidersHorizontal,
+  Loader2,
+  BookOpen,
+  Clock,
+  X,
+  ArrowUpDown,
+  Search,
+  Calendar,
+  GraduationCap
 } from "lucide-react";
 
 import {
@@ -59,9 +59,6 @@ interface FilterState {
 
 const SORT_OPTIONS: { label: string; field: SortField }[] = [
   { label: "Title", field: "title" },
-  { label: "Semester", field: "semester" },
-  { label: "Status", field: "status" },
-  { label: "Start Time", field: "start_time" },
 ];
 
 const STATUS_VARIANT: Record<string, "success" | "warning" | "error" | "dark" | "pink"> = {
@@ -134,7 +131,7 @@ export default function CoursesPage() {
         const matchesSearch = `${c.title} ${c.semester}`.toLowerCase().includes(search.toLowerCase());
         const matchesStatus = filters.status.size === 0 || filters.status.has(c.status || "");
         const matchesSemester = filters.semester.size === 0 || filters.semester.has(c.semester || "");
-        
+
         return matchesSearch && matchesStatus && matchesSemester;
       })
       .sort((a, b) => {
@@ -149,7 +146,7 @@ export default function CoursesPage() {
     setFilters((prev) => {
       const next = new Set(prev[type]);
       next.has(value) ? next.delete(value) : next.add(value);
-      
+
       // If we are modifying semesters via dropdown, reset the chip UI to "All" 
       // if more than one is selected, otherwise sync it.
       if (type === "semester") {
@@ -166,9 +163,9 @@ export default function CoursesPage() {
 
   const handleSemesterChip = (sem: string) => {
     setActiveSemesterChip(sem);
-    setFilters(prev => ({ 
-      ...prev, 
-      semester: sem === "All Semesters" ? new Set() : new Set([sem]) 
+    setFilters(prev => ({
+      ...prev,
+      semester: sem === "All Semesters" ? new Set() : new Set([sem])
     }));
   };
 
@@ -219,8 +216,8 @@ export default function CoursesPage() {
       ) : filteredAndSorted.length === 0 ? (
         <Card className="py-20 text-center text-gray-500">
           <p>No Guidelines found matching your criteria.</p>
-          <Button 
-            variant="ghost" 
+          <Button
+            variant="ghost"
             className="mt-4 text-xs underline"
             onClick={() => {
               setFilters({ status: new Set(), semester: new Set() });
@@ -275,7 +272,7 @@ export default function CoursesPage() {
         {detailCourse && (
           <div className="flex flex-col gap-2 p-2">
             <div className="flex justify-end items-center">
-              <button onClick={() => setDetailCourse(null)}><X size={20}/></button>
+              <button onClick={() => setDetailCourse(null)}><X size={20} /></button>
             </div>
             <h2 className="heading-md">{detailCourse.title}</h2>
             <div className="divider" />
@@ -283,10 +280,10 @@ export default function CoursesPage() {
               <p className="label">Description</p>
               <p className="body text-gray-600">{detailCourse.description || "No description provided."}</p>
             </div>
-            
 
-            </div>
-          
+
+          </div>
+
         )}
       </Modal>
 
@@ -324,16 +321,16 @@ export default function CoursesPage() {
 
             {/* details row */}
             <div className="flex flex-col gap-1.5">
-                {/* ---------- date ---------- */}
-                <div className="flex items-start gap-2 caption sm:text-sm text-[var(--gray)]">
-                    <Clock size={15} className="shrink-0 mt-0.5" />
-                        <span>
-                        {detailCourse.start_time ? new Date(detailCourse.start_time).toLocaleDateString("en-PH", { weekday: "long", month: "long", day: "numeric", year: "numeric" }) : "—"}
-                        {detailCourse.end_time && detailCourse.end_time !== detailCourse.start_time && (
-                            <> — {new Date(detailCourse.end_time).toLocaleDateString("en-PH", { month: "long", day: "numeric", year: "numeric" })}</>
-                        )}
-                        </span>
-                </div>
+              {/* ---------- date ---------- */}
+              <div className="flex items-start gap-2 caption sm:text-sm text-[var(--gray)]">
+                <Clock size={15} className="shrink-0 mt-0.5" />
+                <span>
+                  {detailCourse.start_time ? new Date(detailCourse.start_time).toLocaleDateString("en-PH", { weekday: "long", month: "long", day: "numeric", year: "numeric" }) : "—"}
+                  {detailCourse.end_time && detailCourse.end_time !== detailCourse.start_time && (
+                    <> — {new Date(detailCourse.end_time).toLocaleDateString("en-PH", { month: "long", day: "numeric", year: "numeric" })}</>
+                  )}
+                </span>
+              </div>
             </div>
 
             {/* divider */}
