@@ -13,6 +13,7 @@
 */
 
 import { useEffect, useState, useMemo } from "react";
+import { createPortal } from "react-dom";
 import { X, Loader2, BarChart3, Users, ClipboardList } from "lucide-react";
 import { Card, Badge } from "@/components/ui";
 import type { SurveyFormData } from "@/components/admin/survey-form";
@@ -59,6 +60,9 @@ export default function SurveyAnalyticsModal({ survey, open, onClose }: Props) {
   const [responses, setResponses] = useState<ResponseRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => setMounted(true), []);
 
   // fetch questions + responses on mount / survey change
   useEffect(() => {
@@ -108,11 +112,11 @@ export default function SurveyAnalyticsModal({ survey, open, onClose }: Props) {
     return map;
   }, [responses]);
 
-  if (!open) return null;
+  if (!open || !mounted) return null;
 
-  return (
+  return createPortal(
     <div className="modal-backdrop" style={{ padding: 0 }} onClick={onClose}>
-      <div className="modal modal-fullscreen" onClick={(e) => e.stopPropagation()}>
+      <div className="modal modal-fullscreen flex flex-col" onClick={(e) => e.stopPropagation()}>
 
         {/* ── Sticky header ── */}
         <div
@@ -123,7 +127,7 @@ export default function SurveyAnalyticsModal({ survey, open, onClose }: Props) {
             <BarChart3 size={22} className="text-[var(--periwinkle)] shrink-0" />
             <div className="min-w-0">
               <h2 className="heading-md truncate">{survey.title}</h2>
-              <p className="caption mt-0.5">Survey Analytics</p>
+              <p className="caption mt-0.5">Analytics</p>
             </div>
           </div>
 
@@ -224,7 +228,8 @@ export default function SurveyAnalyticsModal({ survey, open, onClose }: Props) {
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 
