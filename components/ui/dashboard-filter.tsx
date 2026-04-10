@@ -82,11 +82,11 @@ export function DashboardFilter({ value, onChange, options }: DashboardFilterPro
     <Dropdown
       menuStyle={{ width: 750, overflowX: "auto" }}
       trigger={
-        <Button variant={count > 0 ? "pink" : "ghost"} size="sm">
+        <Button type="button" variant={count > 0 ? "pink" : "ghost"} size="sm">
           <SlidersHorizontal size={13} />
           Filters
           {count > 0 && (
-            <span className="inline-flex items-center justify-center w-4 h-4 rounded-full text-[10px] font-bold text-white bg-[var(--primary-dark)] ml-0.5">
+            <span className="inline-flex items-center justify-center w-2 h-2 rounded-full text-[10px] font-bold text-white bg-[var(--primary-dark)] ml-0.5">
               {count}
             </span>
           )}

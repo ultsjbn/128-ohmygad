@@ -10,7 +10,7 @@ const DOW          = ["Su","Mo","Tu","We","Th","Fr","Sa"];
 
 function daysInMonth(y: number, m: number) { return new Date(y, m + 1, 0).getDate(); }
 function firstDOW  (y: number, m: number) { return new Date(y, m, 1).getDay(); }
-function dateToISO (d: Date)  { return d.toISOString().split("T")[0]; }
+function dateToISO (d: Date)  { return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`; }
 function parseISO  (s: string){ return new Date(s + "T00:00:00"); }
 function cmp(a: Date, b: Date){ return a.getTime() - b.getTime(); }
 
@@ -31,26 +31,25 @@ function buildPresets() {
   const d7  = new Date(today); d7.setDate(d7.getDate() - 6);
   const d30 = new Date(today); d30.setDate(d30.getDate() - 29);
 
+  // day 0 of next month = last day of current month (works for 28/29/30/31)
   const msStart = new Date(today.getFullYear(), today.getMonth(), 1);
   const msEnd   = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+
   const lmStart = new Date(today.getFullYear(), today.getMonth() - 1, 1);
   const lmEnd   = new Date(today.getFullYear(), today.getMonth(), 0);
 
   const mo = today.getMonth();
   let semStart: Date, semEnd: Date;
-    if (mo >= 7) {
-        semStart = new Date(today.getFullYear(), 7, 2);   // Aug 1
-        semEnd   = new Date(today.getFullYear(), 11, 32); // Dec 31
-    } else if (mo <= 4) {
-        semStart = new Date(today.getFullYear(), 0, 2);   // Jan 1
-        semEnd   = new Date(today.getFullYear(), 4, 32);  // May 31
-    } else {
-        semStart = new Date(today.getFullYear(), 0, 2);   // Jan 1
-        semEnd   = new Date(today.getFullYear(), 4, 32);  // May 31
-    }
+  if (mo >= 7) {
+    semStart = new Date(today.getFullYear(), 7, 1);             // Aug 1
+    semEnd   = new Date(today.getFullYear(), 12, 0);            // Dec 31
+  } else {
+    semStart = new Date(today.getFullYear(), 0, 1);             // Jan 1
+    semEnd   = new Date(today.getFullYear(), 5, 0);             // May 31
+  }
 
-  const yrStart = new Date(today.getFullYear(), 0, 2);
-  const yrEnd   = new Date(today.getFullYear(), 11, 32);
+  const yrStart = new Date(today.getFullYear(), 0, 1);
+  const yrEnd   = new Date(today.getFullYear(), 12, 0);         // Dec 31
   const l12     = new Date(today); l12.setFullYear(l12.getFullYear() - 1); l12.setDate(l12.getDate() + 1);
 
   return [
