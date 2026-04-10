@@ -113,14 +113,16 @@ export default function DashboardPage() {
 
             {/* KPI section + greeting ------------------------------------------------ */}
             <div className="flex flex-col gap-3">
-                <div className="flex items-start justify-between gap-4">
-                    <h2 className="heading-md">Welcome, Admin</h2>
+                {/* greeting */}
+                <div className="flex items-center justify-between">
+                    <h2 className="heading-md">Good day, Admin!</h2>
                     <DashboardFilter
                         value={filters}
                         onChange={setFilters}
                         options={filterOptions}
                     />
                 </div>
+
                 <GlobalSearch role="admin" placeholder="Search events, courses, surveys..." />
                 <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
                     <StatCard

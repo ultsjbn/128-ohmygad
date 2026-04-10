@@ -255,7 +255,7 @@ export default function CoursesPage() {
 
   // 
   return (
-    <div className="flex flex-col gap-6 py-2">
+    <div className="flex flex-col gap-3 py-1">
       {/*  toolbar  */}
       <div className="flex flex-col gap-3">
 

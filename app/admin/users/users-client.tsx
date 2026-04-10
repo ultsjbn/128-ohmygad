@@ -298,7 +298,7 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
   ];
 
   return (
-    <div className="flex flex-col gap-6 py-2">
+    <div className="flex flex-col gap-3 py-1">
       {/* toolbar */}
       <div className="flex flex-col gap-3">
         <div className="flex items-center gap-3 flex-wrap">
@@ -332,7 +332,7 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
 
           <Dropdown
             trigger={
-              <Button variant={hasActiveFilters ? "pink-light" : "ghost"}>
+              <Button variant={hasActiveFilters ? "pink" : "ghost"}>
                 <SlidersHorizontal size={15} /> Filter
                 {hasActiveFilters && (
                   <span
