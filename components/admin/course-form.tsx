@@ -165,26 +165,6 @@ export default function CourseForm({ initialData, mode, onSuccess, onCancel }: C
                 </div>
               </div>
 
-          
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <Select
-                  label="Status *"
-                  required
-                  options={[{ value: "", label: "Select status" }, ...STATUS_OPTIONS]}
-                  value={status}
-                  onChange={(e) => setStatus(e.target.value)}
-                />
-
-                <Select 
-                  label="Semester *"
-                  required
-                  options={[{ value: "", label: "Select semester" }, ...SEMESTER_OPTIONS]}
-                  value={semester}
-                  onChange={(e) => setSemester(e.target.value)}
-                />
-              </div>
-
             </div>
           </div>
 
