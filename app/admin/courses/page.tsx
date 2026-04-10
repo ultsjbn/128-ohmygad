@@ -209,38 +209,20 @@ export default function CoursesPage() {
       ),
     },
 
-    {
-      key: "status",
-      header: "Status",
-      render: (course) => (
-        <Badge variant={STATUS_VARIANT[course.status ?? ""] ?? "dark"}>
-          <span className="capitalize">{course.status}</span>
-        </Badge>
-      ),
-    },
+{
+  key: "description",
+  header: "Description",
+  render: (course) => (
+    <span 
+      className="capitalize truncate block max-w-xs" 
+      title={course.description}
+    >
+      {course.description}
+    </span>
+  ),
+},
 
-    {
-    key: "schedule",
-    header: "Schedule",
-    render: (course) => {
-        const start = formatTime(course.start_time)
-        const end = formatTime(course.end_time)
 
-        return (
-        <div className="flex flex-col leading-tight">
-            <span className="caption text-[12px] opacity-80">
-            {course.days || "—"}
-            </span>
-
-            <span className="caption whitespace-nowrap">
-            {start !== "—" && end !== "—"
-                ? `${start} – ${end}`
-                : "—"}
-            </span>
-        </div>
-        )
-    },
-    },
 
     {
       key: "actions",
