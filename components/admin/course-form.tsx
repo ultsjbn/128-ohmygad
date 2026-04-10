@@ -168,49 +168,6 @@ export default function CourseForm({ initialData, mode, onSuccess, onCancel }: C
             </div>
           </div>
 
-          {/* right column: course schedule & actions */}
-          {/* <div className="flex flex-col gap-4">
-            <div className="flex flex-col gap-2 p-3">
-              <div className="border-b border-[rgba(45,42,74,0.08)] pb-2">
-                <h3 className="heading-md">Course Schedule</h3>
-              </div>
-
-              <DateTimePicker
-                label="Start Time"
-                mode="time"
-                required
-                value={start_time}
-                onChange={setStartTime}
-              />
-
-              <DateTimePicker
-                label="End Time"
-                mode="time"
-                required
-                value={end_time}
-                onChange={setEndTime}
-              />
-
-              <Input
-                label="Days"
-                placeholder="e.g. MWF, TTh"
-                value={days}
-                onChange={(e) => setDays(e.target.value)}
-              />
-
-             
-
-          
-            </div> */}
-
-            {/* error toast */}
-            {/* {error && (
-              <div className="toast toast-error">
-                <span className="font-semibold text-[var(--error)]">{error}</span>
-              </div>
-            )}
-          </div> */}
-
         </div>
       </div>
 

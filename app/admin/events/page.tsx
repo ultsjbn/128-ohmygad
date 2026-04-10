@@ -11,7 +11,6 @@ import { Pagination } from "@/components/pagination";
 import {
   Button,
   Badge,
-  FilterChips,
   SearchBar,
   Card,
   DataTable,
@@ -339,15 +338,6 @@ export default function EventsPage() {
     setActiveChip("All");
   }
 
-  const handleChipChange = (chip: string) => {
-    setActiveChip(chip);
-    if (chip === "All") {
-      setCategoryFilters(new Set());
-    } else {
-      setCategoryFilters(new Set([chip]));
-    }
-  };
-
   const handleSort = (field: SortField) => {
     setSort((prev) => ({
       field,
@@ -536,7 +526,7 @@ export default function EventsPage() {
           {/* Filter dropdown */}
           <Dropdown
             trigger={
-            <Button type="button" variant={hasActiveFilters ? "pink-light" : "ghost"}>
+            <Button type="button" variant={hasActiveFilters ? "pink" : "ghost"}>
               <SlidersHorizontal size={15} /> Filter
               {hasActiveFilters && (
                   <span
@@ -587,12 +577,6 @@ export default function EventsPage() {
           </Button>
         </div>
 
-        {/* category filter chips - single select */}
-        <FilterChips
-          chips={["All", ...CATEGORIES]}
-          defaultActive={activeChip}
-          onChange={handleChipChange}
-        />
       </div>
 
       {/* active filter pills */}
@@ -604,13 +588,6 @@ export default function EventsPage() {
             <Badge key={s} variant="warning" dot>
               <span className="capitalize">{s}</span>
               <button onClick={() => toggleStatus(s)} style={{ marginLeft: 6 }}>×</button>
-            </Badge>
-          ))}
-
-          {[...categoryFilters].map((c) => (
-            <Badge key={c} variant="pink-light" dot>
-              {c}
-              <button onClick={() => { toggleCategory(c); setActiveChip("All"); }} style={{ marginLeft: 6 }}>×</button>
             </Badge>
           ))}
 
