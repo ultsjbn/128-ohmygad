@@ -56,9 +56,9 @@ const CATEGORY_GRADIENT: Record<string, string> = {
 const DEFAULT_GRADIENT = "linear-gradient(135deg, #B8B5E8 0%, #2D2A4A 100%)";
 
 // status badge variants
-type BadgeVariant = "pink" | "periwinkle" | "dark" | "success" | "warning" | "error";
+type BadgeVariant = "pink-light" | "periwinkle" | "dark" | "success" | "warning" | "error";
 const STATUS_VARIANT: Record<string, BadgeVariant> = {
-  upcoming: "pink",
+  upcoming: "pink-light",
   past: "periwinkle",
 };
 
