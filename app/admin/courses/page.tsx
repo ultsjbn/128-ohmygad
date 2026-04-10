@@ -209,13 +209,19 @@ export default function CoursesPage() {
       ),
     },
 
-    {
-      key: "description",
-      header: "Description",
-      render: (course) => (
-          <span className="capitalize truncate">{course.description}</span>
-      ),
-    },
+{
+  key: "description",
+  header: "Description",
+  render: (course) => (
+    <span 
+      className="capitalize truncate block max-w-xs" 
+      title={course.description}
+    >
+      {course.description}
+    </span>
+  ),
+},
+
 
 
     {
