@@ -269,7 +269,14 @@ export default function CoursesPage() {
             containerStyle={{ flex: 1, minWidth: 220 }}
           />
 
-        
+          <Button 
+            variant="ghost" 
+            onClick={() => handleSort("title")}
+            className="flex items-center gap-2"
+          >
+            <SortIcon field="title" />
+            <span>Sort by Title</span>
+          </Button>
 
 
             <Button variant="primary" onClick={() => setCreateModalOpen(true)}>
