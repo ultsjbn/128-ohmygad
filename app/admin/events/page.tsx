@@ -20,6 +20,7 @@ import {
   DropdownItem,
   DropdownDivider,
   Modal,
+  Toast,
 } from "@/components/ui";
 
 // constants
@@ -144,6 +145,13 @@ export default function EventsPage() {
 
   // for the delete confirmation modal
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; title: string } | null>(null);
+
+  const [toast, setToast] = useState<{ variant: "success"|"error"; title: string; message?: string } | null>(null);
+
+  const showToast = (variant: "success"|"error", title: string, message?: string) => {
+    setToast({ variant, title, message });
+    setTimeout(() => setToast(null), 3000);
+  };
 
   // ── Event detail modal ──
   const [detailEvent, setDetailEvent] = useState<EventFormData | null>(null);
@@ -363,9 +371,10 @@ export default function EventsPage() {
     const { error } = await supabase.from("event").delete().eq("id", deleteTarget.id);
     
     if (error) {
-      alert("Failed to delete event: " + error.message);
+      showToast("error", "Failed to delete event", error.message);
     } else {
       setEvents((prev) => prev.filter((e) => e.id !== deleteTarget.id));
+      showToast("success", "Event deleted successfully");
     }
     
     setDeletingId(null);
@@ -900,6 +909,13 @@ export default function EventsPage() {
           </div>
         )}
       </Modal>
+
+      {/* floating toast notification */}
+      {toast && (
+        <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999 }}>
+          <Toast variant={toast.variant} title={toast.title} message={toast.message} />
+        </div>
+      )}
 
     </div>
   );

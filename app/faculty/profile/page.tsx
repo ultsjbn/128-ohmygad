@@ -285,6 +285,7 @@ export default function FacultyProfilePage() {
                     placeholder="e.g. Dept. of Math and Computer Science"
                     value={profile.department}
                     onChange={set("department")}
+                    maxLength={100}
                   />
                 </div>
               )}

@@ -20,6 +20,7 @@ import {
   DropdownItem,
   DropdownDivider,
   Modal,
+  Toast,
 } from "@/components/ui";
 
 // constants
@@ -90,6 +91,13 @@ export default function SurveysPage() {
 
   // for the delete confirmation modal
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; title: string } | null>(null);
+
+  const [toast, setToast] = useState<{ variant: "success"|"error"; title: string; message?: string } | null>(null);
+
+  const showToast = (variant: "success"|"error", title: string, message?: string) => {
+    setToast({ variant, title, message });
+    setTimeout(() => setToast(null), 3000);
+  };
 
   // Fetch
   const getSurveys = async () => {
@@ -213,9 +221,10 @@ export default function SurveysPage() {
     const { error } = await supabase.from("survey").delete().eq("id", deleteTarget.id);
     
     if (error) {
-      alert("Failed to delete survey: " + error.message);
+      showToast("error", "Failed to delete survey", error.message);
     } else {
       setSurveys((prev) => prev.filter((e) => e.id !== deleteTarget.id));
+      showToast("success", "Survey deleted successfully");
     }
     
     setDeletingId(null);
@@ -524,6 +533,13 @@ export default function SurveysPage() {
             </div>
             )}
         </Modal>
+
+      {/* floating toast notification */}
+      {toast && (
+        <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999 }}>
+          <Toast variant={toast.variant} title={toast.title} message={toast.message} />
+        </div>
+      )}
 
     </div>
   );
