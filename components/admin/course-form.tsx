@@ -135,9 +135,9 @@ export default function CourseForm({ initialData, mode, onSuccess, onCancel }: C
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             
           {/* left column: basic information */}
-          <div className="flex flex-col gap-6">
-            <Card className="flex flex-col gap-4 p-3 h-full">
-              <div className="border-b border-[rgba(45,42,74,0.08)] pb-3 mb-1">
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-2 p-3 h-full">
+              <div className="border-b border-[rgba(45,42,74,0.08)] pb-2">
                 <h3 className="heading-md">Basic Information</h3>
               </div>
 
@@ -185,13 +185,13 @@ export default function CourseForm({ initialData, mode, onSuccess, onCancel }: C
                 />
               </div>
 
-            </Card>
+            </div>
           </div>
 
           {/* right column: course schedule & actions */}
-          <div className="flex flex-col gap-6">
-            <Card className="flex flex-col gap-4 p-6">
-              <div className="border-b border-[rgba(45,42,74,0.08)] pb-3 mb-1">
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-2 p-3">
+              <div className="border-b border-[rgba(45,42,74,0.08)] pb-2">
                 <h3 className="heading-md">Course Schedule</h3>
               </div>
 
@@ -221,7 +221,7 @@ export default function CourseForm({ initialData, mode, onSuccess, onCancel }: C
              
 
           
-            </Card>
+            </div>
 
             {/* error toast */}
             {error && (

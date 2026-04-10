@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { submitFormData } from "@/lib/form-submit.utils";
 import { MapPin, Users, AlignLeft, Type, ImagePlus, X } from "lucide-react";
 import { Card, Input, Select, Button, DateTimePicker } from "@/components/ui";
@@ -251,9 +252,9 @@ export default function EventForm({ initialData, mode, onSuccess, onCancel }: Ev
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
           {/* left column: basic information */}
-          <div className="flex flex-col gap-6">
-            <Card className="flex flex-col gap-4 p-3 h-full">
-              <div className="border-b border-[rgba(45,42,74,0.08)] pb-3 mb-1">
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-2">
+              <div className="border-b border-[rgba(45,42,74,0.08)] pb-2">
                 <h3 className="heading-md">Basic Information</h3>
               </div>
 
@@ -296,15 +297,17 @@ export default function EventForm({ initialData, mode, onSuccess, onCancel }: Ev
 
                 {bannerPreview ? (
                   <div className="relative rounded-[var(--radius-md)] overflow-hidden">
-                    <img
+                    <Image
                       src={bannerPreview}
                       alt="Banner preview"
+                      width={500}
+                      height={160}
                       className="w-full h-40 object-cover"
                     />
                     <button
                       type="button"
                       onClick={removeBanner}
-                      className="absolute top-2 right-2 w-7 h-7 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center text-[var(--primary-dark)] border-none cursor-pointer"
+                      className="absolute top-2 right-2 w-4 h-4 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center text-[var(--primary-dark)] border-none cursor-pointer"
                     >
                       <X size={14} />
                     </button>
@@ -354,13 +357,13 @@ export default function EventForm({ initialData, mode, onSuccess, onCancel }: Ev
                   onChange={(e) => setStatus(e.target.value)}
                 />
               </div>
-            </Card>
+            </div>
           </div>
 
           {/* right column: event schedule & actions */}
-          <div className="flex flex-col gap-6">
-            <Card className="flex flex-col gap-4 p-6">
-              <div className="border-b border-[rgba(45,42,74,0.08)] pb-3 mb-1">
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-2">
+              <div className="border-b border-[rgba(45,42,74,0.08)] pb-2">
                 <h3 className="heading-md">Event Schedule</h3>
               </div>
 
@@ -394,7 +397,7 @@ export default function EventForm({ initialData, mode, onSuccess, onCancel }: Ev
                 value={registration_close}
                 onChange={setRegistrationClose}
               />
-            </Card>
+            </div>
 
             {/* error toast */}
             {error && (
@@ -402,12 +405,36 @@ export default function EventForm({ initialData, mode, onSuccess, onCancel }: Ev
                 <span className="font-semibold text-[var(--error)]">{error}</span>
               </div>
             )}
+
+            <div className="mt-2 flex gap-3 justify-end shrink-0 z-10">
+                <Button
+                type="button"
+                variant="ghost"
+                onClick={() => onCancel ? onCancel() : router.push("/admin/events")}
+                >
+                Cancel
+                </Button>
+
+                <Button
+                type="submit"
+                variant="primary"
+                disabled={isLoading || uploadingBanner}
+                className="px-8"
+                >
+                {uploadingBanner
+                    ? "Uploading banner…"
+                    : isLoading
+                    ? mode === "create" ? "Creating..." : "Saving..."
+                    : mode === "create" ? "Create Event" : "Save Changes"
+                }
+                </Button>
+            </div>
           </div>
 
         </div>
       </div>
 
-      {/* sticky footer actions on mobile, standard footer flow on desktop */}
+      {/* sticky footer actions on mobile, standard footer flow on desktop
       <div className="mt-2 flex gap-3 justify-end shrink-0 z-10">
         <Button
           type="button"
@@ -430,7 +457,7 @@ export default function EventForm({ initialData, mode, onSuccess, onCancel }: Ev
               : mode === "create" ? "Create Event" : "Save Changes"
           }
         </Button>
-      </div>
+      </div> */}
 
     </form>
   );

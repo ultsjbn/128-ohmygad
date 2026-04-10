@@ -249,8 +249,8 @@ export default function SurveyForm({ mode, initialData, initialQuestions = [], o
       <div className="flex-1 overflow-y-auto lg:overflow-visible custom-scrollbar pr-1 lg:pr-0 pb-4 lg:pb-0 min-h-0 max-w-3xl mx-auto w-full">
 
         <div className="w-full mx-auto flex-1 min-h-0 flex flex-col gap-3 md:gap-6">
-          <Card className="flex flex-col gap-6 ">
-              <div className="border-b border-[rgba(45,42,74,0.08)] pb-3 mb-1">
+          <div className="flex flex-col gap-2">
+              <div className="border-b border-[rgba(45,42,74,0.08)] pb-2">
                 <h3 className="heading-md">Survey Details</h3>
               </div>
 
@@ -295,10 +295,10 @@ export default function SurveyForm({ mode, initialData, initialQuestions = [], o
                 value={status}
                 onChange={(e) => setStatus(e.target.value)}
               />
-          </Card>
+          </div>
 
-          <Card className="flex flex-col gap-6">
-              <div className="border-b border-[rgba(45,42,74,0.08)] pb-3 mb-1">
+          <div className="flex flex-col gap-2">
+              <div className="border-b border-[rgba(45,42,74,0.08)] pb-2">
                 <h3 className="heading-md">Availability</h3>
               </div>
 
@@ -322,12 +322,10 @@ export default function SurveyForm({ mode, initialData, initialQuestions = [], o
                 <span className="font-semibold text-[var(--error)]">{error}</span>
               </div>
             )}
-          </Card>
+          </div>
 
-      
-
-          <Card className="flex flex-col gap-4 p-6">
-            <div className="border-b border-[rgba(45,42,74,0.08)] pb-3 mb-1 flex items-center justify-between">
+          <Card variant="no-shadow" className="flex flex-col gap-4 p-2">
+            <div className="border-b border-[rgba(45,42,74,0.08)] pb-2 flex items-center justify-between">
               <h3 className="heading-md">Questions</h3>
               <span className="caption">{questions.length} question{questions.length !== 1 ? "s" : ""}</span>
             </div>

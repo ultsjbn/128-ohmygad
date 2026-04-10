@@ -190,7 +190,16 @@ export default function SurveysPage() {
       .select("id, question_text, question_type, options, is_required, order_index")
       .eq("survey_id", survey.id)
       .order("order_index");
-    if (data) setEditQuestions(data as SurveyQuestion[]);
+    if (data) setEditQuestions(
+      data.map((q) => ({
+        id: q.id,
+        question_text: q.question_text,
+        question_type: q.question_type,
+        options: Array.isArray(q.options) ? q.options : [],
+        is_required: q.is_required ?? false,
+        order_index: q.order_index,
+      }))
+    );
     setEditQuestionsLoading(false);
   };
 
