@@ -28,7 +28,7 @@ function buildPresets() {
   const today = new Date();
   const T = dateToISO(today);
 
-  const d7  = new Date(today); d7.setDate(d7.getDate() - 6);
+  const d7  = new Date(today); d7.setDate(d7.getDate() - 7);
   const d30 = new Date(today); d30.setDate(d30.getDate() - 29);
 
   // day 0 of next month = last day of current month (works for 28/29/30/31)
