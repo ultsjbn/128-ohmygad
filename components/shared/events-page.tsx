@@ -478,6 +478,7 @@ export default function EventsPage() {
                     title={event.title}
                     category={event.category ?? "Uncategorized"}
                     date={event.start_date ? new Date(event.start_date).toLocaleDateString("en-PH", { month: "short", day: "numeric", year: "numeric" }) : "—"}
+                    time={event.start_date ? new Date(event.start_date).toLocaleTimeString("en-PH", { hour: "numeric", minute: "2-digit" }): "—"}
                     location={event.location ?? "—"}
                     registered={regCounts[event.id!] ?? 0}
                     capacity={event.capacity ?? 0}
@@ -568,6 +569,16 @@ export default function EventsPage() {
                     {detailEvent.start_date ? new Date(detailEvent.start_date).toLocaleDateString("en-PH", { month: "long", day: "numeric", year: "numeric" }) : "—"}
                     {detailEvent.end_date && detailEvent.end_date !== detailEvent.start_date && (
                       <> — {new Date(detailEvent.end_date).toLocaleDateString("en-PH", { month: "long", day: "numeric", year: "numeric" })}</>
+                    )}
+                  </span>
+                </div>
+                {/* ---------- time ---------- */}
+                <div className="flex items-start gap-3 caption sm:text-sm text-[var(--gray)]">
+                  <Clock size={15} className="shrink-0 mt-0.5" />
+                  <span>
+                    {detailEvent.start_date ? new Date(detailEvent.start_date).toLocaleTimeString("en-PH", { hour: "numeric", minute: "2-digit" }) : "—"}
+                    {detailEvent.end_date && detailEvent.end_date !== detailEvent.start_date && (
+                      <> — {new Date(detailEvent.end_date).toLocaleTimeString("en-PH", { hour: "numeric", minute: "2-digit" })}</>
                     )}
                   </span>
                 </div>

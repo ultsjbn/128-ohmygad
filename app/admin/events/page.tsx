@@ -761,10 +761,10 @@ export default function EventsPage() {
               )}
             </div>
 
-            {/* Right column: Registrations + Attendance */}
+            {/* right column: Registrations + Attendance */}
             <div className="flex flex-col gap-4 flex-1">
 
-              {/* Sub-tab toggle */}
+              {/* sub-tab toggle */}
               <div className="flex rounded-xl overflow-hidden border border-[rgba(45,42,74,0.10)] w-fit items-center">
                 <button
                   onClick={() => setDetailTab("registrations")}
@@ -780,7 +780,7 @@ export default function EventsPage() {
                 </button>
               </div>
 
-              {/* Registrations panel */}
+              {/* registrations panel */}
               {detailTab === "registrations" && (
                 <div className="flex flex-col gap-3">
                   <div className="flex items-center justify-between gap-3">
@@ -812,8 +812,8 @@ export default function EventsPage() {
                       <p className="caption text-[var(--gray)]">No registrations yet.</p>
                     </div>
                   ) : (
-                    <div className="flex flex-col gap-1 max-h-[420px] overflow-y-auto pr-1">
-                      <div className="grid grid-cols-[1fr_1fr_44px] gap-3 px-3 py-1.5 sticky top-0 bg-white">
+                    <div className="flex flex-col max-h-[420px] overflow-y-auto pr-1">
+                      <div className="grid grid-cols-[1fr_1fr_44px] gap-3 px-3 sticky top-0 bg-white">
                         <span className="label">Name</span>
                         <span className="label">Email</span>
                         <span className="label text-center">Present</span>
@@ -855,8 +855,8 @@ export default function EventsPage() {
                   ) : attendedUsers.length === 0 ? (
                     <div className="flex flex-col items-center justify-center gap-2 py-8 rounded-xl border border-dashed border-[rgba(45,42,74,0.12)]">
                       <ClipboardCheck size={24} className="text-[var(--gray)] opacity-40" />
-                      <p className="caption text-[var(--gray)]">No attendees marked yet.</p>
-                      <p className="caption text-[var(--gray)] text-center max-w-[220px]">Mark attendance in the Registrations tab using the checkboxes.</p>
+                      <p className="caption">No attendees marked yet.</p>
+                      <p className="caption text-center max-w-[250px]">Mark attendance in the Registrations tab using the checkboxes.</p>
                     </div>
                   ) : (
                     <div className="flex flex-col gap-1 max-h-[420px] overflow-y-auto pr-1">
