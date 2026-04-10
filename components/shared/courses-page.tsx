@@ -205,9 +205,6 @@ export default function CoursesPage() {
                 </DropdownItem>
               ))}
             </Dropdown>
-
-            {/* Filter Dropdown */}
-
           </div>
         </div>
 
@@ -233,6 +230,7 @@ export default function CoursesPage() {
           >
             Clear all filters
           </Button>
+
         </Card>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -256,7 +254,7 @@ export default function CoursesPage() {
       )}
 
       {/* Detail Modal */}
-      <Modal open={!!detailCourse} onClose={() => setDetailCourse(null)} hideCloseButton modalStyle={{ maxWidth: 500 }}>
+      <Modal open={!!detailCourse} onClose={() => setDetailCourse(null)} hideCloseButton modalStyle={{ maxWidth: 1000 }}>
         {detailCourse && (
           <div className="flex flex-col gap-2 p-2">
             <div className="flex justify-between items-center">
