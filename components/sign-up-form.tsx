@@ -78,7 +78,7 @@ export function SignUpForm({
       </div>
 
       <form onSubmit={handleSignUp} className="flex flex-col gap-3">
-        
+
         {/* Full Name Input */}
         <div className="input-wrap">
           <label htmlFor="full_name" className="label">Full Name</label>
@@ -91,6 +91,7 @@ export function SignUpForm({
               value={full_name}
               onChange={(e) => setFullName(e.target.value)}
               className="input"
+              maxLength={64}
             />
           </div>
         </div>
@@ -121,6 +122,7 @@ export function SignUpForm({
               id="password"
               type={showPassword ? "text" : "password"}
               required
+              maxLength={128}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="input"
@@ -145,6 +147,7 @@ export function SignUpForm({
               id="repeat-password"
               type={showRepeatPassword ? "text" : "password"}
               required
+              maxLength={128}
               value={repeatPassword}
               onChange={(e) => setRepeatPassword(e.target.value)}
               className={cn(

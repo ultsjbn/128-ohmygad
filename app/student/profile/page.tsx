@@ -5,11 +5,11 @@ import { createClient } from "@/lib/supabase/client"; // using shared client
 import { useRouter } from "next/navigation";
 import {
   User, Phone, BookOpen, MapPin,
-  Save, ChevronLeft, Heart,
+  Save,
 } from "lucide-react";
 
 import { Card, Input, Select, Button, Badge, Tabs, ProgressBar, Toast } from "@/components/ui";
-import { validateFullName, validateDisplayName, validateContactNum, validateStudentNum } from "@/lib/validation";
+import { validateFullName, validateDisplayName, validateContactNum, validateStudentNum, validateAddress } from "@/lib/validation";
 
 type Profile = {
   id: string;
@@ -57,6 +57,17 @@ const PRONOUNS = [
   { value: "she/they", label: "she/they" },
   { value: "any/all", label: "any/all" },
   { value: "Prefer not to say", label: "Prefer not to say" },
+];
+
+const GENDER_IDENTITY_OPTIONS = [
+  { value: "Man", label: "Man" },
+  { value: "Woman", label: "Woman" },
+  { value: "Non-binary", label: "Non-binary" },
+  { value: "Genderqueer", label: "Genderqueer" },
+  { value: "Genderfluid", label: "Genderfluid" },
+  { value: "Agender", label: "Agender" },
+  { value: "Prefer not to say", label: "Prefer not to say" },
+  { value: "Self-describe", label: "Prefer to self-describe" },
 ];
 
 // imported logic from onboarding
@@ -171,6 +182,13 @@ export default function StudentProfilePage() {
       return;
     }
 
+    const addressErr = validateAddress(profile.address);
+    if (addressErr) {
+      setToast({ type: "error", message: addressErr });
+      setSaving(false);
+      return;
+    }
+
     try {
       const { error } = await supabase
         .from("profile")
@@ -201,34 +219,79 @@ export default function StudentProfilePage() {
 
   return (
     // main wrapper
-    <div className="w-full max-w-8xl mx-auto flex flex-col gap-4 lg:gap-6 animate-in fade-in duration-500 pb-[100px] lg:pb-6">
+    <div className="w-full max-w-8xl mx-auto flex flex-col gap-4 lg:gap-6 animate-in fade-in duration-500 pb-[100px] lg:pb-1.5">
 
       {/* two columns */}
       <div className="flex flex-col lg:flex-row gap-4 lg:gap-6">
 
         {/* left column: profile card */}
         <div className="w-full lg:w-[35%] lg:min-w-[240px] shrink-0 flex flex-col">
-          <Card className="flex flex-col items-center text-center p-4 lg:p-6">
-            
+          <Card variant="no-hover" className="flex flex-col items-center text-center p-4 lg:p-6">
+
             {/* user details */}
             <h2 className="heading-lg mb-1">{profile.full_name || "Your Name"}</h2>
-            <p className="text-sm text-[var(--gray)] mb-4">
-              {profile.display_name ? `@${profile.display_name}` : "No display name set"}
+            <p className="text-sm text-[var(--gray)] mb-2">
+              {profile.display_name ? `${profile.display_name}` : "No display name set"}
             </p>
 
-            <div className="flex flex-wrap justify-center gap-2 mb-6">
+            <div className="flex flex-wrap justify-center gap-2 mb-4">
               <Badge variant="periwinkle" dot>Student</Badge>
               {profile.student_num && <Badge variant="pink">#{profile.student_num}</Badge>}
               {profile.program && <Badge variant="dark">{profile.program}</Badge>}
             </div>
 
-            {/* gso progress bar */}
-            <div className="w-full text-left pt-6 border-t border-[rgba(45,42,74,0.08)]">
-              <ProgressBar 
-                value={profile.gso_attended === 2 ? 100 : profile.gso_attended === 1 ? 50 : 0} 
+                        {/* gso progress bar */}
+            <div className="w-full text-left pt-3 border-t border-[rgba(45,42,74,0.08)]">
+              <ProgressBar
+                value={profile.gso_attended === 2 ? 100 : profile.gso_attended === 1 ? 50 : 0}
                 variant="dark"
                 label="GSO Attendance"
                 sublabel={`${profile.gso_attended ?? 0} / 2 completed`}
+              />
+            </div>
+            {/* asho progress bar */}
+            <div className="w-full text-left pt-3 border-t border-[rgba(45,42,74,0.08)]">
+              <ProgressBar
+                value={profile.gso_attended === 2 ? 100 : profile.gso_attended === 1 ? 50 : 0}
+                variant="dark"
+                label="ASHO Attendance"
+                sublabel={`${profile.gso_attended ?? 0} / 2 completed`}
+              />
+            </div>
+            {/* forums progress bar */}
+            <div className="w-full text-left pt-3 border-t border-[rgba(45,42,74,0.08)]">
+              <ProgressBar
+                value={profile.gso_attended === 2 ? 100 : profile.gso_attended === 1 ? 50 : 0}
+                variant="dark"
+                label="Forums Attended"
+                sublabel={`${profile.gso_attended ?? 0} attended`}
+              />
+            </div>
+            {/* research progress bar */}
+            <div className="w-full text-left pt-3 border-t border-[rgba(45,42,74,0.08)]">
+              <ProgressBar
+                value={profile.gso_attended === 2 ? 100 : profile.gso_attended === 1 ? 50 : 0}
+                variant="dark"
+                label="Research Attended"
+                sublabel={`${profile.gso_attended ?? 0} attended`}
+              />
+            </div>
+            {/* training progress bar */}
+            <div className="w-full text-left pt-3 border-t border-[rgba(45,42,74,0.08)]">
+              <ProgressBar
+                value={profile.gso_attended === 2 ? 100 : profile.gso_attended === 1 ? 50 : 0}
+                variant="dark"
+                label="Trainings Attended"
+                sublabel={`${profile.gso_attended ?? 0} attended`}
+              />
+            </div>
+            {/* research progress bar */}
+            <div className="w-full text-left pt-3 border-t border-[rgba(45,42,74,0.08)]">
+              <ProgressBar
+                value={profile.gso_attended === 2 ? 100 : profile.gso_attended === 1 ? 50 : 0}
+                variant="dark"
+                label="Workshops Attended"
+                sublabel={`${profile.gso_attended ?? 0} attended`}
               />
             </div>
 
@@ -250,7 +313,7 @@ export default function StudentProfilePage() {
 
             {/* form area */}
             <div>
-              
+
               {/* added content-start to prevent vertical stretching */}
               {tab === "Personal" && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 content-start">
@@ -260,6 +323,7 @@ export default function StudentProfilePage() {
                     placeholder="e.g. Juan Dela Cruz"
                     value={profile.full_name}
                     onChange={set("full_name")}
+                    maxLength={64}
                   />
                   <Input
                     label="Display Name"
@@ -267,6 +331,7 @@ export default function StudentProfilePage() {
                     placeholder="e.g. juandc"
                     value={profile.display_name}
                     onChange={set("display_name")}
+                    maxLength={32}
                   />
                   <Select
                     label="Pronouns"
@@ -279,7 +344,11 @@ export default function StudentProfilePage() {
                     prefixIcon={<Phone size={15} />}
                     placeholder="e.g. 09XX XXX XXXX"
                     value={profile.contact_num}
-                    onChange={set("contact_num")}
+                    onChange={(e) => {
+                      const val = e.target.value.replace(/\D/g, '');
+                      setProfile(p => ({ ...p, contact_num: val }));
+                    }}
+                    maxLength={15}
                   />
                   <div className="md:col-span-2">
                     <Input
@@ -288,6 +357,7 @@ export default function StudentProfilePage() {
                       placeholder="Street, Barangay, City, Province"
                       value={profile.address}
                       onChange={set("address")}
+                      maxLength={100}
                     />
                   </div>
                 </div>
@@ -301,7 +371,11 @@ export default function StudentProfilePage() {
                     prefixIcon={<BookOpen size={15} />}
                     placeholder="e.g. 202400123"
                     value={profile.student_num}
-                    onChange={set("student_num")}
+                    onChange={(e) => {
+                      const val = e.target.value.replace(/\D/g, '');
+                      setProfile(p => ({ ...p, student_num: val }));
+                    }}
+                    maxLength={9}
                   />
                   <Select
                     label="Year Level"
@@ -344,10 +418,9 @@ export default function StudentProfilePage() {
                     value={profile.sex_at_birth}
                     onChange={set("sex_at_birth")}
                   />
-                  <Input
+                  <Select
                     label="Gender Identity"
-                    prefixIcon={<Heart size={15} />}
-                    placeholder="e.g. Non-binary, Transgender…"
+                    options={[{ value: "", label: "Select gender identity" }, ...GENDER_IDENTITY_OPTIONS]}
                     value={profile.gender_identity}
                     onChange={set("gender_identity")}
                   />

@@ -10,7 +10,7 @@ interface BadgeProps {
   dot?: boolean;
 }
 
-export function Badge({ children, variant = "pink", dot = false }: BadgeProps) {
+export function Badge({ children, variant = "pink" }: BadgeProps) {
   return (
     <span className={`badge badge-${variant}`}>
       {children}
