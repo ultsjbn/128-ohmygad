@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { SlidersHorizontal, Loader2, CalendarDays, MapPin, Users, Clock, X, ArrowUpDown } from "lucide-react";
+import { SlidersHorizontal, Loader2, CalendarDays, MapPin, Users, Clock, X, ArrowUpDown, ClipboardList } from "lucide-react";
 import type { EventFormData } from "@/components/admin/event-form";
 import ScrollToTop from "@/components/ui/scroll-to-top";
 import { Toast, ProgressBar } from "@/components/ui";
@@ -47,7 +47,7 @@ const SORT_OPTIONS: { label: string; field: SortField }[] = [
 
 // category for gradient map since no images pa
 const CATEGORY_GRADIENT: Record<string, string> = {
-  Orientation: "linear-gradient(135deg, #F4A7B9 0%, #B8B5E8 100%)",
+  Orientation: "linear-gradient(135deg, #F4C97A 0%, #FAF8FF 100%)",
   Forum: "linear-gradient(135deg, #F4A7B9 0%, #FAF8FF 100%)",
   Research: "linear-gradient(135deg, #B8B5E8 0%, #FAF8FF 100%)",
   Training: "linear-gradient(135deg, #6DC5A0 0%, #FAF8FF 100%)",
@@ -58,7 +58,7 @@ const DEFAULT_GRADIENT = "linear-gradient(135deg, #B8B5E8 0%, #2D2A4A 100%)";
 // status badge variants
 type BadgeVariant = "pink" | "periwinkle" | "dark" | "success" | "warning" | "error";
 const STATUS_VARIANT: Record<string, BadgeVariant> = {
-  upcoming: "success",
+  upcoming: "pink",
   past: "periwinkle",
 };
 
@@ -365,7 +365,6 @@ export default function EventsPage() {
             <Dropdown trigger={
               <Button variant={hasActiveFilters ? "pink" : "ghost"}>
                 <SlidersHorizontal size={15} />
-                {/* label hidden on mobile */}
                 <span className="hidden md:inline">Filter</span>
                 {hasActiveFilters && (
                   <span className="inline-flex items-center justify-center w-4 h-4 rounded-full text-[10px] font-bold text-white bg-[var(--primary-dark)] ml-0.5">
@@ -479,6 +478,7 @@ export default function EventsPage() {
                     title={event.title}
                     category={event.category ?? "Uncategorized"}
                     date={event.start_date ? new Date(event.start_date).toLocaleDateString("en-PH", { month: "short", day: "numeric", year: "numeric" }) : "—"}
+                    time={event.start_date ? new Date(event.start_date).toLocaleTimeString("en-PH", { hour: "numeric", minute: "2-digit" }): "—"}
                     location={event.location ?? "—"}
                     registered={regCounts[event.id!] ?? 0}
                     capacity={event.capacity ?? 0}
@@ -572,6 +572,16 @@ export default function EventsPage() {
                     )}
                   </span>
                 </div>
+                {/* ---------- time ---------- */}
+                <div className="flex items-start gap-3 caption sm:text-sm text-[var(--gray)]">
+                  <Clock size={15} className="shrink-0 mt-0.5" />
+                  <span>
+                    {detailEvent.start_date ? new Date(detailEvent.start_date).toLocaleTimeString("en-PH", { hour: "numeric", minute: "2-digit" }) : "—"}
+                    {detailEvent.end_date && detailEvent.end_date !== detailEvent.start_date && (
+                      <> — {new Date(detailEvent.end_date).toLocaleTimeString("en-PH", { hour: "numeric", minute: "2-digit" })}</>
+                    )}
+                  </span>
+                </div>
                 {/* ---------- location ---------- */}
                 <div className="flex items-center gap-3 caption sm:text-sm text-[var(--gray)]">
                   <MapPin size={15} className="shrink-0" />
@@ -585,12 +595,12 @@ export default function EventsPage() {
                 {/* ---------- registration ---------- */}
                 {(detailEvent.registration_open || detailEvent.registration_close) && (
                   <div className="flex items-center gap-3 caption sm:text-sm text-[var(--gray)]">
-                    <Clock size={15} className="shrink-0" />
+                    <ClipboardList size={15} className="shrink-0" />
                     <span>
                       Registration:&nbsp;
-                      {detailEvent.registration_open ? new Date(detailEvent.registration_open).toLocaleDateString("en-PH", { month: "short", day: "numeric" }) : "?"}
-                      &nbsp;–&nbsp;
-                      {detailEvent.registration_close ? new Date(detailEvent.registration_close).toLocaleDateString("en-PH", { month: "short", day: "numeric" }) : "?"}
+                      {detailEvent.registration_open ? new Date(detailEvent.registration_open).toLocaleDateString("en-PH", { month: "long", day: "numeric" }) : "?"}
+                      &nbsp;—&nbsp;
+                      {detailEvent.registration_close ? new Date(detailEvent.registration_close).toLocaleDateString("en-PH", { month: "long", day: "numeric" }) : "?"}
                     </span>
                   </div>
                 )}

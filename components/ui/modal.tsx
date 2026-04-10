@@ -78,9 +78,10 @@ interface ModalProps {
   modalStyle?: React.CSSProperties;
   modalClassName?: string;
   hideCloseButton?: boolean;
+  contentStyle?: React.CSSProperties;
 }
- 
-export function Modal({ open, onClose, title, subtitle, children, footer, modalStyle, modalClassName, hideCloseButton }: ModalProps) {
+
+export function Modal({ open, onClose, title, subtitle, children, footer, modalStyle, modalClassName, hideCloseButton, contentStyle }: ModalProps) {
   if (!open) return null;
  
   return (
@@ -104,7 +105,7 @@ export function Modal({ open, onClose, title, subtitle, children, footer, modalS
         )}
  
         {/* makes the body scroll */}
-        <div style={{ flex: 1, overflowY: "auto", marginBottom: footer ? 24 : 0 }}>{children}</div>
+        <div style={{ flex: 1, overflowY: "auto", marginBottom: footer ? 24 : 0, minHeight: 0, ...contentStyle }}>{children}</div>
  
         {/* footer sticks to bottom */}
         {footer && <div style={{ flexShrink: 0 }}>{footer}</div>}

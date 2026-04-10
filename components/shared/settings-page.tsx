@@ -116,10 +116,10 @@ export default function SharedSettingsPage() {
   }
 
   return (
-    <div className="w-full max-w-4xl mx-auto flex flex-col gap-4 lg:gap-6 animate-in fade-in duration-500 pb-24 lg:pb-6">
+    <div className="w-full mx-auto flex flex-col gap-4 lg:gap-6 animate-in fade-in duration-500 pb-24 lg:pb-6">
 
       {/* top bar */}
-      <div className="shrink-0 flex items-center justify-between md:mt-2">
+      <div className="shrink-0 flex items-center justify-between md:mt-2 md:hidden">
         <div className="flex items-center gap-2 lg:gap-4">
           <Button variant="icon" onClick={() => router.back()}>
             <ChevronLeft size={16} />
@@ -132,13 +132,13 @@ export default function SharedSettingsPage() {
       </div>
 
       {/* content cards wrapper - completely unrestricted flow */}
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col md:flex-row gap-6">
 
         {/* email section */}
-        <Card className="flex flex-col md:flex-row gap-4 p-3 lg:p-6">
+        <Card className="flex flex-col gap-4 p-3 lg:p-4">
           
           {/* description side */}
-          <div className="w-full md:w-1/3 shrink-0">
+          <div className="w-full shrink-0">
             <h2 className="heading-md mb-2">Change Email Address</h2>
             <p className="text-sm text-[var(--gray)] leading-relaxed">
               Update the email address associated with your account. We will send a verification link to your new address to confirm ownership.
@@ -146,7 +146,7 @@ export default function SharedSettingsPage() {
           </div>
 
           {/* form side */}
-          <form onSubmit={handleUpdateEmail} className="w-full md:w-2/3 flex flex-col gap-3">
+          <form onSubmit={handleUpdateEmail} className="w-full flex flex-col gap-3">
             <Input
               label="Current Email"
               value={currentEmail}
@@ -176,10 +176,10 @@ export default function SharedSettingsPage() {
         </Card>
 
         {/* password section */}
-        <Card className="flex flex-col md:flex-row gap-4 p-3 lg:p-6">
+        <Card className="flex flex-col gap-4 p-3 lg:p-4">
           
           {/* description side */}
-          <div className="w-full md:w-1/3 shrink-0">
+          <div className="w-full shrink-0">
             <h2 className="heading-md mb-2">Change Password</h2>
             <p className="text-sm text-[var(--gray)] leading-relaxed">
               Ensure your account is using a long, random password to stay secure. It must be at least 6 characters long.
@@ -187,7 +187,7 @@ export default function SharedSettingsPage() {
           </div>
 
           {/* form side */}
-          <form onSubmit={handleUpdatePassword} className="w-full md:w-2/3 flex flex-col gap-3">
+          <form onSubmit={handleUpdatePassword} className="w-full flex flex-col gap-3">
             <Input
               label="New Password"
               type="password"
@@ -195,6 +195,7 @@ export default function SharedSettingsPage() {
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
               required
+              maxLength={128}
               prefixIcon={<KeyRound size={15} />}
             />
             <Input
@@ -204,6 +205,7 @@ export default function SharedSettingsPage() {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
+              maxLength={128}
               prefixIcon={<KeyRound size={15} />}
             />
             

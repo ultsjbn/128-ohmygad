@@ -9,29 +9,10 @@
 */
 
 import { useState, useMemo } from "react";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-  Legend,
-} from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from "recharts";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { mean, median, stddev } from "@/lib/stats.utils";
-import {
-  BRAND_COLORS,
-  AXIS_COLOR,
-  TICK_COLOR,
-  LIKERT_LABELS,
-  LIKERT_COLORS,
-  CustomTooltip,
-} from "./survey-analytics.constants";
+import { BRAND_COLORS, AXIS_COLOR, TICK_COLOR, LIKERT_LABELS, LIKERT_COLORS, CustomTooltip } from "./survey-analytics.constants";
 
 interface QuestionRow {
   id: string;

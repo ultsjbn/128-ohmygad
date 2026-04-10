@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { User, Mail, Lock, Phone, MapPin, Hash, Loader2 } from "lucide-react";
 import { Button, Input, Select, Toast, Toggle, Card } from "@/components/ui";
-import { validateFullName, validateDisplayName, validateContactNum, validateStudentNum, validatePassword, validateGsoSessions } from "@/lib/validation";
+import { validateFullName, validateDisplayName, validateContactNum, validateStudentNum, validatePassword, validateGsoSessions, validateAddress } from "@/lib/validation";
 
 // types
 interface CreateUserData {
@@ -80,7 +80,7 @@ export default function UserForm({ initialData, onSuccess, layout = "modal" }: U
   // helpers
   const handleStudentNumChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const digits = e.target.value.replace(/\D/g, "").slice(0, 9);
-    setStudentNum(digits.length > 4 ? `${digits.slice(0, 4)}-${digits.slice(4)}` : digits);
+    setStudentNum(digits);
   };
 
   const handleContactNumChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -124,6 +124,9 @@ export default function UserForm({ initialData, onSuccess, layout = "modal" }: U
       const gsoErr = validateGsoSessions(gso_attended);
       if (gsoErr) throw new Error(gsoErr);
 
+      const addressErr = validateAddress(address || "");
+      if (addressErr) throw new Error(addressErr);
+
       const gsoNum = gso_attended === "" ? 0 : Number(gso_attended);
 
       const cleanStudentNum = student_num ? student_num.replace(/\D/g, "") : undefined;
@@ -165,20 +168,20 @@ export default function UserForm({ initialData, onSuccess, layout = "modal" }: U
       <form onSubmit={handleSubmit} className="w-full">
         <div className="grid grid-cols-1 lg:grid-cols-[1.5fr_1fr] gap-6 items-start w-full">
 
-          <Card className="flex flex-col gap-3 p-5 sm:p-6 w-full">
+          <div className="flex flex-col gap-3 w-full">
             <h2 className="text-xl font-bold mb-1" style={{ color: "var(--primary-dark)" }}>Account Information</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 w-full">
-              <Input label="Full Name" required prefixIcon={<User size={15} />} maxLength={100} placeholder="e.g. Maria Santos" value={full_name} onChange={(e) => setFullName(e.target.value)} />
+              <Input label="Full Name" required prefixIcon={<User size={15} />} maxLength={64} placeholder="e.g. Maria Santos" value={full_name} onChange={(e) => setFullName(e.target.value)} />
               <Input label="Email" type="email" required prefixIcon={<Mail size={15} />} placeholder="m@up.edu.ph" value={email} onChange={(e) => setEmail(e.target.value)} />
-              <Input label={isEdit ? "Password (leave blank to keep)" : "Password"} type="password" required={!isEdit} prefixIcon={<Lock size={15} />} placeholder={isEdit ? "Leave blank to keep current" : "Min. 8 characters"} value={password} onChange={(e) => setPassword(e.target.value)} />
+              <Input label={isEdit ? "Password (leave blank to keep)" : "Password"} type="password" required={!isEdit} maxLength={128} prefixIcon={<Lock size={15} />} placeholder={isEdit ? "Leave blank to keep current" : "Min. 8 characters"} value={password} onChange={(e) => setPassword(e.target.value)} />
               <Select label="Role" required value={role} onChange={(e) => setRole(e.target.value)} options={ROLE_OPTIONS} />
             </div>
 
             <hr className="border-gray-100 my-2" />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 w-full">
-              <Input label="Display Name" placeholder="Nickname or preferred name" value={display_name} onChange={(e) => setDisplayName(e.target.value)} />
+              <Input label="Display Name" placeholder="Nickname or preferred name" value={display_name} onChange={(e) => setDisplayName(e.target.value)} maxLength={32} />
               <Input label="Student Number" prefixIcon={<Hash size={15} />} placeholder="e.g. 2021-12345" value={student_num} onChange={handleStudentNumChange} />
               <Select label="Year Level" value={year_level} onChange={(e) => setYearLevel(e.target.value)} options={YEAR_OPTIONS} />
               <Select label="College" value={college} onChange={(e) => setCollege(e.target.value)} options={COLLEGE_OPTIONS} />
@@ -188,7 +191,7 @@ export default function UserForm({ initialData, onSuccess, layout = "modal" }: U
                 <Input label="Address" prefixIcon={<MapPin size={15} />} placeholder="City, Province" value={address} onChange={(e) => setAddress(e.target.value)} />
               </div>
             </div>
-          </Card>
+          </div>
 
           <div className="flex flex-col gap-6 w-full">
             <Card className="flex flex-col gap-3 p-5 sm:p-6 w-full">
@@ -227,18 +230,20 @@ export default function UserForm({ initialData, onSuccess, layout = "modal" }: U
 
   // modal layout
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-4 items-start">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+    {/* account information */}
+      <div className="grid grid-cols-1 gap-x-5 gap-y-2 items-start">
         <SectionLabel>Account Information</SectionLabel>
-        <Input label="Full Name" required prefixIcon={<User size={15} />} placeholder="e.g. Maria Santos" value={full_name} onChange={(e) => setFullName(e.target.value)} />
+        <Input label="Full Name" required prefixIcon={<User size={15} />} maxLength={64} placeholder="e.g. Maria Santos" value={full_name} onChange={(e) => setFullName(e.target.value)} />
         <Input label="Email" type="email" required prefixIcon={<Mail size={15} />} placeholder="m@up.edu.ph" value={email} onChange={(e) => setEmail(e.target.value)} />
-        <Input label={isEdit ? "Password (leave blank to keep)" : "Password"} type="password" required={!isEdit} prefixIcon={<Lock size={15} />} placeholder={isEdit ? "Leave blank to keep current" : "Min. 8 characters"} value={password} onChange={(e) => setPassword(e.target.value)} />
+        <Input label={isEdit ? "Password (leave blank to keep)" : "Password"} type="password" required={!isEdit} maxLength={128} prefixIcon={<Lock size={15} />} placeholder={isEdit ? "Leave blank to keep current" : "Min. 8 characters"} value={password} onChange={(e) => setPassword(e.target.value)} />
         <Select label="Role" required value={role} onChange={(e) => setRole(e.target.value)} options={ROLE_OPTIONS} />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-4 items-start">
+    {/* profile details */}
+      <div className="grid grid-cols-1 gap-x-5 gap-y-2 items-start">
         <SectionLabel>Profile Details</SectionLabel>
-        <Input label="Display Name" placeholder="Nickname or preferred name" value={display_name} onChange={(e) => setDisplayName(e.target.value)} />
+        <Input label="Display Name" placeholder="Nickname or preferred name" value={display_name} onChange={(e) => setDisplayName(e.target.value)} maxLength={32} />
         <Input label="Student Number" prefixIcon={<Hash size={15} />} placeholder="e.g. 2021-12345" value={student_num} onChange={handleStudentNumChange} />
         <Select label="Year Level" value={year_level} onChange={(e) => setYearLevel(e.target.value)} options={YEAR_OPTIONS} />
         <Select label="College" value={college} onChange={(e) => setCollege(e.target.value)} options={COLLEGE_OPTIONS} />
@@ -250,10 +255,10 @@ export default function UserForm({ initialData, onSuccess, layout = "modal" }: U
         <Select label="Gender Identity" value={gender_identity} onChange={(e) => setGenderIdentity(e.target.value)} options={GENDER_OPTIONS} />
         <Input label="GSO Sessions Attended" type="number" min="0" max="5" step="1" placeholder="0" value={gso_attended.toString()} onChange={(e) => setGsoAttended(e.target.value)} />
 
-        <div className="col-span-full flex items-center justify-between p-3 mt-2 rounded-md border" style={{ background: "var(--cream)", borderColor: "rgba(45,42,74,0.10)" }}>
+        <div className="col-span-full flex items-center justify-between p-1 rounded-lg">
           <div>
-            <p className="font-semibold text-[13px]" style={{ color: "var(--primary-dark)" }}>Onboarding complete</p>
-            <p className="text-[11px] text-gray-500">User has completed the onboarding process</p>
+            <p className="body" style={{ color: "var(--primary-dark)" }}>Onboarding complete</p>
+            <p className="caption text-gray-500">User has completed the onboarding process</p>
           </div>
           <Toggle defaultOn={is_onboarded} onChange={setIsOnboarded} />
         </div>
@@ -261,7 +266,7 @@ export default function UserForm({ initialData, onSuccess, layout = "modal" }: U
 
       {error && <Toast variant="error" title="Failed to save user" message={error} />}
 
-      <div className="flex gap-3 pt-4 border-t mt-2" style={{ borderColor: "rgba(45,42,74,0.10)" }}>
+      <div className="flex gap-3 pt-4 border-t" style={{ borderColor: "rgba(45,42,74,0.10)" }}>
         <Button type="button" variant="ghost" style={{ flex: 1 }} disabled={isLoading} onClick={handleCancel}>
           Cancel
         </Button>

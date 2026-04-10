@@ -1,5 +1,5 @@
 import React from "react";
-import { CalendarDays, MapPin } from "lucide-react";
+import { CalendarDays, Clock, MapPin } from "lucide-react";
 
 type CardVariant = "default" | "pink" | "periwinkle" | "dark" | "glass" | "no-shadow" | "no-hover";
 
@@ -61,6 +61,7 @@ export interface EventCardProps {
   title: string;
   category: string;
   date: string;
+  time: string;
   location: string;
   registered: number;
   capacity: number;
@@ -72,7 +73,7 @@ export interface EventCardProps {
 }
 
 export function EventCard({
-  title, category, date, location,
+  title, category, date, time, location,
   registered, capacity, gradient, onRegister, registerDisabled, registerLabel, isRegistered
 }: EventCardProps) {
   const pct = Math.round((registered / capacity) * 100);
@@ -89,6 +90,9 @@ export function EventCard({
         <div className="event-meta" style={{ marginBottom: 12 }}>
           <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
             <CalendarDays size={12} color="var(--gray)" /> {date}
+          </span>
+          <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
+            <Clock size={12} color="var(--gray)" /> {time}
           </span>
           <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
             <MapPin size={12} color="var(--gray)" /> {location}

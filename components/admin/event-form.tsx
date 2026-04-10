@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { submitFormData } from "@/lib/form-submit.utils";
 import { MapPin, Users, AlignLeft, Type, ImagePlus, X } from "lucide-react";
 import { Card, Input, Select, Button, DateTimePicker } from "@/components/ui";
@@ -25,6 +26,8 @@ export type EventFormData = {
 type EventFormProps = {
   initialData?: EventFormData;
   mode: "create" | "edit";
+  onSuccess?: () => void;
+  onCancel?: () => void;
 };
 
 const CATEGORY_OPTIONS = [
@@ -40,7 +43,7 @@ const STATUS_OPTIONS = [
   { value: "past", label: "Past" },
 ];
 
-export default function EventForm({ initialData, mode }: EventFormProps) {
+export default function EventForm({ initialData, mode, onSuccess, onCancel }: EventFormProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -228,8 +231,12 @@ export default function EventForm({ initialData, mode }: EventFormProps) {
     const result = await submitFormData("event", payload, mode, initialData?.id);
 
     if (result.success) {
-      router.push("/admin/events");
-      router.refresh();
+      if (onSuccess) {
+        onSuccess();
+      } else {
+        router.push("/admin/events");
+        router.refresh();
+      }
     } else {
       setError(result.error || "An error occurred");
     }
@@ -241,13 +248,13 @@ export default function EventForm({ initialData, mode }: EventFormProps) {
     <form onSubmit={handleSubmit} className="flex flex-col h-full lg:h-auto w-full min-h-0 relative">
 
       {/* scrollable wrapper for mobile, fully expanded on desktop */}
-      <div className="flex-1 overflow-y-auto lg:overflow-visible custom-scrollbar pr-1 lg:pr-0 pb-4 lg:pb-0 min-h-0">
+      <div className="flex-1 overflow-y-auto custom-scrollbar pr-1 pb-4 min-h-0">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
           {/* left column: basic information */}
-          <div className="flex flex-col gap-6">
-            <Card className="flex flex-col gap-4 p-3 h-full">
-              <div className="border-b border-[rgba(45,42,74,0.08)] pb-3 mb-1">
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-2">
+              <div className="border-b border-[rgba(45,42,74,0.08)] pb-2">
                 <h3 className="heading-md">Basic Information</h3>
               </div>
 
@@ -290,15 +297,17 @@ export default function EventForm({ initialData, mode }: EventFormProps) {
 
                 {bannerPreview ? (
                   <div className="relative rounded-[var(--radius-md)] overflow-hidden">
-                    <img
+                    <Image
                       src={bannerPreview}
                       alt="Banner preview"
+                      width={500}
+                      height={160}
                       className="w-full h-40 object-cover"
                     />
                     <button
                       type="button"
                       onClick={removeBanner}
-                      className="absolute top-2 right-2 w-7 h-7 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center text-[var(--primary-dark)] border-none cursor-pointer"
+                      className="absolute top-2 right-2 w-4 h-4 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center text-[var(--primary-dark)] border-none cursor-pointer"
                     >
                       <X size={14} />
                     </button>
@@ -348,13 +357,13 @@ export default function EventForm({ initialData, mode }: EventFormProps) {
                   onChange={(e) => setStatus(e.target.value)}
                 />
               </div>
-            </Card>
+            </div>
           </div>
 
           {/* right column: event schedule & actions */}
-          <div className="flex flex-col gap-6">
-            <Card className="flex flex-col gap-4 p-6">
-              <div className="border-b border-[rgba(45,42,74,0.08)] pb-3 mb-1">
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-2">
+              <div className="border-b border-[rgba(45,42,74,0.08)] pb-2">
                 <h3 className="heading-md">Event Schedule</h3>
               </div>
 
@@ -388,7 +397,7 @@ export default function EventForm({ initialData, mode }: EventFormProps) {
                 value={registration_close}
                 onChange={setRegistrationClose}
               />
-            </Card>
+            </div>
 
             {/* error toast */}
             {error && (
@@ -396,17 +405,41 @@ export default function EventForm({ initialData, mode }: EventFormProps) {
                 <span className="font-semibold text-[var(--error)]">{error}</span>
               </div>
             )}
+
+            <div className="mt-2 flex gap-3 justify-end shrink-0 z-10">
+                <Button
+                type="button"
+                variant="ghost"
+                onClick={() => onCancel ? onCancel() : router.push("/admin/events")}
+                >
+                Cancel
+                </Button>
+
+                <Button
+                type="submit"
+                variant="primary"
+                disabled={isLoading || uploadingBanner}
+                className="px-8"
+                >
+                {uploadingBanner
+                    ? "Uploading banner…"
+                    : isLoading
+                    ? mode === "create" ? "Creating..." : "Saving..."
+                    : mode === "create" ? "Create Event" : "Save Changes"
+                }
+                </Button>
+            </div>
           </div>
 
         </div>
       </div>
 
-      {/* sticky footer actions on mobile, standard footer flow on desktop */}
-      <div className="lg:static mt-2 flex gap-3 justify-end shrink-0 z-10">
+      {/* sticky footer actions on mobile, standard footer flow on desktop
+      <div className="mt-2 flex gap-3 justify-end shrink-0 z-10">
         <Button
           type="button"
           variant="ghost"
-          onClick={() => router.push("/admin/events")}
+          onClick={() => onCancel ? onCancel() : router.push("/admin/events")}
         >
           Cancel
         </Button>
@@ -424,7 +457,7 @@ export default function EventForm({ initialData, mode }: EventFormProps) {
               : mode === "create" ? "Create Event" : "Save Changes"
           }
         </Button>
-      </div>
+      </div> */}
 
     </form>
   );
