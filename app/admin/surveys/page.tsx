@@ -77,6 +77,14 @@ export default function SurveysPage() {
   const [surveys, setSurveys] = useState<SurveyFormData[]>([]);
   const [filtered, setFiltered] = useState<SurveyFormData[]>([]);
   const [search, setSearch] = useState(searchParams.get("search") || "");
+  const [prevUrlSearch, setPrevUrlSearch] = useState(searchParams.get("search") || "");
+
+  // Sync search state with URL parameter synchronously to avoid "previous search" flash
+  const urlSearch = searchParams.get("search") || "";
+  if (urlSearch !== prevUrlSearch) {
+    setPrevUrlSearch(urlSearch);
+    setSearch(urlSearch);
+  }
   const [isLoading, setIsLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [analyticsTarget, setAnalyticsTarget] = useState<SurveyFormData | null>(null);
@@ -116,12 +124,6 @@ export default function SurveysPage() {
   };
 
   useEffect(() => { getSurveys(); }, []);
-
-  // sync URL search param
-  useEffect(() => {
-    const s = searchParams.get("search");
-    if (s !== null) setSearch(s);
-  }, [searchParams]);
 
   // filter / sort
   useEffect(() => {

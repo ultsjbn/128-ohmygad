@@ -50,6 +50,15 @@ export default function SurveysListPage({ basePath }: SurveysListPageProps) {
 
   const [surveys, setSurveys] = useState<SurveyFormData[]>([]);
   const [search, setSearch] = useState(searchParams.get("search") || "");
+  const [prevUrlSearch, setPrevUrlSearch] = useState(searchParams.get("search") || "");
+
+  // Sync search state with URL parameter synchronously to avoid "previous search" flash
+  const urlSearch = searchParams.get("search") || "";
+  if (urlSearch !== prevUrlSearch) {
+    setPrevUrlSearch(urlSearch);
+    setSearch(urlSearch);
+  }
+
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [sort, setSort] = useState<SortState>({ field: "open_at", direction: "desc" });
@@ -93,11 +102,6 @@ export default function SurveysListPage({ basePath }: SurveysListPageProps) {
     }
     fetchData();
   }, []);
-
-  useEffect(() => {
-    const s = searchParams.get("search");
-    if (s !== null) setSearch(s);
-  }, [searchParams]);
 
   const sortSurveys = (items: SurveyFormData[], sortState: SortState): SurveyFormData[] => {
     const { field, direction } = sortState;

@@ -98,6 +98,15 @@ export default function EventsPage() {
   // useStates
   const [events, setEvents] = useState<EventFormData[]>([]);
   const [search, setSearch] = useState(searchParams.get("search") || "");
+  const [prevUrlSearch, setPrevUrlSearch] = useState(searchParams.get("search") || "");
+
+  // Sync search state with URL parameter synchronously to avoid "previous search" flash
+  const urlSearch = searchParams.get("search") || "";
+  if (urlSearch !== prevUrlSearch) {
+    setPrevUrlSearch(urlSearch);
+    setSearch(urlSearch);
+  }
+
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [sort, setSort] = useState<SortState>({ field: "start_date", direction: "desc" });
@@ -174,11 +183,9 @@ export default function EventsPage() {
     fetchData();
   }, []);
 
-  // sync the URL search param to the local search
   useEffect(() => {
-    const s = searchParams.get("search");
-    if (s !== null) setSearch(s);
-  }, [searchParams]);
+    fetchData();
+  }, []);
 
   // handle registrations
     const handleRegister = async (eventId: string, e?: React.MouseEvent) => {

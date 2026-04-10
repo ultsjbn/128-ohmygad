@@ -69,6 +69,7 @@ export default function FacultyProfilePage() {
     sex_at_birth: "", gender_identity: "", gso_attended: null,
   });
 
+  const [initialProfile, setInitialProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState<ToastState>(null);
@@ -99,9 +100,13 @@ export default function FacultyProfilePage() {
       if (error && error.code !== "PGRST116") throw error;
 
       if (data) {
-        setProfile({ ...data, email: user.email ?? data.email });
+        const p = { ...data, email: user.email ?? data.email };
+        setProfile(p);
+        setInitialProfile(p);
       } else {
-        setProfile((p) => ({ ...p, id: user.id, email: user.email ?? "" }));
+        const p = { ...profile, id: user.id, email: user.email ?? "" };
+        setProfile(p);
+        setInitialProfile(p);
       }
     } catch {
       setToast({ type: "error", message: "Failed to load profile." });
@@ -154,6 +159,7 @@ export default function FacultyProfilePage() {
         .upsert({ ...profile }, { onConflict: "id" });
 
       if (error) throw error;
+      setInitialProfile({ ...profile });
       setToast({ type: "success", message: "Profile saved successfully." });
     } catch {
       setToast({ type: "error", message: "Failed to save changes." });
@@ -165,6 +171,8 @@ export default function FacultyProfilePage() {
   const set = (field: keyof Profile) => (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => setProfile((p) => ({ ...p, [field]: e.target.value }));
+
+  const isChanged = initialProfile ? JSON.stringify(profile) !== JSON.stringify(initialProfile) : false;
 
   if (loading) {
     return (
@@ -327,7 +335,7 @@ export default function FacultyProfilePage() {
             <Button
               variant="primary"
               onClick={handleSave}
-              disabled={saving}
+              disabled={saving || !isChanged}
               className="px-8 w-full md:w-auto"
             >
               {saving ? "Saving…" : "Save changes"}
