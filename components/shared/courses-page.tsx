@@ -59,8 +59,6 @@ interface FilterState {
 
 const SORT_OPTIONS: { label: string; field: SortField }[] = [
   { label: "Title", field: "title" },
-  { label: "Semester", field: "semester" },
-  { label: "Status", field: "status" },
 ];
 
 const STATUS_VARIANT: Record<string, "success" | "warning" | "error" | "dark" | "pink"> = {
