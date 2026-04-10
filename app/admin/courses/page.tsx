@@ -200,7 +200,7 @@ export default function CoursesPage() {
       render: (course) => (
         <button
           className="text-left font-semibold hover:underline underline-offset-4 max-w-[200px] truncate block"
-          style={{ color: "var(--primary-dark)", fontSize: 13 }}
+          style={{ color: "var(--primary-dark)", fontSize: 14 }}
           onClick={() => setModalContent({ label: course.title, text: course.description })}
           title="Click to view description"
         >
@@ -214,6 +214,7 @@ export default function CoursesPage() {
   header: "Description",
   render: (course) => (
     <span 
+      style={{ color: "var(--primary-dark)", fontSize: 12 }}
       className="capitalize truncate block max-w-xs" 
       title={course.description}
     >
@@ -268,7 +269,14 @@ export default function CoursesPage() {
             containerStyle={{ flex: 1, minWidth: 220 }}
           />
 
-        
+          <Button 
+            variant="ghost" 
+            onClick={() => handleSort("title")}
+            className="flex items-center gap-2"
+          >
+            <SortIcon field="title" />
+            <span>Sort by Title</span>
+          </Button>
 
 
             <Button variant="primary" onClick={() => setCreateModalOpen(true)}>
