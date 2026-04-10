@@ -11,6 +11,7 @@ import Link from "next/link";
 import UserMenu from "@/components/user-menu";
 import { Button } from "./button";
 
+
 // navigation ------------------------------------------------
 const NAV_ITEMS = [
   { href: "/admin",         label: "Dashboard", icon: LayoutDashboard,          exact: true  },
@@ -37,46 +38,6 @@ function isActive(pathname: string, href: string, exact = false) {
   return exact ? pathname === href : pathname.startsWith(href);
 }
 
-// mobile nav ------------------------------------------------
-function AdminMobileNav() {
-  const pathname = usePathname();
-  return (
-    <nav
-      aria-label="Mobile navigation"
-      className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around md:hidden"
-      style={{
-        background: "var(--primary-dark)",
-        borderTop:  "1px solid rgba(255,255,255,0.10)",
-        padding:    "8px 4px",
-        boxShadow:  "0 -4px 24px rgba(45,42,74,0.18)",
-      }}
-    >
-      {NAV_ITEMS.map(({ href, label, icon: Icon, exact }) => {
-        const active = isActive(pathname, href, exact);
-        return (
-          <Link
-            key={href}
-            href={href}
-            className="relative flex flex-1 flex-col items-center gap-0.5 rounded-xl px-1 py-1.5 transition-all duration-200"
-            style={{ background: active ? "rgba(255,255,255,0.12)" : "transparent" }}
-          >
-            {active && (
-              <span
-                className="absolute left-1/2 top-0 h-0.5 w-6 -translate-x-1/2 rounded-b-full"
-                style={{ background: "var(--soft-pink)" }}
-              />
-            )}
-            <Icon size={22} style={{ color: active ? "white" : "rgba(255,255,255,0.45)" }} />
-            <span style={{ fontSize: 9, fontWeight: active ? 700 : 500, color: active ? "white" : "rgba(255,255,255,0.45)", lineHeight: 1, letterSpacing: "0.02em" }}>
-              {label}
-            </span>
-          </Link>
-        );
-      })}
-    </nav>
-  );
-}
-
 // shell ------------------------------------------------------------------------------------------------
 export default function AdminShell({ children }: { children: React.ReactNode }) {
   const router   = useRouter();
@@ -84,14 +45,9 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
 
   const [open, setOpen] = useState(true);
   const [logoHovered, setLogoHovered] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    const check = () => {
-      const mobile = window.innerWidth < 768;
-      setIsMobile(mobile);
-      if (mobile) setOpen(false);
-    };
+    const check = () => { if (window.innerWidth < 768) setOpen(false); };
     check();
     window.addEventListener("resize", check);
     return () => window.removeEventListener("resize", check);
@@ -106,16 +62,14 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
   return (
     <div className="flex h-screen w-full p-2 bg-[var(--primary-dark)]">
 
-      {isMobile && <AdminMobileNav />}
-
       {/* outer card that hugs sidebar + content */}
-      <div style={{ position: "relative", zIndex: 1, display: "flex", flex: 1, overflow: "hidden", borderRadius: "16px", background: "var(--primary-dark)" }}>
+      <div style={{ position: "relative", zIndex: 1, display: "flex", flex: 1, overflow: "hidden", background: "var(--primary-dark)" }}>
 
       <aside
         data-state={state}
         className={[
-          "group/sidebar relative z-10 flex-col shrink-0 hidden md:flex",
-          "bg-[var(--primary-dark)] overflow-hidden md:pr-2",
+          "group/sidebar relative z-10 flex-col shrink-0 flex",
+          "bg-[var(--primary-dark)] overflow-hidden pr-2",
           "w-[--sidebar-width] data-[state=collapsed]:w-[--sidebar-width-icon]",
           "transition-[width] duration-200 ease-linear"
         ].join(" ")}
@@ -257,19 +211,12 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
         {/* page header ------------------------------------------------ */}
         <header className="shrink-0 flex items-center justify-between gap-3 px-3 md:px-5 pb-0 h-[78px]" style={{ position: "relative", zIndex: 10 }}>
           <div className="flex items-center gap-2 min-w-0">
-            <div className="flex md:hidden items-center gap-2 shrink-0 mr-1">
-              <Image src="/kasarian-upb-logo.svg" alt="UPB Kasarian" width={36} height={36} />
-              <div className="flex flex-col justify-center">
-                <span className="caption">UP BAGUIO</span>
-                <span className="heading-sm uppercase">Kasarian</span>
-              </div>
-            </div>
             {!isDashboard && (
               <Button variant="icon" onClick={() => router.back()} aria-label="Go back">
                 <ArrowLeft size={16} />
               </Button>
             )}
-            <h1 className="heading-lg truncate hidden md:block">{pageLabel}</h1>
+            <h1 className="heading-lg truncate">{pageLabel}</h1>
           </div>
           <div className="flex items-center gap-2 shrink-0">
             <UserMenu />
