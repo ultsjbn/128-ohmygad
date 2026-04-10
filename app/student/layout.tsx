@@ -27,7 +27,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
     <div className="flex h-screen w-full p-2 bg-[var(--primary-dark)]">
 
       {/* outer card that hugs sidebar + content */}
-      <div className="bg-[var(--primary-dark)]" style={{ position:'relative', zIndex:1, display:'flex', flex:1, overflow:'hidden' }}>
+      <div className="bg-[var(--primary-dark)]" style={{ position:'relative', zIndex:1, display:'flex', flex:1, overflow:'hidden', borderRadius:'16px' }}>
         <StudentSidebar />
 
         <div style={{ position:'relative', display:'flex', flexDirection:'column', flex:1, minWidth:0, overflow:'hidden', background:'linear-gradient(145deg,#f5f3ff 0%,#fce8ee 35%,#f0eefd 65%,#faf8ff 100%)' }}>

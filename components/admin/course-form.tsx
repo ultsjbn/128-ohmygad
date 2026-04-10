@@ -3,8 +3,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { submitFormData } from "@/lib/form-submit.utils";
-import { AlignLeft, Type } from "lucide-react";
+import { MapPin, Users, AlignLeft, Type } from "lucide-react";
 import { Card, Input, Select, Button, DateTimePicker } from "@/components/ui"; 
+import { ST } from "next/dist/shared/lib/utils";
 
 export type CourseFormData = {
   id?: string;
@@ -41,6 +42,13 @@ export default function CourseForm({ initialData, mode }: CourseFormProps) {
 
   const [title, setTitle] = useState(initialData?.title ?? "");
   const [description, setDescription] = useState(initialData?.description ?? "");
+  
+  const [banner_url, setBannerUrl] = useState(initialData?.banner_url ?? "");
+  const [bannerFile, setBannerFile] = useState<File | null>(null);
+  const [bannerPreview, setBannerPreview] = useState(initialData?.banner_url ?? "");
+  const [uploadingBanner, setUploadingBanner] = useState(false);
+
+
 
   const parseTime = (value?: string) => {
     if (!value) return "";

@@ -101,55 +101,52 @@ export default function GlobalSearch({ role, placeholder = "Search events, users
       />
 
       {open && query.trim().length >= 2 && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-[var(--radius-lg)] shadow-[var(--shadow-float)] border border-black/[0.05] z-[100] overflow-hidden flex flex-col max-h-[85vh]">
-          {/* Results Area */}
+        <div style={{
+          position: "absolute",
+          top: "100%",
+          left: 0,
+          right: 0,
+          marginTop: 8,
+          background: "#fff",
+          borderRadius: 12,
+          boxShadow: "0 8px 30px rgba(0,0,0,0.12)",
+          border: "1px solid rgba(45,42,74,0.08)",
+          zIndex: 100,
+          overflow: "hidden",
+          display: "flex",
+          flexDirection: "column",
+          maxHeight: 400,
+        }}>
           {loading ? (
             <div style={{ padding: 16, display: "flex", alignItems: "center", justifyItems: "center", justifyContent: "center", gap: 8, color: "var(--gray)", fontSize: 13 }}>
               <Loader2 size={16} className="animate-spin" /> Searching...
             </div>
           ) : results.length > 0 ? (
-            <div style={{ overflowY: "auto", flex: 1, paddingBottom: 8 }}>
-              {AVAILABLE_CATEGORIES.map(c => {
-                const catResults = results.filter(r => r.type === c.type);
-                if (catResults.length === 0) return null;
-
-                return (
-                  <div key={c.id} className="border-b border-black/[0.05] last:border-0 pb-2">
-                    <div className="px-4 py-3 flex items-center justify-between border-b border-black/[0.02]">
-                      <span className="text-[14px] font-bold text-[var(--primary-dark)]">{c.id}</span>
-                      <span className="bg-[var(--lavender)] text-[var(--primary-dark)] px-2 py-0.5 rounded-full text-[11px] font-semibold">{catResults.length}</span>
-                    </div>
-                    <div className="flex flex-col">
-                      {catResults.slice(0, 3).map(r => (
-                        <div
-                          key={r.id + r.type}
-                          onClick={() => handleSelect(r)}
-                          className="px-4 py-2.5 flex items-center justify-between hover:bg-[var(--cream)] cursor-pointer group transition-colors"
-                        >
-                          <span className="text-[14px] text-[var(--primary-dark)] font-medium truncate group-hover:underline">{r.title}</span>
-                          <span className="opacity-0 group-hover:opacity-100 transition-opacity text-[var(--gray)]"><ExternalLink size={14} /></span>
-                        </div>
-                      ))}
-                    </div>
-                    {catResults.length >= 4 && (
-                      <div className="px-4 pt-1">
-                        <button
-                          onClick={() => {
-                            setOpen(false);
-                            if (c.id === "Guidelines") router.push(`/${role}/courses?search=${encodeURIComponent(query)}`);
-                            else if (c.id === "Events") router.push(`/${role}/events?search=${encodeURIComponent(query)}`);
-                            else if (c.id === "Users") router.push(`/admin/users?search=${encodeURIComponent(query)}`);
-                            else if (c.id === "Surveys") router.push(`/${role}/surveys?search=${encodeURIComponent(query)}`);
-                          }}
-                          className="text-[13px] font-semibold text-blue-600 hover:text-blue-700 hover:underline bg-transparent border-none cursor-pointer flex items-center gap-1 mt-1 transition-colors"
-                        >
-                          See all {c.id} results <ExternalLink size={12} />
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
+            <div style={{ padding: "8px 0", overflowY: "auto" }}>
+              {results.map(r => (
+                <div
+                  key={r.id + r.type}
+                  onClick={() => handleSelect(r)}
+                  className="global-search-item"
+                  style={{
+                    padding: "10px 16px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    cursor: "pointer",
+                    transition: "background 0.2s"
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(45,42,74,0.04)")}
+                  onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                >
+                  <span style={{ fontSize: 14, color: "var(--primary-dark)", fontWeight: 500, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "70%" }}>
+                    {r.title}
+                  </span>
+                  <Badge variant={r.type === "User" ? "pink" : r.type === "Course" ? "periwinkle" : r.type === "Survey" ? "pink" : "dark"}>
+                    {r.type}
+                  </Badge>
+                </div>
+              ))}
             </div>
           ) : (
             <div style={{ padding: 16, textAlign: "center", color: "var(--gray)", fontSize: 13 }}>
