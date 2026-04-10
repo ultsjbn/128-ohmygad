@@ -178,7 +178,7 @@ export default function CoursesPage() {
     <div className="flex flex-col gap-6">
       {/* Header */}
       <div className="hidden md:block">
-        <h1 className="heading-lg">Course Catalog</h1>
+        <h1 className="heading-lg">Rules and Guidelines</h1>
       </div>
 
       {/* Toolbar */}
@@ -207,60 +207,11 @@ export default function CoursesPage() {
             </Dropdown>
 
             {/* Filter Dropdown */}
-            <Dropdown trigger={
-              <Button variant={totalActiveFilters > 0 ? "pink" : "ghost"}>
-                <SlidersHorizontal size={15} />
-                <span className="hidden md:inline ml-2">Filter</span>
-                {totalActiveFilters > 0 && (
-                  <span className="ml-2 bg-white text-pink-600 px-1.5 rounded-full text-[10px] font-bold">
-                    {totalActiveFilters}
-                  </span>
-                )}
-              </Button>
-            }>
-              {/* Status Section */}
-              <div className="px-3 py-2 font-bold text-xs uppercase opacity-50">Status</div>
-              {statuses.map(s => (
-                <CheckItem 
-                  key={s} 
-                  label={s} 
-                  active={filters.status.has(s)} 
-                  onToggle={() => toggleFilter("status", s)} 
-                />
-              ))}
 
-              <DropdownDivider />
-
-              {/* Semester Section */}
-              <div className="px-3 py-2 font-bold text-xs uppercase opacity-50">Semester</div>
-              {semesters.map(sem => (
-                <CheckItem 
-                  key={sem} 
-                  label={sem} 
-                  active={filters.semester.has(sem)} 
-                  onToggle={() => toggleFilter("semester", sem)} 
-                />
-              ))}
-
-              <DropdownDivider />
-              <DropdownItem 
-                className="text-red-500"
-                onClick={() => {
-                  setFilters({ status: new Set(), semester: new Set() });
-                  setActiveSemesterChip("All Semesters");
-                }}
-              >
-                Reset All Filters
-              </DropdownItem>
-            </Dropdown>
           </div>
         </div>
 
-        <FilterChips 
-          chips={["All Semesters", ...semesters]} 
-          defaultActive={activeSemesterChip} 
-          onChange={handleSemesterChip} 
-        />
+
       </div>
 
       {/* Grid */}
@@ -270,7 +221,7 @@ export default function CoursesPage() {
         </Card>
       ) : filteredAndSorted.length === 0 ? (
         <Card className="py-20 text-center text-gray-500">
-          <p>No courses found matching your criteria.</p>
+          <p>No Guidelines found matching your criteria.</p>
           <Button 
             variant="ghost" 
             className="mt-4 text-xs underline"
@@ -317,7 +268,7 @@ export default function CoursesPage() {
             <div className="flex items-center gap-1 caption sm:text-sm text-[var(--gray)]"><Calendar size={14}/> {detailCourse.days || "TBA"}</div>
             <div className="divider" />
             <div className="space-y-3">
-              <p className="label">Course Description</p>
+              <p className="label">Description</p>
               <p className="body text-gray-600">{detailCourse.description || "No description provided."}</p>
             </div>
             
@@ -380,7 +331,7 @@ export default function CoursesPage() {
 
             {/* full description */}
             <div className="flex flex-col gap-2 pb-2">
-              <p className="label">ABOUT THIS COURSE</p>
+              <p className="label">Click to Open</p>
               <p className="body whitespace-pre-wrap">{detailCourse.description || "No description provided."}</p>
             </div>
           </div>{/* end body */}
