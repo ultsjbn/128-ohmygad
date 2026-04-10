@@ -77,6 +77,7 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
   const [gsoFilters, setGsoFilters] = useState<Set<string>>(new Set());
   const [activeChip, setActiveChip] = useState("All");
 
+  const [createModalOpen, setCreateModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editUser, setEditUser] = useState<any>(null);
   const [editLoading, setEditLoading] = useState(false);
@@ -285,7 +286,7 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
   ];
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6 py-2">
       {/* toolbar */}
       <div className="flex flex-col gap-3">
         <div className="flex items-center gap-3 flex-wrap">
@@ -323,7 +324,7 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
                 <SlidersHorizontal size={15} /> Filter
                 {hasActiveFilters && (
                   <span
-                    className="inline-flex items-center justify-center w-4 h-4 rounded-full text-[10px] font-bold text-white"
+                    className="inline-flex items-center justify-center w-2 h-2 rounded-full text-[10px] font-bold text-white"
                     style={{ background: "var(--primary-dark)", marginLeft: 2 }}
                   >
                     {activeFilterCount}
@@ -365,7 +366,7 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
             </DropdownItem>
           </Dropdown>
 
-          <Button variant="primary" onClick={() => router.push("/admin/users/create")}>
+          <Button variant="primary" onClick={() => setCreateModalOpen(true)}>
             <UserPlus size={16} /> Add User
           </Button>
         </div>
@@ -382,14 +383,14 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
           <span className="caption">Active filters:</span>
 
           {[...roleFilters].map((r) => (
-            <Badge key={r} variant="pink" dot>
+            <Badge key={r} variant="pink">
               <span className="capitalize">{r}</span>
               <button onClick={() => { toggleRole(r); setActiveChip("All"); }} style={{ marginLeft: 6 }}>×</button>
             </Badge>
           ))}
 
           {[...gsoFilters].map((g) => (
-            <Badge key={g} variant="warning" dot>
+            <Badge key={g} variant="warning">
               <span className="capitalize">{g === "attended" ? "Attended" : "Pending"}</span>
               <button onClick={() => toggleGso(g)} style={{ marginLeft: 6 }}>×</button>
             </Badge>
@@ -440,6 +441,20 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
           />
         </div>
       )}
+
+      {/* create modal */}
+      <Modal
+        open={createModalOpen}
+        onClose={() => setCreateModalOpen(false)}
+        title="Add User"
+      >
+        <UserForm
+          onSuccess={() => {
+            setCreateModalOpen(false);
+            router.refresh();
+          }}
+        />
+      </Modal>
 
       {/* edit modal */}
       <Modal

@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Plus, ArrowUpDown, SlidersHorizontal, Pencil, Trash2, Loader2, ChevronUp, ChevronDown, Copy, Check, Users, AlignLeft, ClipboardCheck, MapPin, Clock } from "lucide-react";
-import type { EventFormData } from "@/components/admin/event-form";
+import EventForm, { type EventFormData } from "@/components/admin/event-form";
 import { paginate, totalPages, PER_PAGE } from "@/lib/pagination.utils";
 import { Pagination } from "@/components/pagination";
 
@@ -123,7 +123,6 @@ function AttendanceCheckbox({
 }
 
 export default function EventsPage() {
-  const router = useRouter();
   const searchParams = useSearchParams();
 
   const [events, setEvents] = useState<EventFormData[]>([]);
@@ -140,6 +139,9 @@ export default function EventsPage() {
   
   const [page, setPage] = useState(1);
   
+  const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [editTarget, setEditTarget] = useState<EventFormData | null>(null);
+
   // for the delete confirmation modal
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; title: string } | null>(null);
 
@@ -453,7 +455,7 @@ export default function EventsPage() {
           <Button
             variant="icon"
             title="Edit event"
-            onClick={() => router.push(`/admin/events/${event.id}/edit`)}
+            onClick={() => setEditTarget(event)}
           >
             <Pencil size={14} />
           </Button>
@@ -494,7 +496,7 @@ export default function EventsPage() {
   );
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6 py-2">
 
       {/* toolbar */}
       <div className="flex flex-col gap-3">
@@ -532,11 +534,11 @@ export default function EventsPage() {
           {/* Filter dropdown */}
           <Dropdown
             trigger={
-            <Button variant={hasActiveFilters ? "pink" : "ghost"}>
+            <Button type="button" variant={hasActiveFilters ? "pink" : "ghost"}>
               <SlidersHorizontal size={15} /> Filter
               {hasActiveFilters && (
                   <span
-                    className="inline-flex items-center justify-center w-4 h-4 rounded-full text-[10px] font-bold text-white"
+                    className="inline-flex items-center justify-center w-2 h-2 rounded-full text-[10px] font-bold text-white"
                     style={{ background: "var(--primary-dark)", marginLeft: 2 }}
                   >
                   {activeFilterCount}
@@ -578,7 +580,7 @@ export default function EventsPage() {
             </DropdownItem>
           </Dropdown>
 
-          <Button variant="primary" onClick={() => router.push("/admin/events/create")}>
+          <Button variant="primary" onClick={() => setCreateModalOpen(true)}>
             <Plus size={16} /> Add Event
           </Button>
         </div>
@@ -666,6 +668,39 @@ export default function EventsPage() {
           />
         </div>
       )}
+
+      {/* create modal */}
+      <Modal
+        open={createModalOpen}
+        onClose={() => setCreateModalOpen(false)}
+        title="Add Event"
+        modalStyle={{ maxWidth: 900 }}
+      >
+        <EventForm
+          mode="create"
+          onSuccess={() => { setCreateModalOpen(false); getEvents(); }}
+          onCancel={() => setCreateModalOpen(false)}
+        />
+      </Modal>
+
+      {/* edit modal */}
+      <Modal
+        open={!!editTarget}
+        onClose={() => setEditTarget(null)}
+        title="Edit Event"
+        subtitle={editTarget?.title}
+        modalStyle={{ maxWidth: 900 }}
+      >
+        {editTarget && (
+          <EventForm
+            key={editTarget.id}
+            mode="edit"
+            initialData={editTarget}
+            onSuccess={() => { setEditTarget(null); getEvents(); }}
+            onCancel={() => setEditTarget(null)}
+          />
+        )}
+      </Modal>
 
       {/* Event detail modal */}
       <Modal open={!!detailEvent} onClose={() => setDetailEvent(null)} title={detailEvent?.title} modalClassName="!max-w-xl !h-[50vh] items-center">
