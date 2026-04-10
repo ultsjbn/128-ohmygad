@@ -233,10 +233,10 @@ export default function DashboardPage() {
                             <Calendar size={16} /> New Event
                         </Button>
                         <Button variant="soft" className="w-full justify-between" onClick={() => setActiveModal("user")}>
-                            <Users size={16} /> Create User
+                            <Users size={16} /> New User
                         </Button>
                         <Button variant="soft" className="w-full justify-between" onClick={() => setActiveModal("course")}>
-                            <BookOpen size={16} /> Add Guideline
+                            <BookOpen size={16} /> New Guideline
                         </Button>
                         <Button variant="soft" className="w-full justify-between" onClick={() => setActiveModal("survey")}>
                             <ClipboardList size={16} /> New Survey

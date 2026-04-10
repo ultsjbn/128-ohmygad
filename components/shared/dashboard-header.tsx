@@ -25,25 +25,37 @@ export default function DashboardHeader({ basePath, pageLabels }: DashboardHeade
   const pageLabel   = pageLabels[activeId] ?? activeId.charAt(0).toUpperCase() + activeId.slice(1);
 
   return (
-    <header className="shrink-0 flex items-center justify-between gap-3 px-3 md:px-5 pt-0.5 pb-0 h-[78px]">
-      <div className="flex items-center gap-2 min-w-0">
-        <div className="flex md:hidden items-center gap-2 shrink-0">
-          <Image src="/kasarian-upb-logo.svg" alt="UPB Kasarian" width={45} height={45} />
-          <div className="flex flex-col justify-center">
-            <span className="caption">UP BAGUIO</span>
-            <span className="heading-sm uppercase">Kasarian</span>
+    <header className="shrink-0 flex flex-col md:flex-row md:items-center md:justify-between gap-0 md:gap-3 px-3 md:px-5 pt-1 pb-0 md:h-[78px]">
+      {/* row 1: logo (mobile) + title (desktop) on left, UserMenu on right */}
+      <div className="flex items-center justify-between md:flex-1 min-w-0">
+        <div className="flex items-center gap-2 min-w-0">
+          <div className="flex md:hidden items-center gap-1.5 shrink-0">
+            <Image src="/kasarian-upb-logo.svg" alt="UPB Kasarian" width={38} height={38} />
+            <div className="flex flex-col justify-center">
+              <span className="caption">UP BAGUIO</span>
+              <span className="heading-sm uppercase">Kasarian</span>
+            </div>
           </div>
+          {!isDashboard && (
+            <div className="hidden md:flex">
+              <Button variant="icon" onClick={() => router.back()} aria-label="Go back">
+                <ArrowLeft size={16} />
+              </Button>
+            </div>
+          )}
+          <h1 className="heading-lg truncate hidden md:block">{pageLabel}</h1>
         </div>
-        {!isDashboard && (
-          <Button variant="icon" onClick={() => router.back()} aria-label="Go back">
-            <ArrowLeft size={16} />
-          </Button>
-        )}
-        <h1 className="heading-lg truncate hidden md:block">{pageLabel}</h1>
+        <div className="flex items-center gap-2 shrink-0">
+          <UserMenu />
+        </div>
       </div>
-      <div className="flex items-center gap-2 shrink-0">
-        <UserMenu />
-      </div>
+
+      {/* row 2 (mobile only): page title for non-dashboard pages */}
+      {!isDashboard && (
+        <div className="flex md:hidden items-center gap-1.5 my-2">
+          <h1 className="heading-md">{pageLabel}</h1>
+        </div>
+      )}
     </header>
   );
 }

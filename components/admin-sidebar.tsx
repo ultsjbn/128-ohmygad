@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import {
   Home, Calendar, Users, BookOpen, ClipboardList,
-  LogOut, PanelLeftClose, PanelLeftOpen,
+  PanelLeftClose, PanelLeftOpen,
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -62,7 +62,6 @@ function AdminMobileNav() {
 
 export default function AdminSidebar() {
   const pathname = usePathname();
-  const router   = useRouter();
 
   const [open,        setOpen]        = useState(true);
   const [logoHovered, setLogoHovered] = useState(false);
@@ -207,32 +206,6 @@ export default function AdminSidebar() {
           })}
         </nav>
 
-        {/* Logout ------------------------------------------------ */}
-        <div className="shrink-0 flex flex-col gap-[2px] px-2 pb-2 pt-2 border-t border-white/[0.07]">
-          <button
-            onClick={() => router.push("/auth/login")}
-            title={!open ? "Log out" : undefined}
-            className={[
-              "flex items-center w-full h-[38px] rounded-[10px]",
-              "cursor-pointer border-none bg-transparent",
-              "font-[var(--font-body)] text-[13px] text-white/35 hover:text-white/70 hover:bg-white/[0.06]",
-              "justify-start pl-[10px] group-data-[state=collapsed]/sidebar:justify-center group-data-[state=collapsed]/sidebar:pl-0",
-              "transition-[padding,justify-content,background-color,color] duration-200 ease-linear",
-            ].join(" ")}
-          >
-            <LogOut size={17} className="shrink-0" />
-            <span
-              className={[
-                "overflow-hidden shrink-0",
-                "w-[140px] opacity-100",
-                "group-data-[state=collapsed]/sidebar:w-0 group-data-[state=collapsed]/sidebar:opacity-0",
-                "transition-[width,opacity] duration-200 ease-linear",
-              ].join(" ")}
-            >
-              <span className="block truncate pl-[10px] whitespace-nowrap">Log out</span>
-            </span>
-          </button>
-        </div>
       </aside>
     </div>
   );
