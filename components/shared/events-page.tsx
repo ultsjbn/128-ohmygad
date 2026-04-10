@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { SlidersHorizontal, Loader2, CalendarDays, MapPin, Users, Clock, X, ArrowUpDown } from "lucide-react";
+import { SlidersHorizontal, Loader2, CalendarDays, MapPin, Users, Clock, X, ArrowUpDown, ClipboardList } from "lucide-react";
 import type { EventFormData } from "@/components/admin/event-form";
 import ScrollToTop from "@/components/ui/scroll-to-top";
 import { Toast, ProgressBar } from "@/components/ui";
@@ -595,12 +595,12 @@ export default function EventsPage() {
                 {/* ---------- registration ---------- */}
                 {(detailEvent.registration_open || detailEvent.registration_close) && (
                   <div className="flex items-center gap-3 caption sm:text-sm text-[var(--gray)]">
-                    <Clock size={15} className="shrink-0" />
+                    <ClipboardList size={15} className="shrink-0" />
                     <span>
                       Registration:&nbsp;
-                      {detailEvent.registration_open ? new Date(detailEvent.registration_open).toLocaleDateString("en-PH", { month: "short", day: "numeric" }) : "?"}
-                      &nbsp;–&nbsp;
-                      {detailEvent.registration_close ? new Date(detailEvent.registration_close).toLocaleDateString("en-PH", { month: "short", day: "numeric" }) : "?"}
+                      {detailEvent.registration_open ? new Date(detailEvent.registration_open).toLocaleDateString("en-PH", { month: "long", day: "numeric" }) : "?"}
+                      &nbsp;—&nbsp;
+                      {detailEvent.registration_close ? new Date(detailEvent.registration_close).toLocaleDateString("en-PH", { month: "long", day: "numeric" }) : "?"}
                     </span>
                   </div>
                 )}
