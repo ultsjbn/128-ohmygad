@@ -11,7 +11,6 @@ import { Pagination } from "@/components/pagination";
 import {
   Button,
   Badge,
-  FilterChips,
   SearchBar,
   Card,
   DataTable,
@@ -587,12 +586,6 @@ export default function EventsPage() {
           </Button>
         </div>
 
-        {/* category filter chips - single select */}
-        <FilterChips
-          chips={["All", ...CATEGORIES]}
-          defaultActive={activeChip}
-          onChange={handleChipChange}
-        />
       </div>
 
       {/* active filter pills */}
@@ -604,13 +597,6 @@ export default function EventsPage() {
             <Badge key={s} variant="warning" dot>
               <span className="capitalize">{s}</span>
               <button onClick={() => toggleStatus(s)} style={{ marginLeft: 6 }}>×</button>
-            </Badge>
-          ))}
-
-          {[...categoryFilters].map((c) => (
-            <Badge key={c} variant="pink" dot>
-              {c}
-              <button onClick={() => { toggleCategory(c); setActiveChip("All"); }} style={{ marginLeft: 6 }}>×</button>
             </Badge>
           ))}
 
