@@ -1,35 +1,29 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { useRouter } from "next/navigation";
 import {
   Users, Calendar, UserCheck, ClipboardList, BookOpen,
 } from "lucide-react";
 import {
   Card, StatCard, Button, MiniCalendar, TodayTimeline, DateRangePicker,
-  DashboardFilter, EMPTY_FILTERS,
+  DashboardFilter, EMPTY_FILTERS, Modal,
 } from "@/components/ui";
 import type { DateRange, DashboardFilters } from "@/components/ui";
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Legend, BarChart, Bar,
-  Label,
 } from "recharts";
 import { useDashboardData } from "./hooks/use-dashboard-data";
 import GlobalSearch from "@/components/global-search";
+import EventForm from "@/components/admin/event-form";
+import UserForm from "@/components/admin/user-form";
+import CourseForm from "@/components/admin/course-form";
+import SurveyForm, { type SurveyQuestion } from "@/components/admin/survey-form";
 
 // constants ------------------------------------------------
 const BRAND_COLORS = ["#B8B5E8", "#F4A7B9", "#6DC5A0", "#F4C97A", "#9B9BB4", "#2D2A4A"];
 const AXIS_COLOR   = "rgba(45,42,74,0.10)";
 const TICK_COLOR   = "rgba(45,42,74,0.45)";
-
-// quick actions ------------------------------------------------
-const QUICK_ACTIONS = [
-  { icon: <Calendar size={16} />, label: "New Event",   href: "/admin/events/create"  },
-  { icon: <Users size={16} />, label: "Create User", href: "/admin/users/create"   },
-  { icon: <BookOpen size={16} />, label: "Add Guideline",  href: "/admin/courses/create" },
-  { icon: <ClipboardList size={16} />, label: "New Survey",  href: "/admin/surveys/create" },
-];
 
 // tooltip ------------------------------------------------
 interface TooltipEntry { color?: string; payload?: { fill?: string }; name?: string; dataKey?: string; value?: number | string; }
@@ -69,15 +63,18 @@ const DUMMY_ATTENDANCE = [
 
 // ------------------------------------------------ DASHBOARD PAGE ------------------------------------------------
 export default function DashboardPage() {
-    const router = useRouter();
     const [attendanceRange, setAttendanceRange] = useState<DateRange>(() => {
         const now   = new Date();
-        const start = new Date(now.getFullYear(), now.getMonth(), 1);
-        const end   = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-        const iso   = (d: Date) => d.toISOString().split("T")[0];
-        return { from: iso(start), to: iso(end) };
+        const start = new Date(now); start.setDate(start.getDate() - 7);
+        const iso   = (d: Date) => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+        return { from: iso(start), to: iso(now) };
     });
     const [filters, setFilters] = useState<DashboardFilters>(EMPTY_FILTERS);
+
+    // quick action modals
+    const [activeModal, setActiveModal]             = useState<"event" | "user" | "course" | "survey" | null>(null);
+    const [editSurveyQuestions, setEditSurveyQuestions] = useState<SurveyQuestion[]>([]);
+    const closeModal = () => { setActiveModal(null); setEditSurveyQuestions([]); };
 
     const {
         eventAttendanceData,
@@ -161,7 +158,7 @@ export default function DashboardPage() {
             <div className="grid grid-cols-1 xl:grid-cols-[1fr_280px] gap-4">
 
                 {/* attendance over time */}
-                <Card variant="no-hover" className="flex flex-col p-5 min-h-[320px]">
+                <Card variant="no-hover" className="flex flex-col p-4 min-h-[320px]">
                     <div className="flex flex-wrap items-start justify-between gap-3 mb-4 shrink-0">
                         <div>
                             <h2 className="heading-md">Attendance Over Time</h2>
@@ -177,8 +174,9 @@ export default function DashboardPage() {
                         )}
                         <ResponsiveContainer width="100%" height="100%">
                             <LineChart
-                                data={DUMMY_ATTENDANCE}
-                                margin={{ top: 0, right: 5, left: 10, bottom: 25 }}
+                                responsive
+                                data={eventAttendanceData ?? DUMMY_ATTENDANCE}
+                                margin={{ top: 10, right: 5, left: 10, bottom: 25 }}
                             >
                                 <CartesianGrid strokeDasharray="3 3" stroke={AXIS_COLOR} vertical={false} />
                                 <XAxis
@@ -226,22 +224,23 @@ export default function DashboardPage() {
                 </Card>
 
               {/* quick actions */}
-                <Card variant="no-hover" className="flex flex-col p-5 gap-3">
+                <Card variant="no-hover" className="flex flex-col justify-around p-4 gap-3">
                     <div>
                         <h2 className="heading-sm">Quick Actions</h2>
                     </div>
                     <div className="flex flex-col gap-2">
-                    {QUICK_ACTIONS.map((action) => (
-                        <Button
-                            key={action.label}
-                            variant="soft"
-                            onClick={() => router.push(action.href)}
-                            className="w-full justify-between"
-                        >
-                            {action.icon}
-                            {action.label}
+                        <Button variant="soft" className="w-full justify-between" onClick={() => setActiveModal("event")}>
+                            <Calendar size={16} /> New Event
                         </Button>
-                    ))}
+                        <Button variant="soft" className="w-full justify-between" onClick={() => setActiveModal("user")}>
+                            <Users size={16} /> Create User
+                        </Button>
+                        <Button variant="soft" className="w-full justify-between" onClick={() => setActiveModal("course")}>
+                            <BookOpen size={16} /> Add Guideline
+                        </Button>
+                        <Button variant="soft" className="w-full justify-between" onClick={() => setActiveModal("survey")}>
+                            <ClipboardList size={16} /> New Survey
+                        </Button>
                     </div>
                 </Card>
             </div>
@@ -282,7 +281,7 @@ export default function DashboardPage() {
 
                     {/* sex at birth */}
                     <Card variant="no-hover" className="flex flex-col p-5 min-h-[260px]">
-                        <h2 className="heading-md mb-0.5">Sex at Birth</h2>
+                        <h2 className="heading-md mb-0.5">Users Sex at Birth</h2>
                         <div className="flex-1 w-full min-h-[190px] cursor-default select-none">
                             <ResponsiveContainer width="100%" height="100%">
                                 <PieChart>
@@ -312,7 +311,7 @@ export default function DashboardPage() {
 
                     {/* gender identity */}
                     <Card variant="no-hover" className="flex flex-col p-5 min-h-[260px]">
-                        <h2 className="heading-md mb-0.5">Gender Identity</h2>
+                        <h2 className="heading-md mb-0.5">Users Gender Identity</h2>
                         <div className="flex-1 w-full min-h-[190px] cursor-default select-none">
                             <ResponsiveContainer width="100%" height="100%">
                                 <PieChart>
@@ -373,6 +372,22 @@ export default function DashboardPage() {
             </Card>
         </aside>
 
+        {/* quick action modals */}
+        <Modal open={activeModal === "event"} onClose={closeModal} title="New Event" modalStyle={{ maxWidth: 900 }}>
+            <EventForm mode="create" onSuccess={closeModal} onCancel={closeModal} />
+        </Modal>
+
+        <Modal open={activeModal === "user"} onClose={closeModal} title="Add User">
+            <UserForm onSuccess={closeModal} />
+        </Modal>
+
+        <Modal open={activeModal === "course"} onClose={closeModal} title="Add Guideline" modalStyle={{ maxWidth: 860 }}>
+            <CourseForm mode="create" onSuccess={closeModal} onCancel={closeModal} />
+        </Modal>
+
+        <Modal open={activeModal === "survey"} onClose={closeModal} title="New Survey" modalStyle={{ maxWidth: 780 }}>
+            <SurveyForm mode="create" onSuccess={closeModal} onCancel={closeModal} />
+        </Modal>
         </div>
     );
 }
