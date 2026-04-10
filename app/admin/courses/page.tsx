@@ -36,7 +36,7 @@ function formatTime(time?: string) {
 // constants 
 const SEMESTERS = ["1st Semester", "2nd Semester", "Mid-Year"];
 const STATUSES = ["open", "closed"];
-const SORT_FIELDS = ["title", "semester", "status"] as const;
+const SORT_FIELDS = ["title"] as const;
 
 type SortField = typeof SORT_FIELDS[number];
 type SortDirection = "asc" | "desc";
@@ -249,38 +249,17 @@ export default function CoursesPage() {
       ),
     },
 
+
     {
-      key: "status",
-      header: "Status",
+      key: "description",
+      header: "Description",
       render: (course) => (
-        <Badge variant={STATUS_VARIANT[course.status ?? ""] ?? "dark"}>
-          <span className="capitalize">{course.status}</span>
-        </Badge>
+        <span className="text-sm text-[var(--primary-dark)] opacity-90 max-w-[300px] truncate block">
+          {course.description || "—"}
+        </span>
       ),
     },
 
-    {
-    key: "schedule",
-    header: "Schedule",
-    render: (course) => {
-        const start = formatTime(course.start_time)
-        const end = formatTime(course.end_time)
-
-        return (
-        <div className="flex flex-col leading-tight">
-            <span className="caption text-[12px] opacity-80">
-            {course.days || "—"}
-            </span>
-
-            <span className="caption whitespace-nowrap">
-            {start !== "—" && end !== "—"
-                ? `${start} – ${end}`
-                : "—"}
-            </span>
-        </div>
-        )
-    },
-    },
 
     {
       key: "actions",
@@ -320,21 +299,38 @@ export default function CoursesPage() {
         <div className="flex items-center gap-3 flex-wrap">
 
           <SearchBar
-            placeholder="Search by Title"
+            placeholder="Search by title"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             containerStyle={{ flex: 1, minWidth: 220 }}
           />
 
-        
-
+          {/* sort multi-field */}
+          <Dropdown
+            trigger={
+              <Button variant="ghost">
+                <ArrowUpDown size={15} /> Sort
+              </Button>
+            }
+          >
+            {SORT_FIELDS.map((field) => (
+              <DropdownItem key={field} onClick={() => handleSort(field)}>
+                <span className="flex items-center justify-between gap-6 w-full">
+                  <span className="capitalize">{field === "start_time" ? "Time" : field}</span>
+                  <SortIcon field={field} />
+                </span>
+              </DropdownItem>
+            ))}
+            <DropdownDivider />
+            <DropdownItem onClick={() => { setSort({ field: "start_time", direction: "desc" }); setPage(1); }}>
+              Reset sort
+            </DropdownItem>
+          </Dropdown>
 
             <Button variant="primary" onClick={() => router.push("/admin/courses/create")}>
                 <Plus size={16} /> Add Guideline
             </Button>
         </div>
-
-     
       </div>
 
       {/*  active filter pills  */}
