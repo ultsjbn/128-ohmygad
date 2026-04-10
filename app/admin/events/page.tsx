@@ -29,19 +29,19 @@ const STATUSES = ["upcoming", "past"];
 const SORT_FIELDS = ["title", "category", "status", "start_date"] as const;
 
 type SortField = typeof SORT_FIELDS[number];
-type BadgeVariant = "pink" | "periwinkle" | "dark" | "success" | "warning" | "error";
+type BadgeVariant = "pink-light" | "periwinkle" | "dark" | "success" | "warning" | "error";
 
 const CATEGORY_VARIANT: Record<string, BadgeVariant> = {
-  Orientation: "pink",
+  Orientation: "pink-light",
   Forum: "periwinkle",
-  Research: "dark",
+  Research: "error",
   Training: "success",
   Workshop: "warning",
 };
 
 const STATUS_VARIANT: Record<string, BadgeVariant> = {
-  upcoming: "periwinkle",
-  past: "dark",
+  upcoming: "pink-light",
+  past: "periwinkle",
 };
 
 type RegisteredUser = {

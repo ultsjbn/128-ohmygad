@@ -2,7 +2,7 @@
 import { useState } from "react";
 
 // Badge
-type BadgeVariant = "pink" | "periwinkle" | "dark" | "success" | "warning" | "error";
+type BadgeVariant = "pink-light" | "periwinkle" | "dark" | "success" | "warning" | "error";
 
 interface BadgeProps {
   children: React.ReactNode;
@@ -11,7 +11,7 @@ interface BadgeProps {
   className?: string;
 }
 
-export function Badge({ children, variant = "pink", className = "" }: BadgeProps) {
+export function Badge({ children, variant = "pink-light", className = "" }: BadgeProps) {
   return (
     <span className={`badge badge-${variant} ${className}`}>
       {children}

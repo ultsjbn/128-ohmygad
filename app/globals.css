@@ -923,9 +923,9 @@ body {
   letter-spacing: 0.04em;
 }
 
-.badge-pink {
+.badge-pink-light {
   background: var(--pink-light);
-  color: #c85a7a;
+  color: #ab546d;
 }
 
 .badge-periwinkle {
@@ -949,8 +949,8 @@ body {
 }
 
 .badge-error {
-  background: rgba(244, 123, 123, 0.15);
-  color: #c23c3c;
+  background: rgba(223, 21, 21, 0.15);
+  color: #b12d2d;
 }
 
 /* Notification dot */
