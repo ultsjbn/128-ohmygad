@@ -69,3 +69,13 @@ export function validateAddress(address: string): string | null {
   if (address && address.length > 100) return "Address cannot exceed 100 characters.";
   return null;
 }
+
+export function validateOffice(office: string): string | null {
+  if (office && office.length > 100) return "Office cannot exceed 100 characters.";
+  return null;
+}
+
+export function validateDepartment(department: string): string | null {
+  if (department && department.length > 100) return "Department cannot exceed 100 characters.";
+  return null;
+}

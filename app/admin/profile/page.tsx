@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 
 import { Card, Input, Select, Button, Badge, Tabs, ProgressBar, Toast } from "@/components/ui";
-import { validateFullName, validateDisplayName, validateContactNum, validateAddress } from "@/lib/validation";
+import { validateFullName, validateDisplayName, validateContactNum, validateAddress, validateOffice } from "@/lib/validation";
 
 type Profile = {
   id: string;
@@ -140,6 +140,13 @@ export default function AdminProfilePage() {
       return;
     }
 
+    const officeErr = validateOffice(profile.office);
+    if (officeErr) {
+      setToast({ type: "error", message: officeErr });
+      setSaving(false);
+      return;
+    }
+
     try {
       const { error } = await supabase
         .from("profile")
@@ -185,7 +192,11 @@ export default function AdminProfilePage() {
 
             <div className="flex flex-wrap justify-center gap-2 mb-6">
               <Badge variant="dark" dot>Administrator</Badge>
-              {profile.office && <Badge variant="pink">{profile.office}</Badge>}
+              {profile.office && (
+                <Badge variant="pink" className="whitespace-normal break-all h-auto py-1.5 px-3 text-center leading-tight max-w-[200px]">
+                  {profile.office}
+                </Badge>
+              )}
             </div>
 
             {/* gso progress bar */}
@@ -318,6 +329,7 @@ export default function AdminProfilePage() {
                       placeholder="e.g. Office of the Chancellor"
                       value={profile.office}
                       onChange={set("office")}
+                      maxLength={100}
                     />
                   </div>
                 </div>

@@ -8,11 +8,12 @@ interface BadgeProps {
   children: React.ReactNode;
   variant?: BadgeVariant;
   dot?: boolean;
+  className?: string;
 }
 
-export function Badge({ children, variant = "pink" }: BadgeProps) {
+export function Badge({ children, variant = "pink", className = "" }: BadgeProps) {
   return (
-    <span className={`badge badge-${variant}`}>
+    <span className={`badge badge-${variant} ${className}`}>
       {children}
     </span>
   );

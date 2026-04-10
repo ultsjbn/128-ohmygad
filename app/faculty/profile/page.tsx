@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 
 import { Card, Input, Select, Button, Badge, Tabs, ProgressBar, Toast } from "@/components/ui";
-import { validateFullName, validateDisplayName, validateContactNum, validateAddress } from "@/lib/validation";
+import { validateFullName, validateDisplayName, validateContactNum, validateAddress, validateDepartment } from "@/lib/validation";
 
 type Profile = {
   id: string;
@@ -137,6 +137,13 @@ export default function FacultyProfilePage() {
     const addressErr = validateAddress(profile.address);
     if (addressErr) {
       setToast({ type: "error", message: addressErr });
+      setSaving(false);
+      return;
+    }
+
+    const departmentErr = validateDepartment(profile.department);
+    if (departmentErr) {
+      setToast({ type: "error", message: departmentErr });
       setSaving(false);
       return;
     }
