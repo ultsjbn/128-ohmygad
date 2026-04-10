@@ -104,15 +104,16 @@ function SearchResultsContent({ role }: { role: string }) {
         
         {!loading && results.length > 0 && (
           <div className="pt-2">
-            <div className="tabs">
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
               {availableTabs.map((c) => {
                 const isActive = c === "All" 
                   ? activeFilters.length === categoryTabs.length 
                   : activeFilters.includes(c);
+                const className = ["chip", isActive ? "active" : ""].filter(Boolean).join(" ");
                 return (
                   <button
                     key={c}
-                    className={`tab${isActive ? " active" : ""}`}
+                    className={className}
                     onClick={() => toggleFilter(c)}
                   >
                     {c}

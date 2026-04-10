@@ -125,22 +125,7 @@ export default function GlobalSearch({ role, placeholder = "Search events, users
       )}
 
       {open && query.trim().length >= 2 && (
-        <div style={{
-          position: "absolute",
-          top: "100%",
-          left: 0,
-          right: 0,
-          marginTop: 8,
-          background: "#fff",
-          borderRadius: 12,
-          boxShadow: "0 8px 30px rgba(0,0,0,0.12)",
-          border: "1px solid rgba(45,42,74,0.08)",
-          zIndex: 100,
-          overflow: "hidden",
-          display: "flex",
-          flexDirection: "column",
-          maxHeight: "85vh",
-        }}>
+        <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-[var(--radius-lg)] shadow-[var(--shadow-float)] border border-black/[0.05] z-[100] overflow-hidden flex flex-col max-h-[85vh]">
           {/* Results Area */}
           {loading ? (
             <div style={{ padding: 24, display: "flex", alignItems: "center", justifyContent: "center", gap: 8, color: "var(--gray)", fontSize: 13 }}>
@@ -154,18 +139,19 @@ export default function GlobalSearch({ role, placeholder = "Search events, users
 
                 return (
                   <div key={c.id} className="border-b border-black/[0.05] last:border-0 pb-2">
-                    <div className="px-4 py-2 flex items-center gap-2 mt-1">
-                      <span className="text-[13px] font-semibold text-[var(--primary-dark)]">{c.id}</span>
-                      <span className="bg-black/5 px-1.5 py-0.5 rounded text-[10px] text-[var(--gray)] font-medium leading-none">{catResults.length}</span>
+                    <div className="px-4 py-3 flex items-center justify-between border-b border-black/[0.02]">
+                      <span className="text-[14px] font-bold text-[var(--primary-dark)]">{c.id}</span>
+                      <span className="bg-[var(--lavender)] text-[var(--primary-dark)] px-2 py-0.5 rounded-full text-[11px] font-semibold">{catResults.length}</span>
                     </div>
                     <div className="flex flex-col">
                       {catResults.slice(0, 3).map(r => (
                         <div
                           key={r.id + r.type}
                           onClick={() => handleSelect(r)}
-                          className="px-4 py-2 flex items-center justify-between hover:bg-black/[0.03] cursor-pointer group"
+                          className="px-4 py-2.5 flex items-center justify-between hover:bg-[var(--cream)] cursor-pointer group transition-colors"
                         >
-                          <span className="text-[13px] text-[var(--primary-dark)] font-medium truncate group-hover:underline">{r.title}</span>
+                          <span className="text-[14px] text-[var(--primary-dark)] font-medium truncate group-hover:underline">{r.title}</span>
+                          <span className="opacity-0 group-hover:opacity-100 transition-opacity text-[var(--gray)]"><ExternalLink size={14} /></span>
                         </div>
                       ))}
                     </div>
@@ -179,9 +165,9 @@ export default function GlobalSearch({ role, placeholder = "Search events, users
                             else if (c.id === "Users") router.push(`/admin/users?search=${encodeURIComponent(query)}`);
                             else if (c.id === "Surveys") router.push(`/${role}/surveys?search=${encodeURIComponent(query)}`);
                           }}
-                          className="text-[12px] font-medium text-blue-600 hover:underline bg-transparent border-none cursor-pointer"
+                          className="text-[13px] font-semibold text-blue-600 hover:text-blue-700 hover:underline bg-transparent border-none cursor-pointer flex items-center gap-1 mt-1 transition-colors"
                         >
-                          See all results
+                          See all {c.id} results <ExternalLink size={12} />
                         </button>
                       </div>
                     )}
