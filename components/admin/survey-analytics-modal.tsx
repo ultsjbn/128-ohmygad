@@ -111,13 +111,12 @@ export default function SurveyAnalyticsModal({ survey, open, onClose }: Props) {
   if (!open) return null;
 
   return (
-    <div className="modal-backdrop" style={{ padding: 0 }} onClick={onClose}>
-      <div className="modal modal-fullscreen" onClick={(e) => e.stopPropagation()}>
+    <div className="modal-backdrop" onClick={onClose}>
+      <div className="modal" style={{ maxWidth: 860, padding: 0 }} onClick={(e) => e.stopPropagation()}>
 
-        {/* ── Sticky header ── */}
+        {/* header */}
         <div
-          className="shrink-0 flex items-center justify-between gap-4 px-6 md:px-10 py-5 border-b border-[rgba(45,42,74,0.08)]"
-          style={{ background: "var(--white)", position: "sticky", top: 0, zIndex: 10 }}
+          className="shrink-0 flex items-center justify-between gap-4 px-4 py-4 border-b border-[rgba(45,42,74,0.08)]"
         >
           <div className="flex items-center gap-3 min-w-0">
             <BarChart3 size={22} className="text-[var(--periwinkle)] shrink-0" />
@@ -142,18 +141,18 @@ export default function SurveyAnalyticsModal({ survey, open, onClose }: Props) {
           </div>
         </div>
 
-        {/* ── Scrollable body ── */}
+        {/* dcrollable body */}
         <div className="flex-1 overflow-y-auto custom-scrollbar">
-          <div className="max-w-5xl mx-auto px-4 md:px-10 py-6 flex flex-col gap-6">
+          <div className="px-4 py-4 flex flex-col gap-6">
 
             {/* loading state */}
             {loading ? (
-              <div className="flex items-center justify-center gap-3 py-20">
+              <div className="flex items-center justify-center gap-3 py-0">
                 <Loader2 size={22} className="animate-spin text-[var(--gray)]" />
                 <span className="caption">Loading analytics…</span>
               </div>
             ) : error ? (
-              <Card className="border-[var(--error)] bg-red-50/50">
+              <Card variant="no-shadow" className="border-[var(--error)] bg-red-50/50">
                 <div className="flex flex-col items-center justify-center gap-3 py-12">
                   <p className="caption text-[var(--error)] font-semibold">Failed to load analytics</p>
                   <p className="text-[12px] text-[var(--error)] opacity-80">{error}</p>
@@ -161,9 +160,9 @@ export default function SurveyAnalyticsModal({ survey, open, onClose }: Props) {
               </Card>
             ) : (
               <>
-                {/* ── Survey description section ── */}
-                <Card className="flex flex-col gap-3">
-                  <div className="flex items-center gap-2 border-b border-[rgba(45,42,74,0.08)] pb-3">
+                {/* description */}
+                <Card variant="no-shadow" className="flex flex-col gap-2">
+                  <div className="flex items-center gap-2">
                     <ClipboardList size={16} className="text-[var(--periwinkle)]" />
                     <h3 className="heading-sm">About this Survey</h3>
                   </div>
@@ -197,9 +196,9 @@ export default function SurveyAnalyticsModal({ survey, open, onClose }: Props) {
                   </div>
                 </Card>
 
-                {/* ── No responses ── */}
+                {/* no responses */}
                 {totalRespondents === 0 ? (
-                  <Card>
+                  <Card variant="no-shadow">
                     <div className="flex flex-col items-center justify-center gap-3 py-12">
                       <BarChart3 size={28} className="text-[var(--gray)]" />
                       <p className="caption">No responses have been submitted yet.</p>
@@ -207,7 +206,7 @@ export default function SurveyAnalyticsModal({ survey, open, onClose }: Props) {
                   </Card>
                 ) : (
                   <>
-                    {/* ── Per-question cards ── */}
+                    {/* per question */}
                     {questions.map((q, idx) => (
                       <QuestionCard
                         key={q.id}
@@ -253,7 +252,7 @@ function QuestionCard({
   const typeLabel = TYPE_LABELS[type] ?? "Open-ended Text";
 
   return (
-    <Card className="flex flex-col gap-4">
+    <Card variant="no-shadow" className="flex flex-col gap-4">
       {/* question header */}
       <div className="flex items-start justify-between gap-3 border-b border-[rgba(45,42,74,0.08)] pb-3">
         <div className="min-w-0">

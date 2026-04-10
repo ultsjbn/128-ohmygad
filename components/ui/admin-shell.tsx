@@ -174,7 +174,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
           })}
         </nav>
 
-        {/* logout ------------------------------------------------ */}
+        {/* logout ------------------------------------------------
         <div className="shrink-0 flex flex-col gap-[2px] px-1 pb-1 pt-2 border-t border-white/[0.07]">
           <button
             onClick={() => router.push("/auth/login")}
@@ -199,7 +199,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
               <span className="block truncate pl-[10px] whitespace-nowrap">Log out</span>
             </span>
           </button>
-        </div>
+        </div> */}
       </aside>
 
       {/* main column ------------------------------------------------------------------------------------------------ */}

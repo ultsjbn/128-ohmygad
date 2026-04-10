@@ -128,7 +128,7 @@ const STATIC_OPTIONS: FilterOptions = {
     // CSS — graduate
     "MA History", "MA SDS", "MMgt", "PhD in Indigenous Studies",
   ],
-  role:           ["Admin", "Student", "Faculty"],
+  role:           ["admin", "student", "faculty"],
   sexAtBirth:     ["Male", "Female", "Intersex", "Prefer not to say"],
 };
 

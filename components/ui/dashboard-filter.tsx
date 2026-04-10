@@ -59,7 +59,7 @@ interface DashboardFilterProps {
   options: FilterOptions;
 }
 
-export function DashboardFilter({ value, onChange, options }: DashboardFilterProps) {
+export function     DashboardFilter({ value, onChange, options }: DashboardFilterProps) {
   const count = countActiveFilters(value);
 
   const chips = [

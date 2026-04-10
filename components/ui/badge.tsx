@@ -36,7 +36,7 @@ export function FilterChips({ chips, defaultActive, onChange, colorMap }: Filter
   }
 
   return (
-    <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+    <div className="flex flex-wrap gap-1">
       {chips.map((c) => {
         const colorVariant = colorMap?.[c];
         const className = ["chip", colorVariant ? `chip-${colorVariant}` : "", active === c ? "active" : ""].filter(Boolean).join(" ");
