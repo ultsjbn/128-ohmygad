@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import {
   Home, Calendar, Users, BookOpen, ClipboardList,
-  PanelLeftClose, PanelLeftOpen,
+  PanelLeftClose, PanelLeftOpen, LayoutDashboard
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
