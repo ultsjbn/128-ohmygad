@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { Search, Loader2 } from "lucide-react";
+import { Search, Loader2, ExternalLink } from "lucide-react";
 import { Badge } from "@/components/ui";
 
 interface GlobalSearchProps {
@@ -25,6 +25,13 @@ export default function GlobalSearch({ role, placeholder = "Search events, users
   const [open, setOpen] = useState(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
+
+  const AVAILABLE_CATEGORIES = [
+    { id: "Events", type: "Event" },
+    ...(role === "admin" ? [{ id: "Users", type: "User" }] : []),
+    { id: "Guidelines", type: "Course" },
+    { id: "Surveys", type: "Survey" }
+  ];
 
   // debouncing
   useEffect(() => {
