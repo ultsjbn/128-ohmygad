@@ -239,10 +239,6 @@ export default function CoursesPage() {
                 className="card cursor-pointer hover:shadow-md transition-shadow"
                 key={course.id} 
                 onClick={() => setDetailCourse(course)}>
-                <div className="flex justify-between items-start mb-2">
-                    <Badge variant={STATUS_VARIANT[course.status?.toLowerCase() || ""] || "dark"}>{course.status}</Badge>
-                    <span className="caption text-gray-400">{course.semester}</span>
-                </div>
                 <h3 className="heading-sm mb-2">{course.title}</h3>
                 <div className="flex flex-col gap-1 text-sm text-gray-500">
                     <div className="flex items-center gap-2 line-clamp-2 leading-snug">{course.description || "No Description Available"}</div>
