@@ -25,7 +25,7 @@ export default function DashboardHeader({ basePath, pageLabels }: DashboardHeade
   const pageLabel   = pageLabels[activeId] ?? activeId.charAt(0).toUpperCase() + activeId.slice(1);
 
   return (
-    <header className="shrink-0 flex flex-col md:flex-row md:items-center md:justify-between md:gap-3 px-3 md:px-5 pb-0">
+    <header className="shrink-0 flex flex-col md:flex-row md:items-center md:justify-between md:gap-3 px-3 md:px-5 pt-2 pb-0.5">
       {/* row 1: logo (mobile) + title (desktop) on left, UserMenu on right */}
       <div className="flex items-center justify-between md:flex-1 min-w-0">
         <div className="flex items-center gap-2 min-w-0">

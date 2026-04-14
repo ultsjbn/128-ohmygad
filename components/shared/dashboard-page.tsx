@@ -34,10 +34,10 @@ export default function DashboardPage({ role = "student", rightPanel }: Dashboar
   }, []);
 
   return (
-    <div className="w-full flex flex-col gap-3 md:gap-4 animate-in fade-in duration-500 md:py-1.5">
+    <div className="w-full flex flex-col gap-3 md:gap-4 animate-in fade-in duration-500">
       {/* dashboard header */}
         <div className="shrink-0 animate-in slide-in-from-bottom-2 duration-500 w-full flex justify-center">
-            <div className="flex flex-col gap-1 md:gap-2 w-full max-w-[1600px]">
+            <div className="flex flex-col gap-1 md:gap-2 w-full max-w-[1700px]">
                 <p className="heading-md">Good day, {displayName}!</p>
                 <div>
                     <GlobalSearch role={role} placeholder="Search events, courses, surveys..." />
