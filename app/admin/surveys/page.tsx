@@ -10,6 +10,7 @@ import { paginate, totalPages, PER_PAGE } from "@/lib/pagination.utils";
 import { Pagination } from "@/components/pagination";
 
 import {
+  Input,
   Button,
   Badge,
   SearchBar,
@@ -99,6 +100,7 @@ export default function SurveysPage() {
 
   // for the delete confirmation modal
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; title: string } | null>(null);
+  const [deletePassword, setDeletePassword] = useState("");
 
   const [toast, setToast] = useState<{ variant: "success"|"error"; title: string; message?: string } | null>(null);
 
@@ -215,21 +217,39 @@ export default function SurveysPage() {
   // delete execution logic triggered by the modal
   const confirmDelete = async () => {
     if (!deleteTarget) return;
-    
-    setDeletingId(deleteTarget.id);
+
     const supabase = createClient();
-    
+    const { data: userData } = await supabase.auth.getUser();
+
+    if (!userData.user || !userData.user.email) {
+      showToast("error", "Unable to verify user");
+      return;
+    }
+
+    const { error: authError } = await supabase.auth.signInWithPassword({
+      email: userData.user.email,
+      password: deletePassword,
+    });
+
+    if (authError) {
+      showToast("error", "Invalid password");
+      setDeletePassword("");
+      return;
+    }
+
+    setDeletingId(deleteTarget.id);
     const { error } = await supabase.from("survey").delete().eq("id", deleteTarget.id);
-    
+
     if (error) {
       showToast("error", "Failed to delete survey", error.message);
     } else {
       setSurveys((prev) => prev.filter((e) => e.id !== deleteTarget.id));
       showToast("success", "Survey deleted successfully");
     }
-    
+
     setDeletingId(null);
     setDeleteTarget(null);
+    setDeletePassword("");
   };
 
   const formatDate = (val?: string | null) =>
@@ -513,24 +533,42 @@ export default function SurveysPage() {
       {/* confirm delete modal */}
         <Modal
             open={!!deleteTarget}
-            onClose={() => !deletingId && setDeleteTarget(null)}
+            onClose={() => {
+              if (!deletingId) {
+                setDeleteTarget(null);
+                setDeletePassword("");
+              }
+            }}
             title="Delete Survey?"
             subtitle="This action cannot be undone."
             footer={
             <div className="flex gap-3 w-full">
-                <Button variant="ghost" className="flex-1" onClick={() => setDeleteTarget(null)} disabled={!!deletingId}>
+                <Button variant="ghost" className="flex-1" onClick={() => { setDeleteTarget(null); setDeletePassword(""); }} disabled={!!deletingId}>
                 Cancel
                 </Button>
-                <Button variant="primary" className="flex-1 !bg-[var(--error)]" onClick={confirmDelete} disabled={!!deletingId}>
+                <Button variant="primary" className="flex-1 !bg-[var(--error)]" onClick={confirmDelete} disabled={!!deletingId || !deletePassword.trim()}>
                 {deletingId ? "Deleting..." : "Yes, Delete"}
                 </Button>
             </div>
             }
         >
             {deleteTarget && (
-            <div className="p-4 rounded-xl bg-[var(--pink-light)] border border-[rgba(244,123,123,0.2)]">
-                <p className="text-sm text-[var(--error)] font-bold mb-1">Warning</p>
-                <p className="text-sm text-[var(--primary-dark)]">You are about to delete: <strong className="break-words">{deleteTarget.title}</strong></p>
+            <div className="space-y-4">
+              <div className="p-4 rounded-xl bg-[var(--pink-light)] border border-[rgba(244,123,123,0.2)]">
+                  <p className="text-sm text-[var(--error)] font-bold mb-1">Warning</p>
+                  <p className="text-sm text-[var(--primary-dark)]">You are about to delete: <strong className="break-words">{deleteTarget.title}</strong></p>
+              </div>
+              <div>
+                <label className="label block mb-2">Enter your password to confirm deletion</label>
+                <Input
+                  type="password"
+                  value={deletePassword}
+                  onChange={(e) => setDeletePassword(e.target.value)}
+                  placeholder="Password"
+                  autoComplete="new-password"
+                  className="input input-bordered w-full"
+                />
+              </div>
             </div>
             )}
         </Modal>
