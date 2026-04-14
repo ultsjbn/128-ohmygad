@@ -153,6 +153,7 @@ export default function EventsPage() {
 
   // for the delete confirmation modal
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; title: string } | null>(null);
+  const [deletePassword, setDeletePassword] = useState("");
 
   const [toast, setToast] = useState<{ variant: "success"|"error"; title: string; message?: string } | null>(null);
 
@@ -357,9 +358,29 @@ export default function EventsPage() {
   // delete execution logic triggered by the modal
   const confirmDelete = async () => {
     if (!deleteTarget) return;
-    
-    setDeletingId(deleteTarget.id);
+
     const supabase = createClient();
+    const { data: userData } = await supabase.auth.getUser();
+
+    if (!userData.user || !userData.user.email) {
+      showToast("error", "Unable to verify user");
+      return;
+    }
+
+    // Verify password by attempting sign in
+    const { error: authError } = await supabase.auth.signInWithPassword({
+      email: userData.user.email,
+      password: deletePassword,
+    });
+
+    if (authError) {
+      showToast("error", "Invalid password");
+      setDeletePassword("");
+      return;
+    }
+
+    // Password verified, proceed with delete
+    setDeletingId(deleteTarget.id);
     
     const { error } = await supabase.from("event").delete().eq("id", deleteTarget.id);
     
@@ -372,6 +393,7 @@ export default function EventsPage() {
     
     setDeletingId(null);
     setDeleteTarget(null);
+    setDeletePassword("");
   };
 
   const activeFilterCount = categoryFilters.size + statusFilters.size;
@@ -879,22 +901,36 @@ export default function EventsPage() {
       {/* confirm delete modal */}
       <Modal
         open={!!deleteTarget}
-        onClose={() => !deletingId && setDeleteTarget(null)}
+        onClose={() => { if (!deletingId) { setDeleteTarget(null); setDeletePassword(""); } }}
         title="Delete Event?"
         subtitle="This action cannot be undone. All registrations and data tied to this event will be permanently removed."
         footer={
           <div className="flex gap-3 w-full">
-            <Button variant="ghost" className="flex-1" onClick={() => setDeleteTarget(null)} disabled={!!deletingId}>Cancel</Button>
-            <Button variant="primary" className="flex-1 !bg-[var(--error)]" onClick={confirmDelete} disabled={!!deletingId}>
+            <Button variant="ghost" className="flex-1" onClick={() => { setDeleteTarget(null); setDeletePassword(""); }} disabled={!!deletingId}>Cancel</Button>
+            <Button variant="primary" className="flex-1 !bg-[var(--error)]" onClick={confirmDelete} disabled={!!deletingId || !deletePassword.trim()}>
               {deletingId ? "Deleting..." : "Yes, Delete"}
             </Button>
           </div>
         }
       >
         {deleteTarget && (
-          <div className="p-4 rounded-xl bg-[var(--pink-light)] border border-[rgba(244,123,123,0.2)]">
-            <p className="text-sm text-[var(--error)] font-bold mb-1">Warning</p>
-            <p className="text-sm text-[var(--primary-dark)]">You are about to delete: <strong className="break-words">{deleteTarget.title}</strong></p>
+          <div className="flex flex-col gap-4">
+            <div className="p-4 rounded-xl bg-[var(--pink-light)] border border-[rgba(244,123,123,0.2)]">
+              <p className="text-sm text-[var(--error)] font-bold mb-1">Warning</p>
+              <p className="text-sm text-[var(--primary-dark)]">You are about to delete: <strong className="break-words">{deleteTarget.title}</strong></p>
+            </div>
+            <div>
+              <label className="label block mb-2">Enter your password to confirm deletion</label>
+              <input
+                type="password"
+                value={deletePassword}
+                onChange={(e) => setDeletePassword(e.target.value)}
+                className="w-full px-3 py-2 border border-[rgba(45,42,74,0.2)] rounded-lg bg-white text-black focus:outline-none focus:ring-2 focus:ring-[var(--pink-light)] disabled:opacity-50"
+                placeholder="Password"
+                disabled={!!deletingId}
+                autoComplete="new-password"
+              />
+            </div>
           </div>
         )}
       </Modal>
