@@ -41,6 +41,7 @@ const CATEGORY_OPTIONS = [
 const STATUS_OPTIONS = [
   { value: "upcoming", label: "Upcoming" },
   { value: "past", label: "Past" },
+  { value: "today", label: "Today" },
 ];
 
 export default function EventForm({ initialData, mode, onSuccess, onCancel }: EventFormProps) {
