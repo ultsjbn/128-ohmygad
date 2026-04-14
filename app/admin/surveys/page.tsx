@@ -32,7 +32,7 @@ type BadgeVariant = "pink-light" | "periwinkle" | "dark" | "success" | "warning"
 
 const STATUS_VARIANT: Record<string, BadgeVariant> = {
   open: "success",
-  closed: "dark",
+  closed: "periwinkle",
 };
 
 // checkbox item
@@ -397,7 +397,7 @@ export default function SurveysPage() {
         <div className="flex items-center gap-2 flex-wrap -mt-2">
           <span className="caption">Active filters:</span>
           {[...statusFilters].map((s) => (
-            <Badge key={s} variant="warning" dot>
+            <Badge key={s} variant={STATUS_VARIANT[s] ?? "dark"} dot>
               <span className="capitalize">{s}</span>
               <button
                 onClick={() => toggleStatus(s)}
