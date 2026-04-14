@@ -20,7 +20,6 @@ import {
   Dropdown,
   DropdownItem,
   DropdownDivider,
-  FilterChips,
   Modal,
   Toast,
 } from "@/components/ui";
@@ -34,6 +33,11 @@ const ROLE_VARIANT: Record<string, "pink-light" | "periwinkle" | "success"> = {
   admin: "success",
   faculty: "periwinkle",
   student: "pink-light",
+};
+
+const GSO_VARIANT: Record<string, "warning" | "success"> = {
+  attended: "success",
+  pending: "warning",
 };
 
 const ROLES = ["student", "faculty", "admin"];
@@ -380,11 +384,6 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
           </Button>
         </div>
 
-        <FilterChips
-          chips={["All", "Student", "Faculty", "Admin"]}
-          defaultActive={activeChip}
-          onChange={handleChipChange}
-        />
       </div>
 
       {hasActiveFilters && (
@@ -392,14 +391,14 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
           <span className="caption">Active filters:</span>
 
           {[...roleFilters].map((r) => (
-            <Badge key={r} variant="pink">
+            <Badge key={r} variant={ROLE_VARIANT[r] ?? "dark"} dot>
               <span className="capitalize">{r}</span>
               <button onClick={() => { toggleRole(r); setActiveChip("All"); }} style={{ marginLeft: 6 }}>×</button>
             </Badge>
           ))}
 
           {[...gsoFilters].map((g) => (
-            <Badge key={g} variant="warning">
+            <Badge key={g} variant={GSO_VARIANT[g] ?? "dark"} dot>
               <span className="capitalize">{g === "attended" ? "Attended" : "Pending"}</span>
               <button onClick={() => toggleGso(g)} style={{ marginLeft: 6 }}>×</button>
             </Badge>

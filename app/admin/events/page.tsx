@@ -593,10 +593,19 @@ export default function EventsPage() {
         <div className="flex items-center gap-2 flex-wrap -mt-2">
           <span className="caption">Active filters:</span>
 
+          {/* Status pills */}
           {[...statusFilters].map((s) => (
-            <Badge key={s} variant="warning" dot>
+            <Badge key={s} variant={STATUS_VARIANT[s] ?? "dark"} dot>
               <span className="capitalize">{s}</span>
               <button onClick={() => toggleStatus(s)} style={{ marginLeft: 6 }}>×</button>
+            </Badge>
+          ))}
+
+          {/* Category pills */}
+          {[...categoryFilters].map((c) => (
+            <Badge key={c} variant={CATEGORY_VARIANT[c] ?? "dark"} dot>
+              {c}
+              <button onClick={() => { toggleCategory(c); setActiveChip("All"); }} style={{ marginLeft: 6 }}>×</button>
             </Badge>
           ))}
 
