@@ -74,6 +74,15 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
   const [profiles, setProfiles] = useState<Profile[]>(initialProfiles);
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState(searchParams.get("search") || "");
+  const [prevUrlSearch, setPrevUrlSearch] = useState(searchParams.get("search") || "");
+
+  // Sync search state with URL parameter synchronously to avoid "previous search" flash
+  const urlSearch = searchParams.get("search") || "";
+  if (urlSearch !== prevUrlSearch) {
+    setPrevUrlSearch(urlSearch);
+    setSearch(urlSearch);
+  }
+
   const [sort, setSort] = useState<SortState>({ field: "created_at", direction: "desc" });
 
   // Filters
@@ -98,12 +107,6 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
     setToast({ variant, title, message });
     setTimeout(() => setToast(null), 3000);
   };
-
-  // sync the URL search param to local search 
-  useEffect(() => {
-    const s = searchParams.get("search");
-    if (s !== null) setSearch(s);
-  }, [searchParams]);
 
   const filtered = useMemo(() => {
     let result = profiles;
@@ -299,7 +302,7 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
   ];
 
   return (
-    <div className="flex flex-col gap-6 py-2">
+    <div className="flex flex-col gap-3 py-1">
       {/* toolbar */}
       <div className="flex flex-col gap-3">
         <div className="flex items-center gap-3 flex-wrap">

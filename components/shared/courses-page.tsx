@@ -61,7 +61,7 @@ const SORT_OPTIONS: { label: string; field: SortField }[] = [
   { label: "Title", field: "title" },
 ];
 
-const STATUS_VARIANT: Record<string, "success" | "warning" | "error" | "dark" | "pink"> = {
+const STATUS_VARIANT: Record<string, "success" | "warning" | "error" | "dark" | "pink-light"> = {
   open: "success",
   closed: "error",
   ongoing: "warning",
@@ -99,6 +99,14 @@ export default function CoursesPage() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState(searchParams.get("search") || "");
+  const [prevUrlSearch, setPrevUrlSearch] = useState(searchParams.get("search") || "");
+
+  // Sync search state with URL parameter synchronously to avoid "previous search" flash
+  const urlSearch = searchParams.get("search") || "";
+  if (urlSearch !== prevUrlSearch) {
+    setPrevUrlSearch(urlSearch);
+    setSearch(urlSearch);
+  }
   const [sort, setSort] = useState<SortState>({ field: "title", direction: "asc" });
   const [filters, setFilters] = useState<FilterState>({ status: new Set(), semester: new Set() });
   const [activeSemesterChip, setActiveSemesterChip] = useState("All Semesters");

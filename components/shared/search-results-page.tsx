@@ -167,7 +167,7 @@ function SearchResultsContent({ role }: { role: string }) {
                       {r.title}
                     </span>
                   </div>
-                  <Badge variant={r.type === "User" ? "pink" : r.type === "Course" ? "periwinkle" : r.type === "Survey" ? "pink" : "dark"}>
+                  <Badge variant={r.type === "User" ? "pink-light" : r.type === "Course" ? "periwinkle" : r.type === "Survey" ? "pink-light" : "dark"}>
                     {r.type}
                   </Badge>
                 </div>

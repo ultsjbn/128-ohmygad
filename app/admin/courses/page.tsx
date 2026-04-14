@@ -36,7 +36,7 @@ type SortField = typeof SORT_FIELDS[number];
 type SortDirection = "asc" | "desc";
 
 // variant helpers 
-type BadgeVariant = "pink" | "periwinkle" | "dark" | "success" | "warning" | "error";
+type BadgeVariant = "pink-light" | "periwinkle" | "dark" | "success" | "warning" | "error";
 
 
 const STATUS_VARIANT: Record<string, BadgeVariant> = {
@@ -255,7 +255,7 @@ export default function CoursesPage() {
 
   // 
   return (
-    <div className="flex flex-col gap-6 py-2">
+    <div className="flex flex-col gap-3 py-1">
       {/*  toolbar  */}
       <div className="flex flex-col gap-3">
 
@@ -293,7 +293,7 @@ export default function CoursesPage() {
           <span className="caption">Active filters:</span>
 
           {semesterFilter !== "All" && (
-            <Badge variant="pink" dot>
+            <Badge variant="pink-light" dot>
               {semesterFilter}
               <button
                 onClick={() => setSemesterFilter("All")}

@@ -28,7 +28,7 @@ const STATUSES = ["open", "closed"];
 const SORT_FIELDS = ["title", "status", "open_at"] as const;
 
 type SortField = typeof SORT_FIELDS[number];
-type BadgeVariant = "pink" | "periwinkle" | "dark" | "success" | "warning" | "error";
+type BadgeVariant = "pink-light" | "periwinkle" | "dark" | "success" | "warning" | "error";
 
 const STATUS_VARIANT: Record<string, BadgeVariant> = {
   open: "success",
@@ -77,6 +77,14 @@ export default function SurveysPage() {
   const [surveys, setSurveys] = useState<SurveyFormData[]>([]);
   const [filtered, setFiltered] = useState<SurveyFormData[]>([]);
   const [search, setSearch] = useState(searchParams.get("search") || "");
+  const [prevUrlSearch, setPrevUrlSearch] = useState(searchParams.get("search") || "");
+
+  // Sync search state with URL parameter synchronously to avoid "previous search" flash
+  const urlSearch = searchParams.get("search") || "";
+  if (urlSearch !== prevUrlSearch) {
+    setPrevUrlSearch(urlSearch);
+    setSearch(urlSearch);
+  }
   const [isLoading, setIsLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [analyticsTarget, setAnalyticsTarget] = useState<SurveyFormData | null>(null);
@@ -116,12 +124,6 @@ export default function SurveysPage() {
   };
 
   useEffect(() => { getSurveys(); }, []);
-
-  // sync URL search param
-  useEffect(() => {
-    const s = searchParams.get("search");
-    if (s !== null) setSearch(s);
-  }, [searchParams]);
 
   // filter / sort
   useEffect(() => {
@@ -317,7 +319,7 @@ export default function SurveysPage() {
   ];
 
   return (
-    <div className="flex flex-col gap-6 py-2">
+    <div className="flex flex-col gap-3 py-1">
 
       {/* toolbar */}
       <div className="flex flex-col gap-3">
@@ -355,7 +357,7 @@ export default function SurveysPage() {
           {/* filter */}
           <Dropdown
             trigger={
-              <Button variant={hasActiveFilters ? "pink" : "ghost"}>
+              <Button variant={hasActiveFilters ? "pink-light" : "ghost"}>
                 <SlidersHorizontal size={15} /> Filter
                 {hasActiveFilters && (
                   <span

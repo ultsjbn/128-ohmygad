@@ -109,18 +109,20 @@ export default function DashboardPage() {
         <div className="flex flex-col xl:flex-row gap-5 w-full animate-in fade-in duration-500">
 
         {/* ------------------------------------------------ MAIN CONTENT ------------------------------------------------*/}
-        <div className="flex flex-col gap-5 flex-1 min-w-0 pb-8 mt-1">
+        <div className="flex flex-col gap-3 flex-1 min-w-0 pb-2">
 
             {/* KPI section + greeting ------------------------------------------------ */}
             <div className="flex flex-col gap-3">
-                <div className="flex items-start justify-between gap-4">
-                    <h2 className="heading-md">Welcome, Admin</h2>
+                {/* greeting */}
+                <div className="flex items-center justify-between">
+                    <h2 className="heading-md">Good day, Admin!</h2>
                     <DashboardFilter
                         value={filters}
                         onChange={setFilters}
                         options={filterOptions}
                     />
                 </div>
+
                 <GlobalSearch role="admin" placeholder="Search events, courses, surveys..." />
                 <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
                     <StatCard
@@ -345,7 +347,7 @@ export default function DashboardPage() {
         </div>
 
         {/* right panel ------------------------------------------------------------------------------------------------ */}
-        <aside className="flex flex-col gap-4 xl:w-[268px] shrink-0 pb-8">
+        <aside className="flex flex-col gap-3 xl:w-[268px] shrink-0 pb-8">
             {/* calendar */}
             <Card variant="no-hover" className="p-4">
                 <MiniCalendar

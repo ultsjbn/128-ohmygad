@@ -38,13 +38,13 @@ const CATEGORY_GRADIENT: Record<string, string> = {
 };
 const DEFAULT_GRADIENT = "linear-gradient(135deg, #B8B5E8 0%, #2D2A4A 100%)";
 
-type BadgeVariant = "pink" | "periwinkle" | "dark" | "success" | "warning" | "error";
+type BadgeVariant = "pink-light" | "periwinkle" | "dark" | "success" | "warning" | "error";
 const REG_STATUS_VARIANT: Record<string, BadgeVariant> = {
   registered: "periwinkle",
   attended:   "success",
   cancelled:  "error",
   pending:    "warning",
-  invited:    "pink",
+  invited:    "pink-light",
 };
 
 const formatDateLabel = (s: string) =>

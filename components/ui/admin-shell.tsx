@@ -173,33 +173,6 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
             );
           })}
         </nav>
-
-        {/* logout ------------------------------------------------
-        <div className="shrink-0 flex flex-col gap-[2px] px-1 pb-1 pt-2 border-t border-white/[0.07]">
-          <button
-            onClick={() => router.push("/auth/login")}
-            title={!open ? "Log out" : undefined}
-            className={[
-              "flex items-center w-full h-[38px] rounded-[10px]",
-              "cursor-pointer border-none bg-transparent",
-              "font-[var(--font-body)] text-[13px] text-white/35 hover:text-white/70 hover:bg-white/[0.06]",
-              "justify-start pl-[10px] group-data-[state=collapsed]/sidebar:justify-center group-data-[state=collapsed]/sidebar:pl-0",
-              "transition-[padding,justify-content,background-color,color] duration-200 ease-linear",
-            ].join(" ")}
-          >
-            <LogOut size={17} className="shrink-0" />
-            <span
-              className={[
-                "overflow-hidden shrink-0",
-                "w-[140px] opacity-100",
-                "group-data-[state=collapsed]/sidebar:w-0 group-data-[state=collapsed]/sidebar:opacity-0",
-                "transition-[width,opacity] duration-200 ease-linear",
-              ].join(" ")}
-            >
-              <span className="block truncate pl-[10px] whitespace-nowrap">Log out</span>
-            </span>
-          </button>
-        </div> */}
       </aside>
 
       {/* main column ------------------------------------------------------------------------------------------------ */}
@@ -209,7 +182,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
         <div className="pointer-events-none absolute -bottom-16 left-20 w-[320px] h-[320px] rounded-full blur-[56px] opacity-[0.13] bg-[var(--periwinkle)] z-0" />
 
         {/* page header ------------------------------------------------ */}
-        <header className="shrink-0 flex items-center justify-between gap-3 px-3 md:px-5 pb-0 h-[78px]" style={{ position: "relative", zIndex: 10 }}>
+        <header className="shrink-0 flex items-center justify-between gap-3 px-3 md:px-5 h-[70px]" style={{ position: "relative", zIndex: 10 }}>
           <div className="flex items-center gap-2 min-w-0">
             {!isDashboard && (
               <Button variant="icon" onClick={() => router.back()} aria-label="Go back">

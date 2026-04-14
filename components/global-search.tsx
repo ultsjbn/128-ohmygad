@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { Search, Loader2, ChevronUp, ExternalLink, X, MoveUp, MoveDown } from "lucide-react";
 import { Badge } from "@/components/ui";
 
@@ -23,8 +23,18 @@ export default function GlobalSearch({ role, placeholder = "Search events, users
   const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
 
   const containerRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const isNavigating = useRef(false);
+
+  // close and clear search when clicking a result / navigating
+  useEffect(() => {
+    setOpen(false);
+    setQuery("");
+    isNavigating.current = false;
+  }, [pathname]);
 
   const AVAILABLE_CATEGORIES = [
     { id: "Events", type: "Event" },
@@ -54,10 +64,12 @@ export default function GlobalSearch({ role, placeholder = "Search events, users
       setLoading(true);
       try {
         const res = await fetch(`/api/global-search?q=${encodeURIComponent(debouncedQuery)}`);
-        if (res.ok) {
+        if (res.ok && !isNavigating.current) {
           const data = await res.json();
-          setResults(data.results || []);
-          setOpen(true);
+          if (!isNavigating.current) {
+            setResults(data.results || []);
+            setOpen(true);
+          }
         }
       } catch (err) {
         console.error("Search failed:", err);
@@ -79,9 +91,13 @@ export default function GlobalSearch({ role, placeholder = "Search events, users
     return () => document.removeEventListener("mousedown", handleOutside);
   }, [open]);
 
-  const handleSelect = (r: SearchResult) => {
+  const handleSelect = (r: SearchResult, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    isNavigating.current = true;
     setOpen(false);
-    setQuery("");
+    inputRef.current?.blur();
+    // Don't clear query immediately to prevent glitchy re-renders while closing
 
     if (r.type === "Course") {
       router.push(`/${role}/courses?search=${encodeURIComponent(r.title)}`);
@@ -100,11 +116,14 @@ export default function GlobalSearch({ role, placeholder = "Search events, users
       <input
         className="search-input"
         maxLength={64}
+        ref={inputRef}
         placeholder={placeholder}
         value={query}
         onChange={(e) => {
           setQuery(e.target.value);
-          if (!open && e.target.value.trim().length >= 2) setOpen(true);
+          if (!open && e.target.value.trim().length >= 2 && !isNavigating.current) {
+            setOpen(true);
+          }
         }}
         onKeyDown={(e) => {
           if (e.key === "Enter" && query.trim().length >= 2) {
@@ -147,7 +166,7 @@ export default function GlobalSearch({ role, placeholder = "Search events, users
                       {catResults.slice(0, 3).map(r => (
                         <div
                           key={r.id + r.type}
-                          onClick={() => handleSelect(r)}
+                          onClick={(e) => handleSelect(r, e)}
                           className="px-4 py-2.5 flex items-center justify-between hover:bg-[var(--cream)] cursor-pointer group transition-colors"
                         >
                           <span className="text-[14px] text-[var(--primary-dark)] font-medium truncate group-hover:underline">{r.title}</span>
@@ -158,8 +177,12 @@ export default function GlobalSearch({ role, placeholder = "Search events, users
                     {catResults.length >= 4 && (
                       <div className="px-4 pt-1">
                         <button
-                          onClick={() => {
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            isNavigating.current = true;
                             setOpen(false);
+                            inputRef.current?.blur();
                             if (c.id === "Guidelines") router.push(`/${role}/courses?search=${encodeURIComponent(query)}`);
                             else if (c.id === "Events") router.push(`/${role}/events?search=${encodeURIComponent(query)}`);
                             else if (c.id === "Users") router.push(`/admin/users?search=${encodeURIComponent(query)}`);
@@ -184,7 +207,14 @@ export default function GlobalSearch({ role, placeholder = "Search events, users
           {/* Footer Area */}
           <div className="px-4 py-2.5 border-t border-black/[0.05] flex items-center justify-between bg-[rgba(240,240,245,0.4)]">
             <button
-              onClick={() => { setOpen(false); router.push(`/${role}/search?q=${encodeURIComponent(query)}`); }}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                isNavigating.current = true;
+                setOpen(false);
+                inputRef.current?.blur();
+                router.push(`/${role}/search?q=${encodeURIComponent(query)}`);
+              }}
               className="flex items-center gap-1.5 text-[12px] font-medium text-blue-600 hover:underline bg-transparent border-none cursor-pointer"
             >
               {/* <ExternalLink size={13} /> Open search page */}
