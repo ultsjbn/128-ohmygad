@@ -25,7 +25,7 @@ import {
 
 // constants
 const CATEGORIES = ["Orientation", "Forum", "Research", "Training", "Workshop"];
-const STATUSES = ["upcoming", "past"];
+const STATUSES = ["upcoming", "past", "today"];
 const SORT_FIELDS = ["title", "category", "status", "start_date"] as const;
 
 type SortField = typeof SORT_FIELDS[number];
@@ -465,10 +465,10 @@ export default function EventsPage() {
     },
     {
       key: "actions",
-      header: "Actions",
+      header: <div className="text-right">Actions</div>,
       width: "11%",
       render: (event) => (
-        <div style={{ display: "flex", justifyContent: "flex-start", gap: 4 }}>
+        <div style={{ display: "flex", justifyContent: "flex-end", gap: 4 }}>
           <Button
             variant="icon"
             title="Edit event"

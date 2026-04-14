@@ -248,9 +248,9 @@ export default function CoursesPage() {
 
     {
       key: "actions",
-      header: "Actions",
+      header: <div className="text-right">Actions</div>,
       render: (course) => (
-        <div style={{ display: "flex", justifyContent: "flex-start", gap: 4 }}>
+        <div style={{ display: "flex", justifyContent: "flex-end", gap: 4 }}>
           <Button
             variant="icon"
             title="Edit course"
