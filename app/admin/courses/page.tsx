@@ -9,6 +9,7 @@ import { paginate, totalPages, PER_PAGE } from "@/lib/pagination.utils";
 import { Pagination } from "@/components/pagination";
 
 import {
+  Input,
   Button,
   Badge,
   SearchBar,
@@ -83,18 +84,19 @@ export default function CoursesPage() {
 
     if (!error && data) {
       setCourses(data);
-      setFiltered(data);
     }
     setIsLoading(false);
   };
 
   useEffect(() => { getCourses(); }, []);
 
-  // sync the URL search param to the local search state
-  useEffect(() => {
-    const s = searchParams.get("search");
-    if (s !== null) setSearch(s);
-  }, [searchParams]);
+  // Sync search state with URL parameter synchronously to avoid "previous search" flash
+  const [prevUrlSearch, setPrevUrlSearch] = useState(searchParams.get("search") || "");
+  const urlSearch = searchParams.get("search") || "";
+  if (urlSearch !== prevUrlSearch) {
+    setPrevUrlSearch(urlSearch);
+    setSearch(urlSearch);
+  }
 
   //  filter / sort 
   useEffect(() => {
@@ -464,7 +466,7 @@ export default function CoursesPage() {
               </div>
               <div>
                 <label className="label block mb-2">Enter your password to confirm deletion</label>
-                <input
+                <Input
                   type="password"
                   value={deletePassword}
                   onChange={(e) => setDeletePassword(e.target.value)}
