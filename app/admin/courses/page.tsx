@@ -82,18 +82,19 @@ export default function CoursesPage() {
 
     if (!error && data) {
       setCourses(data);
-      setFiltered(data);
     }
     setIsLoading(false);
   };
 
   useEffect(() => { getCourses(); }, []);
 
-  // sync the URL search param to the local search state
-  useEffect(() => {
-    const s = searchParams.get("search");
-    if (s !== null) setSearch(s);
-  }, [searchParams]);
+  // Sync search state with URL parameter synchronously to avoid "previous search" flash
+  const [prevUrlSearch, setPrevUrlSearch] = useState(searchParams.get("search") || "");
+  const urlSearch = searchParams.get("search") || "";
+  if (urlSearch !== prevUrlSearch) {
+    setPrevUrlSearch(urlSearch);
+    setSearch(urlSearch);
+  }
 
   //  filter / sort 
   useEffect(() => {

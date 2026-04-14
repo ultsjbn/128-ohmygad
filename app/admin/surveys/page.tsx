@@ -118,7 +118,6 @@ export default function SurveysPage() {
     if (!error && data) {
       const normalized = data.map((s) => ({ ...s, status: s.status ?? "" }));
       setSurveys(normalized);
-      setFiltered(normalized);
     }
     setIsLoading(false);
   };

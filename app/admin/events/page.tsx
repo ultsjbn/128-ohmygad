@@ -263,7 +263,6 @@ export default function EventsPage() {
     
         if (!error && data) {
       setEvents(data);
-      setFiltered(data);
     }
     setIsLoading(false);
   };
