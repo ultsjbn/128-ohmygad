@@ -9,6 +9,7 @@ import { paginate, totalPages, PER_PAGE } from "@/lib/pagination.utils";
 import { Pagination } from "@/components/pagination";
 
 import {
+  Input,
   Button,
   Badge,
   SearchBar,
@@ -464,7 +465,7 @@ export default function CoursesPage() {
               </div>
               <div>
                 <label className="label block mb-2">Enter your password to confirm deletion</label>
-                <input
+                <Input
                   type="password"
                   value={deletePassword}
                   onChange={(e) => setDeletePassword(e.target.value)}

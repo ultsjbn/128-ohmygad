@@ -9,6 +9,7 @@ import { paginate, totalPages, PER_PAGE } from "@/lib/pagination.utils";
 import { Pagination } from "@/components/pagination";
 
 import {
+  Input,
   Button,
   Badge,
   SearchBar,
@@ -921,11 +922,11 @@ export default function EventsPage() {
             </div>
             <div>
               <label className="label block mb-2">Enter your password to confirm deletion</label>
-              <input
+              <Input
                 type="password"
                 value={deletePassword}
                 onChange={(e) => setDeletePassword(e.target.value)}
-                className="w-full px-3 py-2 border border-[rgba(45,42,74,0.2)] rounded-lg bg-white text-black focus:outline-none focus:ring-2 focus:ring-[var(--pink-light)] disabled:opacity-50"
+                className="w-full px-3 py-2 border border-[rgba(45,42,74,0.2)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--pink-light)] disabled:opacity-50"
                 placeholder="Password"
                 disabled={!!deletingId}
                 autoComplete="new-password"
