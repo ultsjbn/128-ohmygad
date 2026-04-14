@@ -307,6 +307,7 @@ export function OnboardingForm({
               value={contact_num}
               onChange={(e) => setContactNum(e.target.value)}
               autoComplete="off"
+              maxLength={15}
             />
 
             <Select
