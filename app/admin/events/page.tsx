@@ -509,7 +509,7 @@ export default function EventsPage() {
       key={user.registration_id}
       className={`grid gap-3 px-3 py-2.5 rounded-lg hover:bg-[var(--lavender)] transition-colors items-center ${showCheckbox ? "grid-cols-[1fr_1fr_44px]" : "grid-cols-[1fr_1fr]"} ${i % 2 !== 0 ? "bg-[rgba(45,42,74,0.02)]" : ""}`}
     >
-      <span className="body truncate font-medium">
+      <span className="caption truncate font-medium">
         {user.display_name || user.full_name || <span className="text-[var(--gray)]">—</span>}
       </span>
       <span className="caption truncate text-[var(--gray)]">{user.email || "—"}</span>

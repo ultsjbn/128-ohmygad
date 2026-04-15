@@ -141,7 +141,7 @@ export default function SurveyAnalyticsModal({ survey, open, onClose }: Props) {
 
         {/* dcrollable body */}
         <div className="flex-1 overflow-y-auto custom-scrollbar">
-          <div className="px-2 py-1 flex flex-col gap-2">
+          <div className="px-1 py-1 flex flex-col gap-2">
 
             {/* loading state */}
             {loading ? (
