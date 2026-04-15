@@ -328,7 +328,7 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
   ];
 
   return (
-    <div className="flex flex-col gap-3 py-1">
+    <div className="flex flex-col gap-3">
       {/* toolbar */}
       <div className="flex flex-col gap-3">
         <div className="flex items-center gap-3 flex-wrap">

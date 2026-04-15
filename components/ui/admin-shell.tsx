@@ -198,7 +198,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
 
         {/* scrollable content ------------------------------------------------ */}
         <main
-          className="flex flex-col flex-1 min-h-0 overflow-y-auto px-3 md:px-5 pb-0"
+          className="flex flex-col flex-1 min-h-0 overflow-y-auto px-3 md:px-5 pb-0 md:py-2"
           style={{ scrollbarGutter: "stable", position: "relative" }}
         >
           {children}
