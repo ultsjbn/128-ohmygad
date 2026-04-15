@@ -288,7 +288,7 @@ export default function FacultyProfilePage() {
                     options={[
                       { value: "", label: "Select college" },
                       { value: "CS", label: "College of Science (CS)" },
-                      { value: "CAC", label: "College of Arts and Communication (CAC)" },
+                      { value: "CAC", label: "College of Arts and Communications (CAC)" },
                       { value: "CSS", label: "College of Social Sciences (CSS)" },
                     ]}
                     value={profile.college}
@@ -300,7 +300,7 @@ export default function FacultyProfilePage() {
                     placeholder="e.g. Dept. of Math and Computer Science"
                     value={profile.department}
                     onChange={set("department")}
-                    maxLength={100}
+                    maxLength={64}
                   />
                 </div>
               )}

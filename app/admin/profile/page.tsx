@@ -337,7 +337,7 @@ export default function AdminProfilePage() {
                       placeholder="e.g. Office of the Chancellor"
                       value={profile.office}
                       onChange={set("office")}
-                      maxLength={100}
+                      maxLength={64}
                     />
                   </div>
                 </div>

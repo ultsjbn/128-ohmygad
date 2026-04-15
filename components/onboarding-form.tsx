@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { User, Hash, Phone, MapPin, } from "lucide-react";
+import { User, Hash, Phone, MapPin, Building2} from "lucide-react";
 import { Input, Select } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { validateFullName, validateContactNum, validateStudentNum } from "@/lib/validation";
@@ -70,6 +70,10 @@ export function OnboardingForm({
   const [program, setProgram] = useState("");
   const [student_num, setStudentNum] = useState("");
   const [year_level, setYearLevel] = useState("");
+
+  // Faculty fields
+  const [department, setDepartment] = useState("");
+  const [office, setOffice] = useState("");
 
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -252,7 +256,7 @@ export function OnboardingForm({
               />
             </div>
 
-            {role === "student" && (
+            {(role === "student" || !role) && (
               <>
                 <Input
                   label="Student Number"
@@ -261,8 +265,8 @@ export function OnboardingForm({
                   value={student_num}
                   onChange={(e) => setStudentNum(e.target.value)}
                   autoComplete="off"
+                  maxLength = {9}
                 />
-
                 <Select
                   label="Year Level"
                   value={year_level}
@@ -276,23 +280,31 @@ export function OnboardingForm({
                     { value: "Extendee", label: "Extendee" },
                   ]}
                 />
+              </>
+            )}
 
+            {(role === "student" || role === "faculty" || !role) && (
+              <>
                 <Select
-                  label="College *"
-                  required
-                  value={college}
-                  onChange={(e) => {
-                    setCollege(e.target.value);
-                    setProgram("");
-                  }}
-                  options={[
-                    { value: "", label: "Select college" },
-                    { value: "CS", label: "College of Science (CS)" },
-                    { value: "CAC", label: "College of Arts and Communication (CAC)" },
-                    { value: "CSS", label: "College of Social Sciences (CSS)" },
-                  ]}
+                    label="College *"
+                    required
+                    value={college}
+                    onChange={(e) => {
+                      setCollege(e.target.value);
+                      setProgram("");
+                    }}
+                    options={[
+                      { value: "", label: "Select college" },
+                      { value: "CS", label: "College of Science (CS)" },
+                      { value: "CAC", label: "College of Arts and Communications (CAC)" },
+                      { value: "CSS", label: "College of Social Sciences (CSS)" },
+                    ]}
                 />
+              </>
+            )}
 
+            {(role === "student" || !role) && (
+              <>
                 <Select
                   label="Program *"
                   required
@@ -305,6 +317,32 @@ export function OnboardingForm({
                       : [{ value: "", label: "Select a college first" }]
                   }
                 />
+              </>
+            )}
+
+            {role === "faculty" && (
+              <>
+                <Input
+                    label="Department"
+                    prefixIcon={<Building2 size={15} />}
+                    placeholder="e.g. Dept. of Math and Computer Science"
+                    value={department}
+                    onChange={(e) => setDepartment("department")}
+                    maxLength={64}
+                  />
+              </>
+            )}
+
+            {role === "admin" && (
+              <>
+                <Input
+                    label="Office / Unit"
+                    prefixIcon={<Building2 size={15} />}
+                    placeholder="e.g. Office of the Chancellor"
+                    value={department}
+                    onChange={(e) => setDepartment("department")}
+                    maxLength={64}
+                  />
               </>
             )}
 
@@ -334,6 +372,7 @@ export function OnboardingForm({
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
                 autoComplete="off"
+                maxLength={100}
               />
             </div>
 
