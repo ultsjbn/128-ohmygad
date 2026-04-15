@@ -349,7 +349,7 @@ export default function DashboardPage() {
         </div>
 
         {/* right panel ------------------------------------------------------------------------------------------------ */}
-        <aside className="flex flex-col gap-3 xl:w-[268px] shrink-0 pb-8">
+        <aside className="flex flex-col gap-3 xl:w-[268px] shrink-0 pb-8 mt-8">
             {/* calendar */}
             <Card variant="no-hover" className="p-4">
                 <MiniCalendar

@@ -1260,7 +1260,7 @@ body {
   max-width: 480px;
   padding: 32px;
   position: relative;
-  animation: modalIn 0.25s ease;
+  animation: modalIn 0.15s ease;
   max-height: calc(100dvh - 40px);
   display: flex;
   flex-direction: column;
@@ -1310,7 +1310,7 @@ body {
   max-height: 100dvh;
   border-radius: 0;
   padding: 0;
-  animation: modalFadeIn 0.25s ease;
+  animation: modalFadeIn 0.15s ease;
 }
 
 @keyframes modalFadeIn {
