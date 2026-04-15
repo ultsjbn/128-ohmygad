@@ -377,7 +377,7 @@ export default function EventsPage() {
 
             {/* filter is icon only on mobile, text on md+ devices */}
             <Dropdown trigger={
-              <Button variant={hasActiveFilters ? "pink-light" : "ghost"}>
+              <Button variant={hasActiveFilters ? "pink" : "ghost"}>
                 <SlidersHorizontal size={15} />
                 <span className="hidden md:inline">Filter</span>
                 {hasActiveFilters && (
