@@ -168,11 +168,11 @@ export default function CoursesPage() {
   const totalActiveFilters = filters.semester.size;
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6 mt-2">
       {/* Header */}
-      <div className="hidden md:block">
+      {/* <div className="hidden md:block">
         <h1 className="heading-lg">Rules and Guidelines</h1>
-      </div>
+      </div> */}
 
       {/* Toolbar */}
       <div className="flex flex-col gap-3">
