@@ -552,8 +552,6 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
               value={deletePassword}
               onChange={(e) => setDeletePassword(e.target.value)}
               placeholder="Password"
-              autoComplete="new-password"
-              className="input input-bordered w-full"
             />
           </div>
         </div>

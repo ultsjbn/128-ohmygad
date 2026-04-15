@@ -560,7 +560,7 @@ export default function EventsPage() {
               </div>
             </div>
 
-            {/* body - overflow-y-auto here so only body scrolls, cover + footer stay fixed */}
+            {/* only body scrolls, cover + footer stay fixed */}
             <div className="flex flex-col gap-3 p-3 sm:p-5 overflow-y-auto">
               {/* title */}
               <h2 className="heading-md m-0">{detailEvent.title}</h2>

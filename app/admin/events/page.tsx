@@ -3,11 +3,11 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { Plus, ArrowUpDown, SlidersHorizontal, Pencil, Trash2, Loader2, ChevronUp, ChevronDown, Copy, Check, Users, ClipboardCheck, MapPin, CalendarDays } from "lucide-react";
+import { Plus, ArrowUpDown, SlidersHorizontal, Pencil, Trash2, Loader2, ChevronUp, ChevronDown, Copy, Check, Users, ClipboardCheck, MapPin, CalendarDays, Clock, X, ClipboardList } from "lucide-react";
 import EventForm, { type EventFormData } from "@/components/admin/event-form";
+import { Tabs } from "@/components/ui";
 import { paginate, totalPages, PER_PAGE } from "@/lib/pagination.utils";
 import { Pagination } from "@/components/pagination";
-import Image from "next/image";
 
 import {
   Input,
@@ -45,13 +45,22 @@ const STATUS_VARIANT: Record<string, BadgeVariant> = {
   past: "periwinkle",
 };
 
+const CATEGORY_GRADIENT: Record<string, string> = {
+  Orientation: "linear-gradient(135deg, #F4C97A 0%, #FAF8FF 100%)",
+  Forum: "linear-gradient(135deg, #F4A7B9 0%, #FAF8FF 100%)",
+  Research: "linear-gradient(135deg, #B8B5E8 0%, #FAF8FF 100%)",
+  Training: "linear-gradient(135deg, #6DC5A0 0%, #FAF8FF 100%)",
+  Workshop: "linear-gradient(135deg, #2D2A4A 0%, #FAF8FF 100%)",
+};
+const DEFAULT_GRADIENT = "linear-gradient(135deg, #B8B5E8 0%, #2D2A4A 100%)";
+
 type RegisteredUser = {
-  registration_id: string;       // event_registration.id — needed to update attended
+  registration_id: string;
   display_name: string | null;
   full_name: string | null;
   email: string | null;
   registration_date: string | null;
-  attended: boolean;             // from event_registration.attended column
+  attended: boolean;
 };
 
 function CheckItem({
@@ -716,212 +725,204 @@ export default function EventsPage() {
         )}
       </Modal>
 
-      {/* Event detail modal */}
+      {/* event detail modal */}
       <Modal
         open={!!detailEvent}
         onClose={() => setDetailEvent(null)}
-        title={detailEvent?.title}
-        modalStyle={{ maxWidth: 960 }}
-        contentStyle={{ display: "flex" }}
+        hideCloseButton
+        modalStyle={{ maxWidth: 960, padding: 0 }}
+        contentStyle={{ display: "flex", flexDirection: "column" }}
       >
         {detailEvent && (
-          <div className="flex gap-4 w-full">
+          <div className="flex flex-col min-h-0">
+            {/* banner cover */}
+            <div
+              className="h-[300px] sm:h-[280px] relative shrink-0 rounded-t-[var(--radius-xl)]"
+              style={{ background: detailEvent.banner_url ? `url(${detailEvent.banner_url}) center/cover no-repeat` : CATEGORY_GRADIENT[detailEvent.category ?? ""] ?? DEFAULT_GRADIENT }}
+            >
+              {/* close button inside cover */}
+              <button
+                onClick={() => setDetailEvent(null)}
+                aria-label="Close"
+                className="absolute top-3 right-3 w-4 h-4 sm:w-6 sm:h-6 rounded-full border-none cursor-pointer flex items-center justify-center text-[var(--primary-dark)] z-10 backdrop-blur-sm bg-white/80"
+              >
+                <X size={14} />
+              </button>
 
-            {/* left column: Event info */}
-            <div className="flex flex-col gap-4 flex-1">
-
-              <div className="flex flex-wrap gap-2">
-                {detailEvent.category && <Badge variant={CATEGORY_VARIANT[detailEvent.category] ?? "dark"}>{detailEvent.category}</Badge>}
-                {detailEvent.status && <Badge variant={STATUS_VARIANT[detailEvent.status] ?? "dark"}><span className="capitalize">{detailEvent.status}</span></Badge>}
-              </div>
-
-              <div className="grid grid-cols-2 gap-3 text-sm">
-                {detailEvent.registration_open && (
-                  <div>
-                    <div className="flex items-center gap-1.5">
-                      <CalendarDays size={14} className="text-[var(--gray)] shrink-0" />
-                      <p className="label !m-0">Registration Open</p>
-                    </div>
-                    <p className="body ml-0.5">{new Date(detailEvent.registration_open).toLocaleDateString("en-PH", { month: "long", day: "numeric", year: "numeric" })}</p>
-                  </div>
-                )}
-                {detailEvent.registration_close && (
-                  <div>
-                    <div className="flex items-center gap-1.5">
-                      <CalendarDays size={14} className="text-[var(--gray)] shrink-0" />
-                      <p className="label !m-0">Registration Close</p>
-                    </div>
-                    <p className="body ml-0.5">{new Date(detailEvent.registration_close).toLocaleDateString("en-PH", { month: "long", day: "numeric", year: "numeric" })}</p>
-                  </div>
-                )}
-                {detailEvent.start_date && (
-                  <div>
-                    <div className="flex items-center gap-1.5">
-                      <CalendarDays size={14} className="text-[var(--gray)] shrink-0" />
-                      <p className="label !m-0">Event Start</p>
-                    </div>
-                    <p className="body ml-0.5">{new Date(detailEvent.start_date).toLocaleDateString("en-PH", { month: "long", day: "numeric", year: "numeric" })}</p>
-                  </div>
-                )}
-                {detailEvent.end_date && (
-                  <div>
-                    <div className="flex items-center gap-1.5">
-                      <CalendarDays size={14} className="text-[var(--gray)] shrink-0" />
-                      <p className="label !m-0">Event End</p>
-                    </div>
-                    <p className="body ml-0.5">{new Date(detailEvent.end_date).toLocaleDateString("en-PH", { month: "long", day: "numeric", year: "numeric" })}</p>
-                  </div>
-                )}
-                {detailEvent.location && (
-                  <div>
-                    <div className="flex items-center gap-1.5">
-                      <MapPin size={14} className="text-[var(--gray)] shrink-0" />
-                      <p className="label !m-0">Location</p>
-                    </div>
-                    <p className="body ml-0.5">{detailEvent.location}</p>
-                  </div>
-                )}
-                {detailEvent.capacity != null && (
-                  <div>
-                    <div className="flex items-center gap-1.5">
-                      <Users size={14} className="text-[var(--gray)] shrink-0" />
-                      <p className="label !m-0">Capacity</p>
-                    </div>
-                    <p className="body ml-0.5">{detailEvent.capacity}</p>
-                  </div>
+              {/* category and status badges bottom-left of cover */}
+              <div className="absolute bottom-3 left-3 flex gap-2 items-center">
+                <Badge variant={CATEGORY_VARIANT[detailEvent.category ?? ""] ?? "dark"}>
+                  {detailEvent.category ?? "Uncategorized"}
+                </Badge>
+                {detailEvent.status && (
+                  <Badge variant={STATUS_VARIANT[detailEvent.status.toLowerCase().trim()] ?? "dark"}>
+                    <span className="capitalize">{detailEvent.status}</span>
+                  </Badge>
                 )}
               </div>
-
-              {detailEvent?.banner_url && (
-                <Image
-                  src={detailEvent.banner_url}
-                  alt="Event Banner"
-                  width={800}
-                  height={400}
-                  className="w-full h-auto rounded-lg object-cover"
-                />
-              )}
-
-              {detailEvent.description && (
-                <div>
-                  <p className="label mb-1">Description</p>
-                  <p className="body whitespace-pre-wrap text-[var(--gray)]">{detailEvent.description}</p>
-                </div>
-              )}
             </div>
 
-            {/* right column: Registrations + Attendance */}
-            <div className="flex flex-col gap-4 flex-1">
+            {/* two-column body */}
+            <div className="flex gap-4 p-3 sm:p-5 overflow-y-auto">
 
-              {/* sub-tab toggle */}
-              <div className="flex rounded-xl overflow-hidden border border-[rgba(45,42,74,0.10)] w-fit items-center">
-                <button
-                  onClick={() => setDetailTab("registrations")}
-                  className={`flex items-center gap-1.5 px-4 py-2 text-sm font-medium transition-colors ${detailTab === "registrations" ? "bg-[var(--primary-dark)] text-white" : "text-[var(--gray)] hover:bg-[var(--lavender)]"}`}
-                >
-                  <Users size={14} /> Registrations
-                </button>
-                <button
-                  onClick={() => setDetailTab("attendance")}
-                  className={`flex items-center gap-1.5 px-4 py-2 text-sm font-medium transition-colors ${detailTab === "attendance" ? "bg-[var(--primary-dark)] text-white" : "text-[var(--gray)] hover:bg-[var(--lavender)]"}`}
-                >
-                  <ClipboardCheck size={14} /> Attendance
-                </button>
+              {/* left column: event info */}
+              <div className="flex flex-col gap-4 flex-1 min-w-0">
+                <h2 className="heading-md m-0">{detailEvent.title}</h2>
+
+                <div className="flex flex-col gap-1.5">
+                  <div className="flex items-start gap-3 caption sm:text-sm text-[var(--gray)]">
+                    <CalendarDays size={15} className="shrink-0 mt-0.5" />
+                    <span>
+                      {detailEvent.start_date ? new Date(detailEvent.start_date).toLocaleDateString("en-PH", { month: "long", day: "numeric", year: "numeric" }) : "—"}
+                      {detailEvent.end_date && detailEvent.end_date !== detailEvent.start_date && (
+                        <> — {new Date(detailEvent.end_date).toLocaleDateString("en-PH", { month: "long", day: "numeric", year: "numeric" })}</>
+                      )}
+                    </span>
+                  </div>
+                  <div className="flex items-start gap-3 caption sm:text-sm text-[var(--gray)]">
+                    <Clock size={15} className="shrink-0 mt-0.5" />
+                    <span>
+                      {detailEvent.start_date ? new Date(detailEvent.start_date).toLocaleTimeString("en-PH", { hour: "numeric", minute: "2-digit" }) : "—"}
+                      {detailEvent.end_date && detailEvent.end_date !== detailEvent.start_date && (
+                        <> — {new Date(detailEvent.end_date).toLocaleTimeString("en-PH", { hour: "numeric", minute: "2-digit" })}</>
+                      )}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3 caption sm:text-sm text-[var(--gray)]">
+                    <MapPin size={15} className="shrink-0" />
+                    <span>{detailEvent.location ?? "—"}</span>
+                  </div>
+                  <div className="flex items-center gap-3 caption sm:text-sm text-[var(--gray)]">
+                    <Users size={15} className="shrink-0" />
+                    <span>Capacity: {detailEvent.capacity ?? "—"}</span>
+                  </div>
+                  {(detailEvent.registration_open || detailEvent.registration_close) && (
+                    <div className="flex items-center gap-3 caption sm:text-sm text-[var(--gray)]">
+                      <ClipboardList size={15} className="shrink-0" />
+                      <span>
+                        Registration:&nbsp;
+                        {detailEvent.registration_open ? new Date(detailEvent.registration_open).toLocaleDateString("en-PH", { month: "long", day: "numeric" }) : "?"}
+                        &nbsp;—&nbsp;
+                        {detailEvent.registration_close ? new Date(detailEvent.registration_close).toLocaleDateString("en-PH", { month: "long", day: "numeric" }) : "?"}
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="divider"/>
+
+                <div className="flex flex-col gap-2">
+                  <p className="label">ABOUT THIS EVENT</p>
+                  <p className="body whitespace-pre-wrap">{detailEvent.description || "No description provided."}</p>
+                </div>
               </div>
 
-              {/* registrations panel */}
-              {detailTab === "registrations" && (
-                <div className="flex flex-col gap-3">
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-2">
-                      <Users size={15} className="text-[var(--gray)]" />
-                      {loadingRegs ? (
-                        <span className="caption text-[var(--gray)]">Loading…</span>
-                      ) : (
-                        <span className="caption">
-                          <strong>{registrations.length}</strong> registered user{registrations.length !== 1 ? "s" : ""}
-                        </span>
+              {/* right column: registrations + attendance */}
+              <div className="flex flex-col gap-4 flex-1 min-w-0">
+
+                {/* sub-tab toggle */}
+                <Tabs
+                  tabs={["Registrations", "Attendance"]}
+                  icons={[<Users key="reg" size={14} />, <ClipboardCheck key="att" size={14} />]}
+                  defaultTab={detailTab === "registrations" ? "Registrations" : "Attendance"}
+                  onChange={(tab) => setDetailTab(tab === "Registrations" ? "registrations" : "attendance")}
+                  className="w-fit"
+                />
+
+                {/* registrations panel */}
+                {detailTab === "registrations" && (
+                  <div className="flex flex-col gap-3">
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-2">
+                        <Users size={15} className="text-[var(--gray)]" />
+                        {loadingRegs ? (
+                          <span className="caption text-[var(--gray)]">Loading…</span>
+                        ) : (
+                          <span className="caption">
+                            <strong>{registrations.length}</strong> registered user{registrations.length !== 1 ? "s" : ""}
+                          </span>
+                        )}
+                      </div>
+                      {!loadingRegs && registrations.length > 0 && (
+                        <Button variant="soft" size="sm" onClick={() => handleCopyEmails(registrations)} title="Copy all emails to clipboard">
+                          {copied ? <><Check size={13} /> Copied!</> : <><Copy size={13} /> Copy emails</>}
+                        </Button>
                       )}
                     </div>
-                    {!loadingRegs && registrations.length > 0 && (
-                      <Button variant="soft" size="sm" onClick={() => handleCopyEmails(registrations)} title="Copy all emails to clipboard">
-                        {copied ? <><Check size={13} /> Copied!</> : <><Copy size={13} /> Copy emails</>}
-                      </Button>
+
+                    {loadingRegs ? (
+                      <div className="flex items-center justify-center gap-2 py-8 text-[var(--gray)]">
+                        <Loader2 size={18} className="animate-spin" />
+                        <span className="caption">Loading registrations…</span>
+                      </div>
+                    ) : registrations.length === 0 ? (
+                      <div className="flex flex-col items-center justify-center gap-2 py-8 rounded-xl border border-dashed border-[rgba(45,42,74,0.12)]">
+                        <Users size={24} className="text-[var(--gray)] opacity-40" />
+                        <p className="caption text-[var(--gray)]">No registrations yet.</p>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col max-h-[420px] overflow-y-auto pr-1">
+                        <div className="grid grid-cols-[1fr_1fr_44px] gap-3 px-3 sticky top-0 bg-white">
+                          <span className="label">Name</span>
+                          <span className="label">Email</span>
+                          <span className="label text-center">Present</span>
+                        </div>
+                        <div className="divider my-0" />
+                        {registrations.map((user, i) => (
+                          <UserRow key={user.registration_id} user={user} i={i} showCheckbox />
+                        ))}
+                      </div>
                     )}
                   </div>
+                )}
 
-                  {loadingRegs ? (
-                    <div className="flex items-center justify-center gap-2 py-8 text-[var(--gray)]">
-                      <Loader2 size={18} className="animate-spin" />
-                      <span className="caption">Loading registrations…</span>
-                    </div>
-                  ) : registrations.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center gap-2 py-8 rounded-xl border border-dashed border-[rgba(45,42,74,0.12)]">
-                      <Users size={24} className="text-[var(--gray)] opacity-40" />
-                      <p className="caption text-[var(--gray)]">No registrations yet.</p>
-                    </div>
-                  ) : (
-                    <div className="flex flex-col max-h-[420px] overflow-y-auto pr-1">
-                      <div className="grid grid-cols-[1fr_1fr_44px] gap-3 px-3 sticky top-0 bg-white">
-                        <span className="label">Name</span>
-                        <span className="label">Email</span>
-                        <span className="label text-center">Present</span>
+                {/* attendance panel */}
+                {detailTab === "attendance" && (
+                  <div className="flex flex-col gap-3">
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-2">
+                        <ClipboardCheck size={15} className="text-[var(--gray)]" />
+                        {loadingRegs ? (
+                          <span className="caption text-[var(--gray)]">Loading…</span>
+                        ) : (
+                          <span className="caption">
+                            <strong>{attendanceCount}</strong> attended out of <strong>{registrations.length}</strong> registered
+                          </span>
+                        )}
                       </div>
-                      <div className="divider my-0" />
-                      {registrations.map((user, i) => (
-                        <UserRow key={user.registration_id} user={user} i={i} showCheckbox />
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* Attendance panel */}
-              {detailTab === "attendance" && (
-                <div className="flex flex-col gap-3">
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-2">
-                      <ClipboardCheck size={15} className="text-[var(--gray)]" />
-                      {loadingRegs ? (
-                        <span className="caption text-[var(--gray)]">Loading…</span>
-                      ) : (
-                        <span className="caption">
-                          <strong>{attendanceCount}</strong> attended out of <strong>{registrations.length}</strong> registered
-                        </span>
+                      {!loadingRegs && attendedUsers.length > 0 && (
+                        <Button variant="soft" size="sm" onClick={() => handleCopyEmails(attendedUsers)} title="Copy emails to clipboard">
+                          {copied ? <><Check size={13} /> Copied!</> : <><Copy size={13} /> Copy emails</>}
+                        </Button>
                       )}
                     </div>
-                    {!loadingRegs && attendedUsers.length > 0 && (
-                      <Button variant="soft" size="sm" onClick={() => handleCopyEmails(attendedUsers)} title="Copy all emails to clipboard">
-                        {copied ? <><Check size={13} /> Copied!</> : <><Copy size={13} /> Copy emails</>}
-                      </Button>
+
+                    {loadingRegs ? (
+                      <div className="flex items-center justify-center gap-2 py-8 text-[var(--gray)]">
+                        <Loader2 size={18} className="animate-spin" /><span className="caption">Loading…</span>
+                      </div>
+                    ) : attendedUsers.length === 0 ? (
+                      <div className="flex flex-col items-center justify-center gap-2 py-8 rounded-xl border border-dashed border-[rgba(45,42,74,0.12)]">
+                        <ClipboardCheck size={24} className="text-[var(--gray)] opacity-40" />
+                        <p className="caption">No attendees marked yet.</p>
+                        <p className="caption text-center max-w-[250px]">Mark attendance in the Registrations tab using the checkboxes.</p>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col max-h-[420px] overflow-y-auto pr-1">
+                        <div className="grid grid-cols-[1fr_1fr] gap-3 px-3 sticky top-0 bg-white">
+                          <span className="label">Name</span>
+                          <span className="label">Email</span>
+                        </div>
+                        <div className="divider my-0" />
+                        {attendedUsers.map((user, i) => (
+                          <UserRow key={user.registration_id} user={user} i={i} showCheckbox={false} />
+                        ))}
+                      </div>
                     )}
                   </div>
+                )}
 
-                  {loadingRegs ? (
-                    <div className="flex items-center justify-center gap-2 py-8 text-[var(--gray)]">
-                      <Loader2 size={18} className="animate-spin" /><span className="caption">Loading…</span>
-                    </div>
-                  ) : attendedUsers.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center gap-2 py-8 rounded-xl border border-dashed border-[rgba(45,42,74,0.12)]">
-                      <ClipboardCheck size={24} className="text-[var(--gray)] opacity-40" />
-                      <p className="caption">No attendees marked yet.</p>
-                      <p className="caption text-center max-w-[250px]">Mark attendance in the Registrations tab using the checkboxes.</p>
-                    </div>
-                  ) : (
-                    <div className="flex flex-col gap-1 max-h-[420px] overflow-y-auto pr-1">
-                      <div className="grid grid-cols-[1fr_1fr] gap-3 px-3 py-1.5 sticky top-0 bg-white">
-                        <span className="label">Name</span>
-                        <span className="label">Email</span>
-                      </div>
-                      <div className="divider my-0" />
-                      {attendedUsers.map((user, i) => (
-                        <UserRow key={user.registration_id} user={user} i={i} showCheckbox={false} />
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
-
+              </div>
             </div>
           </div>
         )}
@@ -944,7 +945,7 @@ export default function EventsPage() {
       >
         {deleteTarget && (
           <div className="flex flex-col gap-4">
-            <div className="p-4 rounded-xl bg-[var(--pink-light)] border border-[rgba(244,123,123,0.2)]">
+            <div className="p-2 rounded-xl bg-[var(--pink-light)] border border-[rgba(244,123,123,0.2)]">
               <p className="text-sm text-[var(--error)] font-bold mb-1">Warning</p>
               <p className="text-sm text-[var(--primary-dark)]">You are about to delete: <strong className="break-words">{deleteTarget.title}</strong></p>
             </div>
@@ -954,10 +955,8 @@ export default function EventsPage() {
                 type="password"
                 value={deletePassword}
                 onChange={(e) => setDeletePassword(e.target.value)}
-                className="w-full px-3 py-2 border border-[rgba(45,42,74,0.2)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--pink-light)] disabled:opacity-50"
                 placeholder="Password"
                 disabled={!!deletingId}
-                autoComplete="new-password"
               />
             </div>
           </div>
