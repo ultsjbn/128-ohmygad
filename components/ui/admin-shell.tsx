@@ -202,7 +202,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
           style={{ scrollbarGutter: "stable", position: "relative" }}
         >
           {children}
-          <footer className="fixed bottom-0 mt-8 mb-3 flex flex-wrap items-center justify-between gap-2 text-[10px] text-[var(--gray)]/60 border-t border-black/[0.05] pt-3">
+          <footer className={`${pathname === "/admin" ? "static" : "fixed"} bottom-0 mt-8 mb-3 flex flex-wrap items-center justify-between gap-2 text-[10px] text-[var(--gray)]/60 border-t border-black/[0.05] pt-3`}>
             <span className="flex flex-wrap items-center gap-x-1.5">
               <strong className="font-semibold text-[var(--primary-dark)]/60">Kasarian / Gender Studies UP Baguio</strong>
               <span className="opacity-30">·</span>
