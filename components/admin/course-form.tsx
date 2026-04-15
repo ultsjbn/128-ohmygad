@@ -78,10 +78,10 @@ export default function CourseForm({ initialData, mode, onSuccess, onCancel }: C
       )}
 
       {/* scrollable wrapper for mobile, fully expanded on desktop */}
-      <div className="flex-1 overflow-y-auto custom-scrollbar pr-1 pb-4 min-h-0">
+      <div className="flex-1 overflow-y-auto custom-scrollbar pr-1 pb-2 min-h-0">
         <div className="gap-6 flex flex-col">
           {/* basic information */}
-          <div className="flex flex-col p-3">
+          <div className="flex flex-col">
             <div className="border-b border-[rgba(45,42,74,0.08)] pb-2 mb-4">
               <h3 className="heading-md">Guideline Information</h3>
             </div>
