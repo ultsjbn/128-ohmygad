@@ -252,6 +252,22 @@ export function OnboardingForm({
               />
             </div>
 
+            <Select
+                  label="College *"
+                  required
+                  value={college}
+                  onChange={(e) => {
+                    setCollege(e.target.value);
+                    setProgram("");
+                  }}
+                  options={[
+                    { value: "", label: "Select college" },
+                    { value: "CS", label: "College of Science (CS)" },
+                    { value: "CAC", label: "College of Arts and Communications (CAC)" },
+                    { value: "CSS", label: "College of Social Sciences (CSS)" },
+                  ]}
+              />
+
             {role === "student" && (
               <>
                 <Input
@@ -261,6 +277,7 @@ export function OnboardingForm({
                   value={student_num}
                   onChange={(e) => setStudentNum(e.target.value)}
                   autoComplete="off"
+                  maxLength = {9}
                 />
 
                 <Select
@@ -274,22 +291,6 @@ export function OnboardingForm({
                     { value: "3rd Year", label: "3rd Year" },
                     { value: "4th Year", label: "4th Year" },
                     { value: "Extendee", label: "Extendee" },
-                  ]}
-                />
-
-                <Select
-                  label="College *"
-                  required
-                  value={college}
-                  onChange={(e) => {
-                    setCollege(e.target.value);
-                    setProgram("");
-                  }}
-                  options={[
-                    { value: "", label: "Select college" },
-                    { value: "CS", label: "College of Science (CS)" },
-                    { value: "CAC", label: "College of Arts and Communication (CAC)" },
-                    { value: "CSS", label: "College of Social Sciences (CSS)" },
                   ]}
                 />
 
