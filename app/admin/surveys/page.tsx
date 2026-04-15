@@ -303,7 +303,7 @@ export default function SurveysPage() {
     },
     {
       key: "actions",
-      header: <div className="text-right">Actions</div>,
+      header: <div className="text-center">Actions</div>,
       width: "13%",
       render: (survey) => (
         <div style={{ display: "flex", justifyContent: "flex-end", gap: 4 }}>
@@ -376,7 +376,7 @@ export default function SurveysPage() {
           {/* filter */}
           <Dropdown
             trigger={
-              <Button variant={hasActiveFilters ? "pink-light" : "ghost"}>
+              <Button variant={hasActiveFilters ? "pink" : "ghost"}>
                 <SlidersHorizontal size={15} /> Filter
                 {hasActiveFilters && (
                   <span

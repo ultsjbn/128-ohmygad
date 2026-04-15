@@ -915,7 +915,7 @@ export default function EventsPage() {
       >
         {deleteTarget && (
           <div className="flex flex-col gap-4">
-            <div className="p-4 rounded-xl bg-[var(--pink-light)] border border-[rgba(244,123,123,0.2)]">
+            <div className="p-2 rounded-xl bg-[var(--pink-light)] border border-[rgba(244,123,123,0.2)]">
               <p className="text-sm text-[var(--error)] font-bold mb-1">Warning</p>
               <p className="text-sm text-[var(--primary-dark)]">You are about to delete: <strong className="break-words">{deleteTarget.title}</strong></p>
             </div>
@@ -925,10 +925,8 @@ export default function EventsPage() {
                 type="password"
                 value={deletePassword}
                 onChange={(e) => setDeletePassword(e.target.value)}
-                className="w-full px-3 py-2 border border-[rgba(45,42,74,0.2)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--pink-light)] disabled:opacity-50"
                 placeholder="Password"
                 disabled={!!deletingId}
-                autoComplete="new-password"
               />
             </div>
           </div>
