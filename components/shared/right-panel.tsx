@@ -9,7 +9,7 @@ export default function RightPanel() {
   return (
     <aside className="flex flex-col gap-4 w-full shrink-0 pb-8">
       {/* GSOs attended */}
-      <Card variant="no-hover" className="flex flex-col gap-2 p-4 cursor-pointer transition-all" >
+      <Card variant="no-hover" className="flex flex-col gap-2 p-4 transition-all" >
         <div className="flex items-center justify-between">
           <p className="body">GSOs Attended</p>
           <CheckCircle2 size={18} style={{ color: "var(--periwinkle)" }} />
