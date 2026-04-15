@@ -30,8 +30,8 @@ interface SortState {
 const SORT_OPTIONS: { label: string; field: SortField }[] = [
   { label: "Title",     field: "title"    },
   { label: "Status",    field: "status"   },
-  { label: "Opens At",  field: "open_at"  },
-  { label: "Closes At", field: "close_at" },
+  { label: "Open Date",  field: "open_at"  },
+  { label: "Close Date", field: "close_at" },
 ];
 
 type BadgeVariant = "pink-light" | "periwinkle" | "dark" | "success" | "warning" | "error";
