@@ -18,7 +18,7 @@ import GlobalSearch from "@/components/global-search";
 import EventForm from "@/components/admin/event-form";
 import UserForm from "@/components/admin/user-form";
 import CourseForm from "@/components/admin/course-form";
-import SurveyForm, { type SurveyQuestion } from "@/components/admin/survey-form";
+import SurveyForm from "@/components/admin/survey-form";
 
 // constants ------------------------------------------------
 const BRAND_COLORS = ["#B8B5E8", "#F4A7B9", "#6DC5A0", "#F4C97A", "#9B9BB4", "#2D2A4A"];
@@ -73,8 +73,7 @@ export default function DashboardPage() {
 
     // quick action modals
     const [activeModal, setActiveModal]             = useState<"event" | "user" | "course" | "survey" | null>(null);
-    const [editSurveyQuestions, setEditSurveyQuestions] = useState<SurveyQuestion[]>([]);
-    const closeModal = () => { setActiveModal(null); setEditSurveyQuestions([]); };
+    const closeModal = () => setActiveModal(null);
 
     const {
         eventAttendanceData,
@@ -106,23 +105,24 @@ export default function DashboardPage() {
     );
 
     return (
-        <div className="flex flex-col xl:flex-row gap-5 w-full animate-in fade-in duration-500">
+        <div className="flex flex-col gap-2 w-full animate-in fade-in duration-500">
+
+        {/* greeting ------------------------------------------------ */}
+        <div className="flex items-center justify-between w-full">
+            <h2 className="heading-md">Good day, Admin!</h2>
+            <DashboardFilter
+                value={filters}
+                onChange={setFilters}
+                options={filterOptions}
+            />
+        </div>
 
         {/* ------------------------------------------------ MAIN CONTENT ------------------------------------------------*/}
+        <div className="flex flex-col xl:flex-row gap-3">
         <div className="flex flex-col gap-3 flex-1 min-w-0 pb-2">
 
-            {/* KPI section + greeting ------------------------------------------------ */}
+            {/* KPI section ------------------------------------------------ */}
             <div className="flex flex-col gap-3">
-                {/* greeting */}
-                <div className="flex items-center justify-between">
-                    <h2 className="heading-md">Good day, Admin!</h2>
-                    <DashboardFilter
-                        value={filters}
-                        onChange={setFilters}
-                        options={filterOptions}
-                    />
-                </div>
-
                 <GlobalSearch role="admin" placeholder="Search events, courses, surveys..." />
                 <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
                     <StatCard
@@ -349,7 +349,7 @@ export default function DashboardPage() {
         </div>
 
         {/* right panel ------------------------------------------------------------------------------------------------ */}
-        <aside className="flex flex-col gap-3 xl:w-[268px] shrink-0 pb-8 mt-8">
+        <aside className="flex flex-col gap-3 xl:w-[268px] shrink-0 pb-8">
             {/* calendar */}
             <Card variant="no-hover" className="p-4">
                 <MiniCalendar
@@ -363,6 +363,8 @@ export default function DashboardPage() {
                 <TodayTimeline events={todayEvents} loading={loading} />
             </Card>
         </aside>
+
+        </div>{/* end xl:flex-row */}
 
         {/* quick action modals */}
         <Modal open={activeModal === "event"} onClose={closeModal} title="New Event" modalStyle={{ maxWidth: 900 }}>
