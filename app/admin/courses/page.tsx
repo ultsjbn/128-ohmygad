@@ -257,7 +257,7 @@ export default function CoursesPage() {
 
 
             <Button variant="primary" onClick={() => setCreateModalOpen(true)}>
-                <Plus size={16} /> Add Course
+                <Plus size={16} /> Add Guideline
             </Button>
         </div>
 

@@ -137,7 +137,7 @@ export default function CourseForm({ initialData, mode, onSuccess, onCancel }: C
               ? "Creating..."
               : "Saving..."
             : mode === "create"
-              ? "Create Course"
+              ? "Create Guideline"
               : "Save Changes"}
         </Button>
       </div>
