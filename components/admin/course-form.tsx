@@ -83,7 +83,7 @@ export default function CourseForm({ initialData, mode, onSuccess, onCancel }: C
           {/* basic information */}
           <div className="flex flex-col p-3">
             <div className="border-b border-[rgba(45,42,74,0.08)] pb-2 mb-4">
-              <h3 className="heading-md">Course Information</h3>
+              <h3 className="heading-md">Guideline Information</h3>
             </div>
 
             <div className="flex flex-col gap-4">
