@@ -243,8 +243,8 @@ export default function UserForm({ initialData, onSuccess, layout = "modal" }: U
               {(role === "student" || !role) && <Select label="Year Level" value={year_level} onChange={(e) => setYearLevel(e.target.value)} options={YEAR_OPTIONS} />}
               {(role === "student" || role === "faculty" || !role) && <Select label="College" value={college} onChange={(e) => setCollege(e.target.value)} options={COLLEGE_OPTIONS} />}
               {(role === "student" || !role) && <Select label="Program" value={program} onChange={(e) => setProgram(e.target.value)} options={college && UPB_PROGRAMS[college] ? [{ value: "", label: "Select program" }, ...UPB_PROGRAMS[college]] : [{ value: "", label: "Select a college first" }]}/>}
-              {role === "faculty" && <Input label="Department" prefixIcon={<Building2 size={15} />} placeholder="e.g. Dept. of Math and Computer Science" value={department} onChange={(e) => setDepartment(e.target.value)} maxLength={100} />}
-              {role === "admin" && <Input label="Office / Unit" prefixIcon={<Building2 size={15} />} placeholder="e.g. Office of the Chancellor" value={office} onChange={(e) => setOffice(e.target.value)} maxLength={100} />}
+              {role === "faculty" && <Input label="Department" prefixIcon={<Building2 size={15} />} placeholder="e.g. Dept. of Math and Computer Science" value={department} onChange={(e) => setDepartment(e.target.value)} maxLength={64} />}
+              {role === "admin" && <Input label="Office / Unit" prefixIcon={<Building2 size={15} />} placeholder="e.g. Office of the Chancellor" value={office} onChange={(e) => setOffice(e.target.value)} maxLength={64} />}
               <div className="col-span-full">
                 <Input label="Address" prefixIcon={<MapPin size={15} />} placeholder="City, Province" value={address} onChange={(e) => setAddress(e.target.value)} />
               </div>
@@ -306,8 +306,8 @@ export default function UserForm({ initialData, onSuccess, layout = "modal" }: U
         {(role === "student" || !role) && <Select label="Year Level" value={year_level} onChange={(e) => setYearLevel(e.target.value)} options={YEAR_OPTIONS} />}
         {(role === "student" || role === "faculty" || !role) && <Select label="College" value={college} onChange={(e) => setCollege(e.target.value)} options={COLLEGE_OPTIONS} />}
         {(role === "student" || !role) && <Select label="Program" value={program} onChange={(e) => setProgram(e.target.value)} options={college && UPB_PROGRAMS[college] ? [{ value: "", label: "Select program" }, ...UPB_PROGRAMS[college]] : [{ value: "", label: "Select a college first" }]}/>}
-        {role === "faculty" && <Input label="Department" prefixIcon={<Building2 size={15} />} placeholder="e.g. Dept. of Math and Computer Science" value={department} onChange={(e) => setDepartment(e.target.value)} maxLength={100} />}
-        {role === "admin" && <Input label="Office / Unit" prefixIcon={<Building2 size={15} />} placeholder="e.g. Office of the Chancellor" value={office} onChange={(e) => setOffice(e.target.value)} maxLength={100} />}
+        {role === "faculty" && <Input label="Department" prefixIcon={<Building2 size={15} />} placeholder="e.g. Dept. of Math and Computer Science" value={department} onChange={(e) => setDepartment(e.target.value)} maxLength={64} />}
+        {role === "admin" && <Input label="Office / Unit" prefixIcon={<Building2 size={15} />} placeholder="e.g. Office of the Chancellor" value={office} onChange={(e) => setOffice(e.target.value)} maxLength={64} />}
         <Input label="Contact Number" prefixIcon={<Phone size={15} />} maxLength={11} placeholder="e.g. 09123456789" value={contact_num} onChange={handleContactNumChange} />
         <Input label="Address" prefixIcon={<MapPin size={15} />} placeholder="City, Province" value={address} onChange={(e) => setAddress(e.target.value)} />
         <Select label="Pronouns" value={pronouns} onChange={(e) => setPronouns(e.target.value)} options={PRONOUNS} />
