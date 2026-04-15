@@ -55,12 +55,12 @@ const CATEGORY_GRADIENT: Record<string, string> = {
 const DEFAULT_GRADIENT = "linear-gradient(135deg, #B8B5E8 0%, #2D2A4A 100%)";
 
 type RegisteredUser = {
-  registration_id: string;       // event_registration.id — needed to update attended
+  registration_id: string;
   display_name: string | null;
   full_name: string | null;
   email: string | null;
   registration_date: string | null;
-  attended: boolean;             // from event_registration.attended column
+  attended: boolean;
 };
 
 function CheckItem({
@@ -737,7 +737,7 @@ export default function EventsPage() {
           <div className="flex flex-col min-h-0">
             {/* banner cover */}
             <div
-              className="h-[240px] sm:h-[220px] relative shrink-0 rounded-t-[var(--radius-xl)]"
+              className="h-[300px] sm:h-[280px] relative shrink-0 rounded-t-[var(--radius-xl)]"
               style={{ background: detailEvent.banner_url ? `url(${detailEvent.banner_url}) center/cover no-repeat` : CATEGORY_GRADIENT[detailEvent.category ?? ""] ?? DEFAULT_GRADIENT }}
             >
               {/* close button inside cover */}
@@ -751,7 +751,9 @@ export default function EventsPage() {
 
               {/* category and status badges bottom-left of cover */}
               <div className="absolute bottom-3 left-3 flex gap-2 items-center">
-                <span className="badge badge-pink">{detailEvent.category ?? "Uncategorized"}</span>
+                <Badge variant={CATEGORY_VARIANT[detailEvent.category ?? ""] ?? "dark"}>
+                  {detailEvent.category ?? "Uncategorized"}
+                </Badge>
                 {detailEvent.status && (
                   <Badge variant={STATUS_VARIANT[detailEvent.status.toLowerCase().trim()] ?? "dark"}>
                     <span className="capitalize">{detailEvent.status}</span>
@@ -906,8 +908,8 @@ export default function EventsPage() {
                         <p className="caption text-center max-w-[250px]">Mark attendance in the Registrations tab using the checkboxes.</p>
                       </div>
                     ) : (
-                      <div className="flex flex-col gap-1 max-h-[420px] overflow-y-auto pr-1">
-                        <div className="grid grid-cols-[1fr_1fr] gap-3 px-3 py-1.5 sticky top-0 bg-white">
+                      <div className="flex flex-col max-h-[420px] overflow-y-auto pr-1">
+                        <div className="grid grid-cols-[1fr_1fr] gap-3 px-3 sticky top-0 bg-white">
                           <span className="label">Name</span>
                           <span className="label">Email</span>
                         </div>
