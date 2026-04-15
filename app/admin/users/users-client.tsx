@@ -8,9 +8,10 @@ import { sortProfiles, paginate, totalPages } from "./profile.utils";
 import { PER_PAGE } from "@/lib/pagination.utils";
 import { Pagination } from "@/components/pagination";
 import UserForm from "@/components/admin/user-form";
-import { deleteUser } from "./action";
+import { createClient } from "@/lib/supabase/client";
 
 import {
+  Input,
   Button,
   Badge,
   SearchBar,
@@ -100,6 +101,7 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
   const [deleteTarget, setDeleteTarget] = useState<Profile | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [deletePassword, setDeletePassword] = useState("");
 
   const [toast, setToast] = useState<{ variant: "success"|"error"; title: string; message?: string } | null>(null);
 
@@ -215,12 +217,35 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
     setDeleteModalOpen(false);
     setDeleteTarget(null);
     setDeleteError(null);
+    setDeletePassword("");
   };
 
   const handleDelete = async () => {
     if (!deleteTarget) return;
     setIsDeleting(true);
     setDeleteError(null);
+
+    const supabase = createClient();
+    const { data: userData } = await supabase.auth.getUser();
+
+    if (!userData.user || !userData.user.email) {
+      setDeleteError("Unable to verify user.");
+      setIsDeleting(false);
+      return;
+    }
+
+    const { error: authError } = await supabase.auth.signInWithPassword({
+      email: userData.user.email,
+      password: deletePassword,
+    });
+
+    if (authError) {
+      setDeleteError("Invalid password");
+      setDeletePassword("");
+      setIsDeleting(false);
+      return;
+    }
+
     try {
       const result = await deleteUser(deleteTarget.id);
       if (result.success) {
@@ -281,10 +306,10 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
     },
     {
       key: "actions",
-      header: "Actions",
+      header: <div className="text-right">Actions</div>,
       width: "20%",
       render: (p) => (
-        <div style={{ display: "flex", justifyContent: "flex-start", gap: 4 }}>
+        <div style={{ display: "flex", justifyContent: "flex-end", gap: 4 }}>
           <Button variant="icon" title="Edit user" onClick={() => openEditModal(p.id)}>
             <Pencil size={14} />
           </Button>
@@ -498,7 +523,11 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
       {/* delete modal */}
       <Modal
         open={deleteModalOpen}
-        onClose={closeDeleteModal}
+        onClose={() => {
+          if (!isDeleting) {
+            closeDeleteModal();
+          }
+        }}
         title="Delete User?"
         subtitle={deleteTarget ? (deleteTarget.full_name ?? deleteTarget.email ?? undefined) : undefined}
         footer={
@@ -506,7 +535,7 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
             <Button variant="ghost" style={{ flex: 1 }} disabled={isDeleting} onClick={closeDeleteModal}>
               Cancel
             </Button>
-            <Button variant="primary" style={{ flex: 1, background: "var(--error)" }} disabled={isDeleting} onClick={handleDelete}>
+            <Button variant="primary" style={{ flex: 1, background: "var(--error)" }} disabled={isDeleting || !deletePassword.trim()} onClick={handleDelete}>
               {isDeleting ? <><Loader2 size={14} className="animate-spin mr-2" /> Deleting…</> : <><Trash2 size={14} className="mr-2" /> Delete User</>}
             </Button>
           </div>
@@ -515,6 +544,17 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
         <div className="flex flex-col gap-3">
           <Toast variant="warning" title="This action cannot be undone." message="The user's profile and all associated data will be permanently removed." />
           {deleteError && <Toast variant="error" title="Deletion failed" message={deleteError} />}
+          <div>
+            <label className="label block mb-2">Enter your password to confirm deletion</label>
+            <Input
+              type="password"
+              value={deletePassword}
+              onChange={(e) => setDeletePassword(e.target.value)}
+              placeholder="Password"
+              autoComplete="new-password"
+              className="input input-bordered w-full"
+            />
+          </div>
         </div>
       </Modal>
 

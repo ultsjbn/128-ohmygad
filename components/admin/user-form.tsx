@@ -248,7 +248,7 @@ export default function UserForm({ initialData, onSuccess, layout = "modal" }: U
         <Select label="Year Level" value={year_level} onChange={(e) => setYearLevel(e.target.value)} options={YEAR_OPTIONS} />
         <Select label="College" value={college} onChange={(e) => setCollege(e.target.value)} options={COLLEGE_OPTIONS} />
         <Input label="Program" placeholder="e.g. BS Computer Science" value={program} onChange={(e) => setProgram(e.target.value)} />
-        <Input label="Contact Number" prefixIcon={<Phone size={15} />} placeholder="e.g. 09123456789" value={contact_num} onChange={handleContactNumChange} />
+        <Input label="Contact Number" prefixIcon={<Phone size={15} />} maxLength={15} placeholder="e.g. 09123456789" value={contact_num} onChange={handleContactNumChange} />
         <Input label="Address" prefixIcon={<MapPin size={15} />} placeholder="City, Province" value={address} onChange={(e) => setAddress(e.target.value)} />
         <Input label="Pronouns" placeholder="e.g. she/her, they/them" value={pronouns} onChange={(e) => setPronouns(e.target.value)} />
         <Select label="Sex at Birth" value={sex_at_birth} onChange={(e) => setSexAtBirth(e.target.value)} options={SEX_OPTIONS} />
