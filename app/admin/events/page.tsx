@@ -7,6 +7,7 @@ import { Plus, ArrowUpDown, SlidersHorizontal, Pencil, Trash2, Loader2, ChevronU
 import EventForm, { type EventFormData } from "@/components/admin/event-form";
 import { paginate, totalPages, PER_PAGE } from "@/lib/pagination.utils";
 import { Pagination } from "@/components/pagination";
+import Image from "next/image";
 
 import {
   Input,
@@ -735,11 +736,29 @@ export default function EventsPage() {
               </div>
 
               <div className="grid grid-cols-2 gap-3 text-sm">
+                {detailEvent.registration_open && (
+                  <div>
+                    <div className="flex items-center gap-1.5">
+                      <CalendarDays size={14} className="text-[var(--gray)] shrink-0" />
+                      <p className="label !m-0">Registration Open</p>
+                    </div>
+                    <p className="body ml-0.5">{new Date(detailEvent.registration_open).toLocaleDateString("en-PH", { month: "long", day: "numeric", year: "numeric" })}</p>
+                  </div>
+                )}
+                {detailEvent.registration_close && (
+                  <div>
+                    <div className="flex items-center gap-1.5">
+                      <CalendarDays size={14} className="text-[var(--gray)] shrink-0" />
+                      <p className="label !m-0">Registration Close</p>
+                    </div>
+                    <p className="body ml-0.5">{new Date(detailEvent.registration_close).toLocaleDateString("en-PH", { month: "long", day: "numeric", year: "numeric" })}</p>
+                  </div>
+                )}
                 {detailEvent.start_date && (
                   <div>
                     <div className="flex items-center gap-1.5">
                       <CalendarDays size={14} className="text-[var(--gray)] shrink-0" />
-                      <p className="label !m-0">Start</p>
+                      <p className="label !m-0">Event Start</p>
                     </div>
                     <p className="body ml-0.5">{new Date(detailEvent.start_date).toLocaleDateString("en-PH", { month: "long", day: "numeric", year: "numeric" })}</p>
                   </div>
@@ -748,7 +767,7 @@ export default function EventsPage() {
                   <div>
                     <div className="flex items-center gap-1.5">
                       <CalendarDays size={14} className="text-[var(--gray)] shrink-0" />
-                      <p className="label !m-0">End</p>
+                      <p className="label !m-0">Event End</p>
                     </div>
                     <p className="body ml-0.5">{new Date(detailEvent.end_date).toLocaleDateString("en-PH", { month: "long", day: "numeric", year: "numeric" })}</p>
                   </div>
@@ -772,6 +791,16 @@ export default function EventsPage() {
                   </div>
                 )}
               </div>
+
+              {detailEvent?.banner_url && (
+                <Image
+                  src={detailEvent.banner_url}
+                  alt="Event Banner"
+                  width={800}
+                  height={400}
+                  className="w-full h-auto rounded-lg object-cover"
+                />
+              )}
 
               {detailEvent.description && (
                 <div>
