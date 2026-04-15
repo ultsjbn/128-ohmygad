@@ -232,7 +232,7 @@ export default function CoursesPage() {
 
   // 
   return (
-    <div className="flex flex-col gap-3 py-1">
+    <div className="flex flex-col gap-3">
       {/*  toolbar  */}
       <div className="flex flex-col gap-3">
 
