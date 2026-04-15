@@ -143,7 +143,7 @@ export default function SurveysListPage({ basePath }: SurveysListPageProps) {
     val ? new Date(val).toLocaleDateString("en-PH", { month: "short", day: "numeric", year: "numeric" }) : null;
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 mt-2">
 
       {/* search + sort only */}
       <div className="flex items-center gap-3 flex-wrap overflow-visible">

@@ -339,7 +339,7 @@ export default function EventsPage() {
   return (
     <div className="flex flex-col gap-4">
       {/* search, sort, filter */}
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-3 mt-2">
         <div className="flex items-center gap-3 flex-wrap overflow-visible">
           {/* search bar */}
           <SearchBar
