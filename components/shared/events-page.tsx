@@ -60,6 +60,15 @@ type BadgeVariant = "pink-light" | "periwinkle" | "dark" | "success" | "warning"
 const STATUS_VARIANT: Record<string, BadgeVariant> = {
   upcoming: "pink-light",
   past: "periwinkle",
+  today: "success", 
+};
+
+const CATEGORY_VARIANT: Record<string, BadgeVariant> = {
+  Orientation: "pink-light",
+  Forum: "periwinkle",
+  Research: "error",
+  Training: "success",
+  Workshop: "warning",
 };
 
 // checkbox item used inside filter dropdown (multi-select)
@@ -549,21 +558,24 @@ export default function EventsPage() {
                 <X size={14} />
               </button>
 
-              {/* category and status badges bottom-left of cover */}
-              <div className="absolute bottom-3 left-3 flex gap-2 items-center">
-                <span className="badge badge-pink">{detailEvent.category ?? "Uncategorized"}</span>
-                {detailEvent.status && (
-                  <Badge variant={STATUS_VARIANT[detailEvent.status.toLowerCase().trim()] ?? "dark"}>
-                    <span className="capitalize">{detailEvent.status}</span>
-                  </Badge>
-                )}
-              </div>
+              
             </div>
 
             {/* only body scrolls, cover + footer stay fixed */}
-            <div className="flex flex-col gap-3 p-3 sm:p-5 overflow-y-auto">
+            <div className="flex flex-col gap-2 p-3 sm:p-5 overflow-y-auto">
               {/* title */}
               <h2 className="heading-md m-0">{detailEvent.title}</h2>
+              {/* category and status badges moved below */}
+                <div className="flex gap-2 items-center">
+                    <Badge variant={CATEGORY_VARIANT[detailEvent.category ?? ""] ?? "dark"}>
+                    {detailEvent.category ?? "Uncategorized"}
+                    </Badge>
+                    {detailEvent.status && (
+                    <Badge variant={STATUS_VARIANT[detailEvent.status.toLowerCase().trim()] ?? "dark"}>
+                        <span className="capitalize">{detailEvent.status}</span>
+                    </Badge>
+                    )}
+                </div>
 
               {/* details row */}
               <div className="flex flex-col gap-1.5">

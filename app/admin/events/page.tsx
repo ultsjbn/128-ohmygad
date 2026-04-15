@@ -43,6 +43,7 @@ const CATEGORY_VARIANT: Record<string, BadgeVariant> = {
 const STATUS_VARIANT: Record<string, BadgeVariant> = {
   upcoming: "pink-light",
   past: "periwinkle",
+  today: "success",
 };
 
 const CATEGORY_GRADIENT: Record<string, string> = {
@@ -748,26 +749,25 @@ export default function EventsPage() {
               >
                 <X size={14} />
               </button>
-
-              {/* category and status badges bottom-left of cover */}
-              <div className="absolute bottom-3 left-3 flex gap-2 items-center">
-                <Badge variant={CATEGORY_VARIANT[detailEvent.category ?? ""] ?? "dark"}>
-                  {detailEvent.category ?? "Uncategorized"}
-                </Badge>
-                {detailEvent.status && (
-                  <Badge variant={STATUS_VARIANT[detailEvent.status.toLowerCase().trim()] ?? "dark"}>
-                    <span className="capitalize">{detailEvent.status}</span>
-                  </Badge>
-                )}
-              </div>
             </div>
 
             {/* two-column body */}
             <div className="flex gap-4 p-3 sm:p-5 overflow-y-auto">
 
               {/* left column: event info */}
-              <div className="flex flex-col gap-4 flex-1 min-w-0">
-                <h2 className="heading-md m-0">{detailEvent.title}</h2>
+              <div className="flex flex-col gap-2 flex-1 min-w-0">
+                <h2 className="heading-md">{detailEvent.title}</h2>
+                {/* category and status badges moved below */}
+                <div className="flex gap-2 items-center">
+                    <Badge variant={CATEGORY_VARIANT[detailEvent.category ?? ""] ?? "dark"}>
+                    {detailEvent.category ?? "Uncategorized"}
+                    </Badge>
+                    {detailEvent.status && (
+                    <Badge variant={STATUS_VARIANT[detailEvent.status.toLowerCase().trim()] ?? "dark"}>
+                        <span className="capitalize">{detailEvent.status}</span>
+                    </Badge>
+                    )}
+                </div>
 
                 <div className="flex flex-col gap-1.5">
                   <div className="flex items-start gap-3 caption sm:text-sm text-[var(--gray)]">
