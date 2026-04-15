@@ -7,6 +7,7 @@ import { Plus, ArrowUpDown, SlidersHorizontal, Pencil, Trash2, Loader2, ChevronU
 import EventForm, { type EventFormData } from "@/components/admin/event-form";
 import { paginate, totalPages, PER_PAGE } from "@/lib/pagination.utils";
 import { Pagination } from "@/components/pagination";
+import Image from "next/image";
 
 import {
   Input,
@@ -790,6 +791,16 @@ export default function EventsPage() {
                   </div>
                 )}
               </div>
+
+              {detailEvent?.banner_url && (
+                <Image
+                  src={detailEvent.banner_url}
+                  alt="Event Banner"
+                  width={800}
+                  height={400}
+                  className="w-full h-auto rounded-lg object-cover"
+                />
+              )}
 
               {detailEvent.description && (
                 <div>
