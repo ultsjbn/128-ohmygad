@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowUpDown, UserPlus, Pencil, Trash2, ChevronUp, ChevronDown, Loader2, SlidersHorizontal } from "lucide-react";
 import type { Profile, SortState } from "./profile.types";
 import { sortProfiles, paginate, totalPages } from "./profile.utils";
+import { deleteUser } from "./action";
 import { PER_PAGE } from "@/lib/pagination.utils";
 import { Pagination } from "@/components/pagination";
 import UserForm from "@/components/admin/user-form";
