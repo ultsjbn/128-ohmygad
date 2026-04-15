@@ -9,7 +9,7 @@ export async function PATCH(req: Request) {
             id, email, password, full_name, display_name, role,
             contact_num, address, pronouns, college, program,
             student_num, year_level, sex_at_birth, gender_identity,
-            gso_attended, is_onboarded,
+            gso_attended, is_onboarded, office, department,
         } = body;
 
         if (!id) {
@@ -65,6 +65,8 @@ export async function PATCH(req: Request) {
         if (gender_identity !== undefined) profileUpdatePayload.gender_identity = gender_identity || null;
         if (gso_attended !== undefined) profileUpdatePayload.gso_attended = gso_attended ? Number(gso_attended) : 0;
         if (is_onboarded !== undefined) profileUpdatePayload.is_onboarded = is_onboarded;
+        if (office !== undefined) profileUpdatePayload.office = office || null;
+        if (department !== undefined) profileUpdatePayload.department = department || null;
 
         if (Object.keys(profileUpdatePayload).length > 0) {
             const { error: profileError } = await supabaseAdmin

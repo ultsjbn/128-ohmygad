@@ -39,6 +39,16 @@ const UPB_PROGRAMS: Record<string, { value: string; label: string }[]> = {
   ],
 };
 
+const PRONOUNS = [
+  { value: "he/him", label: "he/him" },
+  { value: "she/her", label: "she/her" },
+  { value: "they/them", label: "they/them" },
+  { value: "he/they", label: "he/they" },
+  { value: "she/they", label: "she/they" },
+  { value: "any/all", label: "any/all" },
+  { value: "Prefer not to say", label: "Prefer not to say" },
+];
+
 export function OnboardingForm({
   className,
   ...props
@@ -303,7 +313,6 @@ export function OnboardingForm({
               required
               placeholder="09XX XXX XXXX"
               prefixIcon={<Phone size={15} />}
-              maxLength={15}
               value={contact_num}
               onChange={(e) => setContactNum(e.target.value)}
               autoComplete="off"
@@ -314,16 +323,7 @@ export function OnboardingForm({
                 label="Pronouns (optional)"
                 value={pronouns}
                 onChange={(e) => setPronouns(e.target.value)}
-                options={[
-                { value: "", label: "Select pronouns" },
-                { value: "he/him", label: "he/him" },
-                { value: "she/her", label: "she/her" },
-                { value: "they/them", label: "they/them" },
-                { value: "he/they", label: "he/they" },
-                { value: "she/they", label: "she/they" },
-                { value: "any/all", label: "any/all" },
-                { value: "prefer not to say", label: "Prefer not to say" },
-                ]}
+                options={PRONOUNS}
             />
 
             <div className="md:col-span-2">

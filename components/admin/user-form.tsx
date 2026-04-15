@@ -2,9 +2,9 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { User, Mail, Lock, Phone, MapPin, Hash, Loader2 } from "lucide-react";
+import { User, Mail, Lock, Phone, MapPin, Hash, Loader2, Building2 } from "lucide-react";
 import { Button, Input, Select, Toast, Toggle, Card } from "@/components/ui";
-import { validateFullName, validateDisplayName, validateContactNum, validateStudentNum, validatePassword, validateGsoSessions, validateAddress } from "@/lib/validation";
+import { validateFullName, validateDisplayName, validateContactNum, validateStudentNum, validatePassword, validateGsoSessions, validateAddress, validateOffice, validateDepartment } from "@/lib/validation";
 
 // types
 interface CreateUserData {
@@ -24,6 +24,8 @@ interface CreateUserData {
   year_level?: string;
   gso_attended?: number;
   is_onboarded?: boolean;
+  office?: string;
+  department?: string;
 }
 
 interface EditUserData extends Partial<CreateUserData> { id: string; }
@@ -40,6 +42,45 @@ const YEAR_OPTIONS = [{ value: "", label: "Select year…" }, { value: "1st Year
 const COLLEGE_OPTIONS = [{ value: "", label: "Select college…" }, { value: "CS", label: "College of Science (CS)" }, { value: "CAC", label: "College of Arts and Communications (CAC)" }, { value: "CSS", label: "College of Social Sciences (CSS)" }];
 const SEX_OPTIONS = [{ value: "", label: "Select…" }, { value: "Male", label: "Male" }, { value: "Female", label: "Female" }, { value: "Intersex", label: "Intersex" }, { value: "Prefer not to say", label: "Prefer not to say" }];
 const GENDER_OPTIONS = [{ value: "", label: "Select…" }, { value: "Man", label: "Man" }, { value: "Woman", label: "Woman" }, { value: "Non-binary", label: "Non-binary" }, { value: "Genderqueer", label: "Genderqueer" }, { value: "Genderfluid", label: "Genderfluid" }, { value: "Agender", label: "Agender" }, { value: "Prefer not to say", label: "Prefer not to say" }, { value: "Self-describe", label: "Prefer to self-describe" }];
+
+const UPB_PROGRAMS: Record<string, { value: string; label: string }[]> = {
+  CS: [
+    { value: "BS Biology", label: "BS Biology" },
+    { value: "BS Computer Science", label: "BS Computer Science" },
+    { value: "BS Mathematics", label: "BS Mathematics" },
+    { value: "BS Physics", label: "BS Physics" },
+    { value: "MS Conservation and Restoration Ecology", label: "MS Conservation and Restoration Ecology" },
+    { value: "MS Mathematics", label: "MS Mathematics" },
+    { value: "Doctor of Philosophy in Mathematics", label: "Doctor of Philosophy in Mathematics" },
+  ],
+  CAC: [
+    { value: "BA Communication", label: "BA Communication" },
+    { value: "BA Fine Arts", label: "BA Fine Arts" },
+    { value: "BA Language and Literature", label: "BA Language and Literature" },
+    { value: "Certificate in Fine Arts", label: "Certificate in Fine Arts" },
+    { value: "MA Language and Literature", label: "MA Language and Literature" },
+  ],
+  CSS: [
+    { value: "BA Social Sciences (History)", label: "BA Social Sciences (History)" },
+    { value: "BA Social Sciences (Economics)", label: "BA Social Sciences (Economics)" },
+    { value: "BA Social Sciences (Anthropology)", label: "BA Social Sciences (Anthropology)" },
+    { value: "BS Management Economics", label: "BS Management Economics" },
+    { value: "MA History (Ethnohistory and Local History)", label: "MA History (Ethnohistory and Local History)" },
+    { value: "MA Social and Development Studies", label: "MA Social and Development Studies" },
+    { value: "Master of Management", label: "Master of Management" },
+    { value: "Doctor of Philosophy in Indigenous Studies", label: "Doctor of Philosophy in Indigenous Studies" },
+  ],
+};
+
+const PRONOUNS = [
+  { value: "he/him", label: "he/him" },
+  { value: "she/her", label: "she/her" },
+  { value: "they/them", label: "they/them" },
+  { value: "he/they", label: "he/they" },
+  { value: "she/they", label: "she/they" },
+  { value: "any/all", label: "any/all" },
+  { value: "Prefer not to say", label: "Prefer not to say" },
+];
 
 // section label for modal view
 function SectionLabel({ children }: { children: React.ReactNode }) {
@@ -73,6 +114,8 @@ export default function UserForm({ initialData, onSuccess, layout = "modal" }: U
   const [year_level, setYearLevel] = useState(initialData?.year_level ?? "");
   const [gso_attended, setGsoAttended] = useState<string | number>(initialData?.gso_attended ?? "");
   const [is_onboarded, setIsOnboarded] = useState(initialData?.is_onboarded ?? true);
+  const [office, setOffice] = useState(initialData?.office ?? "");
+  const [department, setDepartment] = useState(initialData?.department ?? "");
 
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -118,14 +161,26 @@ export default function UserForm({ initialData, onSuccess, layout = "modal" }: U
       const contactErr = validateContactNum(contact_num);
       if (contactErr) throw new Error(contactErr);
 
-      const studentErr = validateStudentNum(student_num);
-      if (studentErr) throw new Error(studentErr);
+      if (role === "student" || !role) {
+        const studentErr = validateStudentNum(student_num);
+        if (studentErr) throw new Error(studentErr);
 
-      const gsoErr = validateGsoSessions(gso_attended);
-      if (gsoErr) throw new Error(gsoErr);
+        const gsoErr = validateGsoSessions(gso_attended);
+        if (gsoErr) throw new Error(gsoErr);
+      }
 
       const addressErr = validateAddress(address || "");
       if (addressErr) throw new Error(addressErr);
+
+      if (role === "admin") {
+        const officeErr = validateOffice(office);
+        if (officeErr) throw new Error(officeErr);
+      }
+
+      if (role === "faculty") {
+        const deptErr = validateDepartment(department);
+        if (deptErr) throw new Error(deptErr);
+      }
 
       const gsoNum = gso_attended === "" ? 0 : Number(gso_attended);
 
@@ -133,9 +188,10 @@ export default function UserForm({ initialData, onSuccess, layout = "modal" }: U
 
       const payload: Partial<CreateUserData> = {
         full_name, email, display_name, role, contact_num, address,
-        pronouns, sex_at_birth, gender_identity, college, program,
-        student_num: cleanStudentNum, year_level, is_onboarded,
-        gso_attended: gsoNum,
+        pronouns, sex_at_birth, gender_identity, is_onboarded,
+        ...(role === "student" || !role ? { college, program, student_num: cleanStudentNum, year_level, gso_attended: gsoNum } : {}),
+        ...(role === "admin" ? { office } : {}),
+        ...(role === "faculty" ? { college, department } : {}),
       };
 
       if (isEdit) (payload as any).id = initialData!.id;
@@ -182,11 +238,13 @@ export default function UserForm({ initialData, onSuccess, layout = "modal" }: U
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 w-full">
               <Input label="Display Name" placeholder="Nickname or preferred name" value={display_name} onChange={(e) => setDisplayName(e.target.value)} maxLength={32} />
-              <Input label="Student Number" prefixIcon={<Hash size={15} />} placeholder="e.g. 2021-12345" value={student_num} onChange={handleStudentNumChange} />
-              <Select label="Year Level" value={year_level} onChange={(e) => setYearLevel(e.target.value)} options={YEAR_OPTIONS} />
-              <Select label="College" value={college} onChange={(e) => setCollege(e.target.value)} options={COLLEGE_OPTIONS} />
-              <Input label="Program" placeholder="e.g. BS Computer Science" value={program} onChange={(e) => setProgram(e.target.value)} />
               <Input label="Contact Number" prefixIcon={<Phone size={15} />} maxLength={15} placeholder="e.g. 09123456789" value={contact_num} onChange={handleContactNumChange} />
+              {(role === "student" || !role) && <Input label="Student Number" prefixIcon={<Hash size={15} />} placeholder="e.g. 2021-12345" value={student_num} onChange={handleStudentNumChange} />}
+              {(role === "student" || !role) && <Select label="Year Level" value={year_level} onChange={(e) => setYearLevel(e.target.value)} options={YEAR_OPTIONS} />}
+              {(role === "student" || role === "faculty" || !role) && <Select label="College" value={college} onChange={(e) => setCollege(e.target.value)} options={COLLEGE_OPTIONS} />}
+              {(role === "student" || !role) && <Select label="Program" value={program} onChange={(e) => setProgram(e.target.value)} options={college && UPB_PROGRAMS[college] ? [{ value: "", label: "Select program" }, ...UPB_PROGRAMS[college]] : [{ value: "", label: "Select a college first" }]}/>}
+              {role === "faculty" && <Input label="Department" prefixIcon={<Building2 size={15} />} placeholder="e.g. Dept. of Math and Computer Science" value={department} onChange={(e) => setDepartment(e.target.value)} maxLength={100} />}
+              {role === "admin" && <Input label="Office / Unit" prefixIcon={<Building2 size={15} />} placeholder="e.g. Office of the Chancellor" value={office} onChange={(e) => setOffice(e.target.value)} maxLength={100} />}
               <div className="col-span-full">
                 <Input label="Address" prefixIcon={<MapPin size={15} />} placeholder="City, Province" value={address} onChange={(e) => setAddress(e.target.value)} />
               </div>
@@ -200,7 +258,7 @@ export default function UserForm({ initialData, onSuccess, layout = "modal" }: U
               <Input label="Pronouns" placeholder="e.g. she/her, they/them" value={pronouns} onChange={(e) => setPronouns(e.target.value)} />
               <Select label="Sex at Birth" value={sex_at_birth} onChange={(e) => setSexAtBirth(e.target.value)} options={SEX_OPTIONS} />
               <Select label="Gender Identity" value={gender_identity} onChange={(e) => setGenderIdentity(e.target.value)} options={GENDER_OPTIONS} />
-              <Input label="GSO Sessions Attended" maxLength={1} placeholder="0" value={gso_attended.toString()} onChange={(e) => setGsoAttended(e.target.value)} />
+              {(role === "student" || role === "faculty" || !role) && <Input label="GSO Sessions Attended" maxLength={1} placeholder="0" value={gso_attended.toString()} onChange={(e) => setGsoAttended(e.target.value)} />}
 
               <div className="flex items-center justify-between p-4 mt-2 rounded-[var(--radius-md)] border w-full" style={{ background: "var(--cream)", borderColor: "rgba(45,42,74,0.10)" }}>
                 <div>
@@ -244,24 +302,28 @@ export default function UserForm({ initialData, onSuccess, layout = "modal" }: U
       <div className="grid grid-cols-1 gap-x-5 gap-y-2 items-start">
         <SectionLabel>Profile Details</SectionLabel>
         <Input label="Display Name" placeholder="Nickname or preferred name" value={display_name} onChange={(e) => setDisplayName(e.target.value)} maxLength={32} />
-        <Input label="Student Number" prefixIcon={<Hash size={15} />} placeholder="e.g. 2021-12345" value={student_num} onChange={handleStudentNumChange} />
-        <Select label="Year Level" value={year_level} onChange={(e) => setYearLevel(e.target.value)} options={YEAR_OPTIONS} />
-        <Select label="College" value={college} onChange={(e) => setCollege(e.target.value)} options={COLLEGE_OPTIONS} />
-        <Input label="Program" placeholder="e.g. BS Computer Science" value={program} onChange={(e) => setProgram(e.target.value)} />
+        {(role === "student" || !role) && <Input label="Student Number" prefixIcon={<Hash size={15} />} placeholder="e.g. 2021-12345" value={student_num} onChange={handleStudentNumChange} />}
+        {(role === "student" || !role) && <Select label="Year Level" value={year_level} onChange={(e) => setYearLevel(e.target.value)} options={YEAR_OPTIONS} />}
+        {(role === "student" || role === "faculty" || !role) && <Select label="College" value={college} onChange={(e) => setCollege(e.target.value)} options={COLLEGE_OPTIONS} />}
+        {(role === "student" || !role) && <Select label="Program" value={program} onChange={(e) => setProgram(e.target.value)} options={college && UPB_PROGRAMS[college] ? [{ value: "", label: "Select program" }, ...UPB_PROGRAMS[college]] : [{ value: "", label: "Select a college first" }]}/>}
+        {role === "faculty" && <Input label="Department" prefixIcon={<Building2 size={15} />} placeholder="e.g. Dept. of Math and Computer Science" value={department} onChange={(e) => setDepartment(e.target.value)} maxLength={100} />}
+        {role === "admin" && <Input label="Office / Unit" prefixIcon={<Building2 size={15} />} placeholder="e.g. Office of the Chancellor" value={office} onChange={(e) => setOffice(e.target.value)} maxLength={100} />}
         <Input label="Contact Number" prefixIcon={<Phone size={15} />} maxLength={15} placeholder="e.g. 09123456789" value={contact_num} onChange={handleContactNumChange} />
         <Input label="Address" prefixIcon={<MapPin size={15} />} placeholder="City, Province" value={address} onChange={(e) => setAddress(e.target.value)} />
-        <Input label="Pronouns" placeholder="e.g. she/her, they/them" value={pronouns} onChange={(e) => setPronouns(e.target.value)} />
+        <Select label="Pronouns" value={pronouns} onChange={(e) => setPronouns(e.target.value)} options={PRONOUNS} />
         <Select label="Sex at Birth" value={sex_at_birth} onChange={(e) => setSexAtBirth(e.target.value)} options={SEX_OPTIONS} />
         <Select label="Gender Identity" value={gender_identity} onChange={(e) => setGenderIdentity(e.target.value)} options={GENDER_OPTIONS} />
-        <Input label="GSO Sessions Attended" type="number" min="0" max="5" step="1" placeholder="0" value={gso_attended.toString()} onChange={(e) => setGsoAttended(e.target.value)} />
+        {(role === "student" || !role) && <Input label="GSO Sessions Attended" type="number" min="0" max="5" step="1" placeholder="0" value={gso_attended.toString()} onChange={(e) => setGsoAttended(e.target.value)} />}
+        {(role === "faculty" || !role) && <Input label="GSO Sessions Attended" type="number" min="0" max="5" step="1" placeholder="0" value={gso_attended.toString()} onChange={(e) => setGsoAttended(e.target.value)} />}
 
-        <div className="col-span-full flex items-center justify-between p-1 rounded-lg">
+        {(role === "student" || role === "faculty" || !role) && <div className="col-span-full flex items-center justify-between p-1 rounded-lg">
+        
           <div>
             <p className="body" style={{ color: "var(--primary-dark)" }}>Onboarding complete</p>
             <p className="caption text-gray-500">User has completed the onboarding process</p>
           </div>
           <Toggle defaultOn={is_onboarded} onChange={setIsOnboarded} />
-        </div>
+        </div>}
       </div>
 
       {error && <Toast variant="error" title="Failed to save user" message={error} />}
