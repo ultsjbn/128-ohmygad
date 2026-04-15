@@ -115,9 +115,7 @@ export default function SurveyAnalyticsModal({ survey, open, onClose }: Props) {
       <div className="modal" style={{ maxWidth: 860, padding: 0 }} onClick={(e) => e.stopPropagation()}>
 
         {/* header */}
-        <div
-          className="shrink-0 flex items-center justify-between gap-4 px-4 py-4 border-b border-[rgba(45,42,74,0.08)]"
-        >
+        <div className="shrink-0 flex items-center justify-between gap-4 px-4 py-3 border-b border-[rgba(45,42,74,0.08)]" >
           <div className="flex items-center gap-3 min-w-0">
             <BarChart3 size={22} className="text-[var(--periwinkle)] shrink-0" />
             <div className="min-w-0">
@@ -143,7 +141,7 @@ export default function SurveyAnalyticsModal({ survey, open, onClose }: Props) {
 
         {/* dcrollable body */}
         <div className="flex-1 overflow-y-auto custom-scrollbar">
-          <div className="px-4 py-4 flex flex-col gap-6">
+          <div className="px-2 py-1 flex flex-col gap-2">
 
             {/* loading state */}
             {loading ? (

@@ -514,7 +514,7 @@ export default function EventsPage() {
         modalStyle={{ maxWidth: 600, padding: 0 }}
         footer={
           detailEvent && (
-            <div className="px-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] sm:px-4 sm:pb-4 shrink-0">
+            <div className="px-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] sm:px-5 sm:pb-5 shrink-0">
               <Button
                 variant={isDetailRegistered ? "ghost" : "primary"}
                 className="w-full"
