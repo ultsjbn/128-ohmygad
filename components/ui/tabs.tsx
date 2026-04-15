@@ -1,15 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 
-// Tabs 
+// Tabs
 interface TabsProps {
   tabs: string[];
+  icons?: ReactNode[];
   defaultTab?: string;
   onChange?: (tab: string) => void;
+  className?: string;
 }
 
-export function Tabs({ tabs, defaultTab, onChange }: TabsProps) {
+export function Tabs({ tabs, icons, defaultTab, onChange, className }: TabsProps) {
   const [active, setActive] = useState(defaultTab ?? tabs[0]);
 
   function handleClick(t: string) {
@@ -18,13 +20,14 @@ export function Tabs({ tabs, defaultTab, onChange }: TabsProps) {
   }
 
   return (
-    <div className="tabs">
-      {tabs.map((t) => (
+    <div className={`tabs${className ? ` ${className}` : ""}`}>
+      {tabs.map((t, i) => (
         <button
           key={t}
-          className={`tab${active === t ? " active" : ""}`}
+          className={`tab${active === t ? " active" : ""}${icons?.[i] ? " flex items-center gap-1.5" : ""}`}
           onClick={() => handleClick(t)}
         >
+          {icons?.[i]}
           {t}
         </button>
       ))}
