@@ -34,7 +34,7 @@ export function validateDisplayName(name: string): string | null {
 export function validateContactNum(num: string): string | null {
   if (!num) return null; // optional field
   if (!/^\d+$/.test(num)) return "Contact number can only contain digits.";
-  if (num.length < 10 || num.length > 15) return "Contact number must be 10-15 digits.";
+  if (num.length != 11) return "Contact number must be 11 digits.";
   return null;
 }
 

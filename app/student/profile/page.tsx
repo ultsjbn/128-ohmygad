@@ -356,7 +356,7 @@ export default function StudentProfilePage() {
                       const val = e.target.value.replace(/\D/g, '');
                       setProfile(p => ({ ...p, contact_num: val }));
                     }}
-                    maxLength={15}
+                    maxLength={11}
                   />
                   <div className="md:col-span-2">
                     <Input

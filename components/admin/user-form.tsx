@@ -238,7 +238,7 @@ export default function UserForm({ initialData, onSuccess, layout = "modal" }: U
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 w-full">
               <Input label="Display Name" placeholder="Nickname or preferred name" value={display_name} onChange={(e) => setDisplayName(e.target.value)} maxLength={32} />
-              <Input label="Contact Number" prefixIcon={<Phone size={15} />} maxLength={15} placeholder="e.g. 09123456789" value={contact_num} onChange={handleContactNumChange} />
+              <Input label="Contact Number" prefixIcon={<Phone size={15} />} maxLength={11} placeholder="e.g. 09123456789" value={contact_num} onChange={handleContactNumChange} />
               {(role === "student" || !role) && <Input label="Student Number" prefixIcon={<Hash size={15} />} placeholder="e.g. 2021-12345" value={student_num} onChange={handleStudentNumChange} />}
               {(role === "student" || !role) && <Select label="Year Level" value={year_level} onChange={(e) => setYearLevel(e.target.value)} options={YEAR_OPTIONS} />}
               {(role === "student" || role === "faculty" || !role) && <Select label="College" value={college} onChange={(e) => setCollege(e.target.value)} options={COLLEGE_OPTIONS} />}
@@ -308,7 +308,7 @@ export default function UserForm({ initialData, onSuccess, layout = "modal" }: U
         {(role === "student" || !role) && <Select label="Program" value={program} onChange={(e) => setProgram(e.target.value)} options={college && UPB_PROGRAMS[college] ? [{ value: "", label: "Select program" }, ...UPB_PROGRAMS[college]] : [{ value: "", label: "Select a college first" }]}/>}
         {role === "faculty" && <Input label="Department" prefixIcon={<Building2 size={15} />} placeholder="e.g. Dept. of Math and Computer Science" value={department} onChange={(e) => setDepartment(e.target.value)} maxLength={100} />}
         {role === "admin" && <Input label="Office / Unit" prefixIcon={<Building2 size={15} />} placeholder="e.g. Office of the Chancellor" value={office} onChange={(e) => setOffice(e.target.value)} maxLength={100} />}
-        <Input label="Contact Number" prefixIcon={<Phone size={15} />} maxLength={15} placeholder="e.g. 09123456789" value={contact_num} onChange={handleContactNumChange} />
+        <Input label="Contact Number" prefixIcon={<Phone size={15} />} maxLength={11} placeholder="e.g. 09123456789" value={contact_num} onChange={handleContactNumChange} />
         <Input label="Address" prefixIcon={<MapPin size={15} />} placeholder="City, Province" value={address} onChange={(e) => setAddress(e.target.value)} />
         <Select label="Pronouns" value={pronouns} onChange={(e) => setPronouns(e.target.value)} options={PRONOUNS} />
         <Select label="Sex at Birth" value={sex_at_birth} onChange={(e) => setSexAtBirth(e.target.value)} options={SEX_OPTIONS} />
