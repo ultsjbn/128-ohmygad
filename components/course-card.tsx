@@ -14,20 +14,14 @@ const STATUS_STYLES = {
     text: "text-amber-700",
     dot: "bg-amber-500",
     border: "border-amber-200",
+  },
+  Pending: {
+    bg: "bg-gray-50",
+    text: "text-gray-700",
+    dot: "bg-gray-500",
+    border: "border-gray-200",
+  },
 };
-
-function StatusBadge({ status }) {
-  const style = STATUS_STYLES[status] || STATUS_STYLES["Pending"];
-  return (
-    <span
-      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${style.bg} ${style.text} ${style.border}`}
-      style={{ fontSize: "11px", letterSpacing: "0.01em" }}
-    >
-      <span className={`w-1.5 h-1.5 rounded-full ${style.dot}`} />
-      {status}
-    </span>
-  );
-}
 
 export default function CourseCard({ course }) {
   const [imgError, setImgError] = useState(false);

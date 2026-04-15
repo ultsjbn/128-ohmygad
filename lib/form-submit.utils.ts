@@ -32,7 +32,7 @@ export async function submitFormData(
 
   try {
     if (mode === "create") {
-      const { error } = await supabase.from(table).insert(payload);
+      const { error } = await supabase.from(table).insert([payload]);
       if (error) throw error;
     } else {
       const { error } = await supabase
@@ -42,10 +42,16 @@ export async function submitFormData(
       if (error) throw error;
     }
     return { success: true };
-  } catch (err: unknown) {
-    return {
-      success: false,
-      error: err instanceof Error ? err.message : "An error occurred",
-    };
-  }
+  } catch (err: any) {
+  console.error("Supabase error:", err);
+
+  return {
+    success: false,
+    error:
+      err?.message ||
+      err?.error_description ||
+      err?.details ||
+      JSON.stringify(err),
+  };
+}
 }

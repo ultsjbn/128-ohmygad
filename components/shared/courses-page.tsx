@@ -38,13 +38,12 @@ type Course = {
   end_time?: string;
   days?: string;
   instructor_id?: string;
-  status?: string;
   semester?: string;
   capacity?: number;
   enrolled_count?: number;
 };
 
-type SortField = "title" | "semester" | "status" | "start_time";
+type SortField = "title" | "semester" | "start_time";
 type SortDirection = "asc" | "desc";
 
 interface SortState {
@@ -53,20 +52,12 @@ interface SortState {
 }
 
 interface FilterState {
-  status: Set<string>;
   semester: Set<string>;
 }
 
 const SORT_OPTIONS: { label: string; field: SortField }[] = [
   { label: "Title", field: "title" },
 ];
-
-const STATUS_VARIANT: Record<string, "success" | "warning" | "error" | "dark" | "pink-light"> = {
-  open: "success",
-  closed: "error",
-  ongoing: "warning",
-  archived: "dark",
-};
 
 const CATEGORY_GRADIENT: Record<string, string> = {
   "1st Semester": "linear-gradient(135deg, #F4A7B9 0%, #B8B5E8 100%)",
@@ -108,7 +99,7 @@ export default function CoursesPage() {
     setSearch(urlSearch);
   }
   const [sort, setSort] = useState<SortState>({ field: "title", direction: "asc" });
-  const [filters, setFilters] = useState<FilterState>({ status: new Set(), semester: new Set() });
+  const [filters, setFilters] = useState<FilterState>({ semester: new Set() });
   const [activeSemesterChip, setActiveSemesterChip] = useState("All Semesters");
   const [detailCourse, setDetailCourse] = useState<Course | null>(null);
 
@@ -131,16 +122,13 @@ export default function CoursesPage() {
 
   // Filter & Sort Logic
   const semesters = useMemo(() => Array.from(new Set(courses.map((c) => c.semester).filter(Boolean))) as string[], [courses]);
-  const statuses = useMemo(() => Array.from(new Set(courses.map((c) => c.status).filter(Boolean))) as string[], [courses]);
-
   const filteredAndSorted = useMemo(() => {
     return courses
       .filter((c) => {
-        const matchesSearch = `${c.title} ${c.semester}`.toLowerCase().includes(search.toLowerCase());
-        const matchesStatus = filters.status.size === 0 || filters.status.has(c.status || "");
+        const matchesSearch = `${c.title} ${c.description || ""}`.toLowerCase().includes(search.toLowerCase());
         const matchesSemester = filters.semester.size === 0 || filters.semester.has(c.semester || "");
 
-        return matchesSearch && matchesStatus && matchesSemester;
+        return matchesSearch && matchesSemester;
       })
       .sort((a, b) => {
         const aVal = (a[sort.field] || "").toString().toLowerCase();
@@ -177,7 +165,7 @@ export default function CoursesPage() {
     }));
   };
 
-  const totalActiveFilters = filters.status.size + filters.semester.size;
+  const totalActiveFilters = filters.semester.size;
 
   return (
     <div className="flex flex-col gap-6">
@@ -228,7 +216,7 @@ export default function CoursesPage() {
             variant="ghost"
             className="mt-4 text-xs underline"
             onClick={() => {
-              setFilters({ status: new Set(), semester: new Set() });
+              setFilters({ semester: new Set() });
               setSearch("");
               setActiveSemesterChip("All Semesters");
             }}
@@ -311,14 +299,9 @@ export default function CoursesPage() {
               <X size={14} />
             </button>
 
-            {/* category and status badges bottom-left of cover */}
+            {/* category badge bottom-left of cover */}
             <div className="absolute bottom-3 left-3 flex gap-2 items-center">
               <span className="badge badge-pink">{detailCourse.semester ?? "Uncategorized"}</span>
-              {detailCourse.status && (
-                <Badge variant={STATUS_VARIANT[detailCourse.status.toLowerCase().trim()] ?? "dark"}>
-                  <span className="capitalize">{detailCourse.status}</span>
-                </Badge>
-              )}
             </div>
           </div>
 

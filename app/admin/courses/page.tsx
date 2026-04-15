@@ -21,29 +21,12 @@ import {
   Toast,
 } from "@/components/ui";
 
-function formatTime(time?: string) {
-  if (!time) return "—"
-
-  const [hour, minute] = time.split(":")
-  const h = Number(hour)
-  const suffix = h >= 12 ? "PM" : "AM"
-  const hour12 = h % 12 || 12
-
-  return `${hour12}:${minute} ${suffix}`
-}
-
-const SORT_FIELDS = ["title", "status", "semester", "start_time"] as const;
+const SORT_FIELDS = ["title"] as const;
 type SortField = typeof SORT_FIELDS[number];
 type SortDirection = "asc" | "desc";
 
 // variant helpers 
 type BadgeVariant = "pink-light" | "periwinkle" | "dark" | "success" | "warning" | "error";
-
-
-const STATUS_VARIANT: Record<string, BadgeVariant> = {
-  open: "periwinkle",
-  closed: "dark",
-};
 
 // courses page proper
 export default function CoursesPage() {
@@ -57,10 +40,8 @@ export default function CoursesPage() {
   const [modalContent, setModalContent] = useState<{ label: string; text: string } | null>(null);
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [editTarget, setEditTarget] = useState<CourseFormData | null>(null);
-  const [sort, setSort] = useState<{ field: SortField; direction: SortDirection }>({ field: "start_time", direction: "desc" });
+  const [sort, setSort] = useState<{ field: SortField; direction: SortDirection }>({ field: "title", direction: "desc" });
 
-  const [semesterFilter, setSemesterFilter] = useState<string>("All");
-  const [statusFilters, setStatusFilters] = useState<Set<string>>(new Set());
   const [page, setPage] = useState(1);
 
   // for the delete confirmation modal
@@ -79,8 +60,8 @@ export default function CoursesPage() {
     const supabase = createClient();
     const { data, error } = await supabase
       .from("course")
-      .select("id, title, description, semester, status, start_time, end_time, days")
-      .order("start_time", { ascending: false });
+      .select("id, title, description")
+      .order("created_at", { ascending: false });
 
     if (!error && data) {
       setCourses(data);
@@ -104,18 +85,8 @@ export default function CoursesPage() {
     let result = courses;
 
     result = result.filter((e) =>
-      `${e.title} ${e.days} ${e.start_time} ${e.end_time} ${e.semester ?? ""}`.toLowerCase().includes(q)
+      `${e.title} ${e.description}`.toLowerCase().includes(q)
     );
-
-    // Semester filter (single-select)
-    if (semesterFilter !== "All") {
-      result = result.filter((e) => e.semester === semesterFilter);
-    }
-
-    // Status filter (multi-select)
-    if (statusFilters.size > 0) {
-      result = result.filter((e) => statusFilters.has(e.status ?? ""));
-    }
 
     // Sorting (multi-field)
     result = result.sort((a, b) => {
@@ -125,11 +96,6 @@ export default function CoursesPage() {
       if (aVal == null && bVal == null) return 0;
       if (aVal == null) return sort.direction === "asc" ? 1 : -1;
       if (bVal == null) return sort.direction === "asc" ? -1 : 1;
-
-      if (sort.field === "start_time") {
-        aVal = new Date(aVal).getTime();
-        bVal = new Date(bVal).getTime();
-      }
 
       if (typeof aVal === "string" && typeof bVal === "string") {
         aVal = aVal.toLowerCase();
@@ -143,20 +109,10 @@ export default function CoursesPage() {
 
     setFiltered(result);
     setPage(1);
-  }, [search, courses, sort, semesterFilter, statusFilters]);
-
-  //  toggle helpers 
-  function toggleStatus(s: string) {
-    setStatusFilters((prev) => {
-      const next = new Set(prev);
-      next.has(s) ? next.delete(s) : next.add(s);
-      return next;
-    });
-  }
+  }, [search, courses, sort]);
 
   function clearAllFilters() {
-    setSemesterFilter("All");
-    setStatusFilters(new Set());
+    // No filters to clear
   }
 
   const handleSort = (field: SortField) => {
@@ -210,8 +166,8 @@ export default function CoursesPage() {
     setDeletePassword("");
   };
 
-  const activeFilterCount = (semesterFilter !== "All" ? 1 : 0) + statusFilters.size;
-  const hasActiveFilters = activeFilterCount > 0;
+  const activeFilterCount = 0;
+  const hasActiveFilters = false;
 
   // DataTable columns 
   const columns: Column<CourseFormData>[] = [
@@ -284,7 +240,7 @@ export default function CoursesPage() {
         <div className="flex items-center gap-3 flex-wrap">
 
           <SearchBar
-            placeholder="Search by Title"
+            placeholder="Search by title or description"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             containerStyle={{ flex: 1, minWidth: 220 }}
@@ -301,45 +257,12 @@ export default function CoursesPage() {
 
 
             <Button variant="primary" onClick={() => setCreateModalOpen(true)}>
-                <Plus size={16} /> Add Guideline
+                <Plus size={16} /> Add Course
             </Button>
         </div>
 
      
       </div>
-
-      {/*  active filter pills  */}
-      {hasActiveFilters && (
-        <div className="flex items-center gap-2 flex-wrap -mt-2">
-          <span className="caption">Active filters:</span>
-
-          {semesterFilter !== "All" && (
-            <Badge variant="pink-light" dot>
-              {semesterFilter}
-              <button
-                onClick={() => setSemesterFilter("All")}
-                aria-label={`Remove ${semesterFilter} filter`}
-                style={{ marginLeft: 6 }}
-              >×</button>
-            </Badge>
-          )}
-
-          {[...statusFilters].map((s) => (
-            <Badge key={s} variant="warning" dot>
-              <span className="capitalize">{s}</span>
-              <button
-                onClick={() => toggleStatus(s)}
-                aria-label={`Remove ${s} filter`}
-                style={{ marginLeft: 6 }}
-              >×</button>
-            </Badge>
-          ))}
-
-          <Button variant="soft" size="sm" onClick={clearAllFilters}>
-            Clear all
-          </Button>
-        </div>
-      )}
 
       {/*  table / empty / loading  */}
       {isLoading ? (
