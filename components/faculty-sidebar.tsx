@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, Calendar, BookOpen, ClipboardList,
-  PanelLeftClose, PanelLeftOpen,
+  ChevronLeft, ChevronRight,
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -62,9 +62,8 @@ function MobileNav() {
 export default function FacultySidebar() {
   const pathname = usePathname();
 
-  const [open,        setOpen]        = useState(true);
-  const [logoHovered, setLogoHovered] = useState(false);
-  const [isMobile,    setIsMobile]    = useState(false);
+  const [open,     setOpen]     = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     const check = () => {
@@ -82,6 +81,7 @@ export default function FacultySidebar() {
   const state = open ? "expanded" : "collapsed";
 
   return (
+    <div style={{ position: "relative", flexShrink: 0, display: "flex" }}>
     <aside
       data-state={state}
       className={[
@@ -97,34 +97,9 @@ export default function FacultySidebar() {
     >
         {/* logo ------------------------------------------------ */}
         <div className="flex shrink-0 items-center border-b border-white/[0.07] h-[70px] gap-[6px] overflow-hidden">
-          <button
-            onClick={() => !open && setOpen(true)}
-            onMouseEnter={() => setLogoHovered(true)}
-            onMouseLeave={() => setLogoHovered(false)}
-            aria-label={open ? undefined : "Expand sidebar"}
-            className="relative shrink-0 flex items-center justify-center rounded-[10px] border-none bg-transparent"
-            style={{ width: 44, height: 44, cursor: open ? "default" : "pointer" }}
-          >
-            <Image
-              src="/kasarian-upb-logo.svg"
-              alt="UPB Kasarian"
-              width={44} height={44}
-              style={{
-                opacity: open ? 1 : logoHovered ? 0.22 : 1,
-                transition: "opacity 200ms ease-out",
-              }}
-            />
-            <span
-              className="absolute inset-0 flex items-center justify-center text-white/75"
-              style={{
-                opacity: !open && logoHovered ? 1 : 0,
-                transition: "opacity 200ms ease-out",
-                pointerEvents: "none",
-              }}
-            >
-              <PanelLeftOpen size={20} />
-            </span>
-          </button>
+          <div className="relative shrink-0 flex items-center justify-center rounded-[10px]" style={{ width: 44, height: 44 }}>
+            <Image src="/kasarian-upb-logo.svg" alt="UPB Kasarian" width={44} height={44} />
+          </div>
 
           {/* title fades + clips via overflow on the sidebar itself */}
           <div
@@ -139,20 +114,6 @@ export default function FacultySidebar() {
             <span className="heading-sm-dark uppercase">Kasarian</span>
           </div>
 
-          {/* collapse button */}
-          <button
-            onClick={() => setOpen(false)}
-            aria-label="Collapse sidebar"
-            className={[
-              "shrink-0 flex items-center justify-center cursor-pointer border-none bg-transparent",
-              "text-white/40 hover:text-white/90",
-              "opacity-100 group-data-[state=collapsed]/sidebar:opacity-0 group-data-[state=collapsed]/sidebar:pointer-events-none",
-              "transition-opacity duration-200 ease-linear",
-            ].join(" ")}
-            style={{ marginLeft: "auto" }}
-          >
-            <PanelLeftClose size={18} />
-          </button>
         </div>
 
         {/* nav ------------------------------------------------ */}
@@ -194,5 +155,30 @@ export default function FacultySidebar() {
         </nav>
 
     </aside>
+    <button
+      onClick={() => setOpen(o => !o)}
+      aria-label={open ? "Collapse sidebar" : "Expand sidebar"}
+      style={{
+        position: "absolute",
+        right: -14,
+        top: "50%",
+        transform: "translateY(-50%)",
+        width: 35,
+          height: 35,
+          borderRadius: "50%",
+          background: "var(--primary-dark)",
+          border: "2px solid var(--white)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        cursor: "pointer",
+        zIndex: 20,
+        color: "white",
+        flexShrink: 0,
+      }}
+    >
+      {open ? <ChevronLeft size={14} /> : <ChevronRight size={14} />}
+    </button>
+    </div>
   );
 }
