@@ -198,6 +198,7 @@ export default function DashboardPage() {
                                     stroke={AXIS_COLOR}
                                     tick={{ fill: TICK_COLOR, fontSize: 11 }}
                                     tickLine={false} axisLine={false}
+                                    allowDecimals={false}
                                     label={{
                                         value: "Attendees",
                                         angle: -90,
@@ -269,6 +270,7 @@ export default function DashboardPage() {
                                     stroke={AXIS_COLOR}
                                     tick={{ fill: TICK_COLOR, fontSize: 11 }}
                                     tickLine={false} axisLine={false}
+                                    allowDecimals={false}
                                     />
                                     <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(45,42,74,0.03)" }} />
                                     <Bar dataKey="value" name="Users" radius={[6, 6, 0, 0]} barSize={36}>
