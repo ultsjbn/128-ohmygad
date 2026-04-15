@@ -404,7 +404,7 @@ export function DateTimePicker({
                   { label: "9:00 AM", h: 9, m: 0, ap: "AM" as const },
                   { label: "10:30 AM", h: 10, m: 30, ap: "AM" as const },
                   { label: "12:00 PM", h: 12, m: 0, ap: "PM" as const },
-                  { label: "1:30 PM", h: 1, m: 0, ap: "PM" as const },
+                  { label: "1:30 PM", h: 1, m: 30, ap: "PM" as const },
                   { label: "3:00 PM", h: 3, m: 0, ap: "PM" as const },
                   { label: "4:30 PM", h: 4, m: 30, ap: "PM" as const },
                   { label: "6:00 PM", h: 6, m: 0, ap: "PM" as const },
