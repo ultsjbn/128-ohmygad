@@ -13,8 +13,7 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Legend, BarChart, Bar,
 } from "recharts";
-import { useDashboardData } from "./hooks/use-dashboard-data";
-import GlobalSearch from "@/components/global-search";
+import { useDashboardData } from "./hooks/use-dashboard-data";import { useSurveyCompletionRates } from "./hooks/use-survey-completion-rates";import GlobalSearch from "@/components/global-search";
 import EventForm from "@/components/admin/event-form";
 import UserForm from "@/components/admin/user-form";
 import CourseForm from "@/components/admin/course-form";
@@ -88,6 +87,8 @@ export default function DashboardPage() {
         loading,
         attendanceLoading,
     } = useDashboardData(attendanceRange, filters);
+
+    const { data: surveyCompletionData, loading: surveyCompletionLoading } = useSurveyCompletionRates();
 
     const filteredColleges = useMemo(
         () => (breakdownData ?? []).filter((item: { category?: string }) =>
@@ -344,6 +345,66 @@ export default function DashboardPage() {
                     </Card>
 
                 </div>
+            </div>
+
+            {/* survey completion analytics */}
+            <div>
+                <Card variant="no-hover" className="flex flex-col p-5 min-h-[320px]">
+                    <div className="flex items-start justify-between gap-3 mb-4">
+                        <div>
+                            <h2 className="heading-md">Response Rate by Survey</h2>
+                            <p className="caption mt-0.5">Completed vs incomplete response percentage per survey</p>
+                        </div>
+                    </div>
+                    <div className="flex-1 w-full min-h-[220px] cursor-default select-none">
+                        {surveyCompletionLoading ? (
+                            <div className="flex items-center justify-center h-full">
+                                <span className="caption animate-pulse">Loading survey data…</span>
+                            </div>
+                        ) : surveyCompletionData.length === 0 ? (
+                            <div className="flex items-center justify-center h-full">
+                                <span className="caption text-[var(--gray)]">No survey completion data available.</span>
+                            </div>
+                        ) : (
+                            <ResponsiveContainer width="100%" height={260}>
+                                <BarChart
+                                    layout="vertical"
+                                    data={surveyCompletionData.slice(0, 7)}
+                                    margin={{ top: 8, right: 20, left: 20, bottom: 5 }}
+                                >
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={AXIS_COLOR} />
+                                    <XAxis
+                                        type="number"
+                                        stroke={AXIS_COLOR}
+                                        tick={{ fill: TICK_COLOR, fontSize: 11 }}
+                                        tickLine={false}
+                                        axisLine={false}
+                                        domain={[0, 100]}
+                                        tickFormatter={(value) => `${value}%`}
+                                    />
+                                    <YAxis
+                                        type="category"
+                                        dataKey="title"
+                                        stroke={AXIS_COLOR}
+                                        tick={{ fill: TICK_COLOR, fontSize: 11 }}
+                                        tickLine={false}
+                                        axisLine={false}
+                                        width={140}
+                                        interval={0}
+                                    />
+                                    <Tooltip content={<CustomTooltip />} />
+                                    <Legend
+                                        verticalAlign="top"
+                                        align="right"
+                                        wrapperStyle={{ paddingBottom: 10 }}
+                                    />
+                                    <Bar dataKey="completedPct" name="Completed" stackId="a" fill="#6DC5A0" radius={[6, 0, 0, 6]} />
+                                    <Bar dataKey="incompletePct" name="Incomplete" stackId="a" fill="#F4A7B9" radius={[0, 6, 6, 0]} />
+                                </BarChart>
+                            </ResponsiveContainer>
+                        )}
+                    </div>
+                </Card>
             </div>
 
         </div>
