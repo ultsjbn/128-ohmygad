@@ -59,13 +59,13 @@ interface DashboardFilterProps {
   options: FilterOptions;
 }
 
-export function     DashboardFilter({ value, onChange, options }: DashboardFilterProps) {
+export function DashboardFilter({ value, onChange, options }: DashboardFilterProps) {
   const count = countActiveFilters(value);
 
   const chips = [
     ...ROW1_KEYS,
     { key: "degreeProgram" as keyof DashboardFilters, label: "Degree Program", icon: <BookOpen size={15} /> },
-    { key: "role"          as keyof DashboardFilters, label: "Role",           icon: <Shield size={15} /> },
+    { key: "role"          as keyof DashboardFilters, label: "Role",           icon: <User size={15} /> },
   ].flatMap(({ key }) => value[key].map((val) => ({ key, val })));
 
   function toggle(key: keyof DashboardFilters, val: string) {
@@ -86,7 +86,7 @@ export function     DashboardFilter({ value, onChange, options }: DashboardFilte
           <SlidersHorizontal size={13} />
           Filters
           {count > 0 && (
-            <span className="inline-flex items-center justify-center w-2 h-2 rounded-full text-[10px] font-bold text-white bg-[var(--primary-dark)] ml-0.5">
+            <span className="inline-flex items-center justify-center min-w-[20px] h-5 rounded-full px-1 text-[11px] font-bold text-white bg-[var(--primary-dark)] ml-0.5">
               {count}
             </span>
           )}
@@ -147,7 +147,7 @@ export function     DashboardFilter({ value, onChange, options }: DashboardFilte
       {options.role?.length > 0 && (
         <div className="p-2 flex flex-row gap-4">
           <p className="flex items-center gap-1 label">
-            <span className="text-[var(--periwinkle)]"><Shield size={15} /></span>
+            <span className="text-[var(--periwinkle)]"><User size={15} /></span>
             Role
           </p>
           <div className="flex gap-4">
@@ -171,7 +171,7 @@ export function     DashboardFilter({ value, onChange, options }: DashboardFilte
         <>
           <span className="caption">Active filters:</span>
           {chips.map(({ key, val }) => (
-            <Badge key={`${key}-${val}`} variant="pink">
+            <Badge key={`${key}-${val}`} variant="periwinkle">
               {val}
               <button
                 type="button"

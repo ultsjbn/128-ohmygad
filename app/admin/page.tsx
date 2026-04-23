@@ -106,7 +106,7 @@ export default function DashboardPage() {
     );
 
     return (
-        <div className="flex flex-col gap-2 w-full animate-in fade-in duration-500">
+        <div className="flex flex-col gap-5 w-full animate-in fade-in duration-500">
 
         {/* greeting ------------------------------------------------ */}
         <div className="flex items-center justify-between w-full">
@@ -119,11 +119,11 @@ export default function DashboardPage() {
         </div>
 
         {/* ------------------------------------------------ MAIN CONTENT ------------------------------------------------*/}
-        <div className="flex flex-col xl:flex-row gap-3">
-        <div className="flex flex-col gap-3 flex-1 min-w-0 pb-2">
+        <div className="flex flex-col xl:flex-row gap-5">
+        <div className="flex flex-col gap-5 flex-1 min-w-0 pb-2">
 
             {/* KPI section ------------------------------------------------ */}
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-5">
                 <GlobalSearch role="admin" placeholder="Search events, courses, surveys..." />
                 <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
                     <StatCard
@@ -410,7 +410,7 @@ export default function DashboardPage() {
         </div>
 
         {/* right panel ------------------------------------------------------------------------------------------------ */}
-        <aside className="flex flex-col gap-3 xl:w-[268px] shrink-0 pb-8">
+        <aside className="flex flex-col gap-5 xl:w-[268px] shrink-0 pb-8">
             {/* calendar */}
             <Card variant="no-hover" className="p-4">
                 <MiniCalendar

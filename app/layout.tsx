@@ -3,7 +3,6 @@ import { ThemeProvider } from "next-themes";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import "./fonts.css";
-import "@snowball-tech/design-tokens/dist/web/css/variables.css";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -34,8 +33,7 @@ export default function RootLayout({
       <body className="antialiased">
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
-          enableSystem
+          defaultTheme="light"
           disableTransitionOnChange
         >
           {children}

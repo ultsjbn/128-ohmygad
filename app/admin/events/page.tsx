@@ -566,7 +566,7 @@ export default function EventsPage() {
               <SlidersHorizontal size={15} /> Filter
               {hasActiveFilters && (
                   <span
-                    className="inline-flex items-center justify-center w-2 h-2 rounded-full text-[10px] font-bold text-white"
+                    className="inline-flex items-center justify-center min-w-[20px] h-5 rounded-full px-1 text-[11px] font-bold text-white"
                     style={{ background: "var(--primary-dark)", marginLeft: 2 }}
                   >
                   {activeFilterCount}
@@ -752,10 +752,10 @@ export default function EventsPage() {
             </div>
 
             {/* two-column body */}
-            <div className="flex gap-4 p-3 sm:p-5 overflow-y-auto">
+            <div className="flex gap-6 p-5 sm:p-7 overflow-y-auto">
 
               {/* left column: event info */}
-              <div className="flex flex-col gap-2 flex-1 min-w-0">
+              <div className="flex flex-col gap-4 flex-1 min-w-0">
                 <h2 className="heading-md">{detailEvent.title}</h2>
                 {/* category and status badges moved below */}
                 <div className="flex gap-2 items-center">
@@ -769,7 +769,7 @@ export default function EventsPage() {
                     )}
                 </div>
 
-                <div className="flex flex-col gap-1.5">
+                <div className="flex flex-col gap-3">
                   <div className="flex items-start gap-3 caption sm:text-sm text-[var(--gray)]">
                     <CalendarDays size={15} className="shrink-0 mt-0.5" />
                     <span>
@@ -811,14 +811,14 @@ export default function EventsPage() {
 
                 <div className="divider"/>
 
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-3">
                   <p className="label">ABOUT THIS EVENT</p>
                   <p className="body whitespace-pre-wrap">{detailEvent.description || "No description provided."}</p>
                 </div>
               </div>
 
               {/* right column: registrations + attendance */}
-              <div className="flex flex-col gap-4 flex-1 min-w-0">
+              <div className="flex flex-col gap-3 flex-1 min-w-0">
 
                 {/* sub-tab toggle */}
                 <Tabs

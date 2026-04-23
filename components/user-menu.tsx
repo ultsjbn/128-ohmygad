@@ -54,7 +54,7 @@ export default function UserMenu() {
       trigger={
         <button
           aria-label="User menu"
-          className="w-6 h-6 bg-[var(--primary-dark)] rounded-full flex items-center justify-center cursor-pointer transition-all duration-150 border-none text-white text-[11px] font-bold tracking-tight select-none hover:opacity-80 shrink-0">
+          className="w-9 h-9 bg-[var(--primary-dark)] rounded-full flex items-center justify-center cursor-pointer transition-all duration-150 border-none text-white text-[13px] font-bold tracking-tight select-none hover:opacity-80 shrink-0">
           {initials}
         </button>
       }
