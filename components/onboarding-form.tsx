@@ -215,11 +215,11 @@ export function OnboardingForm({
     <div className={cn("card max-w-4xl w-full mx-auto h-auto flex flex-col md:flex-row gap-3 md:gap-4", className)} {...props}>
       <div className="md:w-1/3 flex flex-col items-center md:justify-center text-center md:pb-0 md:border-r border-[rgba(45,42,74,0.08)] md:pr-3 shrink-0">
         <Image
-          src="/kasarian_logo.jpg"
+          src="/kasarian-upb-logo.svg"
           alt="UPB Kasarian Gender Studies Program Logo"
           width={90}
           height={90}
-          className="rounded-full object-cover mb-5 shadow-soft border-2 border-white"
+          className="mb-5"
         />
         <h2 className="heading-lg leading-tight">Complete<br />Your Profile</h2>
         <p className="body text-[var(--gray)] mt-3">

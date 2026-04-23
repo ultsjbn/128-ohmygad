@@ -54,11 +54,11 @@ export function ForgotPasswordForm({
         <>
           <div className="flex flex-col items-center mb-6 text-center">
             <Image
-              src="/kasarian_logo.jpg"
+              src="/kasarian-upb-logo.svg"
               alt="UPB Kasarian Gender Studies Program Logo"
               width={80}
               height={80}
-              className="rounded-full object-cover mb-4 shadow-soft"
+              className="mb-4"
             />
             <h2 className="heading-lg">Reset Password</h2>
             <p className="body text-[var(--gray)] mt-1">
