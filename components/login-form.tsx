@@ -1,11 +1,15 @@
 "use client";
 
+import React from "react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
+import { signInWithGoogle } from "@/lib/supabase/actions";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { DropdownDivider } from "./ui";
 
 export function LoginForm({
   className,
@@ -94,7 +98,7 @@ export function LoginForm({
               id="email"
               type="email"
               placeholder="jmdelacruz@up.edu.ph"
-              required
+            //   required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="input"
@@ -110,7 +114,7 @@ export function LoginForm({
             <input
               id="password"
               type={showPassword ? "text" : "password"}
-              required
+            //   required
               maxLength={128}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -151,19 +155,27 @@ export function LoginForm({
           {isLoading ? "Logging in..." : "Login"}
         </button>
 
-        {/* Footer Link */}
-        <div className="mt-2 text-center">
-          <p className="body">
-            Don&apos;t have an account?{" "}
-            <Link
-              href="/auth/sign-up"
-              className="font-bold text-[var(--soft-pink)] hover:text-[var(--primary-dark)] transition-colors"
-            >
-              Sign up
-            </Link>
-          </p>
-        </div>
       </form>
+
+      <form action={signInWithGoogle} className="flex flex-col gap-4 pt-4 items-center">
+        <hr className="w-full border-[var(--gray)] m-4" />
+        <Button type="submit" variant="ghost" className="w-full">
+          Sign in with Google
+        </Button>
+      </form>
+
+      {/* Footer Link */}
+      <div className="mt-4 text-center">
+        <p className="body">
+          Don&apos;t have an account?{" "}
+          <Link
+            href="/auth/sign-up"
+            className="font-bold text-[var(--soft-pink)] hover:text-[var(--primary-dark)] transition-colors"
+          >
+            Sign up
+          </Link>
+        </p>
+      </div>
     </div>
   );
 }
