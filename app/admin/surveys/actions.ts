@@ -1,6 +1,6 @@
 "use server";
 
-import { createClient as createServerSupabase } from "@/lib/supabase/server";
+import { createClientForServer as createServerSupabase } from "@/lib/supabase/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 
 export async function getSurveyAnalytics(surveyId: string) {
