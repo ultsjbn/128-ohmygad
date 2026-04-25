@@ -108,7 +108,7 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
 
   useEffect(() => {
   setProfiles(initialProfiles);
-}, [initialProfiles]);
+  }, [initialProfiles]);
 
   const showToast = (variant: "success"|"error", title: string, message?: string) => {
     setToast({ variant, title, message });
