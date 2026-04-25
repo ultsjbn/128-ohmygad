@@ -248,7 +248,7 @@ export default function StudentProfilePage() {
               {profile.program && <Badge variant="dark">{profile.program}</Badge>}
             </div>
 
-                        {/* gso progress bar */}
+            {/* gso progress bar */}
             <div className="w-full text-left pt-3 border-t border-[rgba(45,42,74,0.08)]">
               <ProgressBar
                 value={profile.gso_attended === 2 ? 100 : profile.gso_attended === 1 ? 50 : 0}
