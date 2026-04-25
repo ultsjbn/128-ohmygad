@@ -11,7 +11,6 @@ import {
   SearchBar,
   EventCard,
   Badge,
-  FilterChips,
   Button,
   Card,
   Modal,
@@ -415,13 +414,13 @@ export default function EventsPage() {
         <div className="flex items-center gap-2 flex-wrap -mt-2">
           <span className="caption">Active filters:</span>
           {[...filters.status].map((s) => (
-            <Badge key={s} variant="warning" dot>
+            <Badge key={s} variant={STATUS_VARIANT[s] ?? "dark"} dot>
               <span className="capitalize">{s}</span>
               <button onClick={() => toggleFilter("status", s)} className="ml-1.5" aria-label={`Remove ${s} filter`}>×</button>
             </Badge>
           ))}
           {[...filters.category].map((cat) => (
-            <Badge key={cat} variant="pink-light">
+            <Badge key={cat} variant={CATEGORY_VARIANT[cat] ?? "dark"}dot>
               {cat}
               <button onClick={() => { toggleFilter("category", cat); setActiveChip("All"); }} className="ml-1.5" aria-label={`Remove ${cat} filter`}>×</button>
             </Badge>
