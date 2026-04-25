@@ -106,6 +106,10 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
 
   const [toast, setToast] = useState<{ variant: "success"|"error"; title: string; message?: string } | null>(null);
 
+  useEffect(() => {
+  setProfiles(initialProfiles);
+}, [initialProfiles]);
+
   const showToast = (variant: "success"|"error", title: string, message?: string) => {
     setToast({ variant, title, message });
     setTimeout(() => setToast(null), 3000);
