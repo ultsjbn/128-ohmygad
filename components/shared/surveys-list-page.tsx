@@ -81,19 +81,38 @@ export default function SurveysListPage({ basePath }: SurveysListPageProps) {
       const supabase = createClient();
 
       const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const { data: responses } = await supabase
-          .from("survey_responses")
-          .select("survey_id")
-          .eq("response_token", user.id);
-        if (responses) {
-          setRespondedIds(new Set(responses.map((r) => r.survey_id as string)));
-        }
+      if (!user) { setIsLoading(false); return; }
+
+      // Check which surveys the user already responded to
+      const { data: responses } = await supabase
+        .from("survey_responses")
+        .select("survey_id")
+        .eq("response_token", user.id);
+      if (responses) {
+        setRespondedIds(new Set(responses.map((r) => r.survey_id as string)));
       }
 
+      // Get events the user attended
+      const { data: attended } = await supabase
+        .from("event_registration")
+        .select("event_id")
+        .eq("user_id", user.id)
+        .eq("attended", true);
+
+      const attendedEventIds = (attended ?? []).map((r) => r.event_id as string);
+
+      if (attendedEventIds.length === 0) {
+        // User hasn't attended any events — show nothing
+        setSurveys([]);
+        setIsLoading(false);
+        return;
+      }
+
+      // Fetch surveys linked to those events only
       const { data, error } = await supabase
         .from("survey")
         .select("id, title, description, status, event_id, open_at, close_at")
+        .in("event_id", attendedEventIds)
         .order("open_at", { ascending: false });
 
       if (error) setError(error.message);
@@ -197,7 +216,8 @@ export default function SurveysListPage({ basePath }: SurveysListPageProps) {
         <Card>
           <div className="flex flex-col items-center justify-center gap-3 py-12">
             <ClipboardList size={28} className="text-[var(--gray)]" />
-            <p className="caption">{search ? "No surveys match your search." : "No surveys available."}</p>
+            <p className="caption">
+            {search ? "No surveys match your search." : "No surveys available. Open surveys are shown for events you have attended."}</p>
             {search && (
               <Button variant="ghost" size="sm" onClick={() => setSearch("")}>Clear search</Button>
             )}
