@@ -23,7 +23,7 @@ export default function RightPanel() {
       {/* ASHs attended*/}
       <Card variant="no-hover" className="flex flex-col gap-2 p-4 transition-all" >
         <div className="flex items-center justify-between">
-          <p className="body">ASHs Attended</p>
+          <p className="body">ASHOs Attended</p>
           <CheckCircle2 size={18} style={{ color: "var(--periwinkle)" }} />
         </div>
         <p className="heading-xl" >

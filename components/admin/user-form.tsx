@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { User, Mail, Lock, Phone, MapPin, Hash, Loader2, Building2 } from "lucide-react";
 import { Button, Input, Select, Toast, Toggle, Card } from "@/components/ui";
-import { validateFullName, validateDisplayName, validateContactNum, validateStudentNum, validatePassword, validateGsoSessions, validateAddress, validateOffice, validateDepartment } from "@/lib/validation";
+import { validateFullName, validateDisplayName, validateContactNum, validateStudentNum, validatePassword, validateGsoSessions, validateAshoSessions, validateAddress, validateOffice, validateDepartment } from "@/lib/validation";
 
 // types
 interface CreateUserData {
@@ -23,6 +23,7 @@ interface CreateUserData {
   student_num?: string;
   year_level?: string;
   gso_attended?: number;
+  asho_attended?: number;
   is_onboarded?: boolean;
   office?: string;
   department?: string;
@@ -113,6 +114,7 @@ export default function UserForm({ initialData, onSuccess, layout = "modal" }: U
   const [student_num, setStudentNum] = useState(initialData?.student_num ?? "");
   const [year_level, setYearLevel] = useState(initialData?.year_level ?? "");
   const [gso_attended, setGsoAttended] = useState<string | number>(initialData?.gso_attended ?? "");
+  const [asho_attended, setAshoAttended] = useState<string | number>(initialData?.asho_attended ?? "");
   const [is_onboarded, setIsOnboarded] = useState(initialData?.is_onboarded ?? true);
   const [office, setOffice] = useState(initialData?.office ?? "");
   const [department, setDepartment] = useState(initialData?.department ?? "");
@@ -164,9 +166,14 @@ export default function UserForm({ initialData, onSuccess, layout = "modal" }: U
       if (role === "student" || !role) {
         const studentErr = validateStudentNum(student_num);
         if (studentErr) throw new Error(studentErr);
+      }
 
+      if (role === "student" || role=== "faculty" || !role) {
         const gsoErr = validateGsoSessions(gso_attended);
         if (gsoErr) throw new Error(gsoErr);
+
+        const ashoErr = validateAshoSessions(asho_attended);
+        if (ashoErr) throw new Error(ashoErr);
       }
 
       const addressErr = validateAddress(address || "");
@@ -184,12 +191,14 @@ export default function UserForm({ initialData, onSuccess, layout = "modal" }: U
 
       const gsoNum = gso_attended === "" ? 0 : Number(gso_attended);
 
+      const ashoNum = asho_attended === "" ? 0 : Number(asho_attended);
+
       const cleanStudentNum = student_num ? student_num.replace(/\D/g, "") : undefined;
 
       const payload: Partial<CreateUserData> = {
         full_name, email, display_name, role, contact_num, address,
         pronouns, sex_at_birth, gender_identity, is_onboarded,
-        ...(role === "student" || !role ? { college, program, student_num: cleanStudentNum, year_level, gso_attended: gsoNum } : {}),
+        ...(role === "student" || !role ? { college, program, student_num: cleanStudentNum, year_level, gso_attended: gsoNum, asho_attended: ashoNum } : {}),
         ...(role === "admin" ? { office } : {}),
         ...(role === "faculty" ? { college, department } : {}),
       };
@@ -259,6 +268,7 @@ export default function UserForm({ initialData, onSuccess, layout = "modal" }: U
               <Select label="Sex at Birth" value={sex_at_birth} onChange={(e) => setSexAtBirth(e.target.value)} options={SEX_OPTIONS} />
               <Select label="Gender Identity" value={gender_identity} onChange={(e) => setGenderIdentity(e.target.value)} options={GENDER_OPTIONS} />
               {(role === "student" || role === "faculty" || !role) && <Input label="GSO Sessions Attended" maxLength={1} placeholder="0" value={gso_attended.toString()} onChange={(e) => setGsoAttended(e.target.value)} />}
+              {(role === "student" || role === "faculty" || !role) && <Input label="ASHO Sessions Attended" maxLength={1} placeholder="0" value={asho_attended.toString()} onChange={(e) => setAshoAttended(e.target.value)} />}
 
               <div className="flex items-center justify-between p-4 mt-2 rounded-[var(--radius-md)] border w-full" style={{ background: "var(--cream)", borderColor: "rgba(45,42,74,0.10)" }}>
                 <div>
@@ -315,6 +325,8 @@ export default function UserForm({ initialData, onSuccess, layout = "modal" }: U
         <Select label="Gender Identity" value={gender_identity} onChange={(e) => setGenderIdentity(e.target.value)} options={GENDER_OPTIONS} />
         {(role === "student" || !role) && <Input label="GSO Sessions Attended" type="number" min="0" max="5" step="1" placeholder="0" value={gso_attended.toString()} onChange={(e) => setGsoAttended(e.target.value)} />}
         {(role === "faculty" || !role) && <Input label="GSO Sessions Attended" type="number" min="0" max="5" step="1" placeholder="0" value={gso_attended.toString()} onChange={(e) => setGsoAttended(e.target.value)} />}
+        {(role === "student" || !role) && <Input label="ASHO Sessions Attended" type="number" min="0" max="5" step="1" placeholder="0" value={asho_attended.toString()} onChange={(e) => setAshoAttended(e.target.value)} />}
+        {(role === "faculty" || !role) && <Input label="ASHO Sessions Attended" type="number" min="0" max="5" step="1" placeholder="0" value={asho_attended.toString()} onChange={(e) => setAshoAttended(e.target.value)} />}
 
         {(role === "student" || role === "faculty" || !role) && <div className="col-span-full flex items-center justify-between p-1 rounded-lg">
         

@@ -6,6 +6,7 @@ export interface Profile {
   email: string | null;
   role: UserRole | null;
   gso_attended: number;
+  asho_attended: number;
   created_at: string;
   display_name?: string | null;
   contact_num?: string | null;

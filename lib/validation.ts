@@ -65,6 +65,12 @@ export function validateGsoSessions(value: string | number): string | null {
   return null;
 }
 
+export function validateAshoSessions(value: string | number): string | null {
+  const num = value === "" ? 0 : Number(value);
+  if (isNaN(num) || num < 0 || num > 5) return "ASHO Sessions Attended must be between 0 and 5.";
+  return null;
+}
+
 export function validateAddress(address: string): string | null {
   if (address && address.length > 100) return "Address cannot exceed 100 characters.";
   return null;

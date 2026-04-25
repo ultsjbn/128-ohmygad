@@ -9,7 +9,7 @@ export async function POST(req: Request) {
             email, password, full_name, display_name, role,
             contact_num, address, pronouns, college, program,
             student_num, year_level, sex_at_birth, gender_identity,
-            gso_attended, is_onboarded, office, department,
+            gso_attended, asho_attended, is_onboarded, office, department,
         } = body;
 
         if (!email || !password || !full_name || !role) {
@@ -80,6 +80,7 @@ export async function POST(req: Request) {
                 sex_at_birth: sex_at_birth || null,
                 gender_identity: gender_identity || null,
                 gso_attended: gso_attended ? Number(gso_attended) : 0,
+                asho_attended: asho_attended ? Number(asho_attended) : 0,
                 is_onboarded: is_onboarded ?? true,
                 office: office || null,
                 department: department || null,
