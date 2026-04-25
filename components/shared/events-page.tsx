@@ -408,10 +408,6 @@ export default function EventsPage() {
           </div>{/* end sort filter group */}
         </div>
 
-        {/* category single select below search bar */}
-        {categories.length > 0 && (
-          <FilterChips chips={["All", ...categories]} defaultActive={activeChip} onChange={handleChipChange} />
-        )}
       </div>
 
       {/* active filter pills */}
