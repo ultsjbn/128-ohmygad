@@ -104,7 +104,7 @@
   --gradient-bg: linear-gradient(145deg, #f5f3ff 0%, #fce8ee 35%, #f0eefd 65%, #faf8ff 100%);
 
   /* Motion */
-  --transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition: all 0.05s cubic-bezier(0.4, 0, 0.2, 1);
   --sidebar: #2D2A4A;
   --sidebar-foreground: rgba(255, 255, 255, 0.5);
   --sidebar-primary: #ffffff;

@@ -122,38 +122,53 @@ export function DataTable<T>({ columns, rows, keyExtractor, minRows, onRowClick 
 	const padCount = minRows && minRows > rows.length ? minRows - rows.length : 0;
 
 	return (
-		<div className="card" style={{ padding: 0, overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
-		<table className="table" style={{ tableLayout: "fixed" }}>
-			<thead>
-			<tr>
+    <div
+      className="card"
+      style={{
+        padding: 0,
+        overflowX: "auto",
+        WebkitOverflowScrolling: "touch",
+      }}
+    >
+      <table className="table" style={{ tableLayout: "fixed" }}>
+        <thead>
+          	<tr>
 				{columns.map((col) => (
-				<th key={col.key} draggable={false} style={col.width ? { width: col.width } : undefined}>{col.header}</th>
+					<th
+						key={col.key}
+						draggable={false}
+						style={col.width ? { width: col.width } : undefined}
+					>
+					{col.header}
+				</th>
 				))}
-			</tr>
-			</thead>
-			<tbody>
+          	</tr>
+        </thead>
+        <tbody>
 			{rows.map((row, i) => (
 				<tr
-                    key={keyExtractor(row, i)}
-                    onClick={() => onRowClick?.(row,i)}
-                    style={onRowClick ? { cursor: "pointer" } : undefined}
-                >
+					key={keyExtractor(row, i)}
+					onClick={() => onRowClick?.(row, i)}
+					style={{
+						background:
+						i % 2 === 0 ? "transparent" : "rgba(179, 173, 240, 0.0)",
+						...(onRowClick ? { cursor: "pointer" } : {}),
+					}}
+				>
 					{columns.map((col) => (
 						<td key={col.key}>{col.render(row, i)}</td>
 					))}
 				</tr>
 			))}
 			{Array.from({ length: padCount }).map((_, i) => (
-				<tr
-                    key={`__pad_${i}`} aria-hidden="true"
-                >
+				<tr key={`__pad_${i}`} aria-hidden="true">
 					{columns.map((col) => (
 						<td key={col.key}>&nbsp;</td>
 					))}
 				</tr>
 			))}
-			</tbody>
-		</table>
-		</div>
-	);
+        </tbody>
+      </table>
+    </div>
+  );
 }
