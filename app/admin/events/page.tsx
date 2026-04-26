@@ -32,13 +32,7 @@ const SORT_FIELDS = ["title", "category", "status", "start_date"] as const;
 type SortField = typeof SORT_FIELDS[number];
 type BadgeVariant = "pink-light" | "periwinkle" | "dark" | "success" | "warning" | "error";
 
-const CATEGORY_VARIANT: Record<string, BadgeVariant> = {
-  Orientation: "pink-light",
-  Forum: "periwinkle",
-  Research: "error",
-  Training: "success",
-  Workshop: "warning",
-};
+
 
 const STATUS_VARIANT: Record<string, BadgeVariant> = {
   upcoming: "pink-light",
@@ -435,9 +429,12 @@ export default function EventsPage() {
       header: "Category",
       width: "14%",
       render: (event) => (
-        <Badge variant={CATEGORY_VARIANT[event.category ?? ""] ?? "dark"}>
+        <span 
+        className="font-semibold"
+        style={{ color: "var(--primary-dark)", fontSize: 13}}
+        >
           {event.category}
-        </Badge>
+        </span>
       ),
     },
     {
