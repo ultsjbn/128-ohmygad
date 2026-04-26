@@ -311,8 +311,8 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
     },
     {
       key: "actions",
-      header: <div className="text-right">Actions</div>,
-      width: "20%",
+      header: <div className="text-center">Actions</div>,
+      width: "8%",
       render: (p) => (
         <div style={{ display: "flex", justifyContent: "flex-end", gap: 4 }}>
           <Button variant="icon" title="Edit user" onClick={(e) => { e.stopPropagation(); openEditModal(p.id); }}>
@@ -339,7 +339,10 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
           <SearchBar
             placeholder="Search by name, email or role…"
             value={search}
-            onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setPage(1);
+            }}
             containerStyle={{ flex: 1, minWidth: 220 }}
           />
 
@@ -350,16 +353,27 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
               </Button>
             }
           >
-            {(["full_name", "email", "role"] as SortState["field"][]).map((field) => (
-              <DropdownItem key={field} onClick={() => handleSort(field)}>
-                <span className="flex items-center justify-between gap-6 w-full">
-                  <span className="capitalize">{field === "created_at" ? "Date joined" : field.replace("_", " ")}</span>
-                  <SortIcon field={field} />
-                </span>
-              </DropdownItem>
-            ))}
+            {(["full_name", "email", "role"] as SortState["field"][]).map(
+              (field) => (
+                <DropdownItem key={field} onClick={() => handleSort(field)}>
+                  <span className="flex items-center justify-between gap-6 w-full">
+                    <span className="capitalize">
+                      {field === "created_at"
+                        ? "Date joined"
+                        : field.replace("_", " ")}
+                    </span>
+                    <SortIcon field={field} />
+                  </span>
+                </DropdownItem>
+              ),
+            )}
             <DropdownDivider />
-            <DropdownItem onClick={() => { setSort({ field: "created_at", direction: "desc" }); setPage(1); }}>
+            <DropdownItem
+              onClick={() => {
+                setSort({ field: "created_at", direction: "desc" });
+                setPage(1);
+              }}
+            >
               Reset sort
             </DropdownItem>
           </Dropdown>
@@ -370,7 +384,7 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
                 <SlidersHorizontal size={15} /> Filter
                 {hasActiveFilters && (
                   <span
-                    className="inline-flex items-center justify-center w-4 h-4 rounded-full text-[10px] font-bold text-white"
+                    className="inline-flex items-center justify-center min-w-[20px] h-5 rounded-full px-1 text-[11px] font-bold text-white"
                     style={{ background: "var(--primary-dark)", marginLeft: 2 }}
                   >
                     {activeFilterCount}
@@ -380,7 +394,9 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
             }
           >
             <div style={{ padding: "4px 12px 6px" }}>
-              <p className="label" style={{ marginBottom: 4 }}>Role</p>
+              <p className="label" style={{ marginBottom: 4 }}>
+                Role
+              </p>
             </div>
             {ROLES.map((r) => (
               <CheckItem
@@ -393,9 +409,11 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
             ))}
 
             <DropdownDivider />
-            
+
             <div style={{ padding: "6px 12px 4px" }}>
-              <p className="label" style={{ marginBottom: 4 }}>GSO Attended</p>
+              <p className="label" style={{ marginBottom: 4 }}>
+                GSO Attended
+              </p>
             </div>
             {GSO_STATUSES.map((g) => (
               <CheckItem
@@ -416,7 +434,6 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
             <UserPlus size={16} /> Add User
           </Button>
         </div>
-
       </div>
 
       {hasActiveFilters && (
@@ -426,14 +443,26 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
           {[...roleFilters].map((r) => (
             <Badge key={r} variant={ROLE_VARIANT[r] ?? "dark"} dot>
               <span className="capitalize">{r}</span>
-              <button onClick={() => { toggleRole(r); setActiveChip("All"); }} style={{ marginLeft: 6 }}>×</button>
+              <button
+                onClick={() => {
+                  toggleRole(r);
+                  setActiveChip("All");
+                }}
+                style={{ marginLeft: 6 }}
+              >
+                ×
+              </button>
             </Badge>
           ))}
 
           {[...gsoFilters].map((g) => (
             <Badge key={g} variant={GSO_VARIANT[g] ?? "dark"} dot>
-              <span className="capitalize">{g === "attended" ? "Attended" : "Pending"}</span>
-              <button onClick={() => toggleGso(g)} style={{ marginLeft: 6 }}>×</button>
+              <span className="capitalize">
+                {g === "attended" ? "Attended" : "Pending"}
+              </span>
+              <button onClick={() => toggleGso(g)} style={{ marginLeft: 6 }}>
+                ×
+              </button>
             </Badge>
           ))}
 
@@ -443,18 +472,33 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
         </div>
       )}
 
-      {fetchError && <Toast variant="error" title="Failed to load users" message={fetchError} />}
+      {fetchError && (
+        <Toast
+          variant="error"
+          title="Failed to load users"
+          message={fetchError}
+        />
+      )}
 
       {/* table / empty */}
-      {!fetchError && (
-        filtered.length === 0 ? (
+      {!fetchError &&
+        (filtered.length === 0 ? (
           <Card>
             <div className="flex flex-col items-center justify-center gap-3 py-12">
               <p className="caption">
-                {search || hasActiveFilters ? "No users match your search or filters." : "No users found."}
+                {search || hasActiveFilters
+                  ? "No users match your search or filters."
+                  : "No users found."}
               </p>
               {(search || hasActiveFilters) && (
-                <Button variant="ghost" size="sm" onClick={() => { setSearch(""); clearAllFilters(); }}>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setSearch("");
+                    clearAllFilters();
+                  }}
+                >
                   Clear search & filters
                 </Button>
               )}
@@ -467,14 +511,15 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
             keyExtractor={(p) => p.id}
             onRowClick={(p) => openEditModal(p.id)}
           />
-        )
-      )}
+        ))}
 
       {/* pagination */}
       {filtered.length > 0 && (
         <div className="flex items-center justify-between flex-wrap gap-3">
           <span className="caption">
-            Showing {Math.min((page - 1) * PER_PAGE + 1, filtered.length)}–{Math.min(page * PER_PAGE, filtered.length)} of {filtered.length} users
+            Showing {Math.min((page - 1) * PER_PAGE + 1, filtered.length)}–
+            {Math.min(page * PER_PAGE, filtered.length)} of {filtered.length}{" "}
+            users
           </span>
           <Pagination
             page={page}
@@ -512,8 +557,14 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
           </div>
         ) : editError ? (
           <div className="flex flex-col gap-4">
-            <Toast variant="error" title="Failed to load user" message={editError} />
-            <Button variant="ghost" className="w-full" onClick={closeEditModal}>Close</Button>
+            <Toast
+              variant="error"
+              title="Failed to load user"
+              message={editError}
+            />
+            <Button variant="ghost" className="w-full" onClick={closeEditModal}>
+              Close
+            </Button>
           </div>
         ) : editUser ? (
           <UserForm
@@ -538,50 +589,80 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
         subtitle="This action cannot be undone. All data about this user will be permanently removed."
         footer={
           <div className="flex gap-3 w-full">
-            <Button variant="ghost" style={{ flex: 1 }} disabled={isDeleting} onClick={closeDeleteModal}>
+            <Button
+              variant="ghost"
+              style={{ flex: 1 }}
+              disabled={isDeleting}
+              onClick={closeDeleteModal}
+            >
               Cancel
             </Button>
-            <Button variant="primary" style={{ flex: 1, background: "var(--error)" }} disabled={isDeleting || !deletePassword.trim()} onClick={handleDelete}>
-              {isDeleting ? <><Loader2 size={14} className="animate-spin mr-2" /> Deleting…</> : <><Trash2 size={14} className="mr-2" /> Delete User</>}
+            <Button
+              variant="primary"
+              style={{ flex: 1, background: "var(--error)" }}
+              disabled={isDeleting || !deletePassword.trim()}
+              onClick={handleDelete}
+            >
+              {isDeleting ? (
+                <>
+                  <Loader2 size={14} className="animate-spin mr-2" /> Deleting…
+                </>
+              ) : (
+                <>
+                  <Trash2 size={14} className="mr-2" /> Delete User
+                </>
+              )}
             </Button>
           </div>
         }
       >
         {deleteTarget && (
-            <div className="space-y-4">
-                <div className="p-4 rounded-xl bg-[var(--pink-light)] border border-[rgba(244,123,123,0.2)]">
-                    <p className="text-sm text-[var(--error)] font-bold mb-1">Warning</p>
-                    <p className="text-sm text-[var(--primary-dark)]">You are about to delete: <strong className="break-words">{deleteTarget.full_name}</strong></p>
-                </div>
-
-              {deleteError && (
-                    <div className="p-4 rounded-xl bg-[var(--pink-light)] border border-[rgba(244,123,123,0.2)]">
-                        <p className="text-sm text-[var(--error)]">{deleteError}</p>
-                    </div>
-              )}
-
-                <div>
-                    <label className="label block mb-2">Enter your password to confirm deletion</label>
-                        <Input
-                            type="password"
-                            value={deletePassword}
-                            onChange={(e) => setDeletePassword(e.target.value)}
-                            placeholder="Password"
-                            autoComplete="new-password"
-                            className="input input-bordered w-full"
-                        />
-                </div>
+          <div className="space-y-4">
+            <div className="p-4 rounded-xl bg-[var(--pink-light)] border border-[rgba(244,123,123,0.2)]">
+              <p className="text-sm text-[var(--error)] font-bold mb-1">
+                Warning
+              </p>
+              <p className="text-sm text-[var(--primary-dark)]">
+                You are about to delete:{" "}
+                <strong className="break-words">
+                  {deleteTarget.full_name}
+                </strong>
+              </p>
             </div>
+
+            {deleteError && (
+              <div className="p-4 rounded-xl bg-[var(--pink-light)] border border-[rgba(244,123,123,0.2)]">
+                <p className="text-sm text-[var(--error)]">{deleteError}</p>
+              </div>
             )}
+
+            <div>
+              <label className="label block mb-2">
+                Enter your password to confirm deletion
+              </label>
+              <Input
+                type="password"
+                value={deletePassword}
+                onChange={(e) => setDeletePassword(e.target.value)}
+                placeholder="Password"
+                autoComplete="new-password"
+                className="input input-bordered w-full"
+              />
+            </div>
+          </div>
+        )}
       </Modal>
 
       {/* floating toast notification */}
       {toast && (
         <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999 }}>
-          <Toast variant={toast.variant} title={toast.title} message={toast.message} />
+          <Toast
+            variant={toast.variant}
+            title={toast.title}
+            message={toast.message}
+          />
         </div>
       )}
-
     </div>
   );
 };

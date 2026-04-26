@@ -2,7 +2,7 @@
 import { useState } from "react";
 
 // Badge
-type BadgeVariant = "pink-light" | "periwinkle" | "dark" | "success" | "warning" | "error";
+type BadgeVariant = "pink-light" | "periwinkle" | "dark" | "success" | "warning" | "error" | "ghost";
 
 interface BadgeProps {
   children: React.ReactNode;

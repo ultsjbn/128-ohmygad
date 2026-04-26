@@ -1,7 +1,7 @@
 "use client";
 
 import {
-  SlidersHorizontal, GraduationCap, Heart, Hash, BookOpen, Shield, User, VenusAndMars,
+  SlidersHorizontal, GraduationCap, Heart, Hash, BookOpen, User, VenusAndMars,
 } from "lucide-react";
 import { Button } from "./button";
 import { Badge } from "./badge";
@@ -183,7 +183,7 @@ export function DashboardFilter({ value, onChange, options }: DashboardFilterPro
               </button>
             </Badge>
           ))}
-          <Button type="button" variant="soft" size="sm" onClick={() => onChange(EMPTY_FILTERS)}>
+          <Button variant="soft" size="sm" onClick={() => onChange(EMPTY_FILTERS)}>
             Clear all
           </Button>
           {filterButton}

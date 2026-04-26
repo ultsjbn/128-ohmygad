@@ -159,7 +159,7 @@ body {
   font-size: 28px;
   font-weight: 700;
   color: var(--primary-dark);
-  line-height: 1.2;
+  line-height: 0.8;
   letter-spacing: 4%;
 }
 
@@ -400,7 +400,10 @@ body {
 
 .btn-icon {
   width: 44px;
+  min-width: 44px;
   height: 44px;
+  min-height: 44px;
+  flex-shrink: 0;
   border-radius: var(--radius-full);
   background: var(--lavender);
   color: var(--primary-dark);
@@ -410,7 +413,10 @@ body {
 
 .btn-icon-sm {
   width: 30px;
+  min-width: 30px;
   height: 30px;
+  min-height: 30px;
+  flex-shrink: 0;
   border-radius: var(--radius-full);
   background: var(--lavender);
   color: var(--primary-dark);
@@ -424,7 +430,10 @@ body {
 
 .btn-icon-dark {
   width: 44px;
+  min-width: 44px;
   height: 44px;
+  min-height: 44px;
+  flex-shrink: 0;
   border-radius: var(--radius-full);
   background: var(--primary-dark);
   color: var(--white);
@@ -435,8 +444,9 @@ body {
 
 /* Size modifiers */
 .btn-sm {
-  padding: 8px 18px !important;
-  font-size: 14px !important;
+  padding: 8px 12px !important;
+  font-size: 12px !important;
+  letter-spacing: 0.02em;
 }
 
 .btn-lg {
@@ -455,6 +465,19 @@ body {
   border: 1.5px solid rgba(45, 42, 74, 0.12);
   background: transparent;
   color: var(--primary-dark);
+  transition: var(--transition);
+}
+
+.btn-page-num:hover {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-full);
+  padding: 0;
+  font-size: 13px;
+  font-weight: 500;
+  border: 1.5px solid rgba(45, 42, 74, 0.12);
+  background: var(--primary-dark);
+  color: var(--white);
   transition: var(--transition);
 }
 
@@ -1097,7 +1120,6 @@ body {
   letter-spacing: 0.04em;
   padding: 8px 12px;
   font-size: 12px;
-  box-shadow: 0 4px 16px rgba(244, 167, 185, 0.20);
 }
 
 .badge-pink-light {
@@ -1130,6 +1152,12 @@ body {
   color: var(--error-text);
 }
 
+.badge-ghost {
+    background: rgba(255, 255, 255, 0.15);
+    color: var(--badge-periwinkle-text);
+    border: 1px var(--periwinkle-deep);
+}
+
 /* Notification dot */
 .notif-dot {
   width: 8px;
@@ -1144,16 +1172,16 @@ body {
    CHIPS / FILTER
 ------------------------------------------------------------------─ */
 .chip {
-  padding: 6px 16px;
-  border-radius: var(--radius-full);
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: var(--transition);
-  border: 1.5px solid transparent;
-  background: rgba(45, 42, 74, 0.06);
-  color: var(--gray);
-  font-family: var(--font-body);
+    padding: 8px 12px;
+    border-radius: var(--radius-full);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    border: 1.5px solid transparent;
+    background: rgba(45, 42, 74, 0.06);
+    color: var(--gray);
+    font-family: var(--font-body);
 }
 
 .chip.active {

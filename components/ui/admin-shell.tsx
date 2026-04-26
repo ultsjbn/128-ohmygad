@@ -169,7 +169,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
         <div className="pointer-events-none absolute -bottom-16 left-20 w-[320px] h-[320px] rounded-full blur-[56px] opacity-[0.13] bg-[var(--periwinkle)] z-0" />
 
         {/* page header ------------------------------------------------ */}
-        <header className="shrink-0 flex items-center justify-between gap-3 px-3 md:px-5 pt-2 pb-0.5" style={{ position: "relative", zIndex: 10 }}>
+        <header className="shrink-0 flex items-center justify-between gap-3 px-3 md:px-5 pt-4 pb-0.5" style={{ position: "relative", zIndex: 10 }}>
           <div className="flex items-center gap-2 min-w-0">
             {!isDashboard && (
               <Button variant="icon" onClick={() => router.back()} aria-label="Go back">
