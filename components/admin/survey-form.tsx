@@ -274,7 +274,7 @@ export default function SurveyForm({ mode, initialData, initialQuestions = [], o
               <div className="input-wrap">
                 <label htmlFor="description" className="label">Description</label>
                 <div className="input-icon-wrap">
-                  <AlignLeft className="input-prefix-icon w-2 h-2 top-5 translate-y-0" />
+                  <AlignLeft className="input-prefix-icon w-4 h-4 top-5 translate-y-0" />
                   <textarea
                     id="description"
                     placeholder="Briefly describe the purpose of this survey..."

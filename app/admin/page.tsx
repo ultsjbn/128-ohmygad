@@ -35,7 +35,7 @@ function CustomTooltip({ active, payload, label }: { active?: boolean; payload?:
       )}
       {payload.map((e: TooltipEntry, i: number) => (
         <div key={i} className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full shrink-0" style={{ background: e.color ?? e.payload?.fill }} />
+          <span className="w-4 h-4 rounded-full shrink-0" style={{ background: e.color ?? e.payload?.fill }} />
           <span className="caption capitalize">
             {e.name ?? e.dataKey}: {e.value}
           </span>

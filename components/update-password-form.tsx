@@ -87,7 +87,7 @@ export function UpdatePasswordForm({
         <div className="input-wrap">
           <label htmlFor="password" className="label">New Password</label>
           <div className="input-icon-wrap">
-            <Lock className="input-prefix-icon w-2 h-2" />
+            <Lock className="input-prefix-icon w-4 h-4" />
             <input
               id="password"
               type="password"
