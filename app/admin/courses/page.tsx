@@ -182,38 +182,43 @@ const confirmDelete = async () => {
     {
       key: "title",
       header: "Title",
+      width: "20%",
       render: (course) => (
-        <span className="font-semibold truncate block" style={{ color: "var(--primary-dark)", fontSize: 13 }}>
+        <span
+          className="font-semibold truncate block"
+          style={{ color: "var(--primary-dark)", fontSize: 13 }}
+        >
           {course.title}
         </span>
       ),
     },
-
-{
-  key: "description",
-  header: "Description",
-  render: (course) => (
-    <span 
-      style={{ color: "var(--primary-dark)", fontSize: 13 }}
-      className="capitalize truncate block max-w-xs" 
-      title={course.description}
-    >
-      {course.description}
-    </span>
-  ),
-},
-
-
-
+    {
+      key: "description",
+      header: "Description",
+      width: "60%",
+      render: (course) => (
+        <span
+          style={{ color: "var(--primary-dark)", fontSize: 13 }}
+          className="capitalize truncate block"
+          title={course.description}
+        >
+          {course.description}
+        </span>
+      ),
+    },
     {
       key: "actions",
-      header: <div className="text-right">Actions</div>,
+      header: <div className="text-center">Actions</div>,
+      width: "8%",
       render: (course) => (
         <div style={{ display: "flex", justifyContent: "flex-end", gap: 4 }}>
           <Button
             variant="icon"
             title="Edit course"
-            onClick={(e) => { e.stopPropagation(); setEditTarget(course); }}
+            onClick={(e) => {
+              e.stopPropagation();
+              setEditTarget(course);
+            }}
           >
             <Pencil size={14} />
           </Button>
@@ -221,12 +226,21 @@ const confirmDelete = async () => {
             variant="icon"
             title="Delete course"
             disabled={deletingId === course.id}
-            style={deletingId === course.id ? { opacity: 0.5 } : { color: "var(--error)" }}
-            onClick={(e) => { e.stopPropagation(); setDeleteTarget({ id: course.id!, title: course.title }); }}
+            style={
+              deletingId === course.id
+                ? { opacity: 0.5 }
+                : { color: "var(--error)" }
+            }
+            onClick={(e) => {
+              e.stopPropagation();
+              setDeleteTarget({ id: course.id!, title: course.title });
+            }}
           >
-            {deletingId === course.id
-              ? <Loader2 size={14} className="animate-spin" />
-              : <Trash2 size={14} />}
+            {deletingId === course.id ? (
+              <Loader2 size={14} className="animate-spin" />
+            ) : (
+              <Trash2 size={14} />
+            )}
           </Button>
         </div>
       ),
