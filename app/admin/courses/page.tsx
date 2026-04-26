@@ -21,6 +21,8 @@ import {
   Toast,
 } from "@/components/ui";
 
+
+
 const SORT_FIELDS = ["title"] as const;
 type SortField = typeof SORT_FIELDS[number];
 type SortDirection = "asc" | "desc";
@@ -30,6 +32,10 @@ type BadgeVariant = "pink-light" | "periwinkle" | "dark" | "success" | "warning"
 
 // courses page proper
 export default function CoursesPage() {
+
+  // delete constant
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+
   const searchParams = useSearchParams();
 
   const [courses, setCourses] = useState<CourseFormData[]>([]);
@@ -129,42 +135,46 @@ export default function CoursesPage() {
   }
 
   // delete execution logic triggered by the modal
-  const confirmDelete = async () => {
-    if (!deleteTarget) return;
+const confirmDelete = async () => {
+  if (!deleteTarget) return;
 
-    const supabase = createClient();
-    const { data: userData } = await supabase.auth.getUser();
+  setDeleteError(null); // reset previous error
 
-    if (!userData.user || !userData.user.email) {
-      showToast("error", "Unable to verify user");
-      return;
-    }
+  const supabase = createClient();
+  const { data: userData } = await supabase.auth.getUser();
 
-    const { error: authError } = await supabase.auth.signInWithPassword({
-      email: userData.user.email,
-      password: deletePassword,
-    });
+  if (!userData.user || !userData.user.email) {
+    setDeleteError("Unable to verify user");
+    return;
+  }
 
-    if (authError) {
-      showToast("error", "Invalid password");
-      setDeletePassword("");
-      return;
-    }
+  const { error: authError } = await supabase.auth.signInWithPassword({
+    email: userData.user.email,
+    password: deletePassword,
+  });
 
-    setDeletingId(deleteTarget.id);
-    const { error } = await supabase.from("course").delete().eq("id", deleteTarget.id);
-
-    if (error) {
-      showToast("error", "Failed to delete course", error.message);
-    } else {
-      setCourses((prev) => prev.filter((e) => e.id !== deleteTarget.id));
-      showToast("success", "Course deleted successfully");
-    }
-
-    setDeletingId(null);
-    setDeleteTarget(null);
+  if (authError) {
+    setDeleteError("Invalid password");
     setDeletePassword("");
-  };
+    return;
+  }
+
+  setDeletingId(deleteTarget.id);
+
+  const { error } = await supabase
+    .from("course")
+    .delete()
+    .eq("id", deleteTarget.id);
+
+  if (error) {
+    setDeleteError(error.message || "Failed to delete course");
+  } else {
+    setCourses((prev) => prev.filter((e) => e.id !== deleteTarget.id));
+    showToast("success", "Course deleted successfully");
+  }
+
+  setDeletingId(null);
+};
 
   const activeFilterCount = 0;
   const hasActiveFilters = false;
@@ -362,10 +372,12 @@ export default function CoursesPage() {
       {/* confirm delete modal */}
         <Modal
             open={!!deleteTarget}
+            
             onClose={() => {
               if (!deletingId) {
                 setDeleteTarget(null);
                 setDeletePassword("");
+                setDeleteError(null);
               }
             }}
             title="Delete Course?"
@@ -387,6 +399,13 @@ export default function CoursesPage() {
                   <p className="text-sm text-[var(--error)] font-bold mb-1">Warning</p>
                   <p className="text-sm text-[var(--primary-dark)]">You are about to delete: <strong className="break-words">{deleteTarget.title}</strong></p>
               </div>
+
+              {deleteError && (
+                  <div className="p-3 rounded-xl bg-[var(--pink-light)] border border-[rgba(244,123,123,0.2)]">
+                    <p className="text-sm text-[var(--error)]">{deleteError}</p>
+                  </div>
+              )}
+
               <div>
                 <label className="label block mb-2">Enter your password to confirm deletion</label>
                 <Input
