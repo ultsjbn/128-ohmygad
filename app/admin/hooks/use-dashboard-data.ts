@@ -93,16 +93,11 @@ function buildBuckets(range: DateRange): Bucket[] {
   return buckets;
 }
 
-function humanise(str: string) {
-  return str.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
-}
-
 function toCounts(values: (string | null)[]): { name: string; value: number }[] {
   const map: Record<string, number> = {};
   for (const v of values) {
     if (!v) continue;
-    const key = humanise(v);
-    map[key] = (map[key] ?? 0) + 1;
+    map[v] = (map[v] ?? 0) + 1;
   }
   return Object.entries(map)
     .map(([name, value]) => ({ name, value }))
@@ -112,21 +107,20 @@ function toCounts(values: (string | null)[]): { name: string; value: number }[] 
 // static filter options
 const STATIC_OPTIONS: FilterOptions = {
   college:        ["CS", "CAC", "CSS"],
-  genderIdentity: ["Man", "Woman", "Non-binary", "Prefer not to say"],
+  genderIdentity: ["Man", "Woman", "Non-binary", "Genderqueer", "Genderfluid", "Agender", "Prefer not to say", "Self-describe"],
   yearLevel:      ["1st Year", "2nd Year", "3rd Year", "4th Year", "Extendee"],
   degreeProgram:  [
-    // CS — bachelor
-    "BS Biology", "BS Com Sci", "BS Math", "BS Physics",
-    // CAC — bachelor
-    "BA Comm", "BA Fine Arts", "BA LL", "Certificate in FA",
-    // CSS — bachelor
-    "BASS (Hist)", "BASS (Econ)", "BASS (Anthro)", "BS ME",
-    // CS — graduate
-    "MS CaRE", "MS Math", "PhD in Math",
-    // CAC — graduate
-    "MA LL",
-    // CSS — graduate
-    "MA History", "MA SDS", "MMgt", "PhD in Indigenous Studies",
+    // CS
+    "BS Biology", "BS Computer Science", "BS Mathematics", "BS Physics",
+    "MS Conservation and Restoration Ecology", "MS Mathematics", "Doctor of Philosophy in Mathematics",
+    // CAC
+    "BA Communication", "BA Fine Arts", "BA Language and Literature", "Certificate in Fine Arts",
+    "MA Language and Literature",
+    // CSS
+    "BA Social Sciences (History)", "BA Social Sciences (Economics)", "BA Social Sciences (Anthropology)",
+    "BS Management Economics",
+    "MA History (Ethnohistory and Local History)", "MA Social and Development Studies",
+    "Master of Management", "Doctor of Philosophy in Indigenous Studies",
   ],
   role:           ["admin", "student", "faculty"],
   sexAtBirth:     ["Male", "Female", "Intersex", "Prefer not to say"],
@@ -146,7 +140,7 @@ async function resolveFilteredIds(
   if (filters.college.length)        q = q.in("college",         filters.college);
   if (filters.genderIdentity.length) q = q.in("gender_identity", filters.genderIdentity);
   if (filters.yearLevel.length)      q = q.in("year_level",      filters.yearLevel);
-  if (filters.degreeProgram.length)  q = q.in("degree_program",  filters.degreeProgram);
+  if (filters.degreeProgram.length)  q = q.in("program",         filters.degreeProgram);
   if (filters.role.length)           q = q.in("role",            filters.role);
   if (filters.sexAtBirth.length)     q = q.in("sex_at_birth",    filters.sexAtBirth);
 

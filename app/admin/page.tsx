@@ -24,6 +24,34 @@ const BRAND_COLORS = ["#B8B5E8", "#F4A7B9", "#6DC5A0", "#F4C97A", "#9B9BB4", "#2
 const AXIS_COLOR   = "rgba(45,42,74,0.10)";
 const TICK_COLOR   = "rgba(45,42,74,0.45)";
 
+const COLLEGE_COLORS: Record<string, string> = {
+  "CS":  "#6DC5A0",
+  "CAC": "#F4A7B9",
+  "CSS": "#B8B5E8",
+};
+
+const SEX_COLORS: Record<string, string> = {
+  "Male":              "#B8B5E8",
+  "Female":            "#F4A7B9",
+  "Intersex":          "#6DC5A0",
+  "Prefer not to say": "#9B9BB4",
+};
+
+const GENDER_COLORS: Record<string, string> = {
+  "Man":              "#B8B5E8",
+  "Woman":            "#F4A7B9",
+  "Non-binary":       "#6DC5A0",
+  "Genderqueer":      "#F4C97A",
+  "Genderfluid":      "#9B9BB4",
+  "Agender":          "#2D2A4A",
+  "Self-describe":    "#B8B5E8",
+  "Prefer not to say":"#9B9BB4",
+};
+
+function colorFor(map: Record<string, string>, key: string, idx: number) {
+  return map[key] ?? BRAND_COLORS[idx % BRAND_COLORS.length];
+}
+
 // tooltip ------------------------------------------------
 interface TooltipEntry { color?: string; payload?: { fill?: string }; name?: string; dataKey?: string; value?: number | string; }
 function CustomTooltip({ active, payload, label }: { active?: boolean; payload?: TooltipEntry[]; label?: string }) {
@@ -275,8 +303,8 @@ export default function DashboardPage() {
                                     />
                                     <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(45,42,74,0.03)" }} />
                                     <Bar dataKey="value" name="Users" radius={[6, 6, 0, 0]} barSize={36}>
-                                    {filteredColleges.map((_: unknown, idx: number) => (
-                                        <Cell key={`col-${idx}`} fill={BRAND_COLORS[idx % BRAND_COLORS.length]} />
+                                    {filteredColleges.map((item: { category: string }, idx: number) => (
+                                        <Cell key={`col-${idx}`} fill={colorFor(COLLEGE_COLORS, item.category, idx)} />
                                     ))}
                                     </Bar>
                                 </BarChart>
@@ -297,8 +325,8 @@ export default function DashboardPage() {
                                     paddingAngle={2}
                                     dataKey="value" nameKey="name"
                                     >
-                                    {sexAtBirthData?.map((_: unknown, i: number) => (
-                                        <Cell key={`sex-${i}`} fill={BRAND_COLORS[i % BRAND_COLORS.length]} />
+                                    {sexAtBirthData?.map((item: { name: string }, i: number) => (
+                                        <Cell key={`sex-${i}`} fill={colorFor(SEX_COLORS, item.name, i)} />
                                     ))}
                                     </Pie>
                                     <Tooltip content={<CustomTooltip />} />
@@ -327,8 +355,8 @@ export default function DashboardPage() {
                                     paddingAngle={2}
                                     dataKey="value" nameKey="name"
                                     >
-                                    {filteredGenders.map((_: unknown, i: number) => (
-                                        <Cell key={`gender-${i}`} fill={BRAND_COLORS[i % BRAND_COLORS.length]} />
+                                    {filteredGenders.map((item: { name?: string; category?: string }, i: number) => (
+                                        <Cell key={`gender-${i}`} fill={colorFor(GENDER_COLORS, item.name ?? item.category ?? "", i)} />
                                     ))}
                                     </Pie>
                                     <Tooltip content={<CustomTooltip />} />
