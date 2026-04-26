@@ -562,650 +562,650 @@ export default function EventsPage() {
   );
 
   return (
-	<div className="flex flex-col gap-3">
-	  {/* toolbar */}
-	  <div className="flex flex-col gap-3">
-		{/* search, sort, filter */}
-		<div className="flex items-center gap-3 flex-wrap">
-		  <SearchBar
-			placeholder="Search by title, category, or location…"
-			value={search}
-			onChange={(e) => setSearch(e.target.value)}
-			containerStyle={{ flex: 1, minWidth: 220 }}
-		  />
+    <div className="flex flex-col gap-3">
+      {/* toolbar */}
+      <div className="flex flex-col gap-3">
+        {/* search, sort, filter */}
+        <div className="flex items-center gap-3 flex-wrap">
+          <SearchBar
+            placeholder="Search by title, category, or location…"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            containerStyle={{ flex: 1, minWidth: 220 }}
+          />
 
-		  {/* sort multi-select */}
-		  <Dropdown
-			trigger={
-			  <Button variant="ghost">
-				<ArrowUpDown size={15} /> Sort
-			  </Button>
-			}
-		  >
-			{SORT_FIELDS.map((field) => (
-			  <DropdownItem key={field} onClick={() => handleSort(field)}>
-				<span className="flex items-center justify-between gap-6 w-full">
-				  <span className="capitalize">
-					{field === "start_date" ? "Date" : field}
-				  </span>
-				  <SortIcon field={field} />
-				</span>
-			  </DropdownItem>
-			))}
-			<DropdownDivider />
-			<DropdownItem
-			  onClick={() => {
-				setSort({ field: "start_date", direction: "desc" });
-				setPage(1);
-			  }}
-			>
-			  Reset sort
-			</DropdownItem>
-		  </Dropdown>
+          {/* sort multi-select */}
+          <Dropdown
+            trigger={
+              <Button variant="ghost">
+                <ArrowUpDown size={15} /> Sort
+              </Button>
+            }
+          >
+            {SORT_FIELDS.map((field) => (
+              <DropdownItem key={field} onClick={() => handleSort(field)}>
+                <span className="flex items-center justify-between gap-6 w-full">
+                  <span className="capitalize">
+                    {field === "start_date" ? "Date" : field}
+                  </span>
+                  <SortIcon field={field} />
+                </span>
+              </DropdownItem>
+            ))}
+            <DropdownDivider />
+            <DropdownItem
+              onClick={() => {
+                setSort({ field: "start_date", direction: "desc" });
+                setPage(1);
+              }}
+            >
+              Reset sort
+            </DropdownItem>
+          </Dropdown>
 
-		  {/* Filter dropdown */}
-		  <Dropdown
-			trigger={
-			  <Button
-				type="button"
-				variant={hasActiveFilters ? "pink" : "ghost"}
-			  >
-				<SlidersHorizontal size={15} /> Filter
-				{hasActiveFilters && (
-				  <span
-					className="inline-flex items-center justify-center min-w-[20px] h-5 rounded-full px-1 text-[11px] font-bold text-white"
-					style={{ background: "var(--primary-dark)", marginLeft: 2 }}
-				  >
-					{activeFilterCount}
-				  </span>
-				)}
-			  </Button>
-			}
-		  >
-			<div style={{ padding: "4px 12px 6px" }}>
-			  <p className="label" style={{ marginBottom: 4 }}>
-				Status
-			  </p>
-			</div>
-			{STATUSES.map((s) => (
-			  <DropdownItem key={s}>
-				<Checkbox
-				  label={s.charAt(0).toUpperCase() + s.slice(1)}
-				  checked={statusFilters.has(s)}
-				  onChange={() => toggleStatus(s)}
-				/>
-			  </DropdownItem>
-			))}
+          {/* Filter dropdown */}
+          <Dropdown
+            trigger={
+              <Button
+                type="button"
+                variant={hasActiveFilters ? "pink" : "ghost"}
+              >
+                <SlidersHorizontal size={15} /> Filter
+                {hasActiveFilters && (
+                  <span
+                    className="inline-flex items-center justify-center min-w-[20px] h-5 rounded-full px-1 text-[11px] font-bold text-white"
+                    style={{ background: "var(--primary-dark)", marginLeft: 2 }}
+                  >
+                    {activeFilterCount}
+                  </span>
+                )}
+              </Button>
+            }
+          >
+            <div style={{ padding: "4px 12px 6px" }}>
+              <p className="label" style={{ marginBottom: 4 }}>
+                Status
+              </p>
+            </div>
+            {STATUSES.map((s) => (
+              <DropdownItem key={s}>
+                <Checkbox
+                  label={s.charAt(0).toUpperCase() + s.slice(1)}
+                  checked={statusFilters.has(s)}
+                  onChange={() => toggleStatus(s)}
+                />
+              </DropdownItem>
+            ))}
 
-			<DropdownDivider />
+            <DropdownDivider />
 
-			<div style={{ padding: "6px 12px 4px" }}>
-			  <p className="label" style={{ marginBottom: 4 }}>
-				Category
-			  </p>
-			</div>
-			{CATEGORIES.map((c) => (
-			  <DropdownItem key={c}>
-				<Checkbox
-				  label={c}
-				  checked={categoryFilters.has(c)}
-				  onChange={() => toggleCategory(c)}
-				/>
-			  </DropdownItem>
-			))}
+            <div style={{ padding: "6px 12px 4px" }}>
+              <p className="label" style={{ marginBottom: 4 }}>
+                Category
+              </p>
+            </div>
+            {CATEGORIES.map((c) => (
+              <DropdownItem key={c}>
+                <Checkbox
+                  label={c}
+                  checked={categoryFilters.has(c)}
+                  onChange={() => toggleCategory(c)}
+                />
+              </DropdownItem>
+            ))}
 
-			<DropdownDivider />
-			<DropdownItem onClick={clearAllFilters}>
-			  Clear all filters
-			</DropdownItem>
-		  </Dropdown>
+            <DropdownDivider />
+            <DropdownItem onClick={clearAllFilters}>
+              Clear all filters
+            </DropdownItem>
+          </Dropdown>
 
-		  <Button variant="primary" onClick={() => setCreateModalOpen(true)}>
-			<Plus size={16} /> Add Event
-		  </Button>
-		</div>
-	  </div>
+          <Button variant="primary" onClick={() => setCreateModalOpen(true)}>
+            <Plus size={16} /> Add Event
+          </Button>
+        </div>
+      </div>
 
-	  {/* active filter pills */}
-	  {hasActiveFilters && (
-		<div className="flex items-center gap-2 flex-wrap -mt-2">
-		  <span className="caption">Active filters:</span>
+      {/* active filter pills */}
+      {hasActiveFilters && (
+        <div className="flex items-center gap-2 flex-wrap -mt-2">
+          <span className="caption">Active filters:</span>
 
-		  {/* Status pills */}
-		  {[...statusFilters].map((s) => (
-			<Badge key={s} variant={STATUS_VARIANT[s] ?? "dark"} dot>
-			  <span className="capitalize">{s}</span>
-			  <button onClick={() => toggleStatus(s)} style={{ marginLeft: 6 }}>
-				×
-			  </button>
-			</Badge>
-		  ))}
+          {/* Status pills */}
+          {[...statusFilters].map((s) => (
+            <Badge key={s} variant={STATUS_VARIANT[s] ?? "dark"} dot>
+              <span className="capitalize">{s}</span>
+              <button onClick={() => toggleStatus(s)} style={{ marginLeft: 6 }}>
+                ×
+              </button>
+            </Badge>
+          ))}
 
-		  {/* Category pills */}
-		  {[...categoryFilters].map((c) => (
-			<Badge key={c} variant={"dark"} dot>
-			  {c}
-			  <button
-				onClick={() => {
-				  toggleCategory(c);
-				  setActiveChip("All");
-				}}
-				style={{ marginLeft: 6 }}
-			  >
-				×
-			  </button>
-			</Badge>
-		  ))}
+          {/* Category pills */}
+          {[...categoryFilters].map((c) => (
+            <Badge key={c} variant={"dark"} dot>
+              {c}
+              <button
+                onClick={() => {
+                  toggleCategory(c);
+                  setActiveChip("All");
+                }}
+                style={{ marginLeft: 6 }}
+              >
+                ×
+              </button>
+            </Badge>
+          ))}
 
-		  <Button variant="soft" size="sm" onClick={clearAllFilters}>
-			Clear all
-		  </Button>
-		</div>
-	  )}
+          <Button variant="soft" size="sm" onClick={clearAllFilters}>
+            Clear all
+          </Button>
+        </div>
+      )}
 
-	  {/* table / empty / loading */}
-	  {isLoading ? (
-		<Card>
-		  <div
-			className="flex items-center justify-center gap-3 py-10"
-			style={{ color: "var(--gray)" }}
-		  >
-			<Loader2 size={20} className="animate-spin" />
-			<span className="caption">Loading events…</span>
-		  </div>
-		</Card>
-	  ) : filtered.length === 0 ? (
-		<Card>
-		  <div className="flex flex-col items-center justify-center gap-3 py-12">
-			<p className="caption">
-			  {search || hasActiveFilters
-				? "No events match your search or filters."
-				: "No events yet. Add your first event to get started."}
-			</p>
-			{(search || hasActiveFilters) && (
-			  <Button
-				variant="ghost"
-				size="sm"
-				onClick={() => {
-				  setSearch("");
-				  clearAllFilters();
-				}}
-			  >
-				Clear search &amp; filters
-			  </Button>
-			)}
-		  </div>
-		</Card>
-	  ) : (
-		<DataTable
-		  columns={columns}
-		  rows={paginate(filtered, page, PER_PAGE)}
-		  keyExtractor={(event) => event.id!}
-		  onRowClick={(event) => openDetail(event)}
-		/>
-	  )}
+      {/* table / empty / loading */}
+      {isLoading ? (
+        <Card>
+          <div
+            className="flex items-center justify-center gap-3 py-10"
+            style={{ color: "var(--gray)" }}
+          >
+            <Loader2 size={20} className="animate-spin" />
+            <span className="caption">Loading events…</span>
+          </div>
+        </Card>
+      ) : filtered.length === 0 ? (
+        <Card>
+          <div className="flex flex-col items-center justify-center gap-3 py-12">
+            <p className="caption">
+              {search || hasActiveFilters
+                ? "No events match your search or filters."
+                : "No events yet. Add your first event to get started."}
+            </p>
+            {(search || hasActiveFilters) && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setSearch("");
+                  clearAllFilters();
+                }}
+              >
+                Clear search &amp; filters
+              </Button>
+            )}
+          </div>
+        </Card>
+      ) : (
+        <DataTable
+          columns={columns}
+          rows={paginate(filtered, page, PER_PAGE)}
+          keyExtractor={(event) => event.id!}
+          onRowClick={(event) => openDetail(event)}
+        />
+      )}
 
-	  {/* pagination */}
-	  {!isLoading && filtered.length > 0 && (
-		<div className="flex items-center justify-between flex-wrap gap-3">
-		  <span className="caption">
-			Showing {Math.min((page - 1) * PER_PAGE + 1, filtered.length)}–
-			{Math.min(page * PER_PAGE, filtered.length)} of {filtered.length}{" "}
-			events
-		  </span>
-		  <Pagination
-			page={page}
-			total={totalPages(filtered.length, PER_PAGE)}
-			onChange={setPage}
-		  />
-		</div>
-	  )}
+      {/* pagination */}
+      {!isLoading && filtered.length > 0 && (
+        <div className="flex items-center justify-between flex-wrap gap-3">
+          <span className="caption">
+            Showing {Math.min((page - 1) * PER_PAGE + 1, filtered.length)}–
+            {Math.min(page * PER_PAGE, filtered.length)} of {filtered.length}{" "}
+            events
+          </span>
+          <Pagination
+            page={page}
+            total={totalPages(filtered.length, PER_PAGE)}
+            onChange={setPage}
+          />
+        </div>
+      )}
 
-	  {/* create modal */}
-	  <Modal
-		open={createModalOpen}
-		onClose={() => setCreateModalOpen(false)}
-		title="Add Event"
-		modalStyle={{ maxWidth: 900 }}
-	  >
-		<EventForm
-		  mode="create"
-		  onSuccess={() => {
-			setCreateModalOpen(false);
-			getEvents();
-		  }}
-		  onCancel={() => setCreateModalOpen(false)}
-		/>
-	  </Modal>
+      {/* create modal */}
+      <Modal
+        open={createModalOpen}
+        onClose={() => setCreateModalOpen(false)}
+        title="Add Event"
+        modalStyle={{ maxWidth: 900 }}
+      >
+        <EventForm
+          mode="create"
+          onSuccess={() => {
+            setCreateModalOpen(false);
+            getEvents();
+          }}
+          onCancel={() => setCreateModalOpen(false)}
+        />
+      </Modal>
 
-	  {/* edit modal */}
-	  <Modal
-		open={!!editTarget}
-		onClose={() => setEditTarget(null)}
-		title="Edit Event"
-		subtitle={editTarget?.title}
-		modalStyle={{ maxWidth: 900 }}
-	  >
-		{editTarget && (
-		  <EventForm
-			key={editTarget.id}
-			mode="edit"
-			initialData={editTarget}
-			onSuccess={() => {
-			  setEditTarget(null);
-			  getEvents();
-			}}
-			onCancel={() => setEditTarget(null)}
-		  />
-		)}
-	  </Modal>
+      {/* edit modal */}
+      <Modal
+        open={!!editTarget}
+        onClose={() => setEditTarget(null)}
+        title="Edit Event"
+        subtitle={editTarget?.title}
+        modalStyle={{ maxWidth: 900 }}
+      >
+        {editTarget && (
+          <EventForm
+            key={editTarget.id}
+            mode="edit"
+            initialData={editTarget}
+            onSuccess={() => {
+              setEditTarget(null);
+              getEvents();
+            }}
+            onCancel={() => setEditTarget(null)}
+          />
+        )}
+      </Modal>
 
-	  {/* event detail modal */}
-	  <Modal
-		open={!!detailEvent}
-		onClose={() => setDetailEvent(null)}
-		hideCloseButton
-		modalStyle={{ maxWidth: 960, padding: 0 }}
-		contentStyle={{ display: "flex", flexDirection: "column" }}
-	  >
-		{detailEvent && (
-		  <div className="flex flex-col min-h-0">
-			{/* banner cover */}
-			<div
-			  className="h-[300px] sm:h-[280px] relative shrink-0 rounded-t-[var(--radius-xl)]"
-			  style={{
-				background: detailEvent.banner_url
-				  ? `url(${detailEvent.banner_url}) center/cover no-repeat`
-				  : (CATEGORY_GRADIENT[detailEvent.category ?? ""] ??
-					DEFAULT_GRADIENT),
-			  }}
-			>
-			  {/* close button inside cover */}
-			  <button
-				onClick={() => setDetailEvent(null)}
-				aria-label="Close"
-				className="absolute top-3 right-3 w-4 h-4 sm:w-6 sm:h-6 rounded-full border-none cursor-pointer flex items-center justify-center text-[var(--primary-dark)] z-10 backdrop-blur-sm bg-white/80"
-			  >
-				<X size={14} />
-			  </button>
-			</div>
+      {/* event detail modal */}
+      <Modal
+        open={!!detailEvent}
+        onClose={() => setDetailEvent(null)}
+        hideCloseButton
+        modalStyle={{ maxWidth: 960, padding: 0 }}
+        contentStyle={{ display: "flex", flexDirection: "column" }}
+      >
+        {detailEvent && (
+          <div className="flex flex-col min-h-0">
+            {/* banner cover */}
+            <div
+              className="h-[300px] sm:h-[280px] relative shrink-0 rounded-t-[var(--radius-xl)]"
+              style={{
+                background: detailEvent.banner_url
+                  ? `url(${detailEvent.banner_url}) center/cover no-repeat`
+                  : (CATEGORY_GRADIENT[detailEvent.category ?? ""] ??
+                    DEFAULT_GRADIENT),
+              }}
+            >
+              {/* close button inside cover */}
+              <button
+                onClick={() => setDetailEvent(null)}
+                aria-label="Close"
+                className="absolute top-3 right-3 w-4 h-4 sm:w-6 sm:h-6 rounded-full border-none cursor-pointer flex items-center justify-center text-[var(--primary-dark)] z-10 backdrop-blur-sm bg-white/80"
+              >
+                <X size={14} />
+              </button>
+            </div>
 
-			{/* two-column body */}
-			<div className="flex gap-6 p-5 sm:p-7 overflow-y-auto">
-			  {/* left column: event info */}
-			  <div className="flex flex-col gap-4 flex-1 min-w-0">
-				<h2 className="heading-md">{detailEvent.title}</h2>
-				{/* category and status badges moved below */}
-				<div className="flex gap-2 items-center">
-				  <Badge variant="ghost">
-					{detailEvent.category ?? "Uncategorized"}
-				  </Badge>
-				  {detailEvent.status && (
-					<Badge
-					  variant={
-						STATUS_VARIANT[
-						  detailEvent.status.toLowerCase().trim()
-						] ?? "dark"
-					  }
-					>
-					  <span className="capitalize">{detailEvent.status}</span>
-					</Badge>
-				  )}
-				</div>
+            {/* two-column body */}
+            <div className="flex gap-6 p-5 sm:p-7 overflow-y-auto">
+              {/* left column: event info */}
+              <div className="flex flex-col gap-4 flex-1 min-w-0">
+                <h2 className="heading-md">{detailEvent.title}</h2>
+                {/* category and status badges moved below */}
+                <div className="flex gap-2 items-center">
+                  <Badge variant="ghost">
+                    {detailEvent.category ?? "Uncategorized"}
+                  </Badge>
+                  {detailEvent.status && (
+                    <Badge
+                      variant={
+                        STATUS_VARIANT[
+                          detailEvent.status.toLowerCase().trim()
+                        ] ?? "dark"
+                      }
+                    >
+                      <span className="capitalize">{detailEvent.status}</span>
+                    </Badge>
+                  )}
+                </div>
 
-				<div className="flex flex-col gap-3">
-				  <div className="flex items-start gap-3 caption sm:text-sm text-[var(--gray)]">
-					<CalendarDays size={15} className="shrink-0 mt-0.5" />
-					<span>
-					  {detailEvent.start_date
-						? new Date(detailEvent.start_date).toLocaleDateString(
-							"en-PH",
-							{ month: "long", day: "numeric", year: "numeric" },
-						  )
-						: "—"}
-					  {detailEvent.end_date &&
-						detailEvent.end_date !== detailEvent.start_date && (
-						  <>
-							{" "}
-							—{" "}
-							{new Date(detailEvent.end_date).toLocaleDateString(
-							  "en-PH",
-							  {
-								month: "long",
-								day: "numeric",
-								year: "numeric",
-							  },
-							)}
-						  </>
-						)}
-					</span>
-				  </div>
-				  <div className="flex items-start gap-3 caption sm:text-sm text-[var(--gray)]">
-					<Clock size={15} className="shrink-0 mt-0.5" />
-					<span>
-					  {detailEvent.start_date
-						? new Date(detailEvent.start_date).toLocaleTimeString(
-							"en-PH",
-							{ hour: "numeric", minute: "2-digit" },
-						  )
-						: "—"}
-					  {detailEvent.end_date &&
-						detailEvent.end_date !== detailEvent.start_date && (
-						  <>
-							{" "}
-							—{" "}
-							{new Date(detailEvent.end_date).toLocaleTimeString(
-							  "en-PH",
-							  { hour: "numeric", minute: "2-digit" },
-							)}
-						  </>
-						)}
-					</span>
-				  </div>
-				  <div className="flex items-center gap-3 caption sm:text-sm text-[var(--gray)]">
-					<MapPin size={15} className="shrink-0" />
-					<span>{detailEvent.location ?? "—"}</span>
-				  </div>
-				  <div className="flex items-center gap-3 caption sm:text-sm text-[var(--gray)]">
-					<Users size={15} className="shrink-0" />
-					<span>Capacity: {detailEvent.capacity ?? "—"}</span>
-				  </div>
-				  {(detailEvent.registration_open ||
-					detailEvent.registration_close) && (
-					<div className="flex items-center gap-3 caption sm:text-sm text-[var(--gray)]">
-					  <ClipboardList size={15} className="shrink-0" />
-					  <span>
-						Registration:&nbsp;
-						{detailEvent.registration_open
-						  ? new Date(
-							  detailEvent.registration_open,
-							).toLocaleDateString("en-PH", {
-							  month: "long",
-							  day: "numeric",
-							})
-						  : "?"}
-						&nbsp;—&nbsp;
-						{detailEvent.registration_close
-						  ? new Date(
-							  detailEvent.registration_close,
-							).toLocaleDateString("en-PH", {
-							  month: "long",
-							  day: "numeric",
-							})
-						  : "?"}
-					  </span>
-					</div>
-				  )}
-				</div>
+                <div className="flex flex-col gap-3">
+                  <div className="flex items-start gap-3 caption sm:text-sm text-[var(--gray)]">
+                    <CalendarDays size={15} className="shrink-0 mt-0.5" />
+                    <span>
+                      {detailEvent.start_date
+                        ? new Date(detailEvent.start_date).toLocaleDateString(
+                            "en-PH",
+                            { month: "long", day: "numeric", year: "numeric" },
+                          )
+                        : "—"}
+                      {detailEvent.end_date &&
+                        detailEvent.end_date !== detailEvent.start_date && (
+                          <>
+                            {" "}
+                            —{" "}
+                            {new Date(detailEvent.end_date).toLocaleDateString(
+                              "en-PH",
+                              {
+                                month: "long",
+                                day: "numeric",
+                                year: "numeric",
+                              },
+                            )}
+                          </>
+                        )}
+                    </span>
+                  </div>
+                  <div className="flex items-start gap-3 caption sm:text-sm text-[var(--gray)]">
+                    <Clock size={15} className="shrink-0 mt-0.5" />
+                    <span>
+                      {detailEvent.start_date
+                        ? new Date(detailEvent.start_date).toLocaleTimeString(
+                            "en-PH",
+                            { hour: "numeric", minute: "2-digit" },
+                          )
+                        : "—"}
+                      {detailEvent.end_date &&
+                        detailEvent.end_date !== detailEvent.start_date && (
+                          <>
+                            {" "}
+                            —{" "}
+                            {new Date(detailEvent.end_date).toLocaleTimeString(
+                              "en-PH",
+                              { hour: "numeric", minute: "2-digit" },
+                            )}
+                          </>
+                        )}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3 caption sm:text-sm text-[var(--gray)]">
+                    <MapPin size={15} className="shrink-0" />
+                    <span>{detailEvent.location ?? "—"}</span>
+                  </div>
+                  <div className="flex items-center gap-3 caption sm:text-sm text-[var(--gray)]">
+                    <Users size={15} className="shrink-0" />
+                    <span>Capacity: {detailEvent.capacity ?? "—"}</span>
+                  </div>
+                  {(detailEvent.registration_open ||
+                    detailEvent.registration_close) && (
+                    <div className="flex items-center gap-3 caption sm:text-sm text-[var(--gray)]">
+                      <ClipboardList size={15} className="shrink-0" />
+                      <span>
+                        Registration:&nbsp;
+                        {detailEvent.registration_open
+                          ? new Date(
+                              detailEvent.registration_open,
+                            ).toLocaleDateString("en-PH", {
+                              month: "long",
+                              day: "numeric",
+                            })
+                          : "?"}
+                        &nbsp;—&nbsp;
+                        {detailEvent.registration_close
+                          ? new Date(
+                              detailEvent.registration_close,
+                            ).toLocaleDateString("en-PH", {
+                              month: "long",
+                              day: "numeric",
+                            })
+                          : "?"}
+                      </span>
+                    </div>
+                  )}
+                </div>
 
-				<div className="divider" />
+                <div className="divider" />
 
-				<div className="flex flex-col gap-3">
-				  <p className="label">ABOUT THIS EVENT</p>
-				  <p className="body whitespace-pre-wrap">
-					{detailEvent.description || "No description provided."}
-				  </p>
-				</div>
-			  </div>
+                <div className="flex flex-col gap-3">
+                  <p className="label">ABOUT THIS EVENT</p>
+                  <p className="body whitespace-pre-wrap">
+                    {detailEvent.description || "No description provided."}
+                  </p>
+                </div>
+              </div>
 
-			  {/* right column: registrations + attendance */}
-			  <div className="flex flex-col gap-3 flex-1 min-w-0">
-				{/* sub-tab toggle */}
-				<Tabs
-				  tabs={["Registrations", "Attendance"]}
-				  icons={[
-					<Users key="reg" size={14} />,
-					<ClipboardCheck key="att" size={14} />,
-				  ]}
-				  defaultTab={
-					detailTab === "registrations"
-					  ? "Registrations"
-					  : "Attendance"
-				  }
-				  onChange={(tab) =>
-					setDetailTab(
-					  tab === "Registrations" ? "registrations" : "attendance",
-					)
-				  }
-				  className="w-fit"
-				/>
+              {/* right column: registrations + attendance */}
+              <div className="flex flex-col gap-3 flex-1 min-w-0">
+                {/* sub-tab toggle */}
+                <Tabs
+                  tabs={["Registrations", "Attendance"]}
+                  icons={[
+                    <Users key="reg" size={14} />,
+                    <ClipboardCheck key="att" size={14} />,
+                  ]}
+                  defaultTab={
+                    detailTab === "registrations"
+                      ? "Registrations"
+                      : "Attendance"
+                  }
+                  onChange={(tab) =>
+                    setDetailTab(
+                      tab === "Registrations" ? "registrations" : "attendance",
+                    )
+                  }
+                  className="w-fit"
+                />
 
-				{/* registrations panel */}
-				{detailTab === "registrations" && (
-				  <div className="flex flex-col gap-3">
-					<div className="flex items-center justify-between gap-3">
-					  <div className="flex items-center gap-2">
-						<Users size={15} className="text-[var(--gray)]" />
-						{loadingRegs ? (
-						  <span className="caption text-[var(--gray)]">
-							Loading…
-						  </span>
-						) : (
-						  <span className="caption">
-							<strong>{registrations.length}</strong> registered
-							user{registrations.length !== 1 ? "s" : ""}
-						  </span>
-						)}
-					  </div>
-					  {!loadingRegs && registrations.length > 0 && (
-						<Button
-						  variant="soft"
-						  size="sm"
-						  onClick={() => handleCopyEmails(registrations)}
-						  title="Copy all emails to clipboard"
-						>
-						  {copied ? (
-							<>
-							  <Check size={13} /> Copied!
-							</>
-						  ) : (
-							<>
-							  <Copy size={13} /> Copy emails
-							</>
-						  )}
-						</Button>
-					  )}
-					</div>
+                {/* registrations panel */}
+                {detailTab === "registrations" && (
+                  <div className="flex flex-col gap-3">
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-2">
+                        <Users size={15} className="text-[var(--gray)]" />
+                        {loadingRegs ? (
+                          <span className="caption text-[var(--gray)]">
+                            Loading…
+                          </span>
+                        ) : (
+                          <span className="caption">
+                            <strong>{registrations.length}</strong> registered
+                            user{registrations.length !== 1 ? "s" : ""}
+                          </span>
+                        )}
+                      </div>
+                      {!loadingRegs && registrations.length > 0 && (
+                        <Button
+                          variant="soft"
+                          size="sm"
+                          onClick={() => handleCopyEmails(registrations)}
+                          title="Copy all emails to clipboard"
+                        >
+                          {copied ? (
+                            <>
+                              <Check size={13} /> Copied!
+                            </>
+                          ) : (
+                            <>
+                              <Copy size={13} /> Copy emails
+                            </>
+                          )}
+                        </Button>
+                      )}
+                    </div>
 
-					{loadingRegs ? (
-					  <div className="flex items-center justify-center gap-2 py-8 text-[var(--gray)]">
-						<Loader2 size={18} className="animate-spin" />
-						<span className="caption">Loading registrations…</span>
-					  </div>
-					) : registrations.length === 0 ? (
-					  <div className="flex flex-col items-center justify-center gap-2 py-8 rounded-xl border border-dashed border-[rgba(45,42,74,0.12)]">
-						<Users
-						  size={24}
-						  className="text-[var(--gray)] opacity-40"
-						/>
-						<p className="caption text-[var(--gray)]">
-						  No registrations yet.
-						</p>
-					  </div>
-					) : (
-					  <div className="flex flex-col max-h-[420px] overflow-y-auto pr-1">
-						<div className="grid grid-cols-[1fr_1fr_44px] gap-3 px-3 sticky top-0 bg-white">
-						  <span className="label">Name</span>
-						  <span className="label">Email</span>
-						  <span className="label text-center">Present</span>
-						</div>
-						<div className="divider my-0" />
-						{registrations.map((user, i) => (
-						  <UserRow
-							key={user.registration_id}
-							user={user}
-							i={i}
-							showCheckbox
-						  />
-						))}
-					  </div>
-					)}
-				  </div>
-				)}
+                    {loadingRegs ? (
+                      <div className="flex items-center justify-center gap-2 py-8 text-[var(--gray)]">
+                        <Loader2 size={18} className="animate-spin" />
+                        <span className="caption">Loading registrations…</span>
+                      </div>
+                    ) : registrations.length === 0 ? (
+                      <div className="flex flex-col items-center justify-center gap-2 py-8 rounded-xl border border-dashed border-[rgba(45,42,74,0.12)]">
+                        <Users
+                          size={24}
+                          className="text-[var(--gray)] opacity-40"
+                        />
+                        <p className="caption text-[var(--gray)]">
+                          No registrations yet.
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col max-h-[420px] overflow-y-auto pr-1">
+                        <div className="grid grid-cols-[1fr_1fr_44px] gap-3 px-3 sticky top-0 bg-white">
+                          <span className="label">Name</span>
+                          <span className="label">Email</span>
+                          <span className="label text-center">Present</span>
+                        </div>
+                        <div className="divider my-0" />
+                        {registrations.map((user, i) => (
+                          <UserRow
+                            key={user.registration_id}
+                            user={user}
+                            i={i}
+                            showCheckbox
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
 
-				{/* attendance panel */}
-				{detailTab === "attendance" && (
-				  <div className="flex flex-col gap-3">
-					<div className="flex items-center justify-between gap-3">
-					  <div className="flex items-center gap-2">
-						<ClipboardCheck
-						  size={15}
-						  className="text-[var(--gray)]"
-						/>
-						{loadingRegs ? (
-						  <span className="caption text-[var(--gray)]">
-							Loading…
-						  </span>
-						) : (
-						  <span className="caption">
-							<strong>{attendanceCount}</strong> attended out of{" "}
-							<strong>{registrations.length}</strong> registered
-						  </span>
-						)}
-					  </div>
-					  {!loadingRegs && attendedUsers.length > 0 && (
-						<Button
-						  variant="soft"
-						  size="sm"
-						  onClick={() => handleCopyEmails(attendedUsers)}
-						  title="Copy emails to clipboard"
-						>
-						  {copied ? (
-							<>
-							  <Check size={13} /> Copied!
-							</>
-						  ) : (
-							<>
-							  <Copy size={13} /> Copy emails
-							</>
-						  )}
-						</Button>
-					  )}
-					</div>
+                {/* attendance panel */}
+                {detailTab === "attendance" && (
+                  <div className="flex flex-col gap-3">
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-2">
+                        <ClipboardCheck
+                          size={15}
+                          className="text-[var(--gray)]"
+                        />
+                        {loadingRegs ? (
+                          <span className="caption text-[var(--gray)]">
+                            Loading…
+                          </span>
+                        ) : (
+                          <span className="caption">
+                            <strong>{attendanceCount}</strong> attended out of{" "}
+                            <strong>{registrations.length}</strong> registered
+                          </span>
+                        )}
+                      </div>
+                      {!loadingRegs && attendedUsers.length > 0 && (
+                        <Button
+                          variant="soft"
+                          size="sm"
+                          onClick={() => handleCopyEmails(attendedUsers)}
+                          title="Copy emails to clipboard"
+                        >
+                          {copied ? (
+                            <>
+                              <Check size={13} /> Copied!
+                            </>
+                          ) : (
+                            <>
+                              <Copy size={13} /> Copy emails
+                            </>
+                          )}
+                        </Button>
+                      )}
+                    </div>
 
-					{loadingRegs ? (
-					  <div className="flex items-center justify-center gap-2 py-8 text-[var(--gray)]">
-						<Loader2 size={18} className="animate-spin" />
-						<span className="caption">Loading…</span>
-					  </div>
-					) : attendedUsers.length === 0 ? (
-					  <div className="flex flex-col items-center justify-center gap-2 py-8 rounded-xl border border-dashed border-[rgba(45,42,74,0.12)]">
-						<ClipboardCheck
-						  size={24}
-						  className="text-[var(--gray)] opacity-40"
-						/>
-						<p className="caption">No attendees marked yet.</p>
-						<p className="caption text-center max-w-[250px]">
-						  Mark attendance in the Registrations tab using the
-						  checkboxes.
-						</p>
-					  </div>
-					) : (
-					  <div className="flex flex-col max-h-[420px] overflow-y-auto pr-1">
-						<div className="grid grid-cols-[1fr_1fr] gap-3 px-3 sticky top-0 bg-white">
-						  <span className="label">Name</span>
-						  <span className="label">Email</span>
-						</div>
-						<div className="divider my-0" />
-						{attendedUsers.map((user, i) => (
-						  <UserRow
-							key={user.registration_id}
-							user={user}
-							i={i}
-							showCheckbox={false}
-						  />
-						))}
-					  </div>
-					)}
-				  </div>
-				)}
-			  </div>
-			</div>
-		  </div>
-		)}
-	  </Modal>
+                    {loadingRegs ? (
+                      <div className="flex items-center justify-center gap-2 py-8 text-[var(--gray)]">
+                        <Loader2 size={18} className="animate-spin" />
+                        <span className="caption">Loading…</span>
+                      </div>
+                    ) : attendedUsers.length === 0 ? (
+                      <div className="flex flex-col items-center justify-center gap-2 py-8 rounded-xl border border-dashed border-[rgba(45,42,74,0.12)]">
+                        <ClipboardCheck
+                          size={24}
+                          className="text-[var(--gray)] opacity-40"
+                        />
+                        <p className="caption">No attendees marked yet.</p>
+                        <p className="caption text-center max-w-[250px]">
+                          Mark attendance in the Registrations tab using the
+                          checkboxes.
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col max-h-[420px] overflow-y-auto pr-1">
+                        <div className="grid grid-cols-[1fr_1fr] gap-3 px-3 sticky top-0 bg-white">
+                          <span className="label">Name</span>
+                          <span className="label">Email</span>
+                        </div>
+                        <div className="divider my-0" />
+                        {attendedUsers.map((user, i) => (
+                          <UserRow
+                            key={user.registration_id}
+                            user={user}
+                            i={i}
+                            showCheckbox={false}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+      </Modal>
 
-	  {/* confirm delete modal */}
-	  <Modal
-		open={!!deleteTarget}
-		onClose={() => {
-		  if (!deletingId) {
-			setDeleteTarget(null);
-			setDeletePassword("");
-			setDeleteError(null);
-		  }
-		}}
-		title="Delete Event?"
-		subtitle="This action cannot be undone. All registrations and data tied to this event will be permanently removed."
-		footer={
-		  <div className="flex gap-3 w-full">
-			<Button
-			  variant="ghost"
-			  className="flex-1"
-			  onClick={() => {
-				setDeleteTarget(null);
-				setDeletePassword("");
-				setDeleteError(null);
-			  }}
-			  disabled={!!deletingId}
-			>
-			  Cancel
-			</Button>
-			<Button
-			  variant="primary"
-			  className="flex-1 !bg-[var(--error)]"
-			  onClick={confirmDelete}
-			  disabled={!!deletingId || !deletePassword.trim()}
-			>
-			  {deletingId ? "Deleting..." : "Yes, Delete"}
-			</Button>
-		  </div>
-		}
-	  >
-		{deleteTarget && (
-		  <div className="space-y-4">
-			<div className="p-4 rounded-xl bg-[var(--pink-light)] border border-[rgba(244,123,123,0.2)]">
-			  <p className="text-sm text-[var(--error)] font-bold mb-1">
-				Warning
-			  </p>
-			  <p className="text-sm text-[var(--primary-dark)]">
-				You are about to delete:{" "}
-				<strong className="break-words">{deleteTarget.title}</strong>
-			  </p>
-			</div>
+      {/* confirm delete modal */}
+      <Modal
+        open={!!deleteTarget}
+        onClose={() => {
+          if (!deletingId) {
+            setDeleteTarget(null);
+            setDeletePassword("");
+            setDeleteError(null);
+          }
+        }}
+        title="Delete Event?"
+        subtitle="This action cannot be undone. All registrations and data tied to this event will be permanently removed."
+        footer={
+          <div className="flex gap-3 w-full">
+            <Button
+              variant="ghost"
+              className="flex-1"
+              onClick={() => {
+                setDeleteTarget(null);
+                setDeletePassword("");
+                setDeleteError(null);
+              }}
+              disabled={!!deletingId}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="primary"
+              className="flex-1 !bg-[var(--error)]"
+              onClick={confirmDelete}
+              disabled={!!deletingId || !deletePassword.trim()}
+            >
+              {deletingId ? "Deleting..." : "Yes, Delete"}
+            </Button>
+          </div>
+        }
+      >
+        {deleteTarget && (
+          <div className="space-y-4">
+            <div className="p-4 rounded-xl bg-[var(--pink-light)] border border-[rgba(244,123,123,0.2)]">
+              <p className="text-sm text-[var(--error)] font-bold mb-1">
+                Warning
+              </p>
+              <p className="text-sm text-[var(--primary-dark)]">
+                You are about to delete:{" "}
+                <strong className="break-words">{deleteTarget.title}</strong>
+              </p>
+            </div>
 
-			{deleteError && (
-			  <div className="p-4 rounded-xl bg-[var(--pink-light)] border border-[rgba(244,123,123,0.2)]">
-				<p className="text-sm text-[var(--error)]">{deleteError}</p>
-			  </div>
-			)}
+            {deleteError && (
+              <div className="p-4 rounded-xl bg-[var(--pink-light)] border border-[rgba(244,123,123,0.2)]">
+                <p className="text-sm text-[var(--error)]">{deleteError}</p>
+              </div>
+            )}
 
-			<div>
-			  <label className="label block mb-2">
-				Enter your password to confirm deletion
-			  </label>
-			  <Input
-				type="password"
-				value={deletePassword}
-				onChange={(e) => setDeletePassword(e.target.value)}
-				placeholder="Password"
-				disabled={!!deletingId}
-			  />
-			</div>
-		  </div>
-		)}
-	  </Modal>
+            <div>
+              <label className="label block mb-2">
+                Enter your password to confirm deletion
+              </label>
+              <Input
+                type="password"
+                value={deletePassword}
+                onChange={(e) => setDeletePassword(e.target.value)}
+                placeholder="Password"
+                disabled={!!deletingId}
+              />
+            </div>
+          </div>
+        )}
+      </Modal>
 
-	  {/* floating toast notification */}
-	  {toast && (
-		<div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999 }}>
-		  <Toast
-			variant={toast.variant}
-			title={toast.title}
-			message={toast.message}
-		  />
-		</div>
-	  )}
-	</div>
+      {/* floating toast notification */}
+      {toast && (
+        <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999 }}>
+          <Toast
+            variant={toast.variant}
+            title={toast.title}
+            message={toast.message}
+          />
+        </div>
+      )}
+    </div>
   );
 }
