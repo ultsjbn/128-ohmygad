@@ -151,7 +151,7 @@ export function DataTable<T>({ columns, rows, keyExtractor, minRows, onRowClick 
 					onClick={() => onRowClick?.(row, i)}
 					style={{
 						background:
-						i % 2 === 0 ? "transparent" : "rgba(179, 173, 240, 0.0)",
+						i % 2 === 0 ? "transparent" : "rgba(255, 235, 245, 0.25)",
 						...(onRowClick ? { cursor: "pointer" } : {}),
 					}}
 				>
