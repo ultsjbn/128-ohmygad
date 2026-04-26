@@ -27,8 +27,6 @@ const SORT_FIELDS = ["title"] as const;
 type SortField = typeof SORT_FIELDS[number];
 type SortDirection = "asc" | "desc";
 
-// variant helpers 
-type BadgeVariant = "pink-light" | "periwinkle" | "dark" | "success" | "warning" | "error";
 
 // courses page proper
 export default function CoursesPage() {
@@ -185,14 +183,9 @@ const confirmDelete = async () => {
       key: "title",
       header: "Title",
       render: (course) => (
-        <button
-          className="text-left font-semibold hover:underline underline-offset-4 max-w-[200px] truncate block"
-          style={{ color: "var(--primary-dark)", fontSize: 13 }}
-          onClick={() => setModalContent({ label: course.title, text: course.description })}
-          title="Click to view description"
-        >
+        <span className="font-semibold truncate block" style={{ color: "var(--primary-dark)", fontSize: 13 }}>
           {course.title}
-        </button>
+        </span>
       ),
     },
 
@@ -220,7 +213,7 @@ const confirmDelete = async () => {
           <Button
             variant="icon"
             title="Edit course"
-            onClick={() => setEditTarget(course)}
+            onClick={(e) => { e.stopPropagation(); setEditTarget(course); }}
           >
             <Pencil size={14} />
           </Button>
@@ -229,7 +222,7 @@ const confirmDelete = async () => {
             title="Delete course"
             disabled={deletingId === course.id}
             style={deletingId === course.id ? { opacity: 0.5 } : { color: "var(--error)" }}
-            onClick={() => setDeleteTarget({ id: course.id!, title: course.title })}
+            onClick={(e) => { e.stopPropagation(); setDeleteTarget({ id: course.id!, title: course.title }); }}
           >
             {deletingId === course.id
               ? <Loader2 size={14} className="animate-spin" />
@@ -308,6 +301,7 @@ const confirmDelete = async () => {
           columns={columns}
           rows={paginate(filtered, page, PER_PAGE)}
           keyExtractor={(course) => course.id!}
+          onRowClick={(course) => setModalContent({ label: course.title, text: course.description })}
         />
       )}
 
@@ -372,7 +366,6 @@ const confirmDelete = async () => {
       {/* confirm delete modal */}
         <Modal
             open={!!deleteTarget}
-            
             onClose={() => {
               if (!deletingId) {
                 setDeleteTarget(null);
@@ -395,28 +388,28 @@ const confirmDelete = async () => {
         >
             {deleteTarget && (
             <div className="space-y-4">
-              <div className="p-4 rounded-xl bg-[var(--pink-light)] border border-[rgba(244,123,123,0.2)]">
-                  <p className="text-sm text-[var(--error)] font-bold mb-1">Warning</p>
-                  <p className="text-sm text-[var(--primary-dark)]">You are about to delete: <strong className="break-words">{deleteTarget.title}</strong></p>
-              </div>
+                <div className="p-4 rounded-xl bg-[var(--pink-light)] border border-[rgba(244,123,123,0.2)]">
+                    <p className="text-sm text-[var(--error)] font-bold mb-1">Warning</p>
+                    <p className="text-sm text-[var(--primary-dark)]">You are about to delete: <strong className="break-words">{deleteTarget.title}</strong></p>
+                </div>
 
               {deleteError && (
-                  <div className="p-3 rounded-xl bg-[var(--pink-light)] border border-[rgba(244,123,123,0.2)]">
-                    <p className="text-sm text-[var(--error)]">{deleteError}</p>
-                  </div>
+                    <div className="p-4 rounded-xl bg-[var(--pink-light)] border border-[rgba(244,123,123,0.2)]">
+                        <p className="text-sm text-[var(--error)]">{deleteError}</p>
+                    </div>
               )}
 
-              <div>
-                <label className="label block mb-2">Enter your password to confirm deletion</label>
-                <Input
-                  type="password"
-                  value={deletePassword}
-                  onChange={(e) => setDeletePassword(e.target.value)}
-                  placeholder="Password"
-                  autoComplete="new-password"
-                  className="input input-bordered w-full"
-                />
-              </div>
+                <div>
+                    <label className="label block mb-2">Enter your password to confirm deletion</label>
+                        <Input
+                        type="password"
+                        value={deletePassword}
+                        onChange={(e) => setDeletePassword(e.target.value)}
+                        placeholder="Password"
+                        autoComplete="new-password"
+                        className="input input-bordered w-full"
+                        />
+                </div>
             </div>
             )}
         </Modal>

@@ -5,7 +5,6 @@ export { Button } from "./button";
 export { Card, StatCard, EventCard, ParticipantCard } from "./card";
 export { Input, Select, SearchBar, Toggle, Checkbox, RadioGroup, Slider } from "./input";
 export { Tabs, PeriodSelector } from "./tabs";
-// export { Avatar, AvatarWithLabel } from "./avatar";
 export { ProgressBar } from "./progress-bar";
 export { Toast } from "./toast";
 export { Dropdown, DropdownItem, DropdownDivider } from "./dropdown";
@@ -19,7 +18,6 @@ export { DashboardFilter, EMPTY_FILTERS, hasActiveFilters } from "./dashboard-fi
 export type { DashboardFilters, FilterOptions } from "./dashboard-filter";
 export { MiniCalendar } from "./mini-calendar"
 export { TodayTimeline } from "./today-timeline"
-// export { SurveyQuestion, SurveyForm, SurveyBuilder } from "./survey-question";
 
 export type { EventCardProps } from "./card";
 export type { NavItem } from "./sidebar";

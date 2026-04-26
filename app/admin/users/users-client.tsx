@@ -315,14 +315,14 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
       width: "20%",
       render: (p) => (
         <div style={{ display: "flex", justifyContent: "flex-end", gap: 4 }}>
-          <Button variant="icon" title="Edit user" onClick={() => openEditModal(p.id)}>
+          <Button variant="icon" title="Edit user" onClick={(e) => { e.stopPropagation(); openEditModal(p.id); }}>
             <Pencil size={14} />
           </Button>
           <Button
             variant="icon"
             title="Delete user"
             style={{ color: "var(--error)" }}
-            onClick={() => openDeleteModal(p)}
+            onClick={(e) => { e.stopPropagation(); openDeleteModal(p); }}
           >
             <Trash2 size={14} />
           </Button>
@@ -465,6 +465,7 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
             columns={columns}
             rows={paginatedProfiles}
             keyExtractor={(p) => p.id}
+            onRowClick={(p) => openEditModal(p.id)}
           />
         )
       )}
@@ -534,7 +535,7 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
           }
         }}
         title="Delete User?"
-        subtitle={deleteTarget ? (deleteTarget.full_name ?? deleteTarget.email ?? undefined) : undefined}
+        subtitle="This action cannot be undone. All data about this user will be permanently removed."
         footer={
           <div className="flex gap-3 w-full">
             <Button variant="ghost" style={{ flex: 1 }} disabled={isDeleting} onClick={closeDeleteModal}>
@@ -546,19 +547,32 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
           </div>
         }
       >
-        <div className="flex flex-col gap-3">
-          <Toast variant="warning" title="This action cannot be undone." message="The user's profile and all associated data will be permanently removed." />
-          {deleteError && <Toast variant="error" title="Deletion failed" message={deleteError} />}
-          <div>
-            <label className="label block mb-2">Enter your password to confirm deletion</label>
-            <Input
-              type="password"
-              value={deletePassword}
-              onChange={(e) => setDeletePassword(e.target.value)}
-              placeholder="Password"
-            />
-          </div>
-        </div>
+        {deleteTarget && (
+            <div className="space-y-4">
+                <div className="p-4 rounded-xl bg-[var(--pink-light)] border border-[rgba(244,123,123,0.2)]">
+                    <p className="text-sm text-[var(--error)] font-bold mb-1">Warning</p>
+                    <p className="text-sm text-[var(--primary-dark)]">You are about to delete: <strong className="break-words">{deleteTarget.full_name}</strong></p>
+                </div>
+
+              {deleteError && (
+                    <div className="p-4 rounded-xl bg-[var(--pink-light)] border border-[rgba(244,123,123,0.2)]">
+                        <p className="text-sm text-[var(--error)]">{deleteError}</p>
+                    </div>
+              )}
+
+                <div>
+                    <label className="label block mb-2">Enter your password to confirm deletion</label>
+                        <Input
+                            type="password"
+                            value={deletePassword}
+                            onChange={(e) => setDeletePassword(e.target.value)}
+                            placeholder="Password"
+                            autoComplete="new-password"
+                            className="input input-bordered w-full"
+                        />
+                </div>
+            </div>
+            )}
       </Modal>
 
       {/* floating toast notification */}
