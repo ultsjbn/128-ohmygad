@@ -263,7 +263,7 @@ export default function SurveysPage() {
     {
       key: "title",
       header: "Title",
-      width: "40%",
+      width: "20%",
       render: (survey) => (
         <button
           className="text-left font-semibold hover:underline underline-offset-4 max-w-[240px] truncate block"
@@ -288,7 +288,7 @@ export default function SurveysPage() {
     {
       key: "open_at",
       header: "Opens",
-      width: "16%",
+      width: "15%",
       render: (survey) => (
         <span className="caption whitespace-nowrap">{formatDate(survey.open_at)}</span>
       ),
@@ -296,7 +296,7 @@ export default function SurveysPage() {
     {
       key: "close_at",
       header: "Closes",
-      width: "16%",
+      width: "15%",
       render: (survey) => (
         <span className="caption whitespace-nowrap">{formatDate(survey.close_at)}</span>
       ),
@@ -304,7 +304,7 @@ export default function SurveysPage() {
     {
       key: "actions",
       header: <div className="text-center">Actions</div>,
-      width: "13%",
+      width: "10%",
       render: (survey) => (
         <div style={{ display: "flex", justifyContent: "flex-end", gap: 4 }}>
           <Button
@@ -317,7 +317,7 @@ export default function SurveysPage() {
           <Button
             variant="icon"
             title="Edit survey"
-            onClick={() => openEditModal(survey)}
+            onClick={(e) => { e.stopPropagation(); openEditModal(survey); }}
           >
             <Pencil size={14} />
           </Button>
@@ -326,7 +326,7 @@ export default function SurveysPage() {
             title="Delete survey"
             disabled={deletingId === survey.id}
             style={deletingId === survey.id ? { opacity: 0.5 } : { color: "var(--error)" }}
-            onClick={() => setDeleteTarget({ id: survey.id!, title: survey.title })}
+            onClick={(e) => { e.stopPropagation(); setDeleteTarget({ id: survey.id!, title: survey.title }); }}
           >
             {deletingId === survey.id
               ? <Loader2 size={14} className="animate-spin" />
@@ -339,10 +339,8 @@ export default function SurveysPage() {
 
   return (
     <div className="flex flex-col gap-3">
-
       {/* toolbar */}
       <div className="flex flex-col gap-3">
-
         <div className="flex items-center gap-3 flex-wrap">
           <SearchBar
             placeholder="Search by title or status…"
@@ -362,13 +360,20 @@ export default function SurveysPage() {
             {SORT_FIELDS.map((field) => (
               <DropdownItem key={field} onClick={() => handleSort(field)}>
                 <span className="flex items-center justify-between gap-6 w-full">
-                  <span className="capitalize">{field === "open_at" ? "Date" : field}</span>
+                  <span className="capitalize">
+                    {field === "open_at" ? "Date" : field}
+                  </span>
                   <SortIcon field={field} />
                 </span>
               </DropdownItem>
             ))}
             <DropdownDivider />
-            <DropdownItem onClick={() => { setSort({ field: "open_at", direction: "desc" }); setPage(1); }}>
+            <DropdownItem
+              onClick={() => {
+                setSort({ field: "open_at", direction: "desc" });
+                setPage(1);
+              }}
+            >
               Reset sort
             </DropdownItem>
           </Dropdown>
@@ -380,7 +385,7 @@ export default function SurveysPage() {
                 <SlidersHorizontal size={15} /> Filter
                 {hasActiveFilters && (
                   <span
-                    className="inline-flex items-center justify-center w-4 h-4 rounded-full text-[10px] font-bold text-white"
+                    className="inline-flex items-center justify-center min-w-[20px] h-5 rounded-full px-1 text-[11px] font-bold text-white"
                     style={{ background: "var(--primary-dark)", marginLeft: 2 }}
                   >
                     {activeFilterCount}
@@ -390,7 +395,9 @@ export default function SurveysPage() {
             }
           >
             <div style={{ padding: "4px 12px 6px" }}>
-              <p className="label" style={{ marginBottom: 4 }}>Status</p>
+              <p className="label" style={{ marginBottom: 4 }}>
+                Status
+              </p>
             </div>
             {STATUSES.map((s) => (
               <CheckItem
@@ -402,12 +409,14 @@ export default function SurveysPage() {
               />
             ))}
             <DropdownDivider />
-            <DropdownItem onClick={clearAllFilters}>Clear all filters</DropdownItem>
+            <DropdownItem onClick={clearAllFilters}>
+              Clear all filters
+            </DropdownItem>
           </Dropdown>
 
-            <Button variant="primary" onClick={() => setCreateModalOpen(true)}>
-                <Plus size={16} /> Add Survey
-            </Button>
+          <Button variant="primary" onClick={() => setCreateModalOpen(true)}>
+            <Plus size={16} /> Add Survey
+          </Button>
         </div>
       </div>
 
@@ -422,7 +431,9 @@ export default function SurveysPage() {
                 onClick={() => toggleStatus(s)}
                 aria-label={`Remove ${s} filter`}
                 style={{ marginLeft: 6 }}
-              >×</button>
+              >
+                ×
+              </button>
             </Badge>
           ))}
           <Button variant="soft" size="sm" onClick={clearAllFilters}>
@@ -434,7 +445,10 @@ export default function SurveysPage() {
       {/* table / empty / loading */}
       {isLoading ? (
         <Card>
-          <div className="flex items-center justify-center gap-3 py-10" style={{ color: "var(--gray)" }}>
+          <div
+            className="flex items-center justify-center gap-3 py-10"
+            style={{ color: "var(--gray)" }}
+          >
             <Loader2 size={20} className="animate-spin" />
             <span className="caption">Loading surveys…</span>
           </div>
@@ -451,7 +465,10 @@ export default function SurveysPage() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => { setSearch(""); clearAllFilters(); }}
+                onClick={() => {
+                  setSearch("");
+                  clearAllFilters();
+                }}
               >
                 Clear search &amp; filters
               </Button>
@@ -463,6 +480,7 @@ export default function SurveysPage() {
           columns={columns}
           rows={paginate(filtered, page, PER_PAGE)}
           keyExtractor={(survey) => survey.id!}
+          onRowClick={(survey) => setAnalyticsTarget(survey)}
         />
       )}
 
@@ -470,7 +488,9 @@ export default function SurveysPage() {
       {!isLoading && filtered.length > 0 && (
         <div className="flex items-center justify-between flex-wrap gap-3">
           <span className="caption">
-            Showing {Math.min((page - 1) * PER_PAGE + 1, filtered.length)}–{Math.min(page * PER_PAGE, filtered.length)} of {filtered.length} surveys
+            Showing {Math.min((page - 1) * PER_PAGE + 1, filtered.length)}–
+            {Math.min(page * PER_PAGE, filtered.length)} of {filtered.length}{" "}
+            surveys
           </span>
           <Pagination
             page={page}
@@ -489,7 +509,10 @@ export default function SurveysPage() {
       >
         <SurveyForm
           mode="create"
-          onSuccess={() => { setCreateModalOpen(false); getSurveys(); }}
+          onSuccess={() => {
+            setCreateModalOpen(false);
+            getSurveys();
+          }}
           onCancel={() => setCreateModalOpen(false)}
         />
       </Modal>
@@ -502,9 +525,12 @@ export default function SurveysPage() {
         subtitle={editTarget?.title}
         modalStyle={{ maxWidth: 780 }}
       >
-        {editTarget && (
-          editQuestionsLoading ? (
-            <div className="flex items-center justify-center gap-3 py-10" style={{ color: "var(--gray)" }}>
+        {editTarget &&
+          (editQuestionsLoading ? (
+            <div
+              className="flex items-center justify-center gap-3 py-10"
+              style={{ color: "var(--gray)" }}
+            >
               <Loader2 size={20} className="animate-spin" />
               <span className="caption">Loading survey…</span>
             </div>
@@ -514,11 +540,13 @@ export default function SurveysPage() {
               mode="edit"
               initialData={editTarget}
               initialQuestions={editQuestions}
-              onSuccess={() => { setEditTarget(null); getSurveys(); }}
+              onSuccess={() => {
+                setEditTarget(null);
+                getSurveys();
+              }}
               onCancel={() => setEditTarget(null)}
             />
-          )
-        )}
+          ))}
       </Modal>
 
       {/* analytics modal */}
@@ -531,55 +559,78 @@ export default function SurveysPage() {
       )}
 
       {/* confirm delete modal */}
-        <Modal
-            open={!!deleteTarget}
-            onClose={() => {
-              if (!deletingId) {
+      <Modal
+        open={!!deleteTarget}
+        onClose={() => {
+          if (!deletingId) {
+            setDeleteTarget(null);
+            setDeletePassword("");
+          }
+        }}
+        title="Delete Survey?"
+        subtitle="This action cannot be undone."
+        footer={
+          <div className="flex gap-3 w-full">
+            <Button
+              variant="ghost"
+              className="flex-1"
+              onClick={() => {
                 setDeleteTarget(null);
                 setDeletePassword("");
-              }
-            }}
-            title="Delete Survey?"
-            subtitle="This action cannot be undone."
-            footer={
-            <div className="flex gap-3 w-full">
-                <Button variant="ghost" className="flex-1" onClick={() => { setDeleteTarget(null); setDeletePassword(""); }} disabled={!!deletingId}>
-                Cancel
-                </Button>
-                <Button variant="primary" className="flex-1 !bg-[var(--error)]" onClick={confirmDelete} disabled={!!deletingId || !deletePassword.trim()}>
-                {deletingId ? "Deleting..." : "Yes, Delete"}
-                </Button>
+              }}
+              disabled={!!deletingId}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="primary"
+              className="flex-1 !bg-[var(--error)]"
+              onClick={confirmDelete}
+              disabled={!!deletingId || !deletePassword.trim()}
+            >
+              {deletingId ? "Deleting..." : "Yes, Delete"}
+            </Button>
+          </div>
+        }
+      >
+        {deleteTarget && (
+          <div className="space-y-4">
+            <div className="p-4 rounded-xl bg-[var(--pink-light)] border border-[rgba(244,123,123,0.2)]">
+              <p className="text-sm text-[var(--error)] font-bold mb-1">
+                Warning
+              </p>
+              <p className="text-sm text-[var(--primary-dark)]">
+                You are about to delete:{" "}
+                <strong className="break-words">{deleteTarget.title}</strong>
+              </p>
             </div>
-            }
-        >
-            {deleteTarget && (
-            <div className="space-y-4">
-              <div className="p-4 rounded-xl bg-[var(--pink-light)] border border-[rgba(244,123,123,0.2)]">
-                  <p className="text-sm text-[var(--error)] font-bold mb-1">Warning</p>
-                  <p className="text-sm text-[var(--primary-dark)]">You are about to delete: <strong className="break-words">{deleteTarget.title}</strong></p>
-              </div>
-              <div>
-                <label className="label block mb-2">Enter your password to confirm deletion</label>
-                <Input
-                  type="password"
-                  value={deletePassword}
-                  onChange={(e) => setDeletePassword(e.target.value)}
-                  placeholder="Password"
-                  autoComplete="new-password"
-                  className="input input-bordered w-full"
-                />
-              </div>
+            <div>
+              <label className="label block mb-2">
+                Enter your password to confirm deletion
+              </label>
+              <Input
+                type="password"
+                value={deletePassword}
+                onChange={(e) => setDeletePassword(e.target.value)}
+                placeholder="Password"
+                autoComplete="new-password"
+                className="input input-bordered w-full"
+              />
             </div>
-            )}
-        </Modal>
+          </div>
+        )}
+      </Modal>
 
       {/* floating toast notification */}
       {toast && (
         <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999 }}>
-          <Toast variant={toast.variant} title={toast.title} message={toast.message} />
+          <Toast
+            variant={toast.variant}
+            title={toast.title}
+            message={toast.message}
+          />
         </div>
       )}
-
     </div>
   );
 }
