@@ -85,7 +85,7 @@ export function SignUpForm({
         <div className="input-wrap">
           <label htmlFor="full_name" className="label">Full Name</label>
           <div className="input-icon-wrap">
-            <User className="input-prefix-icon w-2 h-2" />
+            <User className="input-prefix-icon w-4 h-4" />
             <input
               id="full_name"
               type="text"
@@ -102,7 +102,7 @@ export function SignUpForm({
         <div className="input-wrap">
           <label htmlFor="email" className="label">Email</label>
           <div className="input-icon-wrap">
-            <Mail className="input-prefix-icon w-2 h-2" />
+            <Mail className="input-prefix-icon w-4 h-4" />
             <input
               id="email"
               type="email"
@@ -119,7 +119,7 @@ export function SignUpForm({
         <div className="input-wrap">
           <label htmlFor="password" className="label">Password</label>
           <div className="input-icon-wrap">
-            <Lock className="input-prefix-icon w-2 h-2" />
+            <Lock className="input-prefix-icon w-4 h-4" />
             <input
               id="password"
               type={showPassword ? "text" : "password"}
@@ -135,7 +135,7 @@ export function SignUpForm({
               className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--gray)] hover:text-[var(--text)] transition-colors"
               tabIndex={-1}
             >
-              {showPassword ? <EyeOff className="w-2 h-2" /> : <Eye className="w-2 h-2" />}
+              {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
           </div>
         </div>
@@ -144,7 +144,7 @@ export function SignUpForm({
         <div className="input-wrap">
           <label htmlFor="repeat-password" className="label">Repeat Password</label>
           <div className="input-icon-wrap">
-            <Lock className="input-prefix-icon w-2 h-2" />
+            <Lock className="input-prefix-icon w-4 h-4" />
             <input
               id="repeat-password"
               type={showRepeatPassword ? "text" : "password"}
@@ -163,7 +163,7 @@ export function SignUpForm({
               className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--gray)] hover:text-[var(--text)] transition-colors"
               tabIndex={-1}
             >
-              {showRepeatPassword ? <EyeOff className="w-2 h-2" /> : <Eye className="w-2 h-2" />}
+              {showRepeatPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
           </div>
         </div>

@@ -380,7 +380,7 @@ export default function EventsPage() {
                 <SlidersHorizontal size={15} />
                 <span className="hidden md:inline">Filter</span>
                 {hasActiveFilters && (
-                  <span className="inline-flex items-center justify-center w-2 h-2 rounded-full text-[10px] font-bold text-white bg-[var(--primary-dark)] ml-0.5">
+                  <span className="inline-flex items-center justify-center w-4 h-4 rounded-full text-[10px] font-bold text-white bg-[var(--primary-dark)] ml-0.5">
                     {activeFilterCount}
                   </span>
                 )}

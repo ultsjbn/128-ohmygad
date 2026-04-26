@@ -380,7 +380,7 @@ export default function SurveysPage() {
                 <SlidersHorizontal size={15} /> Filter
                 {hasActiveFilters && (
                   <span
-                    className="inline-flex items-center justify-center w-2 h-2 rounded-full text-[10px] font-bold text-white"
+                    className="inline-flex items-center justify-center w-4 h-4 rounded-full text-[10px] font-bold text-white"
                     style={{ background: "var(--primary-dark)", marginLeft: 2 }}
                   >
                     {activeFilterCount}

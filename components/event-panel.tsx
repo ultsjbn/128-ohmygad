@@ -247,7 +247,7 @@ export const EventPanel = (): JSX.Element => {
                     {/* date row: dot sits on the border line */}
                     <div className="flex items-center gap-3 -ml-[7px] mb-3">
                         <div
-                        className="w-2 h-2 rounded-full shrink-0 ring-2 ring-white"
+                        className="w-4 h-4 rounded-full shrink-0 ring-2 ring-white"
                         style={{ background: "var(--soft-pink)" }}
                         />
                         <span className="label text-[var(--primary-dark)]">{group.dateLabel}</span>

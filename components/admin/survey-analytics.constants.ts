@@ -70,7 +70,7 @@ export function CustomTooltip({
         "div",
         { key: i, className: "flex items-center gap-2" },
         React.createElement("span", {
-          className: "w-2 h-2 rounded-full shrink-0",
+          className: "w-4 h-4 rounded-full shrink-0",
           style: { background: e.color ?? e.payload?.fill },
         }), // this prolly sucks
         React.createElement(

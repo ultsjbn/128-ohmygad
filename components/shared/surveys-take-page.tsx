@@ -475,8 +475,8 @@ export default function SurveyTakePage() {
               i === currentIndex
                 ? "w-4 h-2 bg-[var(--primary-dark)]"
                 : answers[questions[i].id!] !== undefined && answers[questions[i].id!] !== null && answers[questions[i].id!] !== ""
-                ? "w-2 h-2 bg-[var(--primary-dark)] opacity-40"
-                : "w-2 h-2 bg-[rgba(45,42,74,0.15)]"
+                ? "w-4 h-4 bg-[var(--primary-dark)] opacity-40"
+                : "w-4 h-4 bg-[rgba(45,42,74,0.15)]"
             }`}
             title={`Question ${i + 1}`}
           />
