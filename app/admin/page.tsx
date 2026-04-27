@@ -1,19 +1,22 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useEffect, useState, useMemo } from "react";
 import {
   Users, Calendar, UserCheck, ClipboardList, BookOpen,
 } from "lucide-react";
 import {
   Card, StatCard, Button, MiniCalendar, TodayTimeline, DateRangePicker,
-  DashboardFilter, EMPTY_FILTERS, Modal,
+  DashboardFilter, EMPTY_FILTERS, Modal, SearchBar,
 } from "@/components/ui";
+import { Pagination } from "@/components/pagination";
 import type { DateRange, DashboardFilters } from "@/components/ui";
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell, Legend, BarChart, Bar,
+  PieChart, Pie, Cell, Legend, BarChart, Bar, LabelList,
 } from "recharts";
-import { useDashboardData } from "./hooks/use-dashboard-data";import { useSurveyCompletionRates } from "./hooks/use-survey-completion-rates";import GlobalSearch from "@/components/global-search";
+import { useDashboardData } from "./hooks/use-dashboard-data";
+import { useSurveyCompletionRates } from "./hooks/use-survey-completion-rates";
+import GlobalSearch from "@/components/global-search";
 import EventForm from "@/components/admin/event-form";
 import UserForm from "@/components/admin/user-form";
 import CourseForm from "@/components/admin/course-form";
@@ -23,6 +26,9 @@ import SurveyForm from "@/components/admin/survey-form";
 const BRAND_COLORS = ["#B8B5E8", "#F4A7B9", "#6DC5A0", "#F4C97A", "#9B9BB4", "#2D2A4A"];
 const AXIS_COLOR   = "rgba(45,42,74,0.10)";
 const TICK_COLOR   = "rgba(45,42,74,0.45)";
+
+const SURVEY_COMPLETED_COLOR = "var(--success)";
+const SURVEY_INCOMPLETE_COLOR = "var(--warning)";
 
 const COLLEGE_COLORS: Record<string, string> = {
   "CS":  "#6DC5A0",
@@ -97,6 +103,8 @@ export default function DashboardPage() {
         return { from: iso(start), to: iso(now) };
     });
     const [filters, setFilters] = useState<DashboardFilters>(EMPTY_FILTERS);
+    const [surveySearch, setSurveySearch] = useState("");
+    const [surveyPage, setSurveyPage] = useState(1);
 
     // quick action modals
     const [activeModal, setActiveModal]             = useState<"event" | "user" | "course" | "survey" | null>(null);
@@ -132,6 +140,25 @@ export default function DashboardPage() {
         }),
         [genderIdentityData],
     );
+
+    const surveyCompletionFiltered = useMemo(() => {
+        const searchTerm = surveySearch.trim().toLowerCase();
+        return [...(surveyCompletionData ?? [])]
+            .filter((item) => item.title.toLowerCase().includes(searchTerm))
+            .sort((a, b) => b.completedPct - a.completedPct);
+    }, [surveyCompletionData, surveySearch]);
+
+    const surveyPageCount = Math.max(1, Math.ceil(surveyCompletionFiltered.length / 4));
+    const surveyCompletionChartData = useMemo(() => {
+        const startIndex = (surveyPage - 1) * 4;
+        return surveyCompletionFiltered.slice(startIndex, startIndex + 4);
+    }, [surveyCompletionFiltered, surveyPage]);
+
+    useEffect(() => {
+        if (surveyPage > surveyPageCount) {
+            setSurveyPage(1);
+        }
+    }, [surveyPage, surveyPageCount]);
 
     return (
         <div className="flex flex-col gap-5 w-full animate-in fade-in duration-500">
@@ -378,11 +405,17 @@ export default function DashboardPage() {
             {/* survey completion analytics */}
             <div>
                 <Card variant="no-hover" className="flex flex-col p-5 min-h-[320px]">
-                    <div className="flex items-start justify-between gap-3 mb-4">
+                    <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
                         <div>
                             <h2 className="heading-md">Response Rate by Survey</h2>
                             <p className="caption mt-0.5">Completed vs incomplete response percentage per survey</p>
                         </div>
+                        <SearchBar
+                            placeholder="Search all surveys…"
+                            value={surveySearch}
+                            onChange={(e) => setSurveySearch(e.target.value)}
+                            className="min-w-[220px] max-w-full"
+                        />
                     </div>
                     <div className="flex-1 w-full min-h-[220px] cursor-default select-none">
                         {surveyCompletionLoading ? (
@@ -393,43 +426,60 @@ export default function DashboardPage() {
                             <div className="flex items-center justify-center h-full">
                                 <span className="caption text-[var(--gray)]">No survey completion data available.</span>
                             </div>
+                        ) : surveyCompletionChartData.length === 0 ? (
+                            <div className="flex items-center justify-center h-full">
+                                <span className="caption text-[var(--gray)]">No surveys match your search.</span>
+                            </div>
                         ) : (
-                            <ResponsiveContainer width="100%" height={260}>
-                                <BarChart
-                                    layout="vertical"
-                                    data={surveyCompletionData.slice(0, 7)}
-                                    margin={{ top: 8, right: 20, left: 20, bottom: 5 }}
-                                >
-                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={AXIS_COLOR} />
-                                    <XAxis
-                                        type="number"
-                                        stroke={AXIS_COLOR}
-                                        tick={{ fill: TICK_COLOR, fontSize: 11 }}
-                                        tickLine={false}
-                                        axisLine={false}
-                                        domain={[0, 100]}
-                                        tickFormatter={(value) => `${value}%`}
-                                    />
-                                    <YAxis
-                                        type="category"
-                                        dataKey="title"
-                                        stroke={AXIS_COLOR}
-                                        tick={{ fill: TICK_COLOR, fontSize: 11 }}
-                                        tickLine={false}
-                                        axisLine={false}
-                                        width={140}
-                                        interval={0}
-                                    />
-                                    <Tooltip content={<CustomTooltip />} />
-                                    <Legend
-                                        verticalAlign="top"
-                                        align="right"
-                                        wrapperStyle={{ paddingBottom: 10 }}
-                                    />
-                                    <Bar dataKey="completedPct" name="Completed" stackId="a" fill="#6DC5A0" radius={[6, 0, 0, 6]} />
-                                    <Bar dataKey="incompletePct" name="Incomplete" stackId="a" fill="#F4A7B9" radius={[0, 6, 6, 0]} />
-                                </BarChart>
-                            </ResponsiveContainer>
+                            <>
+                                <ResponsiveContainer width="100%" height={300}>
+                                    <BarChart
+                                        layout="vertical"
+                                        data={surveyCompletionChartData}
+                                        margin={{ top: 8, right: 16, left: 24, bottom: 5 }}
+                                        barCategoryGap="24%"
+                                    >
+                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={AXIS_COLOR} />
+                                        <XAxis
+                                            type="number"
+                                            stroke={AXIS_COLOR}
+                                            tick={{ fill: TICK_COLOR, fontSize: 11 }}
+                                            tickLine={false}
+                                            axisLine={false}
+                                            domain={[0, 100]}
+                                            tickFormatter={(value) => `${value}%`}
+                                        />
+                                        <YAxis
+                                            type="category"
+                                            dataKey="title"
+                                            stroke={AXIS_COLOR}
+                                            tick={{ fill: TICK_COLOR, fontSize: 11 }}
+                                            tickLine={false}
+                                            axisLine={false}
+                                            width={175}
+                                            interval={0}
+                                        />
+                                        <Tooltip content={<CustomTooltip />} cursor={{ fill: "transparent", stroke: "transparent" }} />
+                                        <Legend
+                                            verticalAlign="top"
+                                            align="right"
+                                            wrapperStyle={{ paddingBottom: 10 }}
+                                            iconType="circle"
+                                        />
+                                        <Bar dataKey="completedPct" name="Completed" stackId="a" fill={SURVEY_COMPLETED_COLOR} radius={[6, 0, 0, 6]} barSize={24}>
+                                            <LabelList dataKey="completedPct" position="insideRight" formatter={(value) => `${value}%`} fill="var(--primary-dark)" />
+                                        </Bar>
+                                        <Bar dataKey="incompletePct" name="Incomplete" stackId="a" fill={SURVEY_INCOMPLETE_COLOR} radius={[0, 6, 6, 0]} barSize={24}>
+                                            <LabelList dataKey="incompletePct" position="insideRight" formatter={(value) => value > 0 ? `${value}%` : ""} fill="var(--primary-dark)" />
+                                        </Bar>
+                                    </BarChart>
+                                </ResponsiveContainer>
+                                {surveyPageCount > 1 && (
+                                    <div className="mt-4 flex items-center justify-end">
+                                        <Pagination page={surveyPage} total={surveyPageCount} onChange={setSurveyPage} />
+                                    </div>
+                                )}
+                            </>
                         )}
                     </div>
                 </Card>

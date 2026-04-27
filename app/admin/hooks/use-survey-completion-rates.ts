@@ -83,7 +83,7 @@ export function useSurveyCompletionRates() {
         );
 
         if (!cancelled) {
-          setData(completionData.filter((item) => item.totalRegistrations > 0));
+          setData(completionData);
         }
       } catch (err: any) {
         if (!cancelled) setError(err.message || "Failed to load survey completion data");
