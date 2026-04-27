@@ -51,33 +51,47 @@ export function useSurveyCompletionRates() {
           responsesBySurvey[row.survey_id].add(row.response_token);
         });
 
+        const eventIds = (surveys ?? [])
+          .map((survey: any) => survey.event_id)
+          .filter((eventId) => eventId !== null && eventId !== undefined);
+
+        const registrationsByEvent: Record<string, Set<string>> = {};
+        if (eventIds.length > 0) {
+          const { data: registrations, error: regError } = await supabase
+            .from("event_registration")
+            .select("event_id, user_id")
+            .in("event_id", eventIds)
+            .eq("attended", true);
+
+          if (regError) throw regError;
+
+          (registrations ?? []).forEach((row: any) => {
+            if (!row.event_id || !row.user_id) return;
+            registrationsByEvent[row.event_id] ||= new Set();
+            registrationsByEvent[row.event_id].add(row.user_id);
+          });
+        }
+
         const completionData = await Promise.all(
           (surveys ?? []).map(async (survey: any) => {
-            const completedCount = responsesBySurvey[survey.id]?.size ?? 0;
-            let totalRegistrations = 0;
+            const attendedUsers = survey.event_id ? registrationsByEvent[survey.event_id] ?? new Set<string>() : new Set<string>();
+            const completedCount = [...(responsesBySurvey[survey.id] ?? new Set<string>())]
+              .filter((token) => attendedUsers.has(token))
+              .length;
+            const attendeeCount = attendedUsers.size;
             let completedPct = 0;
 
-            if (survey.event_id) {
-              const { count, error: regError } = await supabase
-                .from("event_registration")
-                .select("id", { count: "exact", head: true })
-                .eq("event_id", survey.event_id);
-
-              if (regError) throw regError;
-              totalRegistrations = count ?? 0;
-            }
-
-            if (totalRegistrations > 0) {
-              completedPct = Math.round((completedCount / totalRegistrations) * 100);
+            if (attendeeCount > 0) {
+              completedPct = Math.round((completedCount / attendeeCount) * 100);
             }
 
             return {
               id: survey.id,
               title: survey.title ?? "Untitled Survey",
               completedPct,
-              incompletePct: totalRegistrations > 0 ? Math.max(0, 100 - completedPct) : 0,
+              incompletePct: attendeeCount > 0 ? Math.max(0, 100 - completedPct) : 0,
               completedCount,
-              totalRegistrations,
+              totalRegistrations: attendeeCount,
             };
           })
         );

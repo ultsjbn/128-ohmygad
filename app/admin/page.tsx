@@ -144,7 +144,7 @@ export default function DashboardPage() {
     const surveyCompletionFiltered = useMemo(() => {
         const searchTerm = surveySearch.trim().toLowerCase();
         return [...(surveyCompletionData ?? [])]
-            .filter((item) => item.title.toLowerCase().includes(searchTerm))
+            .filter((item) => (item.title ?? "").toLowerCase().includes(searchTerm))
             .sort((a, b) => b.completedPct - a.completedPct);
     }, [surveyCompletionData, surveySearch]);
 
@@ -405,7 +405,7 @@ export default function DashboardPage() {
             {/* survey completion analytics */}
             <div>
                 <Card variant="no-hover" className="flex flex-col p-5 min-h-[320px]">
-                    <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+                    <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
                         <div>
                             <h2 className="heading-md">Response Rate by Survey</h2>
                             <p className="caption mt-0.5">Completed vs incomplete response percentage per survey</p>
@@ -417,12 +417,12 @@ export default function DashboardPage() {
                             className="min-w-[220px] max-w-full"
                         />
                     </div>
-                    <div className="flex-1 w-full min-h-[220px] cursor-default select-none">
+                    <div className="flex-1 w-full min-h-[220px] cursor-default select-none mt-4">
                         {surveyCompletionLoading ? (
                             <div className="flex items-center justify-center h-full">
                                 <span className="caption animate-pulse">Loading survey data…</span>
                             </div>
-                        ) : surveyCompletionData.length === 0 ? (
+                        ) : (surveyCompletionData?.length?? 0) === 0 ? (
                             <div className="flex items-center justify-center h-full">
                                 <span className="caption text-[var(--gray)]">No survey completion data available.</span>
                             </div>
@@ -436,7 +436,7 @@ export default function DashboardPage() {
                                     <BarChart
                                         layout="vertical"
                                         data={surveyCompletionChartData}
-                                        margin={{ top: 8, right: 16, left: 24, bottom: 5 }}
+                                        margin={{ top: 8, right: 16, left: 40, bottom: 5 }}
                                         barCategoryGap="24%"
                                     >
                                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={AXIS_COLOR} />
