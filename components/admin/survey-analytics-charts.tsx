@@ -69,7 +69,7 @@ export function MultipleChoiceChart({
           <XAxis
             type="number"
             stroke={AXIS_COLOR}
-            tick={{ fill: TICK_COLOR, fontSize: 11 }}
+            tick={{ fill: TICK_COLOR, fontSize: 13 }}
             tickLine={false}
             axisLine={false}
             allowDecimals={false}
@@ -78,7 +78,7 @@ export function MultipleChoiceChart({
             dataKey="name"
             type="category"
             stroke={AXIS_COLOR}
-            tick={{ fill: TICK_COLOR, fontSize: 12 }}
+            tick={{ fill: TICK_COLOR, fontSize: 14 }}
             tickLine={false}
             axisLine={false}
             width={120}
@@ -142,7 +142,7 @@ export function YesNoChart({ responses }: { responses: ResponseRow[] }) {
             iconType="circle"
             wrapperStyle={{ paddingTop: 14 }}
             formatter={(v) => (
-              <span className="text-[10px] font-bold text-[var(--gray)] uppercase tracking-wider">
+              <span className="text-[12px] font-bold text-[var(--gray)] uppercase tracking-wider">
                 {v as string}
               </span>
             )}
@@ -159,10 +159,10 @@ export function YesNoChart({ responses }: { responses: ResponseRow[] }) {
 function StatBox({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex flex-col items-center justify-center gap-1 py-3 px-2 rounded-[var(--radius-md)] bg-[var(--lavender)]">
-      <span className="text-[11px] font-bold text-[var(--gray)] uppercase tracking-wider">
+      <span className="text-[13px] font-bold text-[var(--gray)] uppercase tracking-wider">
         {label}
       </span>
-      <span className="text-lg font-bold text-[var(--primary-dark)]">{value}</span>
+      <span className="text-xl font-bold text-[var(--primary-dark)]">{value}</span>
     </div>
   );
 }
@@ -240,7 +240,7 @@ export function LikertChart({ responses }: { responses: ResponseRow[] }) {
               className="w-2.5 h-2.5 rounded-full shrink-0"
               style={{ background: LIKERT_COLORS[i] }}
             />
-            <span className="text-[11px] text-[var(--gray)] font-medium">
+            <span className="text-[13px] text-[var(--gray)] font-medium">
               {label} ({stats.counts[i]})
             </span>
           </div>
@@ -278,7 +278,7 @@ function TextResponseItem({ text }: { text: string }) {
         &ldquo;{displayText}&rdquo;
       </p>
       {isLong && (
-        <p className="text-[12px] text-[var(--periwinkle)] mt-1.5 font-medium hover:underline w-fit">
+        <p className="text-[14px] text-[var(--periwinkle)] mt-1.5 font-medium hover:underline w-fit">
           {expanded ? "Show less" : "Read more"}
         </p>
       )}
@@ -316,7 +316,7 @@ export function TextResponses({ responses }: { responses: ResponseRow[] }) {
 
       {totalPages > 1 && (
         <div className="flex items-center justify-between mt-1">
-          <span className="caption text-[var(--gray)]">
+          <span className="body text-[var(--gray)]">
             Page {page} of {totalPages}
           </span>
           <div className="flex items-center gap-1">

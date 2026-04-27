@@ -58,7 +58,7 @@ function MultipleChoiceQuestion({
             }`}>
               {selected && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
             </span>
-            <span className="body">{opt}</span>
+            <span className="heading-sm">{opt}</span>
             <input type="radio" className="hidden" checked={selected} onChange={() => onChange(opt)} />
           </label>
         );
@@ -93,14 +93,14 @@ function RatingQuestion({
                   : "border-[rgba(45,42,74,0.12)] hover:border-[var(--primary-dark)] hover:bg-[var(--lavender)]"
               }`}
             >
-              <span className="text-lg font-bold">{n}</span>
+              <span className="text-xl font-bold">{n}</span>
             </button>
           );
         })}
       </div>
       <div className="flex items-center justify-between">
-        <span className="caption text-[var(--gray)]">{labels[0]}</span>
-        <span className="caption text-[var(--gray)]">{labels[4]}</span>
+        <span className="body text-[var(--gray)]">{labels[0]}</span>
+        <span className="body text-[var(--gray)]">{labels[4]}</span>
       </div>
     </div>
   );
@@ -122,7 +122,7 @@ function YesNoQuestion({
             key={opt}
             type="button"
             onClick={() => onChange(opt)}
-            className={`flex-1 py-4 rounded-[var(--radius-md)] border-2 font-semibold text-sm transition-all ${
+            className={`flex-1 py-4 rounded-[var(--radius-md)] border-2 font-semibold text-base transition-all ${
               selected
                 ? "border-[var(--primary-dark)] bg-[var(--primary-dark)] text-white"
                 : "border-[rgba(45,42,74,0.12)] hover:border-[var(--primary-dark)] hover:bg-[var(--lavender)]"
@@ -310,7 +310,7 @@ export default function SurveyTakePage() {
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="flex flex-col items-center gap-3">
           <Loader2 size={24} className="animate-spin text-[var(--gray)]" />
-          <p className="caption">Loading survey…</p>
+          <p className="body">Loading survey…</p>
         </div>
       </div>
     );
@@ -320,7 +320,7 @@ export default function SurveyTakePage() {
   if (error && !survey) {
     return (
       <div className="flex flex-col items-center justify-center gap-4 min-h-[60vh]">
-        <p className="caption text-[var(--error)]">{error}</p>
+        <p className="body text-[var(--error)]">{error}</p>
         <Button variant="ghost" onClick={() => router.back()}>Go back</Button>
       </div>
     );
@@ -334,8 +334,8 @@ export default function SurveyTakePage() {
           <CheckCircle2 size={32} className="text-[var(--success)]" />
         </div>
         <div>
-          <h2 className="heading-md mb-1">Thank you!</h2>
-          <p className="body text-[var(--gray)]">Your responses have been recorded successfully.</p>
+          <h2 className="heading-lg mb-1">Thank you!</h2>
+          <p className="text-lg text-[var(--gray)]">Your responses have been recorded successfully.</p>
         </div>
         <Button variant="primary" onClick={() => router.back()}>Back to Surveys</Button>
       </div>
@@ -346,7 +346,7 @@ export default function SurveyTakePage() {
   if (!isLoading && questions.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center gap-4 min-h-[60vh]">
-        <p className="caption text-[var(--gray)]">This survey has no questions yet.</p>
+        <p className="body text-[var(--gray)]">This survey has no questions yet.</p>
         <Button variant="ghost" onClick={() => router.back()}>Go back</Button>
       </div>
     );
@@ -357,19 +357,19 @@ export default function SurveyTakePage() {
 
       {/* Survey header */}
       <div>
-        <h1 className="heading-lg">{survey?.title}</h1>
+        <h1 className="heading-xl">{survey?.title}</h1>
         {survey?.description && (
-          <p className="body text-[var(--gray)] mt-1">{survey.description}</p>
+          <p className="text-lg text-[var(--gray)] mt-1">{survey.description}</p>
         )}
       </div>
 
       {/* Progress bar */}
       <div className="flex flex-col gap-1.5">
         <div className="flex items-center justify-between">
-          <span className="caption text-[var(--gray)]">
+          <span className="body text-[var(--gray)]">
             Question {currentIndex + 1} of {questions.length}
           </span>
-          <span className="caption text-[var(--gray)]">{Math.round(progress)}%</span>
+          <span className="body text-[var(--gray)]">{Math.round(progress)}%</span>
         </div>
         <div className="h-2 w-full rounded-full bg-[rgba(45,42,74,0.08)]">
           <div
@@ -384,10 +384,10 @@ export default function SurveyTakePage() {
         <Card className="flex flex-col gap-5">
           {/* Question text */}
           <div>
-            <p className="label mb-1 text-[var(--gray)]">
+            <p className="caption mb-1 text-[var(--gray)]">
               {currentQuestion.is_required ? "Required" : "Optional"}
             </p>
-            <h2 className="heading-md">{currentQuestion.question_text}</h2>
+            <h2 className="heading-lg">{currentQuestion.question_text}</h2>
           </div>
 
           {/* Question input */}
@@ -421,14 +421,14 @@ export default function SurveyTakePage() {
 
           {/* Validation error */}
           {validationError && (
-            <p className="caption text-[var(--error)]">{validationError}</p>
+            <p className="body text-[var(--error)]">{validationError}</p>
           )}
         </Card>
       )}
 
       {/* Submit error */}
       {error && (
-        <p className="caption text-[var(--error)] text-center">{error}</p>
+        <p className="body text-[var(--error)] text-center">{error}</p>
       )}
 
       {/* Navigation */}
