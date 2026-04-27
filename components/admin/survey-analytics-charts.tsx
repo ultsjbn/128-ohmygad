@@ -64,7 +64,7 @@ export function MultipleChoiceChart({
   return (
     <div className="w-full min-h-[200px] cursor-default select-none" style={{ height: Math.max(200, data.length * 48) }}>
       <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={data} layout="vertical" margin={{ top: 5, right: 40, left: 10, bottom: 5 }}>
+        <BarChart data={data} layout="vertical" margin={{ top: 5, right: 40, left: 30, bottom: 25 }}>
           <CartesianGrid strokeDasharray="3 3" stroke={AXIS_COLOR} horizontal={false} />
           <XAxis
             type="number"
@@ -73,6 +73,7 @@ export function MultipleChoiceChart({
             tickLine={false}
             axisLine={false}
             allowDecimals={false}
+            label={{ value: "Number of Responses", position: "insideBottom", offset: -20, fill: TICK_COLOR, fontSize: 13, fontWeight: 750, style: { textAnchor: "middle" } }}
           />
           <YAxis
             dataKey="name"
@@ -82,6 +83,7 @@ export function MultipleChoiceChart({
             tickLine={false}
             axisLine={false}
             width={120}
+            label={{ value: "Options", angle: -90, position: "insideLeft", offset: -10, fill: TICK_COLOR, fontSize: 13, fontWeight: 750, style: { textAnchor: "middle" } }}
           />
           <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(45,42,74,0.03)" }} />
           <Bar dataKey="value" name="Responses" radius={[0, 6, 6, 0]} barSize={28} style={{ pointerEvents: "none" }}>
@@ -205,11 +207,29 @@ export function LikertChart({ responses }: { responses: ResponseRow[] }) {
           <BarChart
             data={chartData}
             layout="vertical"
-            margin={{ top: 10, right: 10, left: 10, bottom: 10 }}
+            margin={{ top: 10, right: 10, left: 20, bottom: 25 }}
             barCategoryGap={0}
           >
-            <XAxis type="number" hide />
-            <YAxis type="category" dataKey="name" hide />
+            <XAxis 
+              type="number" 
+              hide={false} 
+              stroke={AXIS_COLOR} 
+              tick={{ fill: TICK_COLOR, fontSize: 13 }}
+              tickLine={false}
+              axisLine={false}
+              label={{ value: "Number of Responses", position: "insideBottom", offset: -20, fill: TICK_COLOR, fontSize: 13, fontWeight: 750, style: { textAnchor: "middle" } }}
+            />
+            <YAxis 
+              type="category" 
+              dataKey="name" 
+              hide={false} 
+              stroke={AXIS_COLOR} 
+              tick={{ fill: TICK_COLOR, fontSize: 13 }}
+              tickLine={false}
+              axisLine={false}
+              width={80}
+              label={{ value: "Metrics", angle: -90, position: "insideLeft", offset: -25, fill: TICK_COLOR, fontSize: 13, fontWeight: 750, style: { textAnchor: "middle" } }}
+            />
             <Tooltip content={<CustomTooltip />} cursor={false} />
             {[1, 2, 3, 4, 5].map((n) => (
               <Bar
