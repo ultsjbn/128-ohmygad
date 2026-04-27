@@ -132,7 +132,11 @@ export function DataTable<T>({ columns, rows, keyExtractor, minRows, onRowClick 
     >
       <table className="table" style={{ tableLayout: "fixed" }}>
         <thead>
-          	<tr>
+          	<tr
+                style={{
+                    background: "rgba(244, 235, 255, 0.25)",
+                }}
+            >
 				{columns.map((col) => (
 					<th
 						key={col.key}
