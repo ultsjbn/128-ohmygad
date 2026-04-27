@@ -99,8 +99,14 @@ export default function DashboardPage() {
     const filteredGenders = useMemo(
         () => (genderIdentityData ?? []).filter((item: { name?: string; category?: string }) => {
             const label = (item.name ?? item.category ?? "");
-            return ["Man", "Woman", "Genderqueer", "Genderfluid", "Agender", "Self-describe", "Non-binary", "Prefer not to say"]
-            .some((g) => label.includes(g));
+            return [
+              "Man",
+              "Woman",
+              "Non-binary",
+              "Genderqueer",
+              "Genderfluid",
+              "Prefer not to say",
+            ].some((g) => label.includes(g));
         }),
         [genderIdentityData],
     );

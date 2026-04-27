@@ -107,7 +107,7 @@ function toCounts(values: (string | null)[]): { name: string; value: number }[] 
 // static filter options
 const STATIC_OPTIONS: FilterOptions = {
   college:        ["CS", "CAC", "CSS"],
-  genderIdentity: ["Man", "Woman", "Non-binary", "Genderqueer", "Genderfluid", "Agender", "Prefer not to say", "Self-describe"],
+  genderIdentity: ["Man", "Woman", "Non-binary", "Genderqueer", "Genderfluid", "Prefer not to say"],
   yearLevel:      ["1st Year", "2nd Year", "3rd Year", "4th Year", "Extendee"],
   degreeProgram:  [
     // CS

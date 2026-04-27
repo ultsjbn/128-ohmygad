@@ -49,8 +49,6 @@ const GENDER_COLORS: Record<string, string> = {
   "Non-binary":       "#6DC5A0",
   "Genderqueer":      "#F4C97A",
   "Genderfluid":      "#9B9BB4",
-  "Agender":          "#2D2A4A",
-  "Self-describe":    "#B8B5E8",
   "Prefer not to say":"#9B9BB4",
 };
 
@@ -135,8 +133,14 @@ export default function DashboardPage() {
     const filteredGenders = useMemo(
         () => (genderIdentityData ?? []).filter((item: { name?: string; category?: string }) => {
             const label = (item.name ?? item.category ?? "");
-            return ["Man", "Woman", "Genderqueer", "Genderfluid", "Agender", "Self-describe", "Non-binary", "Prefer not to say"]
-            .some((g) => label.includes(g));
+            return [
+              "Man",
+              "Woman",
+              "Non-binary",
+              "Genderqueer",
+              "Genderfluid",
+              "Prefer not to say",
+            ].some((g) => label.includes(g));
         }),
         [genderIdentityData],
     );

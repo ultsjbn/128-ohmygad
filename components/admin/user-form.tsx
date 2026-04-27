@@ -42,7 +42,7 @@ const ROLE_OPTIONS = [{ value: "", label: "Select role…" }, { value: "admin", 
 const YEAR_OPTIONS = [{ value: "", label: "Select year…" }, { value: "1st Year", label: "1st Year" }, { value: "2nd Year", label: "2nd Year" }, { value: "3rd Year", label: "3rd Year" }, { value: "4th Year", label: "4th Year" }, { value: "5th Year", label: "5th Year" }];
 const COLLEGE_OPTIONS = [{ value: "", label: "Select college…" }, { value: "CS", label: "College of Science (CS)" }, { value: "CAC", label: "College of Arts and Communications (CAC)" }, { value: "CSS", label: "College of Social Sciences (CSS)" }];
 const SEX_OPTIONS = [{ value: "", label: "Select…" }, { value: "Male", label: "Male" }, { value: "Female", label: "Female" }, { value: "Intersex", label: "Intersex" }, { value: "Prefer not to say", label: "Prefer not to say" }];
-const GENDER_OPTIONS = [{ value: "", label: "Select…" }, { value: "Man", label: "Man" }, { value: "Woman", label: "Woman" }, { value: "Non-binary", label: "Non-binary" }, { value: "Genderqueer", label: "Genderqueer" }, { value: "Genderfluid", label: "Genderfluid" }, { value: "Agender", label: "Agender" }, { value: "Prefer not to say", label: "Prefer not to say" }, { value: "Self-describe", label: "Prefer to self-describe" }];
+const GENDER_OPTIONS = [{ value: "", label: "Select…" }, { value: "Man", label: "Man" }, { value: "Woman", label: "Woman" }, { value: "Non-binary", label: "Non-binary" }, { value: "Genderqueer", label: "Genderqueer" }, { value: "Genderfluid", label: "Genderfluid" }, { value: "Prefer not to say", label: "Prefer not to say" }];
 
 const UPB_PROGRAMS: Record<string, { value: string; label: string }[]> = {
   CS: [

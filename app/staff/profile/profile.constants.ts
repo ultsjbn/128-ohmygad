@@ -18,4 +18,11 @@ export const PRONOUNS = ["he/him", "she/her", "they/them", "he/they", "she/they"
 
 // Options for "Gender" dropdown.
 // Used in: app/admin/profile/page.tsx (personal tab select options) and app/staff/profile/page.tsx
-export const GENDER_OPTIONS = ["Man", "Woman", "Genderqueer", "Genderfluid", "Agender", "Self-describe", "Non-binary", "Prefer not to say"];
+export const GENDER_OPTIONS = [
+  "Man",
+  "Woman",
+  "Non-binary",
+  "Genderqueer",
+  "Genderfluid",
+  "Prefer not to say",
+];
