@@ -119,8 +119,8 @@ export default function SurveyAnalyticsModal({ survey, open, onClose }: Props) {
           <div className="flex items-center gap-3 min-w-0">
             <BarChart3 size={22} className="text-[var(--periwinkle)] shrink-0" />
             <div className="min-w-0">
-              <h2 className="heading-md truncate">{survey.title}</h2>
-              <p className="caption mt-0.5">Survey Analytics</p>
+              <h2 className="heading-lg truncate">{survey.title}</h2>
+              <p className="body mt-0.5">Survey Analytics</p>
             </div>
           </div>
 
@@ -128,18 +128,18 @@ export default function SurveyAnalyticsModal({ survey, open, onClose }: Props) {
             {!loading && (
               <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--lavender)]">
                 <Users size={13} className="text-[var(--gray)]" />
-                <span className="text-[12px] font-semibold text-[var(--primary-dark)]">
+                <span className="text-[16px] font-semibold text-[var(--primary-dark)]">
                   {totalRespondents} respondent{totalRespondents !== 1 ? "s" : ""}
                 </span>
               </div>
             )}
             <button className="modal-close" style={{ position: "static" }} onClick={onClose}>
-              <X size={14} />
+              <X size={18} />
             </button>
           </div>
         </div>
 
-        {/* dcrollable body */}
+        {/* scrollable body */}
         <div className="flex-1 overflow-y-auto custom-scrollbar">
           <div className="px-1 py-1 flex flex-col gap-2">
 
@@ -147,13 +147,13 @@ export default function SurveyAnalyticsModal({ survey, open, onClose }: Props) {
             {loading ? (
               <div className="flex items-center justify-center gap-3 py-0">
                 <Loader2 size={22} className="animate-spin text-[var(--gray)]" />
-                <span className="caption">Loading analytics…</span>
+                <span className="body">Loading analytics…</span>
               </div>
             ) : error ? (
               <Card variant="no-shadow" className="border-[var(--error)] bg-red-50/50">
                 <div className="flex flex-col items-center justify-center gap-3 py-12">
-                  <p className="caption text-[var(--error)] font-semibold">Failed to load analytics</p>
-                  <p className="text-[12px] text-[var(--error)] opacity-80">{error}</p>
+                  <p className="body text-[var(--error)] font-semibold">Failed to load analytics</p>
+                  <p className="text-[14px] text-[var(--error)] opacity-80">{error}</p>
                 </div>
               </Card>
             ) : (
@@ -162,7 +162,7 @@ export default function SurveyAnalyticsModal({ survey, open, onClose }: Props) {
                 <Card variant="no-shadow" className="flex flex-col gap-2">
                   <div className="flex items-center gap-2">
                     <ClipboardList size={16} className="text-[var(--periwinkle)]" />
-                    <h3 className="heading-sm">About this Survey</h3>
+                    <h3 className="heading-md">About this Survey</h3>
                   </div>
 
                   {survey.description ? (
@@ -170,7 +170,7 @@ export default function SurveyAnalyticsModal({ survey, open, onClose }: Props) {
                       {survey.description}
                     </p>
                   ) : (
-                    <p className="caption text-[var(--gray)]">No description provided.</p>
+                    <p className="body text-[var(--gray)]">No description provided.</p>
                   )}
 
                   {/* dates + status row */}
@@ -180,14 +180,14 @@ export default function SurveyAnalyticsModal({ survey, open, onClose }: Props) {
                         <span className="capitalize">{survey.status}</span>
                       </Badge>
                     )}
-                    {survey.open_at && <span className="caption text-[var(--gray)]">Opens {formatDate(survey.open_at)}</span>}
-                    {survey.open_at && survey.close_at && <span className="caption text-[var(--gray)]">·</span>}
-                    {survey.close_at && <span className="caption text-[var(--gray)]">Closes {formatDate(survey.close_at)}</span>}
+                    {survey.open_at && <span className="body text-[var(--gray)]">Opens {formatDate(survey.open_at)}</span>}
+                    {survey.open_at && survey.close_at && <span className="body text-[var(--gray)]">·</span>}
+                    {survey.close_at && <span className="body text-[var(--gray)]">Closes {formatDate(survey.close_at)}</span>}
 
                     {/* respondent count (mobile) */}
                     <div className="flex sm:hidden items-center gap-1.5 ml-auto">
                       <Users size={12} className="text-[var(--gray)]" />
-                      <span className="caption font-semibold">
+                      <span className="body font-semibold">
                         {totalRespondents} respondent{totalRespondents !== 1 ? "s" : ""}
                       </span>
                     </div>
@@ -199,7 +199,7 @@ export default function SurveyAnalyticsModal({ survey, open, onClose }: Props) {
                   <Card variant="no-shadow">
                     <div className="flex flex-col items-center justify-center gap-3 py-12">
                       <BarChart3 size={28} className="text-[var(--gray)]" />
-                      <p className="caption">No responses have been submitted yet.</p>
+                      <p className="body">No responses have been submitted yet.</p>
                     </div>
                   </Card>
                 ) : (
@@ -254,10 +254,10 @@ function QuestionCard({
       {/* question header */}
       <div className="flex items-start justify-between gap-3 border-b border-[rgba(45,42,74,0.08)] pb-3">
         <div className="min-w-0">
-          <p className="label text-[var(--gray)] mb-1">
+          <p className="caption text-[var(--gray)] mb-1">
             Question {index + 1} · {typeLabel}
           </p>
-          <h3 className="heading-sm">{question.question_text}</h3>
+          <h3 className="heading-md">{question.question_text}</h3>
         </div>
         <Badge variant="periwinkle">
           {responses.length} response{responses.length !== 1 ? "s" : ""}
@@ -266,7 +266,7 @@ function QuestionCard({
 
       {/* chart area */}
       {responses.length === 0 ? (
-        <p className="caption text-[var(--gray)] py-4 text-center">No responses for this question.</p>
+        <p className="body text-[var(--gray)] py-4 text-center">No responses for this question.</p>
       ) : type === "multiple_choice" ? (
         <MultipleChoiceChart question={question} responses={responses} />
       ) : type === "yes_no" ? (
