@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ArrowUpDown, UserPlus, Pencil, Trash2, ChevronUp, ChevronDown, Loader2, SlidersHorizontal } from "lucide-react";
+import { ArrowUpDown, UserPlus, Pencil, Trash2, Loader2, SlidersHorizontal } from "lucide-react";
 import type { Profile, SortState } from "./profile.types";
 import { sortProfiles, paginate, totalPages } from "./profile.utils";
 import { deleteUser } from "./action";
@@ -267,11 +267,6 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
     }
   };
 
-  function SortIcon({ field }: { field: SortState["field"] }) {
-    if (sort.field !== field) return <ArrowUpDown size={12} style={{ opacity: 0.35 }} />;
-    return sort.direction === "asc" ? <ChevronUp size={12} /> : <ChevronDown size={12} />;
-  }
-
   const activeFilterCount = roleFilters.size + gsoFilters.size;
   const hasActiveFilters = activeFilterCount > 0;
 
@@ -334,6 +329,15 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
     },
   ];
 
+  const SORT_OPTIONS: { label: string; field: SortState["field"] }[] = [
+    { label: "Full name", field: "full_name" },
+    { label: "Email", field: "email" },
+    { label: "Role", field: "role" },
+    { label: "Date joined", field: "created_at" },
+  ];
+
+  const sortLabel = `${SORT_OPTIONS.find((o) => o.field === sort.field)?.label ?? "Date joined"} ${sort.direction === "asc" ? "↑" : "↓"}`;
+
   return (
     <div className="flex flex-col gap-3">
       {/* toolbar */}
@@ -352,24 +356,22 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
           <Dropdown
             trigger={
               <Button variant="ghost">
-                <ArrowUpDown size={15} /> Sort
+                <ArrowUpDown size={15} />
+                <span className="hidden md:inline"> {sortLabel}</span>
               </Button>
             }
           >
-            {(["full_name", "email", "role"] as SortState["field"][]).map(
-              (field) => (
+            {SORT_OPTIONS.map(({ label, field }) => {
+              const isActive = sort.field === field;
+              return (
                 <DropdownItem key={field} onClick={() => handleSort(field)}>
-                  <span className="flex items-center justify-between gap-6 w-full">
-                    <span className="capitalize">
-                      {field === "created_at"
-                        ? "Date joined"
-                        : field.replace("_", " ")}
-                    </span>
-                    <SortIcon field={field} />
+                  <span className="flex items-center gap-2">
+                    <span className={`w-1.5 h-1.5 rounded-full shrink-0 border-[1.5px] ${isActive ? "bg-[var(--primary-dark)] border-[var(--primary-dark)]" : "bg-transparent border-[rgba(45,42,74,0.20)]"}`} />
+                    <span>{isActive ? <strong>{label} {sort.direction === "asc" ? "↑" : "↓"}</strong> : label}</span>
                   </span>
                 </DropdownItem>
-              ),
-            )}
+              );
+            })}
             <DropdownDivider />
             <DropdownItem
               onClick={() => {

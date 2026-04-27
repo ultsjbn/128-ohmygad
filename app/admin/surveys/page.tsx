@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { Plus, ArrowUpDown, SlidersHorizontal, Pencil, Trash2, Loader2, ChevronUp, ChevronDown, BarChart3 } from "lucide-react";
+import { Plus, ArrowUpDown, SlidersHorizontal, Pencil, Trash2, Loader2, BarChart3 } from "lucide-react";
 import SurveyAnalyticsModal from "@/components/admin/survey-analytics-modal";
 import SurveyForm, { type SurveyFormData, type SurveyQuestion } from "@/components/admin/survey-form";
 import { paginate, totalPages, PER_PAGE } from "@/lib/pagination.utils";
@@ -26,9 +26,13 @@ import {
 
 // constants
 const STATUSES = ["open", "closed"];
-const SORT_FIELDS = ["title", "status", "open_at"] as const;
+type SortField = "title" | "status" | "open_at";
 
-type SortField = typeof SORT_FIELDS[number];
+const SORT_OPTIONS: { label: string; field: SortField }[] = [
+  { label: "Title", field: "title" },
+  { label: "Status", field: "status" },
+  { label: "Date", field: "open_at" },
+];
 type BadgeVariant = "pink-light" | "periwinkle" | "dark" | "success" | "warning" | "error";
 
 const STATUS_VARIANT: Record<string, BadgeVariant> = {
@@ -187,10 +191,6 @@ export default function SurveysPage() {
     setPage(1);
   };
 
-  function SortIcon({ field }: { field: SortField }) {
-    if (sort.field !== field) return <ArrowUpDown size={12} style={{ opacity: 0.35 }} />;
-    return sort.direction === "asc" ? <ChevronUp size={12} /> : <ChevronDown size={12} />;
-  }
   const openEditModal = async (survey: SurveyFormData) => {
     setEditTarget(survey);
     setEditQuestions([]);
@@ -337,6 +337,8 @@ export default function SurveysPage() {
     },
   ];
 
+  const sortLabel = `${SORT_OPTIONS.find((o) => o.field === sort.field)?.label} ${sort.direction === "asc" ? "↑" : "↓"}`;
+
   return (
     <div className="flex flex-col gap-3">
       {/* toolbar */}
@@ -353,20 +355,22 @@ export default function SurveysPage() {
           <Dropdown
             trigger={
               <Button variant="ghost">
-                <ArrowUpDown size={15} /> Sort
+                <ArrowUpDown size={15} />
+                <span className="hidden md:inline"> {sortLabel}</span>
               </Button>
             }
           >
-            {SORT_FIELDS.map((field) => (
-              <DropdownItem key={field} onClick={() => handleSort(field)}>
-                <span className="flex items-center justify-between gap-6 w-full">
-                  <span className="capitalize">
-                    {field === "open_at" ? "Date" : field}
+            {SORT_OPTIONS.map(({ label, field }) => {
+              const isActive = sort.field === field;
+              return (
+                <DropdownItem key={field} onClick={() => handleSort(field)}>
+                  <span className="flex items-center gap-2">
+                    <span className={`w-1.5 h-1.5 rounded-full shrink-0 border-[1.5px] ${isActive ? "bg-[var(--primary-dark)] border-[var(--primary-dark)]" : "bg-transparent border-[rgba(45,42,74,0.20)]"}`} />
+                    <span>{isActive ? <strong>{label} {sort.direction === "asc" ? "↑" : "↓"}</strong> : label}</span>
                   </span>
-                  <SortIcon field={field} />
-                </span>
-              </DropdownItem>
-            ))}
+                </DropdownItem>
+              );
+            })}
             <DropdownDivider />
             <DropdownItem
               onClick={() => {
