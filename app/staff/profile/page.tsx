@@ -53,9 +53,7 @@ const GENDER_IDENTITY_OPTIONS = [
   { value: "Non-binary", label: "Non-binary" },
   { value: "Genderqueer", label: "Genderqueer" },
   { value: "Genderfluid", label: "Genderfluid" },
-  { value: "Agender", label: "Agender" },
   { value: "Prefer not to say", label: "Prefer not to say" },
-  { value: "Self-describe", label: "Prefer to self-describe" },
 ];
 
 export default function StaffProfilePage() {
