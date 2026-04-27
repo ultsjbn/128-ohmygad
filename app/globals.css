@@ -1143,7 +1143,7 @@ header {
 }
 
 .badge-success {
-  background: rgba(109, 197, 160, 0.15);
+  background: rgb(216, 250, 235);
   color: var(--success-text);
 }
 
