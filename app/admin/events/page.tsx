@@ -420,6 +420,7 @@ export default function EventsPage() {
 		<span
 		  className="font-semibold truncate block"
 		  style={{ color: "var(--primary-dark)", fontSize: 13 }}
+      title={event.title}
 		>
 		  {event.title}
 		</span>

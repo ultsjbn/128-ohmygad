@@ -187,6 +187,7 @@ const confirmDelete = async () => {
         <span
           className="font-semibold truncate block"
           style={{ color: "var(--primary-dark)", fontSize: 13 }}
+          title={course.title}
         >
           {course.title}
         </span>
