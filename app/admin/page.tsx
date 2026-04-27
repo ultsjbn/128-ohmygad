@@ -318,22 +318,31 @@ export default function DashboardPage() {
                         <p className="caption mb-3">Registered student breakdown</p>
                         <div className="flex-1 w-full min-h-[170px] cursor-default select-none">
                             <ResponsiveContainer width="100%" height="100%">
-                                <BarChart data={filteredColleges} margin={{ top: 8, right: 0, left: -25, bottom: 0 }}>
+                                <BarChart
+                                    data={filteredColleges}
+                                    margin={{ top: 8, right: 0, left: -25, bottom: 0 }}>
                                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={AXIS_COLOR} />
                                     <XAxis
-                                    dataKey="category"
-                                    stroke={AXIS_COLOR}
-                                    tick={{ fill: TICK_COLOR, fontSize: 11 }}
-                                    tickLine={false} axisLine={false} dy={8}
+                                        dataKey="category"
+                                        stroke={AXIS_COLOR}
+                                        tick={{ fill: TICK_COLOR, fontSize: 11 }}
+                                        tickLine={false} axisLine={false} dy={8}
                                     />
                                     <YAxis
-                                    stroke={AXIS_COLOR}
-                                    tick={{ fill: TICK_COLOR, fontSize: 11 }}
-                                    tickLine={false} axisLine={false}
-                                    allowDecimals={false}
+                                        stroke={AXIS_COLOR}
+                                        tick={{ fill: TICK_COLOR, fontSize: 11 }}
+                                        tickLine={false} axisLine={false}
+                                        allowDecimals={false}
                                     />
-                                    <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(45,42,74,0.03)" }} />
-                                    <Bar dataKey="value" name="Users" radius={[6, 6, 0, 0]} barSize={36}>
+                                    <Tooltip
+                                        content={<CustomTooltip />}
+                                        cursor={{ fill: "rgba(45,42,74,0.03)" }}
+                                    />
+                                    <Bar
+                                        dataKey="value"
+                                        name="Users"
+                                        radius={[6, 6, 0, 0]}
+                                        barSize={36}>
                                     {filteredColleges.map((item: { category: string }, idx: number) => (
                                         <Cell key={`col-${idx}`} fill={colorFor(COLLEGE_COLORS, item.category, idx)} />
                                     ))}

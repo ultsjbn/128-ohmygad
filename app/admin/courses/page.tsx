@@ -253,10 +253,8 @@ const confirmDelete = async () => {
     <div className="flex flex-col gap-3">
       {/*  toolbar  */}
       <div className="flex flex-col gap-3">
-
         {/* search, sort, filter */}
         <div className="flex items-center gap-3 flex-wrap">
-
           <SearchBar
             placeholder="Search by title or description"
             value={search}
@@ -264,8 +262,8 @@ const confirmDelete = async () => {
             containerStyle={{ flex: 1, minWidth: 220 }}
           />
 
-          <Button 
-            variant="ghost" 
+          <Button
+            variant="ghost"
             onClick={() => handleSort("title")}
             className="flex items-center gap-2"
           >
@@ -273,24 +271,23 @@ const confirmDelete = async () => {
             <span>Sort by Title</span>
           </Button>
 
-
-            <Button variant="primary" onClick={() => setCreateModalOpen(true)}>
-                <Plus size={16} /> Add Guideline
-            </Button>
+          <Button variant="primary" onClick={() => setCreateModalOpen(true)}>
+            <Plus size={16} /> Add Guideline
+          </Button>
         </div>
-
-     
       </div>
 
       {/*  table / empty / loading  */}
       {isLoading ? (
         <Card>
-          <div className="flex items-center justify-center gap-3 py-10" style={{ color: "var(--gray)" }}>
+          <div
+            className="flex items-center justify-center gap-3 py-10"
+            style={{ color: "var(--gray)" }}
+          >
             <Loader2 size={20} className="animate-spin" />
             <span className="caption">Loading guidelines…</span>
           </div>
         </Card>
-
       ) : filtered.length === 0 ? (
         <Card>
           <div className="flex flex-col items-center justify-center gap-3 py-12">
@@ -303,20 +300,24 @@ const confirmDelete = async () => {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => { setSearch(""); clearAllFilters(); }}
+                onClick={() => {
+                  setSearch("");
+                  clearAllFilters();
+                }}
               >
                 Clear search &amp; filters
               </Button>
             )}
           </div>
         </Card>
-
       ) : (
         <DataTable
           columns={columns}
           rows={paginate(filtered, page, PER_PAGE)}
           keyExtractor={(course) => course.id!}
-          onRowClick={(course) => setModalContent({ label: course.title, text: course.description })}
+          onRowClick={(course) =>
+            setModalContent({ label: course.title, text: course.description })
+          }
         />
       )}
 
@@ -324,7 +325,9 @@ const confirmDelete = async () => {
       {!isLoading && filtered.length > 0 && (
         <div className="flex items-center justify-between flex-wrap gap-3">
           <span className="caption">
-            Showing {Math.min((page - 1) * PER_PAGE + 1, filtered.length)}–{Math.min(page * PER_PAGE, filtered.length)} of {filtered.length} courses
+            Showing {Math.min((page - 1) * PER_PAGE + 1, filtered.length)}–
+            {Math.min(page * PER_PAGE, filtered.length)} of {filtered.length}{" "}
+            courses
           </span>
           <Pagination
             page={page}
@@ -343,7 +346,10 @@ const confirmDelete = async () => {
       >
         <CourseForm
           mode="create"
-          onSuccess={() => { setCreateModalOpen(false); getCourses(); }}
+          onSuccess={() => {
+            setCreateModalOpen(false);
+            getCourses();
+          }}
           onCancel={() => setCreateModalOpen(false)}
         />
       </Modal>
@@ -361,7 +367,10 @@ const confirmDelete = async () => {
             key={editTarget.id}
             mode="edit"
             initialData={editTarget}
-            onSuccess={() => { setEditTarget(null); getCourses(); }}
+            onSuccess={() => {
+              setEditTarget(null);
+              getCourses();
+            }}
             onCancel={() => setEditTarget(null)}
           />
         )}
@@ -373,69 +382,99 @@ const confirmDelete = async () => {
         onClose={() => setModalContent(null)}
         title={modalContent?.label}
       >
-        <p style={{ fontSize: 14, lineHeight: 1.8, color: "var(--primary-dark)", whiteSpace: "pre-wrap" }}>
+        <p
+          style={{
+            fontSize: 14,
+            lineHeight: 1.8,
+            color: "var(--primary-dark)",
+            whiteSpace: "pre-wrap",
+          }}
+        >
           {modalContent?.text || "No description provided."}
         </p>
       </Modal>
 
       {/* confirm delete modal */}
-        <Modal
-            open={!!deleteTarget}
-            onClose={() => {
-              if (!deletingId) {
+      <Modal
+        open={!!deleteTarget}
+        onClose={() => {
+          if (!deletingId) {
+            setDeleteTarget(null);
+            setDeletePassword("");
+            setDeleteError(null);
+          }
+        }}
+        title="Delete Course?"
+        subtitle="This action cannot be undone."
+        footer={
+          <div className="flex gap-3 w-full">
+            <Button
+              variant="ghost"
+              className="flex-1"
+              onClick={() => {
                 setDeleteTarget(null);
                 setDeletePassword("");
-                setDeleteError(null);
-              }
-            }}
-            title="Delete Course?"
-            subtitle="This action cannot be undone."
-            footer={
-            <div className="flex gap-3 w-full">
-                <Button variant="ghost" className="flex-1" onClick={() => { setDeleteTarget(null); setDeletePassword(""); }} disabled={!!deletingId}>
-                Cancel
-                </Button>
-                <Button variant="primary" className="flex-1 !bg-[var(--error)]" onClick={confirmDelete} disabled={!!deletingId || !deletePassword.trim()}>
-                {deletingId ? "Deleting..." : "Yes, Delete"}
-                </Button>
+              }}
+              disabled={!!deletingId}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="primary"
+              className="flex-1 !bg-[var(--error)]"
+              onClick={confirmDelete}
+              disabled={!!deletingId || !deletePassword.trim()}
+            >
+              {deletingId ? "Deleting..." : "Yes, Delete"}
+            </Button>
+          </div>
+        }
+      >
+        {deleteTarget && (
+          <div className="space-y-4">
+            <div className="p-4 rounded-xl bg-[var(--pink-light)] border border-[rgba(244,123,123,0.2)]">
+              <p className="text-sm text-[var(--error)] font-bold mb-1">
+                Warning
+              </p>
+              <p className="text-sm text-[var(--primary-dark)]">
+                You are about to delete:{" "}
+                <strong className="break-words">{deleteTarget.title}</strong>
+              </p>
             </div>
-            }
-        >
-            {deleteTarget && (
-            <div className="space-y-4">
-                <div className="p-4 rounded-xl bg-[var(--pink-light)] border border-[rgba(244,123,123,0.2)]">
-                    <p className="text-sm text-[var(--error)] font-bold mb-1">Warning</p>
-                    <p className="text-sm text-[var(--primary-dark)]">You are about to delete: <strong className="break-words">{deleteTarget.title}</strong></p>
-                </div>
 
-              {deleteError && (
-                    <div className="p-4 rounded-xl bg-[var(--pink-light)] border border-[rgba(244,123,123,0.2)]">
-                        <p className="text-sm text-[var(--error)]">{deleteError}</p>
-                    </div>
-              )}
-
-                <div>
-                    <label className="label block mb-2">Enter your password to confirm deletion</label>
-                        <Input
-                        type="password"
-                        value={deletePassword}
-                        onChange={(e) => setDeletePassword(e.target.value)}
-                        placeholder="Password"
-                        autoComplete="new-password"
-                        className="input input-bordered w-full"
-                        />
-                </div>
-            </div>
+            {deleteError && (
+              <div className="p-4 rounded-xl bg-[var(--pink-light)] border border-[rgba(244,123,123,0.2)]">
+                <p className="text-sm text-[var(--error)]">{deleteError}</p>
+              </div>
             )}
-        </Modal>
+
+            <div>
+              <label className="label block mb-2">
+                Enter your password to confirm deletion
+              </label>
+              <Input
+                type="password"
+                value={deletePassword}
+                onChange={(e) => setDeletePassword(e.target.value)}
+                placeholder="Password"
+                autoComplete="new-password"
+                className="input input-bordered w-full"
+              />
+            </div>
+          </div>
+        )}
+      </Modal>
 
       {/* floating toast notification */}
       {toast && (
-        <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999 }}>
-          <Toast variant={toast.variant} title={toast.title} message={toast.message} />
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[9999]">
+          <Toast
+            variant={toast.variant}
+            title={toast.title}
+            message={toast.message}
+          />
         </div>
       )}
-
     </div>
   );
 }

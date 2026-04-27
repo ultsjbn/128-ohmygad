@@ -277,7 +277,7 @@ export default function SurveysListPage({ basePath }: SurveysListPageProps) {
       )}
 
       {toast && (
-        <div className="fixed bottom-6 right-4 z-[999] sm:right-6">
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[999] w-max max-w-[90vw]">
           <Toast variant={toast.variant} title={toast.title} message={toast.message} />
         </div>
       )}

@@ -357,62 +357,103 @@ export default function EventsPage() {
           {/* grouped sort and filter */}
           <div className="flex items-center gap-2 shrink-0">
             {/* sort is icon only on mobile, text+arrow on md+ devices */}
-            <Dropdown trigger={
-              <Button variant="ghost">
-                <ArrowUpDown size={15} />
-                {/* label hidden on mobile */}
-                <span className="hidden md:inline"> {sortLabel}</span>
-              </Button>
-            }>
+            <Dropdown
+              trigger={
+                <Button variant="ghost">
+                  <ArrowUpDown size={15} />
+                  {/* label hidden on mobile */}
+                  <span className="hidden md:inline"> {sortLabel}</span>
+                </Button>
+              }
+            >
               {SORT_OPTIONS.map(({ label, field }) => {
                 const isActive = sort.field === field;
                 return (
                   <DropdownItem key={field} onClick={() => handleSort(field)}>
                     <span className="flex items-center gap-2">
                       {/* active dot only on the selected item */}
-                      <span className={`w-1.5 h-1.5 rounded-full shrink-0 border-[1.5px] ${isActive ? "bg-[var(--primary-dark)] border-[var(--primary-dark)]" : "bg-transparent border-[rgba(45,42,74,0.20)]"}`} />
-                      <span>{isActive ? <strong>{label} {sort.direction === "asc" ? "↑" : "↓"}</strong> : label}</span>
+                      <span
+                        className={`w-1.5 h-1.5 rounded-full shrink-0 border-[1.5px] ${isActive ? "bg-[var(--primary-dark)] border-[var(--primary-dark)]" : "bg-transparent border-[rgba(45,42,74,0.20)]"}`}
+                      />
+                      <span>
+                        {isActive ? (
+                          <strong>
+                            {label} {sort.direction === "asc" ? "↑" : "↓"}
+                          </strong>
+                        ) : (
+                          label
+                        )}
+                      </span>
                     </span>
                   </DropdownItem>
                 );
               })}
               <DropdownDivider />
-              <DropdownItem onClick={() => setSort({ field: "start_date", direction: "desc" })}>Reset sort</DropdownItem>
+              <DropdownItem
+                onClick={() =>
+                  setSort({ field: "start_date", direction: "desc" })
+                }
+              >
+                Reset sort
+              </DropdownItem>
             </Dropdown>
 
             {/* filter is icon only on mobile, text on md+ devices */}
-            <Dropdown trigger={
-              <Button variant={hasActiveFilters ? "pink" : "ghost"}>
-                <SlidersHorizontal size={15} />
-                <span className="hidden md:inline">Filter</span>
-                {hasActiveFilters && (
-                  <span className="inline-flex items-center justify-center w-4 h-4 rounded-full text-[10px] font-bold text-white bg-[var(--primary-dark)] ml-0.5">
-                    {activeFilterCount}
-                  </span>
-                )}
-              </Button>
-            }>
+            <Dropdown
+              trigger={
+                <Button variant={hasActiveFilters ? "pink" : "ghost"}>
+                  <SlidersHorizontal size={15} />
+                  <span className="hidden md:inline">Filter</span>
+                  {hasActiveFilters && (
+                    <span className="inline-flex items-center justify-center w-4 h-4 rounded-full text-[10px] font-bold text-white bg-[var(--primary-dark)] ml-0.5">
+                      {activeFilterCount}
+                    </span>
+                  )}
+                </Button>
+              }
+            >
               {/* status section */}
               {statuses.length > 0 && (
                 <>
-                  <div className="px-3 pt-1 pb-1.5"><p className="label mb-1">Status</p></div>
-                  {statuses.map((s) => <CheckItem key={s} label={s} active={filters.status.has(s)} onToggle={() => toggleFilter("status", s)} capitalize />)}
+                  <div className="px-3 pt-1 pb-1.5">
+                    <p className="label mb-1">Status</p>
+                  </div>
+                  {statuses.map((s) => (
+                    <CheckItem
+                      key={s}
+                      label={s}
+                      active={filters.status.has(s)}
+                      onToggle={() => toggleFilter("status", s)}
+                      capitalize
+                    />
+                  ))}
                   <DropdownDivider />
                 </>
               )}
               {/* category section */}
               {categories.length > 0 && (
                 <>
-                  <div className="px-3 pt-1.5 pb-1"><p className="label mb-1">Category</p></div>
-                  {categories.map((cat) => <CheckItem key={cat} label={cat} active={filters.category.has(cat)} onToggle={() => toggleFilter("category", cat)} />)}
+                  <div className="px-3 pt-1.5 pb-1">
+                    <p className="label mb-1">Category</p>
+                  </div>
+                  {categories.map((cat) => (
+                    <CheckItem
+                      key={cat}
+                      label={cat}
+                      active={filters.category.has(cat)}
+                      onToggle={() => toggleFilter("category", cat)}
+                    />
+                  ))}
                   <DropdownDivider />
                 </>
               )}
-              <DropdownItem onClick={clearFilters}>Clear all filters</DropdownItem>
+              <DropdownItem onClick={clearFilters}>
+                Clear all filters
+              </DropdownItem>
             </Dropdown>
-          </div>{/* end sort filter group */}
+          </div>
+          {/* end sort filter group */}
         </div>
-
       </div>
 
       {/* active filter pills */}
@@ -422,16 +463,33 @@ export default function EventsPage() {
           {[...filters.status].map((s) => (
             <Badge key={s} variant={STATUS_VARIANT[s] ?? "dark"} dot>
               <span className="capitalize">{s}</span>
-              <button onClick={() => toggleFilter("status", s)} className="ml-1.5" aria-label={`Remove ${s} filter`}>×</button>
+              <button
+                onClick={() => toggleFilter("status", s)}
+                className="ml-1.5"
+                aria-label={`Remove ${s} filter`}
+              >
+                ×
+              </button>
             </Badge>
           ))}
           {[...filters.category].map((cat) => (
-            <Badge key={cat} variant={CATEGORY_VARIANT[cat] ?? "dark"}dot>
+            <Badge key={cat} variant={CATEGORY_VARIANT[cat] ?? "dark"} dot>
               {cat}
-              <button onClick={() => { toggleFilter("category", cat); setActiveChip("All"); }} className="ml-1.5" aria-label={`Remove ${cat} filter`}>×</button>
+              <button
+                onClick={() => {
+                  toggleFilter("category", cat);
+                  setActiveChip("All");
+                }}
+                className="ml-1.5"
+                aria-label={`Remove ${cat} filter`}
+              >
+                ×
+              </button>
             </Badge>
           ))}
-          <Button variant="soft" size="sm" onClick={clearFilters}>Clear all</Button>
+          <Button variant="soft" size="sm" onClick={clearFilters}>
+            Clear all
+          </Button>
         </div>
       )}
 
@@ -444,33 +502,47 @@ export default function EventsPage() {
             <span className="caption">Loading events…</span>
           </div>
         </Card>
-
-        // error
-      ) : error ? (
+      ) : // error
+      error ? (
         <Card>
           <div className="flex flex-col items-center justify-center gap-3 py-10">
             <p className="caption text-[var(--error)]">Error: {error}</p>
-            <Button variant="ghost" size="sm" onClick={() => window.location.reload()}>Retry</Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => window.location.reload()}
+            >
+              Retry
+            </Button>
           </div>
         </Card>
-
-        /* not error, no results */
-      ) : filtered.length === 0 ? (
+      ) : /* not error, no results */
+      filtered.length === 0 ? (
         <Card>
           <div className="flex flex-col items-center justify-center gap-3 py-12">
             <p className="caption">
-              {hasActiveFilters ? "No events match your filters." : search ? "No events match your search." : "No events available."}
+              {hasActiveFilters
+                ? "No events match your filters."
+                : search
+                  ? "No events match your search."
+                  : "No events available."}
             </p>
             {(hasActiveFilters || search) && (
-              <Button variant="ghost" size="sm" onClick={() => { clearFilters(); setSearch(""); }}>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  clearFilters();
+                  setSearch("");
+                }}
+              >
                 Clear search &amp; filters
               </Button>
             )}
           </div>
         </Card>
-
-        /* not error, yes results */
       ) : (
+        /* not error, yes results */
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {filtered.map((event) => {
             const isRegistered = registeredIds.has(event.id!);
@@ -488,12 +560,20 @@ export default function EventsPage() {
               <div
                 key={event.id}
                 className="relative cursor-pointer"
-                onClick={() => { setDetailEvent(event); setRegisterError(null); }}
+                onClick={() => {
+                  setDetailEvent(event);
+                  setRegisterError(null);
+                }}
               >
                 {/* status badge overlaid top-right of the cover */}
                 {event.status && (
                   <div className="absolute top-3 right-3 z-[2]">
-                    <Badge variant={STATUS_VARIANT[event.status.toLowerCase().trim()] ?? "dark"}>
+                    <Badge
+                      variant={
+                        STATUS_VARIANT[event.status.toLowerCase().trim()] ??
+                        "dark"
+                      }
+                    >
                       <span className="capitalize">{event.status}</span>
                     </Badge>
                   </div>
@@ -501,8 +581,23 @@ export default function EventsPage() {
                 <EventCard
                   title={event.title}
                   category={event.category ?? "Uncategorized"}
-                  date={event.start_date ? new Date(event.start_date).toLocaleDateString("en-PH", { month: "short", day: "numeric", year: "numeric" }) : "—"}
-                  time={event.start_date ? new Date(event.start_date).toLocaleTimeString("en-PH", { hour: "numeric", minute: "2-digit" }) : "—"}
+                  date={
+                    event.start_date
+                      ? new Date(event.start_date).toLocaleDateString("en-PH", {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        })
+                      : "—"
+                  }
+                  time={
+                    event.start_date
+                      ? new Date(event.start_date).toLocaleTimeString("en-PH", {
+                          hour: "numeric",
+                          minute: "2-digit",
+                        })
+                      : "—"
+                  }
                   location={event.location ?? "—"}
                   registered={regCounts[event.id!] ?? 0}
                   capacity={event.capacity ?? 0}
@@ -514,7 +609,9 @@ export default function EventsPage() {
                   registerDisabled={isRegistering || !!isRegClosed}
                   isRegistered={isRegistered}
                   onRegister={(e?: React.MouseEvent) =>
-                    isRegistered ? handleCancelRegistration(event.id!, e) : handleRegister(event.id!, e)
+                    isRegistered
+                      ? handleCancelRegistration(event.id!, e)
+                      : handleRegister(event.id!, e)
                   }
                 />
               </div>
@@ -525,14 +622,19 @@ export default function EventsPage() {
 
       {/* result count footer */}
       {!isLoading && !error && filtered.length > 0 && (
-        <p className="caption">Showing {filtered.length} of {events.length} events</p>
+        <p className="caption">
+          Showing {filtered.length} of {events.length} events
+        </p>
       )}
 
       {/* when opened the event */}
       <Modal
       
         open={!!detailEvent}
-        onClose={() => { setDetailEvent(null); setRegisterError(null); }}
+        onClose={() => {
+          setDetailEvent(null);
+          setRegisterError(null);
+        }}
         hideCloseButton
         modalStyle={{ maxWidth: 600, padding: 0 }}
         footer={
@@ -569,18 +671,24 @@ export default function EventsPage() {
           <div className="flex flex-col min-h-0">
             <div
               className="h-[200px] sm:h-[180px] relative shrink-0 rounded-t-[var(--radius-xl)]"
-              style={{ background: detailEvent.banner_url ? `url(${detailEvent.banner_url}) center/cover no-repeat` : CATEGORY_GRADIENT[detailEvent.category ?? ""] ?? DEFAULT_GRADIENT }}
+              style={{
+                background: detailEvent.banner_url
+                  ? `url(${detailEvent.banner_url}) center/cover no-repeat`
+                  : (CATEGORY_GRADIENT[detailEvent.category ?? ""] ??
+                    DEFAULT_GRADIENT),
+              }}
             >
               {/* close button inside cover */}
               <button
-                onClick={() => { setDetailEvent(null); setRegisterError(null); }}
+                onClick={() => {
+                  setDetailEvent(null);
+                  setRegisterError(null);
+                }}
                 aria-label="Close"
                 className="absolute top-3 right-3 w-4 h-4 sm:w-6 sm:h-6 rounded-full border-none cursor-pointer flex items-center justify-center text-[var(--primary-dark)] z-10 backdrop-blur-sm bg-white/80"
               >
                 <X size={14} />
               </button>
-
-              
             </div>
 
             {/* only body scrolls, cover + footer stay fixed */}
@@ -588,16 +696,25 @@ export default function EventsPage() {
               {/* title */}
               <h2 className="heading-md m-0">{detailEvent.title}</h2>
               {/* category and status badges moved below */}
-                <div className="flex gap-2 items-center">
-                    <Badge variant={CATEGORY_VARIANT[detailEvent.category ?? ""] ?? "dark"}>
-                    {detailEvent.category ?? "Uncategorized"}
-                    </Badge>
-                    {detailEvent.status && (
-                    <Badge variant={STATUS_VARIANT[detailEvent.status.toLowerCase().trim()] ?? "dark"}>
-                        <span className="capitalize">{detailEvent.status}</span>
-                    </Badge>
-                    )}
-                </div>
+              <div className="flex gap-2 items-center">
+                <Badge
+                  variant={
+                    CATEGORY_VARIANT[detailEvent.category ?? ""] ?? "dark"
+                  }
+                >
+                  {detailEvent.category ?? "Uncategorized"}
+                </Badge>
+                {detailEvent.status && (
+                  <Badge
+                    variant={
+                      STATUS_VARIANT[detailEvent.status.toLowerCase().trim()] ??
+                      "dark"
+                    }
+                  >
+                    <span className="capitalize">{detailEvent.status}</span>
+                  </Badge>
+                )}
+              </div>
 
               {/* details row */}
               <div className="flex flex-col gap-1.5">
@@ -605,20 +722,46 @@ export default function EventsPage() {
                 <div className="flex items-start gap-3 caption sm:text-sm text-[var(--gray)]">
                   <CalendarDays size={15} className="shrink-0 mt-0.5" />
                   <span>
-                    {detailEvent.start_date ? new Date(detailEvent.start_date).toLocaleDateString("en-PH", { month: "long", day: "numeric", year: "numeric" }) : "—"}
-                    {detailEvent.end_date && detailEvent.end_date !== detailEvent.start_date && (
-                      <> — {new Date(detailEvent.end_date).toLocaleDateString("en-PH", { month: "long", day: "numeric", year: "numeric" })}</>
-                    )}
+                    {detailEvent.start_date
+                      ? new Date(detailEvent.start_date).toLocaleDateString(
+                          "en-PH",
+                          { month: "long", day: "numeric", year: "numeric" },
+                        )
+                      : "—"}
+                    {detailEvent.end_date &&
+                      detailEvent.end_date !== detailEvent.start_date && (
+                        <>
+                          {" "}
+                          —{" "}
+                          {new Date(detailEvent.end_date).toLocaleDateString(
+                            "en-PH",
+                            { month: "long", day: "numeric", year: "numeric" },
+                          )}
+                        </>
+                      )}
                   </span>
                 </div>
                 {/* ---------- time ---------- */}
                 <div className="flex items-start gap-3 caption sm:text-sm text-[var(--gray)]">
                   <Clock size={15} className="shrink-0 mt-0.5" />
                   <span>
-                    {detailEvent.start_date ? new Date(detailEvent.start_date).toLocaleTimeString("en-PH", { hour: "numeric", minute: "2-digit" }) : "—"}
-                    {detailEvent.end_date && detailEvent.end_date !== detailEvent.start_date && (
-                      <> — {new Date(detailEvent.end_date).toLocaleTimeString("en-PH", { hour: "numeric", minute: "2-digit" })}</>
-                    )}
+                    {detailEvent.start_date
+                      ? new Date(detailEvent.start_date).toLocaleTimeString(
+                          "en-PH",
+                          { hour: "numeric", minute: "2-digit" },
+                        )
+                      : "—"}
+                    {detailEvent.end_date &&
+                      detailEvent.end_date !== detailEvent.start_date && (
+                        <>
+                          {" "}
+                          —{" "}
+                          {new Date(detailEvent.end_date).toLocaleTimeString(
+                            "en-PH",
+                            { hour: "numeric", minute: "2-digit" },
+                          )}
+                        </>
+                      )}
                   </span>
                 </div>
                 {/* ---------- location ---------- */}
@@ -632,14 +775,29 @@ export default function EventsPage() {
                   <span>Capacity: {detailEvent.capacity ?? "—"}</span>
                 </div>
                 {/* ---------- registration ---------- */}
-                {(detailEvent.registration_open || detailEvent.registration_close) && (
+                {(detailEvent.registration_open ||
+                  detailEvent.registration_close) && (
                   <div className="flex items-center gap-3 caption sm:text-sm text-[var(--gray)]">
                     <ClipboardList size={15} className="shrink-0" />
                     <span>
                       Registration:&nbsp;
-                      {detailEvent.registration_open ? new Date(detailEvent.registration_open).toLocaleDateString("en-PH", { month: "long", day: "numeric" }) : "?"}
+                      {detailEvent.registration_open
+                        ? new Date(
+                            detailEvent.registration_open,
+                          ).toLocaleDateString("en-PH", {
+                            month: "long",
+                            day: "numeric",
+                          })
+                        : "?"}
                       &nbsp;—&nbsp;
-                      {detailEvent.registration_close ? new Date(detailEvent.registration_close).toLocaleDateString("en-PH", { month: "long", day: "numeric" }) : "?"}
+                      {detailEvent.registration_close
+                        ? new Date(
+                            detailEvent.registration_close,
+                          ).toLocaleDateString("en-PH", {
+                            month: "long",
+                            day: "numeric",
+                          })
+                        : "?"}
                     </span>
                   </div>
                 )}
@@ -648,7 +806,10 @@ export default function EventsPage() {
               {/* capacity progress bar */}
               {detailEvent.capacity != null && (
                 <ProgressBar
-                  value={Math.round(((regCounts[detailEvent.id!] ?? 0) / detailEvent.capacity) * 100)}
+                  value={Math.round(
+                    ((regCounts[detailEvent.id!] ?? 0) / detailEvent.capacity) *
+                      100,
+                  )}
                   label="Registered"
                   sublabel={`${regCounts[detailEvent.id!] ?? 0} / ${detailEvent.capacity}`}
                 />
@@ -660,16 +821,23 @@ export default function EventsPage() {
               {/* full description */}
               <div className="flex flex-col gap-2 pb-2">
                 <p className="label">ABOUT THIS EVENT</p>
-                <p className="body whitespace-pre-wrap">{detailEvent.description || "No description provided."}</p>
+                <p className="body whitespace-pre-wrap">
+                  {detailEvent.description || "No description provided."}
+                </p>
               </div>
-            </div>{/* end body */}
+            </div>
+            {/* end body */}
           </div>
         )}
       </Modal>
 
       {toast && (
-        <div className="fixed bottom-6 right-4 z-[999] sm:right-6">
-          <Toast variant={toast.variant} title={toast.title} message={toast.message} />
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[999] w-max max-w-[90vw]">
+          <Toast
+            variant={toast.variant}
+            title={toast.title}
+            message={toast.message}
+          />
         </div>
       )}
 

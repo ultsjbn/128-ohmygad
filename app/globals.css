@@ -73,7 +73,7 @@
   --warning-light: #f3eebc;
   --warning-text: #9a7620;
   --error: #F47B7B;
-  --error-light: #f3bcbc;
+  --error-light: #fad4d4;
   --error-text: #b12d2d;
 
   /* Badge text colors */
@@ -125,6 +125,10 @@ body {
   color: var(--primary-dark);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+header {
+    background: linear-gradient(to bottom, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 100%);
 }
 
 /* ------------------------------------------------------------------─
@@ -400,16 +404,16 @@ body {
 }
 
 .btn-icon {
-  width: 44px;
-  min-width: 44px;
-  height: 44px;
-  min-height: 44px;
+  width: 40px;
+  min-width: 40px;
+  height: 40px;
+  min-height: 40px;
   flex-shrink: 0;
   border-radius: var(--radius-full);
   background: var(--lavender);
   color: var(--primary-dark);
   padding: 0;
-  font-size: 18px;
+  font-size: 16px;
 }
 
 .btn-icon-sm {
@@ -1332,13 +1336,14 @@ body {
 ------------------------------------------------------------------─ */
 .toast {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 12px;
-  padding: 16px 20px;
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-soft);
+  padding: 14px 24px;
+  border-radius: var(--radius-full);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.12);
   font-size: 14px;
-  border-left: 4px solid;
+  border: 1.5px solid;
+  white-space: nowrap;
 }
 
 .toast-success {

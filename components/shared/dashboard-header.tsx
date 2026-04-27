@@ -25,12 +25,17 @@ export default function DashboardHeader({ basePath, pageLabels }: DashboardHeade
   const pageLabel   = pageLabels[activeId] ?? activeId.charAt(0).toUpperCase() + activeId.slice(1);
 
   return (
-    <header className="shrink-0 flex flex-col md:flex-row md:items-center md:justify-between md:gap-3 px-3 md:px-5 pt-2 pb-0.5">
+    <header className=" shrink-0 flex flex-col md:flex-row md:items-center md:justify-between md:gap-3 px-3 md:px-5 md:pt-4 md:pb-2">
       {/* row 1: logo (mobile) + title (desktop) on left, UserMenu on right */}
       <div className="flex items-center justify-between md:flex-1 min-w-0">
         <div className="flex items-center gap-2 min-w-0">
           <div className="flex md:hidden items-center gap-1.5 shrink-0">
-            <Image src="/kasarian-upb-logo.svg" alt="UPB Kasarian" width={38} height={38} />
+            <Image
+              src="/kasarian-upb-logo.svg"
+              alt="UPB Kasarian"
+              width={38}
+              height={38}
+            />
             <div className="flex flex-col justify-center">
               <span className="caption">UP BAGUIO</span>
               <span className="heading-sm uppercase">Kasarian</span>
@@ -38,8 +43,13 @@ export default function DashboardHeader({ basePath, pageLabels }: DashboardHeade
           </div>
           {!isDashboard && (
             <div className="hidden md:flex">
-              <Button variant="icon" onClick={() => router.back()} aria-label="Go back">
-                <ArrowLeft size={16} />
+              <Button
+                size="sm"
+                variant="icon"
+                onClick={() => router.back()}
+                aria-label="Go back"
+              >
+                <ArrowLeft size={15} />
               </Button>
             </div>
           )}

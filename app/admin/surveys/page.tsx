@@ -623,7 +623,7 @@ export default function SurveysPage() {
 
       {/* floating toast notification */}
       {toast && (
-        <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999 }}>
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[9999]">
           <Toast
             variant={toast.variant}
             title={toast.title}

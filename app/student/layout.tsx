@@ -34,7 +34,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
           <div className="blob blob-pink"      style={{ position:'absolute', top:-120, right:60, width:420, height:420, opacity:0.20, zIndex:0, pointerEvents:'none' }} />
           <div className="blob blob-periwinkle" style={{ position:'absolute', bottom:0, left:80, width:320, height:320, opacity:0.15, zIndex:0, pointerEvents:'none' }} />
           <DashboardHeader basePath="/student" pageLabels={PAGE_LABELS} />
-          <main className="flex flex-col px-3 md:px-5 pb-0" style={{ position:'relative', zIndex:1, flex:1, overflowY:'scroll'}}>
+          <main className="relative z-1 flex-1 overflow-scroll flex flex-col px-3 md:px-5 md:py-2">
             <Suspense fallback={<div style={{ display:'flex', alignItems:'center', justifyContent:'center', height:'100%', color:'var(--gray)', fontSize:14 }}>Loading…</div>}>
               <StudentAuthGuard>{children}</StudentAuthGuard>
             </Suspense>

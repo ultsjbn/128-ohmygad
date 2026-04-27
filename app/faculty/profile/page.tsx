@@ -357,7 +357,7 @@ export default function FacultyProfilePage() {
 
       {/* fixed toast notification */}
       {toast && (
-        <div className="fixed bottom-24 lg:bottom-6 right-1/2 translate-x-1/2 lg:translate-x-0 lg:right-6 z-[9999] animate-in slide-in-from-bottom-5">
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[9999] animate-in slide-in-from-bottom-5">
           <Toast variant={toast.type} title={toast.message} />
         </div>
       )}

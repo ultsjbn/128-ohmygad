@@ -172,8 +172,8 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
         <header className="shrink-0 flex items-center justify-between gap-3 px-3 md:px-5 pt-4 pb-0.5" style={{ position: "relative", zIndex: 10 }}>
           <div className="flex items-center gap-2 min-w-0">
             {!isDashboard && (
-              <Button variant="icon" onClick={() => router.back()} aria-label="Go back">
-                <ArrowLeft size={16} />
+              <Button size="sm" variant="icon"  onClick={() => router.back()} aria-label="Go back">
+                <ArrowLeft size={15} />
               </Button>
             )}
             <h1 className="heading-lg truncate">{pageLabel}</h1>
