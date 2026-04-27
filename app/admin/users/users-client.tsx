@@ -281,12 +281,15 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
       header: "User",
       width: "46%",
       render: (p) => (
+        <span 
+        title={p.full_name}>
         <div className="flex items-center gap-3">
           <div>
             <div className="font-semibold text-[13px] text-primary-dark">{p.full_name ?? "—"}</div>
             <div className="text-[11px] text-gray-500">{p.email}</div>
           </div>
         </div>
+        </span>
       ),
     },
     {
