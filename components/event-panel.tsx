@@ -212,15 +212,15 @@ export const EventPanel = (): JSX.Element => {
             {!loading && groups.length === 0 && (
             <Card variant="no-shadow" className="flex flex-col items-center justify-center text-center min-h-[220px] gap-3">
                 <div className="w-14 h-14 rounded-full bg-[var(--lavender)] flex items-center justify-center">
-                <Calendar size={26} className="text-[var(--periwinkle)]" />
+                    <Calendar size={26} className="text-[var(--periwinkle)]" />
                 </div>
                 <div>
-                <p className="label text-[var(--primary-dark)]">No events found</p>
-                <p className="caption text-[var(--gray)] mt-0.5">
-                    {filter === "upcoming"
-                    ? "You haven't registered for any upcoming events."
-                    : "You have no past registered events."}
-                </p>
+                    <p className="label text-[var(--primary-dark)]">No events found</p>
+                    <p className="caption text-[var(--gray)] mt-0.5">
+                        {filter === "upcoming"
+                        ? "You haven't registered for any upcoming events."
+                        : "You have no past registered events."}
+                    </p>
                 </div>
                 {filter === "upcoming" && (
                 <Button

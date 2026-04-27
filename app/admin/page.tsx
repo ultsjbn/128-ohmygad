@@ -3,6 +3,7 @@
 import { useEffect, useState, useMemo } from "react";
 import {
   Users, Calendar, UserCheck, ClipboardList, BookOpen,
+  Book,
 } from "lucide-react";
 import {
   Card, StatCard, Button, MiniCalendar, TodayTimeline, DateRangePicker,
@@ -165,375 +166,653 @@ export default function DashboardPage() {
     }, [surveyPage, surveyPageCount]);
 
     return (
-        <div className="flex flex-col gap-5 w-full animate-in fade-in duration-500">
-
+      <div className="flex flex-col gap-5 w-full animate-in fade-in duration-500">
         {/* greeting ------------------------------------------------ */}
         <div className="flex items-center justify-between w-full">
-            <h2 className="heading-md">Good day, Admin!</h2>
-            <DashboardFilter
-                value={filters}
-                onChange={setFilters}
-                options={filterOptions}
-            />
+          <h2 className="heading-md">Good day, Admin!</h2>
+          <DashboardFilter
+            value={filters}
+            onChange={setFilters}
+            options={filterOptions}
+          />
         </div>
 
         {/* ------------------------------------------------ MAIN CONTENT ------------------------------------------------*/}
         <div className="flex flex-col xl:flex-row gap-5">
-        <div className="flex flex-col gap-5 flex-1 min-w-0 pb-2">
-
+          <div className="flex flex-col gap-5 flex-1 min-w-0 pb-2">
             {/* KPI section ------------------------------------------------ */}
             <div className="flex flex-col gap-5">
-                <GlobalSearch role="admin" placeholder="Search events, courses, surveys..." />
-                <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
-                    <StatCard
-                        variant="no-hover"
-                        icon={<Users size={20} className="text-[var(--periwinkle)]"/>}
-                        iconBg="var(--periwinkle-light)"
-                        value={userStats?.total ?? 0}
-                        label="Registered Users"
+              <GlobalSearch
+                role="admin"
+                placeholder="Search events, courses, surveys..."
+              />
+              <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
+                <StatCard
+                  variant="no-hover"
+                  icon={
+                    <Users size={20} className="text-[var(--periwinkle)]" />
+                  }
+                  iconBg="var(--periwinkle-light)"
+                  value={userStats?.total ?? 0}
+                  label="Registered Users"
+                />
+                <StatCard
+                  variant="no-hover"
+                  icon={
+                    <UserCheck size={20} className="text-[var(--success)]" />
+                  }
+                  iconBg="rgba(109,197,160,0.15)"
+                  value={userStats?.onboarded ?? 0}
+                  label="Onboarded Users"
+                />
+                <StatCard
+                  variant="no-hover"
+                  icon={
+                    <Calendar size={20} className="text-[var(--soft-pink)]" />
+                  }
+                  iconBg="var(--pink-light)"
+                  value={gadEventsCount ?? 0}
+                  label="GAD Events"
+                />
+                <StatCard
+                  variant="no-hover"
+                  icon={
+                    <ClipboardList
+                      size={20}
+                      className="text-[var(--warning)]"
                     />
-                    <StatCard
-                        variant="no-hover"
-                        icon={<UserCheck size={20} className="text-[var(--success)]"/>}
-                        iconBg="rgba(109,197,160,0.15)"
-                        value={userStats?.onboarded ?? 0}
-                        label="Onboarded Users"
-                    />
-                    <StatCard
-                        variant="no-hover"
-                        icon={<Calendar size={20} className="text-[var(--soft-pink)]"/>}
-                        iconBg="var(--pink-light)"
-                        value={gadEventsCount ?? 0}
-                        label="GAD Events"
-                    />
-                    <StatCard
-                        variant="no-hover"
-                        icon={<ClipboardList size={20} className="text-[var(--warning)]"/>}
-                        iconBg="rgba(244,201,122,0.18)"
-                        value={surveysCount}
-                        label="Active Surveys"
-                    />
-                </div>
+                  }
+                  iconBg="rgba(244,201,122,0.18)"
+                  value={surveysCount}
+                  label="Active Surveys"
+                />
+              </div>
             </div>
 
             {/* attendance and quick actions ------------------------------------------------ */}
             <div className="grid grid-cols-1 xl:grid-cols-[1fr_280px] gap-4">
-
-                {/* attendance over time */}
-                <Card variant="no-hover" className="flex flex-col p-4 min-h-[320px]">
-                    <div className="flex flex-wrap items-start justify-between gap-3 mb-4 shrink-0">
-                        <div>
-                            <h2 className="heading-md">Attendance Over Time</h2>
-                            <p className="caption mt-0.5">Total event attendees per period</p>
-                        </div>
-                        <DateRangePicker value={attendanceRange} onChange={setAttendanceRange} />
+              {/* attendance over time */}
+              <Card
+                variant="no-hover"
+                className="flex flex-col p-4 min-h-[320px]"
+              >
+                <div className="flex flex-wrap items-start justify-between gap-3 mb-4 shrink-0">
+                  <div>
+                    <h2 className="heading-md">Attendance Over Time</h2>
+                    <p className="caption mt-0.5">
+                      Total event attendees per period
+                    </p>
+                  </div>
+                  <DateRangePicker
+                    value={attendanceRange}
+                    onChange={setAttendanceRange}
+                  />
+                </div>
+                <div className="flex-1 w-full min-h-[200px] cursor-default select-none relative">
+                  {attendanceLoading ? (
+                    <div className="absolute inset-0 flex items-center justify-center bg-white/60 backdrop-blur-sm rounded-xl z-10">
+                      <span className="caption animate-pulse">Loading…</span>
                     </div>
-                    <div className="flex-1 w-full min-h-[200px] cursor-default select-none relative">
-                        {attendanceLoading && (
-                            <div className="absolute inset-0 flex items-center justify-center bg-white/60 backdrop-blur-sm rounded-xl z-10">
-                                <span className="caption animate-pulse">Loading…</span>
-                            </div>
-                        )}
-                        <ResponsiveContainer width="100%" height="100%">
-                            <LineChart
-                                responsive
-                                data={eventAttendanceData ?? DUMMY_ATTENDANCE}
-                                margin={{ top: 10, right: 5, left: 10, bottom: 25 }}
-                            >
-                                <CartesianGrid strokeDasharray="3 3" stroke={AXIS_COLOR} vertical={false} />
-                                <XAxis
-                                    dataKey="month"
-                                    stroke={AXIS_COLOR}
-                                    tick={{ fill: TICK_COLOR, fontSize: 11 }}
-                                    tickLine={false} axisLine={false} dy={10}
-                                    label={{
-                                        value: "Month",
-                                        position: "insideBottom",
-                                        offset: -25,
-                                        fill: "var(--primary-dark)",
-                                        fontSize: 13,
-                                    }}
-                                />
-                                <YAxis
-                                    stroke={AXIS_COLOR}
-                                    tick={{ fill: TICK_COLOR, fontSize: 11 }}
-                                    tickLine={false} axisLine={false}
-                                    allowDecimals={false}
-                                    label={{
-                                        value: "Attendees",
-                                        angle: -90,
-                                        position: "insideLeft",
-                                        offset: 1,
-                                        fill: "var(--primary-dark)",
-                                        fontSize: 13,
-                                    }}
-                                />
-                                <Tooltip
-                                    content={<CustomTooltip />}
-                                    cursor={{ stroke: AXIS_COLOR, strokeWidth: 1, strokeDasharray: "4 4" }}
-                                />
-                                <Line
-                                    type="monotone"
-                                    dataKey="attendees"
-                                    name="Attendees"
-                                    stroke="var(--periwinkle)"
-                                    strokeWidth={2.5}
-                                    dot={{ fill: "var(--periwinkle)", stroke: "var(--periwinkle)", strokeWidth: 2, r: 3 }}
-                                    activeDot={{ r: 5, fill: "var(--primary-dark)", stroke: "white", strokeWidth: 2 }}
-                                />
-                            </LineChart>
-                        </ResponsiveContainer>
+                  ) : eventAttendanceData?.length === 0 ? (
+                    <div className="flex items-center justify-center h-full">
+                      <span className="caption text-[var(--gray)]">
+                        No attendance data for the selected period.
+                      </span>
                     </div>
-                </Card>
+                  ) : null}
+                  {!(
+                    !attendanceLoading && eventAttendanceData?.length === 0
+                  ) && (
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart
+                        responsive
+                        data={eventAttendanceData ?? DUMMY_ATTENDANCE}
+                        margin={{ top: 10, right: 5, left: 10, bottom: 25 }}
+                      >
+                        <CartesianGrid
+                          strokeDasharray="3 3"
+                          stroke={AXIS_COLOR}
+                          vertical={false}
+                        />
+                        <XAxis
+                          dataKey="month"
+                          stroke={AXIS_COLOR}
+                          tick={{ fill: TICK_COLOR, fontSize: 11 }}
+                          tickLine={false}
+                          axisLine={false}
+                          dy={10}
+                          label={{
+                            value: "Month",
+                            position: "insideBottom",
+                            offset: -25,
+                            fill: "var(--primary-dark)",
+                            fontSize: 13,
+                          }}
+                        />
+                        <YAxis
+                          stroke={AXIS_COLOR}
+                          tick={{ fill: TICK_COLOR, fontSize: 11 }}
+                          tickLine={false}
+                          axisLine={false}
+                          allowDecimals={false}
+                          label={{
+                            value: "Attendees",
+                            angle: -90,
+                            position: "insideLeft",
+                            offset: 1,
+                            fill: "var(--primary-dark)",
+                            fontSize: 13,
+                          }}
+                        />
+                        <Tooltip
+                          content={<CustomTooltip />}
+                          cursor={{
+                            stroke: AXIS_COLOR,
+                            strokeWidth: 1,
+                            strokeDasharray: "4 4",
+                          }}
+                        />
+                        <Line
+                          type="monotone"
+                          dataKey="attendees"
+                          name="Attendees"
+                          stroke="var(--periwinkle)"
+                          strokeWidth={2.5}
+                          dot={{
+                            fill: "var(--periwinkle)",
+                            stroke: "var(--periwinkle)",
+                            strokeWidth: 2,
+                            r: 3,
+                          }}
+                          activeDot={{
+                            r: 5,
+                            fill: "var(--primary-dark)",
+                            stroke: "white",
+                            strokeWidth: 2,
+                          }}
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  )}
+                </div>
+              </Card>
 
               {/* quick actions */}
-                <Card variant="no-hover" className="flex flex-col justify-around p-4 gap-3">
-                    <div>
-                        <h2 className="heading-sm">Quick Actions</h2>
-                    </div>
-                    <div className="flex flex-col gap-2">
-                        <Button variant="soft" className="w-full justify-between" onClick={() => setActiveModal("event")}>
-                            <Calendar size={16} /> New Event
-                        </Button>
-                        <Button variant="soft" className="w-full justify-between" onClick={() => setActiveModal("user")}>
-                            <Users size={16} /> New User
-                        </Button>
-                        <Button variant="soft" className="w-full justify-between" onClick={() => setActiveModal("course")}>
-                            <BookOpen size={16} /> New Guideline
-                        </Button>
-                        <Button variant="soft" className="w-full justify-between" onClick={() => setActiveModal("survey")}>
-                            <ClipboardList size={16} /> New Survey
-                        </Button>
-                    </div>
-                </Card>
+              <Card
+                variant="no-hover"
+                className="flex flex-col justify-around p-4 gap-3"
+              >
+                <div>
+                  <h2 className="heading-sm">Quick Actions</h2>
+                </div>
+                <div className="flex flex-col gap-2">
+                  <Button
+                    variant="soft"
+                    className="w-full justify-between"
+                    onClick={() => setActiveModal("event")}
+                  >
+                    <Calendar size={16} /> New Event
+                  </Button>
+                  <Button
+                    variant="soft"
+                    className="w-full justify-between"
+                    onClick={() => setActiveModal("user")}
+                  >
+                    <Users size={16} /> New User
+                  </Button>
+                  <Button
+                    variant="soft"
+                    className="w-full justify-between"
+                    onClick={() => setActiveModal("course")}
+                  >
+                    <BookOpen size={16} /> New Guideline
+                  </Button>
+                  <Button
+                    variant="soft"
+                    className="w-full justify-between"
+                    onClick={() => setActiveModal("survey")}
+                  >
+                    <ClipboardList size={16} /> New Survey
+                  </Button>
+                </div>
+              </Card>
             </div>
 
             {/* other analytics */}
             <div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-
-                    {/* users per college */}
-                    <Card variant="no-hover" className="flex flex-col p-5 min-h-[260px]">
-                        <h2 className="heading-md mb-0.5">Users per College</h2>
-                        <p className="caption mb-3">Registered student breakdown</p>
-                        <div className="flex-1 w-full min-h-[170px] cursor-default select-none">
-                            <ResponsiveContainer width="100%" height="100%">
-                                <BarChart
-                                    data={filteredColleges}
-                                    margin={{ top: 8, right: 0, left: -25, bottom: 0 }}>
-                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={AXIS_COLOR} />
-                                    <XAxis
-                                        dataKey="category"
-                                        stroke={AXIS_COLOR}
-                                        tick={{ fill: TICK_COLOR, fontSize: 11 }}
-                                        tickLine={false} axisLine={false} dy={8}
-                                    />
-                                    <YAxis
-                                        stroke={AXIS_COLOR}
-                                        tick={{ fill: TICK_COLOR, fontSize: 11 }}
-                                        tickLine={false} axisLine={false}
-                                        allowDecimals={false}
-                                    />
-                                    <Tooltip
-                                        content={<CustomTooltip />}
-                                        cursor={{ fill: "rgba(45,42,74,0.03)" }}
-                                    />
-                                    <Bar
-                                        dataKey="value"
-                                        name="Users"
-                                        radius={[6, 6, 0, 0]}
-                                        barSize={36}>
-                                    {filteredColleges.map((item: { category: string }, idx: number) => (
-                                        <Cell key={`col-${idx}`} fill={colorFor(COLLEGE_COLORS, item.category, idx)} />
-                                    ))}
-                                    </Bar>
-                                </BarChart>
-                            </ResponsiveContainer>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* users per college */}
+                <Card
+                  variant="no-hover"
+                  className="flex flex-col p-5 min-h-[260px]"
+                >
+                  <h2 className="heading-md mb-0.5">Users per College</h2>
+                  <p className="caption mb-3">Registered student breakdown</p>
+                  <div className="flex-1 w-full min-h-[170px] cursor-default select-none">
+                    {loading ? (
+                      <div className="flex items-center justify-center h-full">
+                        <span className="caption animate-pulse">Loading…</span>
+                      </div>
+                    ) : filteredColleges.length === 0 ? (
+                      <Card
+                        variant="no-shadow"
+                        className="flex flex-col items-center justify-center text-center min-h-[220px] gap-3"
+                      >
+                        <div className="w-14 h-14 rounded-full bg-[var(--lavender)] flex items-center justify-center">
+                          <Users
+                            size={26}
+                            className="text-[var(--periwinkle)]"
+                          />
                         </div>
-                    </Card>
-
-                    {/* sex at birth */}
-                    <Card variant="no-hover" className="flex flex-col p-5 min-h-[260px]">
-                        <h2 className="heading-md mb-0.5">Users Sex at Birth</h2>
-                        <div className="flex-1 w-full min-h-[190px] cursor-default select-none">
-                            <ResponsiveContainer width="100%" height="100%">
-                                <PieChart>
-                                    <Pie
-                                    data={sexAtBirthData}
-                                    cx="50%" cy="45%"
-                                    innerRadius="55%" outerRadius="78%"
-                                    paddingAngle={2}
-                                    dataKey="value" nameKey="name"
-                                    >
-                                    {sexAtBirthData?.map((item: { name: string }, i: number) => (
-                                        <Cell key={`sex-${i}`} fill={colorFor(SEX_COLORS, item.name, i)} />
-                                    ))}
-                                    </Pie>
-                                    <Tooltip content={<CustomTooltip />} />
-                                    <Legend
-                                    verticalAlign="bottom" align="center" iconType="circle"
-                                    wrapperStyle={{ paddingTop: 14 }}
-                                    formatter={(v) => (
-                                        <span className="caption tracking-wider">{v}</span>
-                                    )}
-                                    />
-                                </PieChart>
-                            </ResponsiveContainer>
+                        <div>
+                          <p className="label text-[var(--primary-dark)]">
+                            {" "}
+                            No users found{" "}
+                          </p>
                         </div>
-                    </Card>
+                      </Card>
+                    ) : (
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart
+                          data={filteredColleges}
+                          margin={{ top: 8, right: 0, left: -25, bottom: 0 }}
+                        >
+                          <CartesianGrid
+                            strokeDasharray="3 3"
+                            vertical={false}
+                            stroke={AXIS_COLOR}
+                          />
+                          <XAxis
+                            dataKey="category"
+                            stroke={AXIS_COLOR}
+                            tick={{ fill: TICK_COLOR, fontSize: 11 }}
+                            tickLine={false}
+                            axisLine={false}
+                            dy={8}
+                          />
+                          <YAxis
+                            stroke={AXIS_COLOR}
+                            tick={{ fill: TICK_COLOR, fontSize: 11 }}
+                            tickLine={false}
+                            axisLine={false}
+                            allowDecimals={false}
+                          />
+                          <Tooltip
+                            content={<CustomTooltip />}
+                            cursor={{ fill: "rgba(45,42,74,0.03)" }}
+                          />
+                          <Bar
+                            dataKey="value"
+                            name="Users"
+                            radius={[6, 6, 0, 0]}
+                            barSize={36}
+                          >
+                            {filteredColleges.map(
+                              (item: { category: string }, idx: number) => (
+                                <Cell
+                                  key={`col-${idx}`}
+                                  fill={colorFor(
+                                    COLLEGE_COLORS,
+                                    item.category,
+                                    idx,
+                                  )}
+                                />
+                              ),
+                            )}
+                          </Bar>
+                        </BarChart>
+                      </ResponsiveContainer>
+                    )}
+                  </div>
+                </Card>
 
-                    {/* gender identity */}
-                    <Card variant="no-hover" className="flex flex-col p-5 min-h-[260px]">
-                        <h2 className="heading-md mb-0.5">Users Gender Identity</h2>
-                        <div className="flex-1 w-full min-h-[190px] cursor-default select-none">
-                            <ResponsiveContainer width="100%" height="100%">
-                                <PieChart>
-                                    <Pie
-                                    data={filteredGenders}
-                                    cx="50%" cy="45%"
-                                    innerRadius="55%" outerRadius="78%"
-                                    paddingAngle={2}
-                                    dataKey="value" nameKey="name"
-                                    >
-                                    {filteredGenders.map((item: { name?: string; category?: string }, i: number) => (
-                                        <Cell key={`gender-${i}`} fill={colorFor(GENDER_COLORS, item.name ?? item.category ?? "", i)} />
-                                    ))}
-                                    </Pie>
-                                    <Tooltip content={<CustomTooltip />} />
-                                    <Legend
-                                    verticalAlign="bottom" align="center" iconType="circle"
-                                    wrapperStyle={{ paddingTop: 14 }}
-                                    formatter={(v) => (
-                                        <span className="caption tracking-wider">{v}</span>
-                                    )}
-                                    />
-                                </PieChart>
-                            </ResponsiveContainer>
+                {/* sex at birth */}
+                <Card
+                  variant="no-hover"
+                  className="flex flex-col p-5 min-h-[260px]"
+                >
+                  <h2 className="heading-md mb-0.5">Users Sex at Birth</h2>
+                  <div className="flex-1 w-full min-h-[190px] cursor-default select-none">
+                    {loading ? (
+                      <div className="flex items-center justify-center h-full">
+                        <span className="caption animate-pulse">Loading…</span>
+                      </div>
+                    ) : !sexAtBirthData?.length ? (
+                      <Card
+                        variant="no-shadow"
+                        className="flex flex-col items-center justify-center text-center min-h-[220px] gap-3"
+                      >
+                        <div className="w-14 h-14 rounded-full bg-[var(--lavender)] flex items-center justify-center">
+                          <Users
+                            size={26}
+                            className="text-[var(--periwinkle)]"
+                          />
                         </div>
-                    </Card>
+                        <div>
+                          <p className="label text-[var(--primary-dark)]">
+                            {" "}
+                            No users found{" "}
+                          </p>
+                        </div>
+                      </Card>
+                    ) : (
+                      <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                          <Pie
+                            data={sexAtBirthData}
+                            cx="50%"
+                            cy="45%"
+                            innerRadius="55%"
+                            outerRadius="78%"
+                            paddingAngle={2}
+                            dataKey="value"
+                            nameKey="name"
+                          >
+                            {sexAtBirthData.map(
+                              (item: { name: string }, i: number) => (
+                                <Cell
+                                  key={`sex-${i}`}
+                                  fill={colorFor(SEX_COLORS, item.name, i)}
+                                />
+                              ),
+                            )}
+                          </Pie>
+                          <Tooltip content={<CustomTooltip />} />
+                          <Legend
+                            verticalAlign="bottom"
+                            align="center"
+                            iconType="circle"
+                            wrapperStyle={{ paddingTop: 14 }}
+                            formatter={(v) => (
+                              <span className="caption tracking-wider">
+                                {v}
+                              </span>
+                            )}
+                          />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    )}
+                  </div>
+                </Card>
 
-                </div>
+                {/* gender identity */}
+                <Card
+                  variant="no-hover"
+                  className="flex flex-col p-5 min-h-[260px]"
+                >
+                  <h2 className="heading-md mb-0.5">Users Gender Identity</h2>
+                  <div className="flex-1 w-full min-h-[190px] cursor-default select-none">
+                    {loading ? (
+                      <div className="flex items-center justify-center h-full">
+                        <span className="caption animate-pulse">Loading…</span>
+                      </div>
+                    ) : !filteredGenders.length ? (
+                      <Card
+                        variant="no-shadow"
+                        className="flex flex-col items-center justify-center text-center min-h-[220px] gap-3"
+                      >
+                        <div className="w-14 h-14 rounded-full bg-[var(--lavender)] flex items-center justify-center">
+                          <Users
+                            size={26}
+                            className="text-[var(--periwinkle)]"
+                          />
+                        </div>
+                        <div>
+                          <p className="label text-[var(--primary-dark)]">
+                            {" "}
+                            No users found{" "}
+                          </p>
+                        </div>
+                      </Card>
+                    ) : (
+                      <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                          <Pie
+                            data={filteredGenders}
+                            cx="50%"
+                            cy="45%"
+                            innerRadius="55%"
+                            outerRadius="78%"
+                            paddingAngle={2}
+                            dataKey="value"
+                            nameKey="name"
+                          >
+                            {filteredGenders.map(
+                              (
+                                item: { name?: string; category?: string },
+                                i: number,
+                              ) => (
+                                <Cell
+                                  key={`gender-${i}`}
+                                  fill={colorFor(
+                                    GENDER_COLORS,
+                                    item.name ?? item.category ?? "",
+                                    i,
+                                  )}
+                                />
+                              ),
+                            )}
+                          </Pie>
+                          <Tooltip content={<CustomTooltip />} />
+                          <Legend
+                            verticalAlign="bottom"
+                            align="center"
+                            iconType="circle"
+                            wrapperStyle={{ paddingTop: 14 }}
+                            formatter={(v) => (
+                              <span className="caption tracking-wider">
+                                {v}
+                              </span>
+                            )}
+                          />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    )}
+                  </div>
+                </Card>
+              </div>
             </div>
 
             {/* survey completion analytics */}
             <div>
-                <Card variant="no-hover" className="flex flex-col p-5 min-h-[320px]">
-                    <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
-                        <div>
-                            <h2 className="heading-md">Response Rate by Survey</h2>
-                            <p className="caption mt-0.5">Completed vs incomplete response percentage per survey</p>
+              <Card
+                variant="no-hover"
+                className="flex flex-col p-5 min-h-[320px]"
+              >
+                <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
+                  <div>
+                    <h2 className="heading-md">Response Rate by Survey</h2>
+                    <p className="caption mt-0.5">
+                      Completed vs incomplete response percentage per survey
+                    </p>
+                  </div>
+                  <SearchBar
+                    placeholder="Search all surveys…"
+                    value={surveySearch}
+                    onChange={(e) => setSurveySearch(e.target.value)}
+                    className="min-w-[220px] max-w-full"
+                  />
+                </div>
+                <div className="flex-1 w-full min-h-[220px] cursor-default select-none mt-4">
+                  {surveyCompletionLoading ? (
+                    <div className="flex items-center justify-center h-full">
+                      <span className="caption animate-pulse">
+                        Loading survey data…
+                      </span>
+                    </div>
+                  ) : (surveyCompletionData?.length ?? 0) === 0 ? (
+                    <div className="flex items-center justify-center h-full">
+                      <span className="caption text-[var(--gray)]">
+                        No survey completion data available.
+                      </span>
+                    </div>
+                  ) : surveyCompletionChartData.length === 0 ? (
+                    <div className="flex items-center justify-center h-full">
+                      <span className="caption text-[var(--gray)]">
+                        No surveys match your search.
+                      </span>
+                    </div>
+                  ) : (
+                    <>
+                      <ResponsiveContainer width="100%" height={300}>
+                        <BarChart
+                          layout="vertical"
+                          data={surveyCompletionChartData}
+                          margin={{ top: 8, right: 16, left: 40, bottom: 5 }}
+                          barCategoryGap="24%"
+                        >
+                          <CartesianGrid
+                            strokeDasharray="3 3"
+                            vertical={false}
+                            stroke={AXIS_COLOR}
+                          />
+                          <XAxis
+                            type="number"
+                            stroke={AXIS_COLOR}
+                            tick={{ fill: TICK_COLOR, fontSize: 11 }}
+                            tickLine={false}
+                            axisLine={false}
+                            domain={[0, 100]}
+                            tickFormatter={(value) => `${value}%`}
+                          />
+                          <YAxis
+                            type="category"
+                            dataKey="title"
+                            stroke={AXIS_COLOR}
+                            tick={{ fill: TICK_COLOR, fontSize: 11 }}
+                            tickLine={false}
+                            axisLine={false}
+                            width={175}
+                            interval={0}
+                          />
+                          <Tooltip
+                            content={<CustomTooltip />}
+                            cursor={{
+                              fill: "transparent",
+                              stroke: "transparent",
+                            }}
+                          />
+                          <Legend
+                            verticalAlign="top"
+                            align="right"
+                            wrapperStyle={{ paddingBottom: 10 }}
+                            iconType="circle"
+                          />
+                          <Bar
+                            dataKey="completedPct"
+                            name="Completed"
+                            stackId="a"
+                            fill={SURVEY_COMPLETED_COLOR}
+                            radius={[6, 0, 0, 6]}
+                            barSize={24}
+                          >
+                            <LabelList
+                              dataKey="completedPct"
+                              position="insideRight"
+                              formatter={(value) => `${value}%`}
+                              fill="var(--primary-dark)"
+                            />
+                          </Bar>
+                          <Bar
+                            dataKey="incompletePct"
+                            name="Incomplete"
+                            stackId="a"
+                            fill={SURVEY_INCOMPLETE_COLOR}
+                            radius={[0, 6, 6, 0]}
+                            barSize={24}
+                          >
+                            <LabelList
+                              dataKey="incompletePct"
+                              position="insideRight"
+                              formatter={(value) =>
+                                value > 0 ? `${value}%` : ""
+                              }
+                              fill="var(--primary-dark)"
+                            />
+                          </Bar>
+                        </BarChart>
+                      </ResponsiveContainer>
+                      {surveyPageCount > 1 && (
+                        <div className="mt-4 flex items-center justify-end">
+                          <Pagination
+                            page={surveyPage}
+                            total={surveyPageCount}
+                            onChange={setSurveyPage}
+                          />
                         </div>
-                        <SearchBar
-                            placeholder="Search all surveys…"
-                            value={surveySearch}
-                            onChange={(e) => setSurveySearch(e.target.value)}
-                            className="min-w-[220px] max-w-full"
-                        />
-                    </div>
-                    <div className="flex-1 w-full min-h-[220px] cursor-default select-none mt-4">
-                        {surveyCompletionLoading ? (
-                            <div className="flex items-center justify-center h-full">
-                                <span className="caption animate-pulse">Loading survey data…</span>
-                            </div>
-                        ) : (surveyCompletionData?.length?? 0) === 0 ? (
-                            <div className="flex items-center justify-center h-full">
-                                <span className="caption text-[var(--gray)]">No survey completion data available.</span>
-                            </div>
-                        ) : surveyCompletionChartData.length === 0 ? (
-                            <div className="flex items-center justify-center h-full">
-                                <span className="caption text-[var(--gray)]">No surveys match your search.</span>
-                            </div>
-                        ) : (
-                            <>
-                                <ResponsiveContainer width="100%" height={300}>
-                                    <BarChart
-                                        layout="vertical"
-                                        data={surveyCompletionChartData}
-                                        margin={{ top: 8, right: 16, left: 40, bottom: 5 }}
-                                        barCategoryGap="24%"
-                                    >
-                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={AXIS_COLOR} />
-                                        <XAxis
-                                            type="number"
-                                            stroke={AXIS_COLOR}
-                                            tick={{ fill: TICK_COLOR, fontSize: 11 }}
-                                            tickLine={false}
-                                            axisLine={false}
-                                            domain={[0, 100]}
-                                            tickFormatter={(value) => `${value}%`}
-                                        />
-                                        <YAxis
-                                            type="category"
-                                            dataKey="title"
-                                            stroke={AXIS_COLOR}
-                                            tick={{ fill: TICK_COLOR, fontSize: 11 }}
-                                            tickLine={false}
-                                            axisLine={false}
-                                            width={175}
-                                            interval={0}
-                                        />
-                                        <Tooltip content={<CustomTooltip />} cursor={{ fill: "transparent", stroke: "transparent" }} />
-                                        <Legend
-                                            verticalAlign="top"
-                                            align="right"
-                                            wrapperStyle={{ paddingBottom: 10 }}
-                                            iconType="circle"
-                                        />
-                                        <Bar dataKey="completedPct" name="Completed" stackId="a" fill={SURVEY_COMPLETED_COLOR} radius={[6, 0, 0, 6]} barSize={24}>
-                                            <LabelList dataKey="completedPct" position="insideRight" formatter={(value) => `${value}%`} fill="var(--primary-dark)" />
-                                        </Bar>
-                                        <Bar dataKey="incompletePct" name="Incomplete" stackId="a" fill={SURVEY_INCOMPLETE_COLOR} radius={[0, 6, 6, 0]} barSize={24}>
-                                            <LabelList dataKey="incompletePct" position="insideRight" formatter={(value) => value > 0 ? `${value}%` : ""} fill="var(--primary-dark)" />
-                                        </Bar>
-                                    </BarChart>
-                                </ResponsiveContainer>
-                                {surveyPageCount > 1 && (
-                                    <div className="mt-4 flex items-center justify-end">
-                                        <Pagination page={surveyPage} total={surveyPageCount} onChange={setSurveyPage} />
-                                    </div>
-                                )}
-                            </>
-                        )}
-                    </div>
-                </Card>
+                      )}
+                    </>
+                  )}
+                </div>
+              </Card>
             </div>
+          </div>
 
-        </div>
-
-        {/* right panel ------------------------------------------------------------------------------------------------ */}
-        <aside className="flex flex-col gap-5 xl:w-[268px] shrink-0 pb-8">
+          {/* right panel ------------------------------------------------------------------------------------------------ */}
+          <aside className="flex flex-col gap-5 xl:w-[268px] shrink-0 pb-8">
             {/* calendar */}
             <Card variant="no-hover" className="p-4">
-                <MiniCalendar
-                    eventDays={new Set([3, 10, 14])}
-                    onDayClick={(date) => console.log(date)}
-                />
+              <MiniCalendar
+                eventDays={new Set([3, 10, 14])}
+                onDayClick={(date) => console.log(date)}
+              />
             </Card>
 
             {/* timeline */}
             <Card variant="no-hover" className="p-4">
-                <TodayTimeline events={todayEvents} loading={loading} />
+              <TodayTimeline events={todayEvents} loading={loading} />
             </Card>
-        </aside>
-
-        </div>{/* end xl:flex-row */}
+          </aside>
+        </div>
+        {/* end xl:flex-row */}
 
         {/* quick action modals */}
-        <Modal open={activeModal === "event"} onClose={closeModal} title="New Event" modalStyle={{ maxWidth: 900 }}>
-            <EventForm mode="create" onSuccess={closeModal} onCancel={closeModal} />
+        <Modal
+          open={activeModal === "event"}
+          onClose={closeModal}
+          title="New Event"
+          modalStyle={{ maxWidth: 900 }}
+        >
+          <EventForm
+            mode="create"
+            onSuccess={closeModal}
+            onCancel={closeModal}
+          />
         </Modal>
 
-        <Modal open={activeModal === "user"} onClose={closeModal} title="Add User">
-            <UserForm onSuccess={closeModal} />
+        <Modal
+          open={activeModal === "user"}
+          onClose={closeModal}
+          title="Add User"
+        >
+          <UserForm onSuccess={closeModal} />
         </Modal>
 
-        <Modal open={activeModal === "course"} onClose={closeModal} title="Add Guideline" modalStyle={{ maxWidth: 860 }}>
-            <CourseForm mode="create" onSuccess={closeModal} onCancel={closeModal} />
+        <Modal
+          open={activeModal === "course"}
+          onClose={closeModal}
+          title="Add Guideline"
+          modalStyle={{ maxWidth: 860 }}
+        >
+          <CourseForm
+            mode="create"
+            onSuccess={closeModal}
+            onCancel={closeModal}
+          />
         </Modal>
 
-        <Modal open={activeModal === "survey"} onClose={closeModal} title="New Survey" modalStyle={{ maxWidth: 780 }}>
-            <SurveyForm mode="create" onSuccess={closeModal} onCancel={closeModal} />
+        <Modal
+          open={activeModal === "survey"}
+          onClose={closeModal}
+          title="New Survey"
+          modalStyle={{ maxWidth: 780 }}
+        >
+          <SurveyForm
+            mode="create"
+            onSuccess={closeModal}
+            onCancel={closeModal}
+          />
         </Modal>
-        </div>
+      </div>
     );
 }
