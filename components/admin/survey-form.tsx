@@ -287,9 +287,10 @@ export default function SurveyForm({ mode, initialData, initialQuestions = [], o
               </div>
 
               <Select
-                label="Linked Event (optional)"
+                label="Linked Event *"
+                required
                 options={[
-                  { value: "",     label: "— Not linked to an event —" },
+                  { value: "",     label: "Select linked event" },
                   ...events.map((e) => ({ value: e.id, label: e.title })),
                 ]}
                 value={event_id}
