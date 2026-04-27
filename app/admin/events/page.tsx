@@ -1189,6 +1189,7 @@ export default function EventsPage() {
                 value={deletePassword}
                 onChange={(e) => setDeletePassword(e.target.value)}
                 placeholder="Password"
+                autoComplete="new-password"
                 disabled={!!deletingId}
               />
             </div>
