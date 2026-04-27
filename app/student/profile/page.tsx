@@ -65,9 +65,7 @@ const GENDER_IDENTITY_OPTIONS = [
   { value: "Non-binary", label: "Non-binary" },
   { value: "Genderqueer", label: "Genderqueer" },
   { value: "Genderfluid", label: "Genderfluid" },
-  { value: "Agender", label: "Agender" },
   { value: "Prefer not to say", label: "Prefer not to say" },
-  { value: "Self-describe", label: "Prefer to self-describe" },
 ];
 
 // imported logic from onboarding
@@ -220,7 +218,7 @@ export default function StudentProfilePage() {
   if (loading) {
     return (
       <div className="flex-1 flex items-center justify-center h-full min-h-0">
-        <div className="w-8 h-8 border-4 border-[var(--periwinkle-light)] border-t-[var(--periwinkle)] rounded-full animate-spin"></div>
+        <div className="w-8 h-8 border-4 border-[var(--periwinkle-light)] border-t-[var(--periwinkle)] rounded-full animate-spin mb-4"></div>
       </div>
     );
   }

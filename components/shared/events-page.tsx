@@ -117,8 +117,8 @@ export default function EventsPage() {
 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [sort, setSort] = useState<SortState>({ field: "start_date", direction: "desc" });
-  const [filters, setFilters] = useState<FilterState>({ status: new Set(), category: new Set() });
+  const [sort, setSort] = useState<SortState>({ field: "start_date", direction: "asc" });
+  const [filters, setFilters] = useState<FilterState>({ status: new Set(["upcoming"]), category: new Set() });
   const [activeChip, setActiveChip] = useState("All");
 
   // event detail modal
@@ -321,8 +321,14 @@ export default function EventsPage() {
   };
 
   // apply search filters sort
+  const now = new Date();
   const filtered = sortEvents(
     events
+      .filter((e) => {
+        // Remove events whose registration close date has already passed
+        if (e.registration_close && new Date(e.registration_close) < now) return false;
+        return true;
+      })
       .filter((e) => `${e.title} ${e.category || ""} ${e.location || ""}`.toLowerCase().includes(search.toLowerCase()))
       .filter((e) => filters.status.size === 0 || filters.status.has(e.status?.toLowerCase().trim() ?? ""))
       .filter((e) => filters.category.size === 0 || filters.category.has(e.category ?? "")),

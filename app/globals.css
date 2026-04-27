@@ -132,6 +132,7 @@ body {
 ------------------------------------------------------------------─ */
 ::-webkit-scrollbar {
   width: 6px;
+  display: none;
 }
 
 ::-webkit-scrollbar-track {
@@ -159,7 +160,7 @@ body {
   font-size: 28px;
   font-weight: 700;
   color: var(--primary-dark);
-  line-height: 0.8;
+  line-height: 1;
   letter-spacing: 4%;
 }
 
