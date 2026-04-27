@@ -167,6 +167,11 @@ export default function CoursesPage() {
 
   const totalActiveFilters = filters.semester.size;
 
+  const handleSort = (field: SortField) =>
+    setSort((prev) => ({ field, direction: prev.field === field && prev.direction === "asc" ? "desc" : "asc" }));
+
+  const sortLabel = `${SORT_OPTIONS.find((o) => o.field === sort.field)?.label} ${sort.direction === "asc" ? "↑" : "↓"}`;
+
   return (
     <div className="flex flex-col gap-6 mt-2">
       {/* Header */}
@@ -189,14 +194,22 @@ export default function CoursesPage() {
             <Dropdown trigger={
               <Button variant="ghost">
                 <ArrowUpDown size={15} />
-                <span className="hidden md:inline ml-2 capitalize">{sort.field}</span>
+                <span className="hidden md:inline"> {sortLabel}</span>
               </Button>
             }>
-              {SORT_OPTIONS.map((opt) => (
-                <DropdownItem key={opt.field} onClick={() => setSort({ field: opt.field, direction: sort.field === opt.field && sort.direction === "asc" ? "desc" : "asc" })}>
-                  {opt.label} {sort.field === opt.field && (sort.direction === "asc" ? "↑" : "↓")}
-                </DropdownItem>
-              ))}
+              {SORT_OPTIONS.map(({ label, field }) => {
+                const isActive = sort.field === field;
+                return (
+                  <DropdownItem key={field} onClick={() => handleSort(field)}>
+                    <span className="flex items-center gap-2">
+                      <span className={`w-1.5 h-1.5 rounded-full shrink-0 border-[1.5px] ${isActive ? "bg-[var(--primary-dark)] border-[var(--primary-dark)]" : "bg-transparent border-[rgba(45,42,74,0.20)]"}`} />
+                      <span>{isActive ? <strong>{label} {sort.direction === "asc" ? "↑" : "↓"}</strong> : label}</span>
+                    </span>
+                  </DropdownItem>
+                );
+              })}
+              <DropdownDivider />
+              <DropdownItem onClick={() => setSort({ field: "title", direction: "asc" })}>Reset sort</DropdownItem>
             </Dropdown>
           </div>
         </div>
