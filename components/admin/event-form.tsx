@@ -44,6 +44,22 @@ const STATUS_OPTIONS = [
   { value: "today", label: "Today" },
 ];
 
+export const deriveStatus = (start: string, end: string): string => {
+  if (!start) return "";
+  const now = new Date();
+  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const startOfTomorrow = new Date(startOfToday);
+  startOfTomorrow.setDate(startOfTomorrow.getDate() + 1);
+
+  const startDate = new Date(start);
+  const endDate = end ? new Date(end) : null;
+
+  const effectiveEnd = endDate ?? startDate;
+  if (effectiveEnd < startOfToday) return "past";
+  if (startDate < startOfTomorrow && effectiveEnd >= startOfToday) return "today";
+  return "upcoming";
+};
+
 export default function EventForm({ initialData, mode, onSuccess, onCancel }: EventFormProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -62,7 +78,8 @@ export default function EventForm({ initialData, mode, onSuccess, onCancel }: Ev
   const [registration_open, setRegistrationOpen] = useState(initialData?.registration_open ?? "");
   const [registration_close, setRegistrationClose] = useState(initialData?.registration_close ?? "");
   const [category, setCategory] = useState(initialData?.category ?? "");
-  const [status, setStatus] = useState(initialData?.status ?? "");
+
+  const status = deriveStatus(start_date, end_date);
 
   // for banner images
   const [banner_url, setBannerUrl] = useState(initialData?.banner_url ?? "");
@@ -130,7 +147,7 @@ export default function EventForm({ initialData, mode, onSuccess, onCancel }: Ev
     }
 
     // validation Logic
-    if (!title || !location || !start_date || !registration_open || !registration_close || !capacity || !category || !status) {
+    if (!title || !location || !start_date || !registration_open || !registration_close || !capacity || !category) {
       setError("Please fill in all required fields.");
       setIsLoading(false);
       return;
@@ -350,13 +367,21 @@ export default function EventForm({ initialData, mode, onSuccess, onCancel }: Ev
                   onChange={(e) => setCategory(e.target.value)}
                 />
 
-                <Select
-                  label="Status *"
-                  required
-                  options={[{ value: "", label: "Select status" }, ...STATUS_OPTIONS]}
-                  value={status}
-                  onChange={(e) => setStatus(e.target.value)}
-                />
+                <div className="input-wrap">
+                  <label className="label">Status</label>
+                  <div className="input flex items-center gap-2 bg-[rgba(45,42,74,0.04)] cursor-default select-none">
+                    {status ? (
+                      <span className={`
+                        ${status === "upcoming" ? "" :
+                          status === "today"    ? "" :
+                                                  ""}`}>
+                        {STATUS_OPTIONS.find(o => o.value === status)?.label ?? status}
+                      </span>
+                    ) : (
+                      <span className="caption text-[var(--gray)]">Set a start date to determine status</span>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
           </div>

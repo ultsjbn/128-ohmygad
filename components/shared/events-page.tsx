@@ -117,8 +117,8 @@ export default function EventsPage() {
 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [sort, setSort] = useState<SortState>({ field: "start_date", direction: "desc" });
-  const [filters, setFilters] = useState<FilterState>({ status: new Set(), category: new Set() });
+  const [sort, setSort] = useState<SortState>({ field: "start_date", direction: "asc" });
+  const [filters, setFilters] = useState<FilterState>({ status: new Set(["upcoming"]), category: new Set() });
   const [activeChip, setActiveChip] = useState("All");
 
   // event detail modal
@@ -321,8 +321,14 @@ export default function EventsPage() {
   };
 
   // apply search filters sort
+  const now = new Date();
   const filtered = sortEvents(
     events
+      .filter((e) => {
+        // Remove events whose registration close date has already passed
+        if (e.registration_close && new Date(e.registration_close) < now) return false;
+        return true;
+      })
       .filter((e) => `${e.title} ${e.category || ""} ${e.location || ""}`.toLowerCase().includes(search.toLowerCase()))
       .filter((e) => filters.status.size === 0 || filters.status.has(e.status?.toLowerCase().trim() ?? ""))
       .filter((e) => filters.category.size === 0 || filters.category.has(e.category ?? "")),
@@ -469,6 +475,15 @@ export default function EventsPage() {
           {filtered.map((event) => {
             const isRegistered = registeredIds.has(event.id!);
             const isRegistering = registeringId === event.id;
+
+            const now = new Date();
+            const regOpen  = event.registration_open  ? new Date(event.registration_open)  : null;
+            const regClose = event.registration_close ? new Date(event.registration_close) : null;
+            const isRegClosed =
+              event.status === "past" ||                          // event already past
+              (regClose && now > regClose) ||                     // registration window closed
+              (regOpen  && now < regOpen);                        // registration not yet open
+              
             return (
               <div
                 key={event.id}
@@ -492,8 +507,11 @@ export default function EventsPage() {
                   registered={regCounts[event.id!] ?? 0}
                   capacity={event.capacity ?? 0}
                   gradient={event.banner_url ? `url(${event.banner_url}) center/cover no-repeat` : CATEGORY_GRADIENT[event.category ?? ""] ?? DEFAULT_GRADIENT}
-                  registerLabel={isRegistering ? "Processing…" : isRegistered ? "Cancel Registration" : "Register"}
-                  registerDisabled={isRegistering}
+                  registerLabel={isRegistering ? "Processing…" :
+                     isRegistered ? "Cancel Registration" :
+                     isRegClosed ? "Registration Closed" :
+                     "Register"}
+                  registerDisabled={isRegistering || !!isRegClosed}
                   isRegistered={isRegistered}
                   onRegister={(e?: React.MouseEvent) =>
                     isRegistered ? handleCancelRegistration(event.id!, e) : handleRegister(event.id!, e)
@@ -512,30 +530,39 @@ export default function EventsPage() {
 
       {/* when opened the event */}
       <Modal
+      
         open={!!detailEvent}
         onClose={() => { setDetailEvent(null); setRegisterError(null); }}
         hideCloseButton
         modalStyle={{ maxWidth: 600, padding: 0 }}
         footer={
-          detailEvent && (
-            <div className="px-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] sm:px-5 sm:pb-5 shrink-0">
-              <Button
-                variant={isDetailRegistered ? "ghost" : "primary"}
-                className="w-full"
-                disabled={isDetailRegistering}
-                onClick={(e) => isDetailRegistered
-                  ? handleCancelRegistration(detailEvent.id!, e)
-                  : handleRegister(detailEvent.id!, e)
-                }
-              >
-                {isDetailRegistering
-                  ? "Processing…"
-                  : isDetailRegistered
-                    ? "Cancel Registration"
-                    : "Register"}
-              </Button>
-            </div>
-          )
+          detailEvent && (() => {
+            const now = new Date();
+            const detailRegClosed =
+              detailEvent.status === "past" ||
+              (detailEvent.registration_close && now > new Date(detailEvent.registration_close)) ||
+              (detailEvent.registration_open  && now < new Date(detailEvent.registration_open));
+
+            return (
+              <div className="px-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] sm:px-5 sm:pb-5 shrink-0">
+                <Button
+                  variant={isDetailRegistered ? "ghost" : detailRegClosed ? "soft" : "primary"}
+                  className="w-full"
+                  disabled={isDetailRegistering || !!detailRegClosed}
+                  onClick={(e) =>
+                    isDetailRegistered
+                      ? handleCancelRegistration(detailEvent.id!, e)
+                      : handleRegister(detailEvent.id!, e)
+                  }
+                >
+                  {isDetailRegistering  ? "Processing…"         :
+                  isDetailRegistered   ? "Cancel Registration" :
+                  detailRegClosed      ? "Registration Closed" :
+                  "Register"}
+                </Button>
+              </div>
+            );
+          })()
         }
       >
         {detailEvent && (
