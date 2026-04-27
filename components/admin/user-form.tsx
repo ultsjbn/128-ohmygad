@@ -38,7 +38,7 @@ interface UserFormProps {
 }
 
 // options
-const ROLE_OPTIONS = [{ value: "", label: "Select role…" }, { value: "admin", label: "Admin" }, { value: "faculty", label: "Faculty" }, { value: "student", label: "Student" }];
+const ROLE_OPTIONS = [{ value: "", label: "Select role…" }, { value: "admin", label: "Admin" }, { value: "staff", label: "Staff" }, { value: "faculty", label: "Faculty" }, { value: "student", label: "Student" }];
 const YEAR_OPTIONS = [{ value: "", label: "Select year…" }, { value: "1st Year", label: "1st Year" }, { value: "2nd Year", label: "2nd Year" }, { value: "3rd Year", label: "3rd Year" }, { value: "4th Year", label: "4th Year" }, { value: "5th Year", label: "5th Year" }];
 const COLLEGE_OPTIONS = [{ value: "", label: "Select college…" }, { value: "CS", label: "College of Science (CS)" }, { value: "CAC", label: "College of Arts and Communications (CAC)" }, { value: "CSS", label: "College of Social Sciences (CSS)" }];
 const SEX_OPTIONS = [{ value: "", label: "Select…" }, { value: "Male", label: "Male" }, { value: "Female", label: "Female" }, { value: "Intersex", label: "Intersex" }, { value: "Prefer not to say", label: "Prefer not to say" }];
@@ -200,6 +200,7 @@ export default function UserForm({ initialData, onSuccess, layout = "modal" }: U
         pronouns, sex_at_birth, gender_identity, is_onboarded,
         ...(role === "student" || !role ? { college, program, student_num: cleanStudentNum, year_level, gso_attended: gsoNum, asho_attended: ashoNum } : {}),
         ...(role === "admin" ? { office } : {}),
+        ...(role === "staff" ? { office } : {}),
         ...(role === "faculty" ? { college, department } : {}),
       };
 
@@ -254,6 +255,7 @@ export default function UserForm({ initialData, onSuccess, layout = "modal" }: U
               {(role === "student" || !role) && <Select label="Program" value={program} onChange={(e) => setProgram(e.target.value)} options={college && UPB_PROGRAMS[college] ? [{ value: "", label: "Select program" }, ...UPB_PROGRAMS[college]] : [{ value: "", label: "Select a college first" }]}/>}
               {role === "faculty" && <Input label="Department" prefixIcon={<Building2 size={15} />} placeholder="e.g. Dept. of Math and Computer Science" value={department} onChange={(e) => setDepartment(e.target.value)} maxLength={64} />}
               {role === "admin" && <Input label="Office / Unit" prefixIcon={<Building2 size={15} />} placeholder="e.g. Office of the Chancellor" value={office} onChange={(e) => setOffice(e.target.value)} maxLength={64} />}
+              {role === "staff" && <Input label="Office / Unit" prefixIcon={<Building2 size={15} />} placeholder="e.g. Office of the Chancellor" value={office} onChange={(e) => setOffice(e.target.value)} maxLength={64} />}
               <div className="col-span-full">
                 <Input label="Address" prefixIcon={<MapPin size={15} />} placeholder="City, Province" value={address} onChange={(e) => setAddress(e.target.value)} />
               </div>
@@ -318,6 +320,7 @@ export default function UserForm({ initialData, onSuccess, layout = "modal" }: U
         {(role === "student" || !role) && <Select label="Program" value={program} onChange={(e) => setProgram(e.target.value)} options={college && UPB_PROGRAMS[college] ? [{ value: "", label: "Select program" }, ...UPB_PROGRAMS[college]] : [{ value: "", label: "Select a college first" }]}/>}
         {role === "faculty" && <Input label="Department" prefixIcon={<Building2 size={15} />} placeholder="e.g. Dept. of Math and Computer Science" value={department} onChange={(e) => setDepartment(e.target.value)} maxLength={64} />}
         {role === "admin" && <Input label="Office / Unit" prefixIcon={<Building2 size={15} />} placeholder="e.g. Office of the Chancellor" value={office} onChange={(e) => setOffice(e.target.value)} maxLength={64} />}
+        {role === "staff" && <Input label="Office / Unit" prefixIcon={<Building2 size={15} />} placeholder="e.g. Office of the Chancellor" value={office} onChange={(e) => setOffice(e.target.value)} maxLength={64} />}
         <Input label="Contact Number" prefixIcon={<Phone size={15} />} maxLength={11} placeholder="e.g. 09123456789" value={contact_num} onChange={handleContactNumChange} />
         <Input label="Address" prefixIcon={<MapPin size={15} />} placeholder="City, Province" value={address} onChange={(e) => setAddress(e.target.value)} />
         <Select label="Pronouns" value={pronouns} onChange={(e) => setPronouns(e.target.value)} options={PRONOUNS} />

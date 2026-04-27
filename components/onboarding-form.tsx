@@ -179,6 +179,8 @@ export function OnboardingForm({
         case "admin":
           router.push("/admin");
           break;
+        case "staff":
+          router.push("/staff");
         case "faculty":
           router.push("/faculty");
           break;
@@ -226,6 +228,7 @@ export function OnboardingForm({
           {role === "student" && "Finish setting up your student account to access the dashboard."}
           {role === "faculty" && "Finish setting up your faculty account to access the dashboard."}
           {role === "admin" && "Finish setting up your admin account to access the dashboard."}
+          {role === "staff" && "Finish setting up your staff account to access the dashboard."}
         </p>
       </div>
 
@@ -333,7 +336,7 @@ export function OnboardingForm({
               </>
             )}
 
-            {role === "admin" && (
+            {role === "admin" || role === "staff" && (
               <>
                 <Input
                     label="Office / Unit"

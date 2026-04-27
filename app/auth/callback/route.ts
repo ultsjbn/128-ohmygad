@@ -34,6 +34,7 @@ export async function GET(request: Request) {
 
       const roleRoutes: Record<string, string> = {
         admin: '/admin',
+        staff: '/staff',
         faculty: '/faculty',
         student: '/student',
       }
