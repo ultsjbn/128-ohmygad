@@ -22,7 +22,7 @@ import {
   X,
   ClipboardList,
 } from "lucide-react";
-import EventForm, { type EventFormData } from "@/components/admin/event-form";
+import EventForm, { type EventFormData, deriveStatus } from "@/components/admin/event-form";
 import { Tabs } from "@/components/ui";
 import { paginate, totalPages, PER_PAGE } from "@/lib/pagination.utils";
 import { Pagination } from "@/components/pagination";
@@ -282,7 +282,7 @@ export default function EventsPage() {
 
 	// status filter
 	if (statusFilters.size > 0) {
-	  result = result.filter((e) => statusFilters.has(e.status ?? ""));
+	  result = result.filter((e) => statusFilters.has(deriveStatus(e.start_date ?? "", e.end_date ?? "")));
 	}
 
 	// sorting
@@ -443,11 +443,14 @@ export default function EventsPage() {
 	  key: "status",
 	  header: "Status",
 	  width: "12%",
-	  render: (event) => (
-		<Badge variant={STATUS_VARIANT[event.status ?? ""] ?? "dark"}>
-		  <span className="capitalize">{event.status}</span>
-		</Badge>
-	  ),
+	  render: (event) => {
+		const computedStatus = deriveStatus(event.start_date ?? "", event.end_date ?? "");
+		return (
+		  <Badge variant={STATUS_VARIANT[computedStatus] ?? "dark"}>
+			<span className="capitalize">{computedStatus}</span>
+		  </Badge>
+		);
+	  },
 	},
 	{
 	  key: "start_date",
@@ -841,17 +844,14 @@ export default function EventsPage() {
                   <Badge variant="ghost">
                     {detailEvent.category ?? "Uncategorized"}
                   </Badge>
-                  {detailEvent.status && (
-                    <Badge
-                      variant={
-                        STATUS_VARIANT[
-                          detailEvent.status.toLowerCase().trim()
-                        ] ?? "dark"
-                      }
-                    >
-                      <span className="capitalize">{detailEvent.status}</span>
-                    </Badge>
-                  )}
+                  {(() => {
+                    const computedStatus = deriveStatus(detailEvent.start_date ?? "", detailEvent.end_date ?? "");
+                    return computedStatus ? (
+                      <Badge variant={STATUS_VARIANT[computedStatus] ?? "dark"}>
+                        <span className="capitalize">{computedStatus}</span>
+                      </Badge>
+                    ) : null;
+                  })()}
                 </div>
 
                 <div className="flex flex-col gap-3">
