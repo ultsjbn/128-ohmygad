@@ -62,6 +62,9 @@ export function LoginForm({
         case "admin":
           router.push("/admin");
           break;
+        case "staff":
+          router.push("/staff");
+          break;
         case "faculty":
           router.push("/faculty");
           break;

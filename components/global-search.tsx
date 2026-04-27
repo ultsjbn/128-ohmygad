@@ -6,7 +6,7 @@ import { Search, Loader2, ChevronUp, ExternalLink, X, MoveUp, MoveDown } from "l
 import { Badge } from "@/components/ui";
 
 interface GlobalSearchProps {
-  role: "admin" | "faculty" | "student";
+  role: "admin" | "staff" |"faculty" | "student";
   placeholder?: string;
 }
 
