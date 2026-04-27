@@ -132,6 +132,7 @@ body {
 ------------------------------------------------------------------─ */
 ::-webkit-scrollbar {
   width: 6px;
+  display: none;
 }
 
 ::-webkit-scrollbar-track {
