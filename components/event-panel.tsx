@@ -1,12 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { JSX, useEffect, useState } from "react";
 import { Calendar, MapPin, Clock } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
-import { Badge, Button, Card } from "@/components/ui";
+import { Badge, Button, Card, Tabs } from "@/components/ui";
 
 //  types 
-
 interface EventData {
   id: string;
   title: string;
@@ -53,12 +52,12 @@ function groupByDate(events: EventData[]): EventGroup[] {
   return Array.from(map.values());
 }
 
-//  component 
+//  component proper --------------------------------------------------------------------------------------------------
 export const EventPanel = (): JSX.Element => {
   const supabase = createClient();
   const [events, setEvents]   = useState<EventData[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter]   = useState<"upcoming" | "past">("upcoming");
+  const [filter, setFilter]   = useState<"upcoming" | "today" | "past">("today");
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -110,40 +109,46 @@ export const EventPanel = (): JSX.Element => {
   const filteredEvents = events.filter((e) => {
     const compareDate = e.rawEndDate || e.rawStartDate;
     const isPast = new Date(compareDate) < new Date();
+    const isToday = new Date(compareDate).toDateString() === new Date().toDateString();
+    if (filter === "today") return isToday;
     return filter === "upcoming" ? !isPast : isPast;
   });
 
   const groups = groupByDate(filteredEvents);
 
+  const [detailTab, setDetailTab] = useState<"upcoming" | "today" | "past">(
+		"today",
+  );
+
   // render 
   return (
-    <div className="flex flex-col h-full p-0 md:p-2 gap-1 md:gap-4">
-
+    <div className="flex flex-col h-full gap-1 md:gap-2">
         {/*  header  */}
-        <div className="flex items-center justify-between shrink-0 min-w-0 w-full">
-            <h2 className="heading-lg m-0">Events</h2>
-            <div className="flex gap-1 p-1 rounded-[var(--radius-full)] bg-[var(--lavender)]">
-            <Button
-                variant={filter === "upcoming" ? "primary" : "ghost"}
-                size="sm"
-                onClick={() => setFilter("upcoming")}
-                style={{ borderRadius: "var(--radius-full)" }}
-            >
-                Upcoming
-            </Button>
-            <Button
-                variant={filter === "past" ? "primary" : "ghost"}
-                size="sm"
-                onClick={() => setFilter("past")}
-                style={{ borderRadius: "var(--radius-full)" }}
-            >
-                Past
-            </Button>
+        <div className="md:flex items-center gap-2 justify-between md:shrink-0 md:min-w-0 md:w-full">
+            <h2 className="heading-lg mb-3">Events</h2>
+            <div className="flex gap-1">
+                <Tabs
+                    tabs={["Today", "Upcoming", "Past"]}
+                    defaultTab={
+                    detailTab === "upcoming"
+                        ? "Upcoming"
+                        : detailTab === "today"
+                        ? "Today"
+                        : "Past"
+                    }
+                    onChange={(tab) => {
+                        const key = tab === "Upcoming" ? "upcoming" : tab === "Today" ? "today" : "past";
+                        setFilter(key);
+                        setDetailTab(key);
+                    }}
+                    className="w-fit"
+                />
             </div>
+            
         </div>
 
         {/*  scrollable timeline  */}
-        <div className="w-full pb-4">
+        <div className="w-full pb-2 items-center">
 
             {/* loading skeletons */}
             {loading && (
