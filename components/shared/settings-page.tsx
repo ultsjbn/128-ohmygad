@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import {
-  ChevronLeft, Mail, Lock, ShieldCheck, KeyRound, AlertCircle
+  Mail, Lock, KeyRound, AlertCircle
 } from "lucide-react";
 
 import { Card, Input, Button, Toast } from "@/components/ui";
@@ -24,6 +24,8 @@ export default function SharedSettingsPage() {
   const [savingEmail, setSavingEmail] = useState(false);
 
   // password form states
+  const [hasPasswordLogin, setHasPasswordLogin] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [savingPassword, setSavingPassword] = useState(false);
@@ -51,6 +53,11 @@ export default function SharedSettingsPage() {
     }
 
     setCurrentEmail(user.email ?? "");
+
+    // true only if they signed up with email and password
+    const hasEmail = user.identities?.some((i) => i.provider === "email") ?? false;
+    setHasPasswordLogin(hasEmail);
+
     setLoading(false);
   }
 
@@ -78,69 +85,92 @@ export default function SharedSettingsPage() {
   }
 
   // handle password update
-  async function handleUpdatePassword(e: React.FormEvent) {
-    e.preventDefault();
-    
-    if (newPassword.length < 6) {
-      setToast({ type: "error", message: "Password must be at least 6 characters long." });
-      return;
-    }
-    
-    if (newPassword !== confirmPassword) {
-      setToast({ type: "error", message: "Passwords do not match." });
-      return;
-    }
+    async function handleUpdatePassword(e: React.FormEvent) {
+        e.preventDefault();
 
-    setSavingPassword(true);
-    try {
-      const { error } = await supabase.auth.updateUser({ password: newPassword });
-      
-      if (error) throw error;
-      
-      setToast({ type: "success", message: "Password updated successfully!" });
-      setNewPassword("");
-      setConfirmPassword("");
-    } catch (error: any) {
-      setToast({ type: "error", message: error.message || "Failed to update password." });
-    } finally {
-      setSavingPassword(false);
-    }
-  }
+        if (!currentPassword) {
+            setToast({
+                type: "error",
+                message: "Please enter your current password."
+            })
+        }
+        
+        if (newPassword.length < 6) {
+            setToast({
+                type: "error",
+                message: "Password must be at least 6 characters long."
+            });
+            return;
+        }
+        
+        if (newPassword !== confirmPassword) {
+            setToast({
+                type: "error",
+                message: "Passwords do not match." });
+            return;
+        }
 
-  if (loading) {
-    return (
-      <div className="flex-1 flex items-center justify-center h-full min-h-0">
-        <div className="w-8 h-8 border-4 border-[var(--periwinkle-light)] border-t-[var(--periwinkle)] rounded-full animate-spin"></div>
-      </div>
-    );
-  }
+        setSavingPassword(true);
+
+        try {
+            // 1. verify current password by signing in again
+            const { error: signInError } = await supabase.auth.signInWithPassword(
+                {
+                    email: currentEmail,
+                    password: currentPassword,
+                }
+            );
+            if (signInError) {
+                setToast({
+                    type: "error",
+                    message: "Current password is incorrect."
+                });
+                return;
+            }
+
+            // 2. current password is correct
+            const { error } = await supabase.auth.updateUser({ password: newPassword });
+        
+            if (error) throw error;
+        
+            setToast({
+                type: "success",
+                message: "Password updated successfully!"
+            });
+
+            setNewPassword("");
+            setConfirmPassword("");
+        }   catch (error: any) {
+                setToast({
+                    type: "error",
+                    message: error.message || "Failed to update password."
+                });
+        }   finally {
+                setSavingPassword(false);
+            }
+        }
+
+        if (loading) {
+            return (
+            <div className="flex-1 flex items-center justify-center h-full min-h-0">
+                <div className="w-8 h-8 border-4 border-[var(--periwinkle-light)] border-t-[var(--periwinkle)] rounded-full animate-spin"></div>
+            </div>
+        );
+    }
 
   return (
     <div className="w-full mx-auto flex flex-col gap-4 lg:gap-6 animate-in fade-in duration-500 pb-24 lg:pb-6">
 
-      {/* top bar */}
-      <div className="shrink-0 flex items-center justify-between md:mt-2 md:hidden">
-        <div className="flex items-center gap-2 lg:gap-4">
-          <Button variant="icon" onClick={() => router.back()}>
-            <ChevronLeft size={16} />
-          </Button>
-          <div>
-            <h1 className="heading-lg lg:heading-xl leading-none">Account Settings</h1>
-            <p className="hidden md:block body text-[var(--gray)] mt-1">Manage your login credentials.</p>
-          </div>
-        </div>
-      </div>
-
-      {/* content cards wrapper - completely unrestricted flow */}
+      {/* content cards wrapper */}
       <div className="flex flex-col md:flex-row gap-6">
 
         {/* email section */}
-        <Card className="flex flex-col gap-4 p-3 lg:p-4">
+        <Card className="flex flex-col gap-4">
           
           {/* description side */}
           <div className="w-full shrink-0">
             <h2 className="heading-md mb-2">Change Email Address</h2>
-            <p className="text-sm text-[var(--gray)] leading-relaxed">
+            <p className="body leading-relaxed">
               Update the email address associated with your account. We will send a verification link to your new address to confirm ownership.
             </p>
           </div>
@@ -176,65 +206,87 @@ export default function SharedSettingsPage() {
         </Card>
 
         {/* password section */}
-        <Card className="flex flex-col gap-4 p-3 lg:p-4">
-          
-          {/* description side */}
-          <div className="w-full shrink-0">
-            <h2 className="heading-md mb-2">Change Password</h2>
-            <p className="text-sm text-[var(--gray)] leading-relaxed">
-              Ensure your account is using a long, random password to stay secure. It must be at least 6 characters long.
-            </p>
-          </div>
-
-          {/* form side */}
-          <form onSubmit={handleUpdatePassword} className="w-full flex flex-col gap-3">
-            <Input
-              label="New Password"
-              type="password"
-              placeholder="••••••••"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              required
-              maxLength={128}
-              prefixIcon={<KeyRound size={15} />}
-            />
-            <Input
-              label="Confirm New Password"
-              type="password"
-              placeholder="••••••••"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              required
-              maxLength={128}
-              prefixIcon={<KeyRound size={15} />}
-            />
+        {hasPasswordLogin ? (
+            <Card className="flex flex-col gap-4">
             
-            {/* inline warning */}
-            {newPassword && confirmPassword && newPassword !== confirmPassword && (
-              <div className="flex items-center gap-2 text-[var(--error)] text-sm mt-1">
-                <AlertCircle size={14} />
-                <span>Passwords do not match.</span>
-              </div>
-            )}
-
-            <div className="flex justify-end mt-2">
-              <Button 
-                type="submit" 
-                variant="primary" 
-                disabled={savingPassword || !newPassword || !confirmPassword || newPassword !== confirmPassword}
-                className="w-full md:w-auto px-8"
-              >
-                {savingPassword ? "Updating..." : "Update Password"}
-              </Button>
+            {/* description side */}
+            <div className="w-full shrink-0">
+                <h2 className="heading-md mb-2">Change Password</h2>
+                <p className="text-sm text-[var(--gray)] leading-relaxed">
+                Ensure your account is using a long, random password to stay secure. It must be at least 6 characters long.
+                </p>
             </div>
-          </form>
-        </Card>
 
+            {/* form side */}
+            <form onSubmit={handleUpdatePassword} className="w-full flex flex-col gap-3">
+                <Input
+                    label="Current Password"
+                    type="password"
+                    placeholder="••••••••"
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                    required
+                    maxLength={16}
+                    prefixIcon={<KeyRound size={15} />}
+                />
+                <Input
+                    label="New Password"
+                    type="password"
+                    placeholder="••••••••"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    required
+                    maxLength={16}
+                    prefixIcon={<KeyRound size={15} />}
+                />
+                <Input
+                    label="Confirm New Password"
+                    type="password"
+                    placeholder="••••••••"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    required
+                    maxLength={16}
+                    prefixIcon={<KeyRound size={15} />}
+                />
+                
+                {/* inline warning */}
+                {newPassword && confirmPassword && newPassword !== confirmPassword && (
+                <div className="flex items-center gap-2 text-[var(--error)] text-sm mt-1">
+                    <AlertCircle size={14} />
+                    <span>Passwords do not match.</span>
+                </div>
+                )}
+
+                <div className="flex justify-end mt-2">
+                <Button 
+                    type="submit" 
+                    variant="primary" 
+                    disabled={savingPassword || !currentPassword || !newPassword || !confirmPassword || newPassword !== confirmPassword}
+                    className="w-full md:w-auto px-8"
+                >
+                    {savingPassword ? "Updating..." : "Update Password"}
+                </Button>
+                </div>
+            </form>
+            </Card>
+        ) : (
+            <Card className="flex flex-col gap-4">
+                <h2 className="heading-md mb-2">Change Password</h2>
+                <div className="flex flex-col items-center justify-center flex-1">
+                    <p className="body text-center">
+                        Your account uses Google Sign-In. Password management is handled through your Google account.
+                    </p>
+                </div>
+                
+            </Card>
+        )}
+        
       </div>
 
       {/* fixed toast notification */}
       {toast && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[9999] w-max max-w-[90vw]">
+        <div className="fixed bottom-10 md:bottom-10 left-1/2 -translate-x-1/2 z-[9999] w-max max-w-[90vw]">
           <Toast variant={toast.type === "info" ? "warning" : toast.type} title={toast.message} />
         </div>
       )}

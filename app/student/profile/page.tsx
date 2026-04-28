@@ -191,7 +191,7 @@ export default function StudentProfilePage() {
             <div className="w-full text-left pt-3 border-t border-[rgba(45,42,74,0.08)]">
               <ProgressBar
                 value={profile.gso_attended === 2 ? 100 : profile.gso_attended === 1 ? 50 : 0}
-                variant="dark"
+                variant="gradient"
                 label="GSO Attendance"
                 sublabel={`${profile.gso_attended ?? 0} / 2 completed`}
               />
@@ -209,7 +209,7 @@ export default function StudentProfilePage() {
             <div className="w-full text-left pt-3 border-t border-[rgba(45,42,74,0.08)]">
               <ProgressBar
                 value={profile.gso_attended === 2 ? 100 : profile.gso_attended === 1 ? 50 : 0}
-                variant="dark"
+                variant="periwinkle"
                 label="Forums Attended"
                 sublabel={`${profile.gso_attended ?? 0} attended`}
               />
@@ -218,7 +218,7 @@ export default function StudentProfilePage() {
             <div className="w-full text-left pt-3 border-t border-[rgba(45,42,74,0.08)]">
               <ProgressBar
                 value={profile.gso_attended === 2 ? 100 : profile.gso_attended === 1 ? 50 : 0}
-                variant="dark"
+                variant="periwinkle"
                 label="Research Attended"
                 sublabel={`${profile.gso_attended ?? 0} attended`}
               />
@@ -227,7 +227,7 @@ export default function StudentProfilePage() {
             <div className="w-full text-left pt-3 border-t border-[rgba(45,42,74,0.08)]">
               <ProgressBar
                 value={profile.gso_attended === 2 ? 100 : profile.gso_attended === 1 ? 50 : 0}
-                variant="dark"
+                variant="periwinkle"
                 label="Trainings Attended"
                 sublabel={`${profile.gso_attended ?? 0} attended`}
               />
@@ -236,7 +236,7 @@ export default function StudentProfilePage() {
             <div className="w-full text-left pt-3 border-t border-[rgba(45,42,74,0.08)]">
               <ProgressBar
                 value={profile.gso_attended === 2 ? 100 : profile.gso_attended === 1 ? 50 : 0}
-                variant="dark"
+                variant="periwinkle"
                 label="Workshops Attended"
                 sublabel={`${profile.gso_attended ?? 0} attended`}
               />
