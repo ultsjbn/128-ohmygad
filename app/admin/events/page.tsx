@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { deleteEventAndLinkedSurveys } from "./actions";
 import {
 	Plus,
 	ArrowUpDown,
@@ -400,14 +401,11 @@ export default function EventsPage() {
 		// Password verified, proceed with delete
 		setDeletingId(deleteTarget.id);
 
-		const { error } = await supabase
-			.from("event")
-			.delete()
-			.eq("id", deleteTarget.id);
+		const result = await deleteEventAndLinkedSurveys(deleteTarget.id);
 
-		if (error) {
-			setDeleteError(error.message || "Failed to delete event.");
-			showToast("error", "Failed to delete event", error.message);
+		if (!result.success) {
+			setDeleteError(result.error || "Failed to delete event.");
+			showToast("error", "Failed to delete event", result.error || "Unknown error");
 		} else {
 			setEvents((prev) => prev.filter((e) => e.id !== deleteTarget.id));
 			showToast("success", "Event deleted successfully");

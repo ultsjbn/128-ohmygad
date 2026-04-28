@@ -100,7 +100,7 @@ export default function EventsPage() {
   const [error, setError] = useState<string | null>(null);
   const [sort, setSort] = useState<SortState>({ field: "start_date", direction: "asc" });
   const [filters, setFilters] = useState<FilterState>({ 
-    status: searchParams.get("search") ? new Set() : new Set(["upcoming"]), 
+    status: searchParams.get("search") ? new Set() : new Set(["today", "upcoming"]), 
     category: new Set() 
   });
   const [activeChip, setActiveChip] = useState("All");
@@ -110,6 +110,7 @@ export default function EventsPage() {
 
   // user registration
   const [registeredIds, setRegisteredIds] = useState<Set<string>>(new Set());
+  const [attendedIds, setAttendedIds] = useState<Set<string>>(new Set());
   const [registeringId, setRegisteringId] = useState<string | null>(null);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [registerError, setRegisterError] = useState<string | null>(null);
@@ -145,10 +146,13 @@ export default function EventsPage() {
         // 2 - fetch existing registrations
         const { data: regs } = await supabase
           .from("event_registration")
-          .select("event_id")
+          .select("event_id, attended")
           .eq("user_id", user.id);
 
-        if (regs) setRegisteredIds(new Set(regs.map((r) => r.event_id)));
+        if (regs) {
+          setRegisteredIds(new Set(regs.map((r) => r.event_id)));
+          setAttendedIds(new Set(regs.filter((r) => r.attended).map((r) => r.event_id)));
+        }
       }
 
       // 3 - fetch events
@@ -318,14 +322,16 @@ export default function EventsPage() {
   const now = new Date();
   const filtered = sortEvents(
     events
-      .filter((e) => {
-        // Remove events whose registration close date has already passed
-        if (e.registration_close && new Date(e.registration_close) < now) return false;
-        return true;
-      })
       .filter((e) => `${e.title} ${e.category || ""} ${e.location || ""}`.toLowerCase().includes(search.toLowerCase()))
       .filter((e) => filters.status.size === 0 || filters.status.has(e.status?.toLowerCase().trim() ?? ""))
-      .filter((e) => filters.category.size === 0 || filters.category.has(e.category ?? "")),
+      .filter((e) => filters.category.size === 0 || filters.category.has(e.category ?? ""))
+      .filter((e) => {
+        // Only allow Past events if the user has already attended them
+        if (e.status?.toLowerCase().trim() === "past") {
+          return attendedIds.has(e.id!);
+        }
+        return true;
+      }),
     sort
   );
 
@@ -385,7 +391,7 @@ export default function EventsPage() {
               <DropdownDivider />
               <DropdownItem
                 onClick={() =>
-                  setSort({ field: "start_date", direction: "desc" })
+                  setSort({ field: "start_date", direction: "asc" })
                 }
               >
                 Reset sort
