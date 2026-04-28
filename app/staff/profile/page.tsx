@@ -50,6 +50,7 @@ export default function StaffProfilePage() {
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState<ToastState>(null);
   const [tab, setTab] = useState("Personal");
+  const [categoryCounts, setCategoryCounts] = useState<Record<string, number>>({});
 
   const supabase = createClient();
 
@@ -83,6 +84,22 @@ export default function StaffProfilePage() {
         const p = { ...profile, id: user.id, email: user.email ?? "" };
         setProfile(p);
         setInitialProfile(p);
+      }
+
+      // fetch attendance counts per event category
+      const { data: regs } = await supabase
+        .from("event_registration")
+        .select("event:event_id(category)")
+        .eq("user_id", user.id)
+        .eq("attended", true);
+
+      if (regs) {
+        const counts: Record<string, number> = {};
+        regs.forEach((r: any) => {
+          const cat = r.event?.category;
+          if (cat) counts[cat] = (counts[cat] ?? 0) + 1;
+        });
+        setCategoryCounts(counts);
       }
     } catch {
       setToast({ type: "error", message: "Failed to load profile." });
@@ -205,37 +222,37 @@ export default function StaffProfilePage() {
             {/* forums progress bar */}
             <div className="w-full text-left pt-3 border-t border-[rgba(45,42,74,0.08)]">
               <ProgressBar
-                value={profile.gso_attended === 2 ? 100 : profile.gso_attended === 1 ? 50 : 0}
+                value={categoryCounts["Forum"] ? Math.min((categoryCounts["Forum"] / 2) * 100, 100) : 0}
                 variant="dark"
                 label="Forums Attended"
-                sublabel={`${profile.gso_attended ?? 0} attended`}
+                sublabel={`${categoryCounts["Forum"] ?? 0} attended`}
               />
             </div>
             {/* research progress bar */}
             <div className="w-full text-left pt-3 border-t border-[rgba(45,42,74,0.08)]">
               <ProgressBar
-                value={profile.gso_attended === 2 ? 100 : profile.gso_attended === 1 ? 50 : 0}
+                value={categoryCounts["Research"] ? Math.min((categoryCounts["Research"] / 2) * 100, 100) : 0}
                 variant="dark"
                 label="Research Attended"
-                sublabel={`${profile.gso_attended ?? 0} attended`}
+                sublabel={`${categoryCounts["Research"] ?? 0} attended`}
               />
             </div>
             {/* training progress bar */}
             <div className="w-full text-left pt-3 border-t border-[rgba(45,42,74,0.08)]">
               <ProgressBar
-                value={profile.gso_attended === 2 ? 100 : profile.gso_attended === 1 ? 50 : 0}
+                value={categoryCounts["Training"] ? Math.min((categoryCounts["Training"] / 2) * 100, 100) : 0}
                 variant="dark"
                 label="Trainings Attended"
-                sublabel={`${profile.gso_attended ?? 0} attended`}
+                sublabel={`${categoryCounts["Training"] ?? 0} attended`}
               />
             </div>
-            {/* research progress bar */}
+            {/* workshops progress bar */}
             <div className="w-full text-left pt-3 border-t border-[rgba(45,42,74,0.08)]">
               <ProgressBar
-                value={profile.gso_attended === 2 ? 100 : profile.gso_attended === 1 ? 50 : 0}
+                value={categoryCounts["Workshop"] ? Math.min((categoryCounts["Workshop"] / 2) * 100, 100) : 0}
                 variant="dark"
                 label="Workshops Attended"
-                sublabel={`${profile.gso_attended ?? 0} attended`}
+                sublabel={`${categoryCounts["Workshop"] ?? 0} attended`}
               />
             </div>
 
