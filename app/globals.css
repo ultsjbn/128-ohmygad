@@ -1173,8 +1173,7 @@ header {
 }
 
 .badge-ghost {
-    padding: 6px 10px;
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.8);
     color: var(--badge-periwinkle-text);
     border: 1px solid var(--periwinkle-deep);
 }

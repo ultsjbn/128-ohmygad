@@ -90,7 +90,7 @@ function colorFor(map: Record<string, string>, key: string, idx: number) {
 // tooltip ------------------------------------------------
 interface TooltipEntry {
 	color?: string;
-	payload?: { fill?: string };
+	payload?: { fill?: string; eventTitle?: string };
 	name?: string;
 	dataKey?: string;
 	value?: number | string;
@@ -105,10 +105,14 @@ function CustomTooltip({
 	label?: string;
 }) {
 	if (!active || !payload?.length) return null;
+	const eventTitle = payload[0]?.payload?.eventTitle;
 	return (
 		<div className="bg-white/90 backdrop-blur-md border border-black/[0.07] shadow-[var(--shadow-float)] rounded-xl p-2 min-w-[120px]">
 			{label && (
 				<p className="body uppercase tracking-wider mb-1.5">{label}</p>
+			)}
+			{eventTitle && (
+				<p className="caption text-[var(--gray)] mb-1">Linked event: {eventTitle}</p>
 			)}
 			{payload.map((e: TooltipEntry, i: number) => (
 				<div key={i} className="flex items-center gap-2">
@@ -700,7 +704,8 @@ export default function DashboardPage() {
 									className="min-w-[220px] max-w-full"
 								/>
 							</div>
-							<div className="flex-1 w-full min-h-[220px] cursor-default select-none mt-4">
+
+							<div className="w-full min-h-[220px] cursor-default select-none mt-6">
 								{surveyCompletionLoading ? (
 									<div className="flex items-center justify-center h-full">
 										<span className="caption animate-pulse"> Loading survey data… </span>

@@ -217,7 +217,7 @@ export default function StudentProfilePage() {
             <div className="w-full text-left pt-3 border-t border-[rgba(45,42,74,0.08)]">
               <ProgressBar
                 value={profile.asho_attended === 2 ? 100 : profile.asho_attended === 1 ? 50 : 0}
-                variant="dark"
+                variant="gradient"
                 label="ASHO Attendance"
                 sublabel={`${profile.asho_attended ?? 0} / 2 completed`}
               />
