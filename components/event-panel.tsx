@@ -308,7 +308,7 @@ export const EventPanel = (): JSX.Element => {
                             ? `url(${event.banner_url}) center/cover no-repeat`
                             : CATEGORY_GRADIENT[event.category ?? ""] ?? DEFAULT_GRADIENT;
                         return (
-                            <Card variant="glass" key={event.id} className="hover:shadow-[var(--shadow-soft)] transition-shadow cursor-pointer">
+                            <Card variant="ghost" key={event.id} className="hover:shadow-[var(--shadow-soft)] transition-shadow cursor-pointer">
                                 <div className="flex gap-4 items-center">
                                     <div className="flex flex-col gap-1.5 flex-1 min-w-0">
                                         <span className="caption flex items-center gap-1">
@@ -327,7 +327,7 @@ export const EventPanel = (): JSX.Element => {
                                             {event.category && <Badge variant="ghost">{event.category}</Badge>}
                                         </div>
                                     </div>
-                                    <div className="w-[100px] h-[100px] rounded-[var(--radius-sm)] shrink-0" style={{ background: cover }} />
+                                    <div className="w-[150px] h-[100px] rounded-[var(--radius-sm)] shrink-0" style={{ background: cover }} />
                                 </div>
                             </Card>
                         );

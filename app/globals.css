@@ -616,20 +616,20 @@ header {
   background: var(--white);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-card);
-  padding: 28px;
+  padding: 24px;
   transition: var(--transition);
 }
 
 .card-no-hover {
   background: var(--white);
   border-radius: var(--radius-lg);
-  padding: 28px;
+  padding: 24px;
 }
 
 .card-no-shadow {
     background: var(--white);
     border-radius: var(--radius-lg);
-    padding: 28px;
+    padding: 24px;
     transition: var(--transition);
 }
 
@@ -652,14 +652,14 @@ header {
 .card-pink {
   background: linear-gradient(135deg, var(--pink-light) 0%, var(--pink-light-deep) 100%);
   border-radius: var(--radius-lg);
-  padding: 28px;
+  padding: 24px;
   box-shadow: var(--shadow-card);
 }
 
 .card-periwinkle {
   background: linear-gradient(135deg, var(--periwinkle-light) 0%, var(--periwinkle-light-deep) 100%);
   border-radius: var(--radius-lg);
-  padding: 28px;
+  padding: 24px;
   box-shadow: var(--shadow-card);
 }
 
@@ -667,7 +667,7 @@ header {
   background: var(--primary-dark);
   color: var(--white);
   border-radius: var(--radius-lg);
-  padding: 28px;
+  padding: 24px;
   box-shadow: 0 8px 32px rgba(45, 42, 74, 0.22);
 }
 
@@ -676,8 +676,22 @@ header {
   backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.6);
   border-radius: var(--radius-lg);
-  padding: 28px;
+  padding: 24px;
   box-shadow: var(--shadow-soft);
+}
+
+.card-ghost {
+    background: rgba(255, 255, 255, 0.72);
+    border: 1px solid #EDEAF9;
+    border-radius: var(--radius-lg);
+    padding: 24px;
+}
+
+.card-ghost:hover {
+    background: rgba(252, 247, 255, 0.72);
+    border-color: var(--periwinkle);
+    border: 1px solid #EDEAF9;
+    box-shadow: var(--shadow-card);
 }
 
 /* ------------------------------------------------------------------─

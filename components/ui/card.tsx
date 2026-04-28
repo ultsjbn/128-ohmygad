@@ -1,7 +1,7 @@
 import React from "react";
 import { CalendarDays, Clock, MapPin } from "lucide-react";
 
-type CardVariant = "default" | "pink" | "periwinkle" | "dark" | "glass" | "no-shadow" | "no-hover";
+type CardVariant = "default" | "pink" | "periwinkle" | "dark" | "glass" | "no-shadow" | "no-hover" | "ghost";
 
 interface CardProps {
   children: React.ReactNode;
@@ -19,6 +19,7 @@ export function Card({ children, variant = "default", className = "", style, noP
     : variant === "glass" ? "card-glass"
     : variant === "no-shadow" ? "card-no-shadow"
     : variant === "no-hover" ? "card-no-hover"
+    : variant === "ghost" ? "card-ghost"
     : "card";
 
   return (
