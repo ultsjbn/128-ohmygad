@@ -473,7 +473,7 @@ export default function DashboardPage() {
 												/>
 											</div>
 											<div>
-												<p className="label text-[var(--primary-dark)]"> {" "} No users found{" "} </p>
+												<p className="label text-[var(--primary-dark)]"> {" "} No user data{" "} </p>
 											</div>
 										</Card>
 									) : (
@@ -555,7 +555,7 @@ export default function DashboardPage() {
 												/>
 											</div>
 											<div>
-												<p className="label text-[var(--primary-dark)]"> {" "} No users found{" "} </p>
+												<p className="label text-[var(--primary-dark)]"> {" "} No user data{" "} </p>
 											</div>
 										</Card>
 									) : (
@@ -631,7 +631,7 @@ export default function DashboardPage() {
 												/>
 											</div>
 											<div>
-												<p className="label text-[var(--primary-dark)]"> {" "} No users found{" "} </p>
+												<p className="label text-[var(--primary-dark)]"> {" "} No user data{" "} </p>
 											</div>
 										</Card>
 									) : (
@@ -890,7 +890,7 @@ export default function DashboardPage() {
 					onCancel={closeModal}
 				/>
 			</Modal>
-			
+
 			{/* -------------------------------------- survey modal -------------------------------------- */}
 			<Modal
 				open={activeModal === "survey"}
