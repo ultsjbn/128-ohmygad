@@ -141,7 +141,7 @@ export default function UserForm({ initialData, onSuccess, layout = "modal" }: U
       const addressErr = validateAddress(address || "");
       if (addressErr) throw new Error(addressErr);
 
-      if (role === "admin") {
+      if (role === "admin" || role === "staff") {
         const officeErr = validateOffice(office);
         if (officeErr) throw new Error(officeErr);
       }
@@ -159,10 +159,10 @@ export default function UserForm({ initialData, onSuccess, layout = "modal" }: U
 
       const payload: Partial<CreateUserData> = {
         full_name, email, display_name, role, contact_num, address,
-        pronouns, sex_at_birth, gender_identity, is_onboarded,
+        pronouns, sex_at_birth, gender_identity, is_onboarded, office, department,
         ...(role === "student" || !role ? { college, program, student_num: cleanStudentNum, year_level, gso_attended: gsoNum, asho_attended: ashoNum } : {}),
-        ...(role === "admin" ? { office } : {}),
-        ...(role === "staff" ? { office } : {}),
+        ...(role === "admin" ? { office: office } : {}),
+        ...(role === "staff" ? { office: office } : {}),
         ...(role === "faculty" ? { college, department } : {}),
       };
 
@@ -228,7 +228,7 @@ export default function UserForm({ initialData, onSuccess, layout = "modal" }: U
             <Card className="flex flex-col gap-3 p-5 sm:p-6 w-full">
               <h2 className="text-xl font-bold mb-1" style={{ color: "var(--primary-dark)" }}>Profile Details</h2>
 
-              <Input label="Pronouns" placeholder="e.g. she/her, they/them" value={pronouns} onChange={(e) => setPronouns(e.target.value)} />
+              <Select label="Pronouns" value={pronouns} onChange={(e) => setPronouns(e.target.value)} options={[{ value: "", label: "Select pronouns…" }, ...PRONOUNS]}/>
               <Select label="Sex at Birth" value={sex_at_birth} onChange={(e) => setSexAtBirth(e.target.value)} options={[{ value: "", label: "Select…" }, ...SEX_OPTIONS]} />
               <Select label="Gender Identity" value={gender_identity} onChange={(e) => setGenderIdentity(e.target.value)} options={[{ value: "", label: "Select…" }, ...GENDER_OPTIONS]} />
               {(role === "student" || role === "faculty" || !role) && <Input label="GSO Sessions Attended" maxLength={1} placeholder="0" value={gso_attended.toString()} onChange={(e) => setGsoAttended(e.target.value)} />}
