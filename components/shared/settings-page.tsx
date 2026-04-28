@@ -273,8 +273,8 @@ export default function SharedSettingsPage() {
         ) : (
             <Card className="flex flex-col gap-4">
                 <h2 className="heading-md mb-2">Change Password</h2>
-                <div className="flex flex-col items-center justify-self-center">
-                    <p className="body">
+                <div className="flex flex-col items-center justify-center flex-1">
+                    <p className="body text-center">
                         Your account uses Google Sign-In. Password management is handled through your Google account.
                     </p>
                 </div>
