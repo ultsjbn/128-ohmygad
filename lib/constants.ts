@@ -121,7 +121,8 @@ export const EVENT_STATUS_VARIANT: Record<string, BadgeVariant> = {
 };
 
 export const CATEGORY_VARIANT: Record<string, BadgeVariant> = {
-  Orientation: "pink-light",
+  GSO: "pink-light",
+  ASHO: "pink-light",
   Forum: "periwinkle",
   Research: "error",
   Training: "success",
@@ -137,6 +138,7 @@ export const REG_STATUS_VARIANT: Record<string, BadgeVariant> = {
 };
 
 export const SURVEY_STATUS_VARIANT: Record<string, BadgeVariant> = {
+  upcoming: "pink-light",
   open: "success",
   closed: "periwinkle",
 };
