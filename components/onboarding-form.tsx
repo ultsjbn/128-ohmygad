@@ -10,44 +10,10 @@ import { Input, Select } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { validateFullName, validateContactNum, validateStudentNum } from "@/lib/validation";
 
-const UPB_PROGRAMS: Record<string, { value: string; label: string }[]> = {
-  CS: [
-    { value: "BS Biology", label: "BS Biology" },
-    { value: "BS Computer Science", label: "BS Computer Science" },
-    { value: "BS Mathematics", label: "BS Mathematics" },
-    { value: "BS Physics", label: "BS Physics" },
-    { value: "MS Conservation and Restoration Ecology", label: "MS Conservation and Restoration Ecology" },
-    { value: "MS Mathematics", label: "MS Mathematics" },
-    { value: "Doctor of Philosophy in Mathematics", label: "Doctor of Philosophy in Mathematics" },
-  ],
-  CAC: [
-    { value: "BA Communication", label: "BA Communication" },
-    { value: "BA Fine Arts", label: "BA Fine Arts" },
-    { value: "BA Language and Literature", label: "BA Language and Literature" },
-    { value: "Certificate in Fine Arts", label: "Certificate in Fine Arts" },
-    { value: "MA Language and Literature", label: "MA Language and Literature" },
-  ],
-  CSS: [
-    { value: "BA Social Sciences (History)", label: "BA Social Sciences (History)" },
-    { value: "BA Social Sciences (Economics)", label: "BA Social Sciences (Economics)" },
-    { value: "BA Social Sciences (Anthropology)", label: "BA Social Sciences (Anthropology)" },
-    { value: "BS Management Economics", label: "BS Management Economics" },
-    { value: "MA History (Ethnohistory and Local History)", label: "MA History (Ethnohistory and Local History)" },
-    { value: "MA Social and Development Studies", label: "MA Social and Development Studies" },
-    { value: "Master of Management", label: "Master of Management" },
-    { value: "Doctor of Philosophy in Indigenous Studies", label: "Doctor of Philosophy in Indigenous Studies" },
-  ],
-};
-
-const PRONOUNS = [
-  { value: "he/him", label: "he/him" },
-  { value: "she/her", label: "she/her" },
-  { value: "they/them", label: "they/them" },
-  { value: "he/they", label: "he/they" },
-  { value: "she/they", label: "she/they" },
-  { value: "any/all", label: "any/all" },
-  { value: "Prefer not to say", label: "Prefer not to say" },
-];
+import { 
+  YEAR_OPTIONS, COLLEGE_OPTIONS, SEX_OPTIONS, 
+  GENDER_OPTIONS, UPB_PROGRAMS, PRONOUNS 
+} from "@/lib/constants";
 
 export function OnboardingForm({
   className,
@@ -274,14 +240,7 @@ export function OnboardingForm({
                   label="Year Level"
                   value={year_level}
                   onChange={(e) => setYearLevel(e.target.value)}
-                  options={[
-                    { value: "", label: "Select year level" },
-                    { value: "1st Year", label: "1st Year" },
-                    { value: "2nd Year", label: "2nd Year" },
-                    { value: "3rd Year", label: "3rd Year" },
-                    { value: "4th Year", label: "4th Year" },
-                    { value: "Extendee", label: "Extendee" },
-                  ]}
+                  options={[{ value: "", label: "Select year level" }, ...YEAR_OPTIONS]}
                 />
               </>
             )}
@@ -296,12 +255,7 @@ export function OnboardingForm({
                       setCollege(e.target.value);
                       setProgram("");
                     }}
-                    options={[
-                      { value: "", label: "Select college" },
-                      { value: "CS", label: "College of Science (CS)" },
-                      { value: "CAC", label: "College of Arts and Communications (CAC)" },
-                      { value: "CSS", label: "College of Social Sciences (CSS)" },
-                    ]}
+                    options={[{ value: "", label: "Select college" }, ...COLLEGE_OPTIONS]}
                 />
               </>
             )}
@@ -364,7 +318,7 @@ export function OnboardingForm({
                 label="Pronouns (optional)"
                 value={pronouns}
                 onChange={(e) => setPronouns(e.target.value)}
-                options={PRONOUNS}
+                options={[{ value: "", label: "Select pronouns" }, ...PRONOUNS]}
             />
 
             <div className="md:col-span-2">
@@ -384,13 +338,7 @@ export function OnboardingForm({
               required
               value={sex_at_birth}
               onChange={(e) => setSexAtBirth(e.target.value)}
-              options={[
-                { value: "", label: "Select sex at birth" },
-                { value: "Male", label: "Male" },
-                { value: "Female", label: "Female" },
-                { value: "Intersex", label: "Intersex" },
-                { value: "Prefer not to say", label: "Prefer not to say" },
-              ]}
+              options={[{ value: "", label: "Select sex at birth" }, ...SEX_OPTIONS]}
             />
 
             <Select
@@ -398,15 +346,7 @@ export function OnboardingForm({
               required
               value={gender_identity}
               onChange={(e) => setGenderIdentity(e.target.value)}
-              options={[
-                { value: "", label: "Select gender identity" },
-                { value: "Man", label: "Man" },
-                { value: "Woman", label: "Woman" },
-                { value: "Non-binary", label: "Non-binary" },
-                { value: "Genderqueer", label: "Genderqueer" },
-                { value: "Genderfluid", label: "Genderfluid" },
-                { value: "Prefer not to say", label: "Prefer not to say" },
-              ]}
+              options={[{ value: "", label: "Select gender identity" }, ...GENDER_OPTIONS]}
             />
           </div>
 

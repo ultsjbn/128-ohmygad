@@ -30,31 +30,9 @@ type ToastState = { type: "success" | "error"; message: string } | null;
 
 const TAB_OPTIONS = ["Personal", "Professional", "Identity"];
 
-const SEX_OPTIONS = [
-  { value: "Male", label: "Male" },
-  { value: "Female", label: "Female" },
-  { value: "Intersex", label: "Intersex" },
-  { value: "Prefer not to say", label: "Prefer not to say" },
-];
-
-const PRONOUNS = [
-  { value: "he/him", label: "he/him" },
-  { value: "she/her", label: "she/her" },
-  { value: "they/them", label: "they/them" },
-  { value: "he/they", label: "he/they" },
-  { value: "she/they", label: "she/they" },
-  { value: "any/all", label: "any/all" },
-  { value: "Prefer not to say", label: "Prefer not to say" },
-];
-
-const GENDER_IDENTITY_OPTIONS = [
-  { value: "Man", label: "Man" },
-  { value: "Woman", label: "Woman" },
-  { value: "Non-binary", label: "Non-binary" },
-  { value: "Genderqueer", label: "Genderqueer" },
-  { value: "Genderfluid", label: "Genderfluid" },
-  { value: "Prefer not to say", label: "Prefer not to say" },
-];
+import { 
+  SEX_OPTIONS, GENDER_OPTIONS, PRONOUNS 
+} from "@/lib/constants";
 
 export default function StaffProfilePage() {
   const router = useRouter();
@@ -351,7 +329,7 @@ export default function StaffProfilePage() {
                   />
                   <Select
                     label="Gender Identity"
-                    options={[{ value: "", label: "Select gender identity" }, ...GENDER_IDENTITY_OPTIONS]}
+                    options={[{ value: "", label: "Select gender identity" }, ...GENDER_OPTIONS]}
                     value={profile.gender_identity}
                     onChange={set("gender_identity")}
                   />

@@ -38,50 +38,12 @@ interface UserFormProps {
 }
 
 // options
-const ROLE_OPTIONS = [{ value: "", label: "Select role…" }, { value: "admin", label: "Admin" }, { value: "staff", label: "Staff" }, { value: "faculty", label: "Faculty" }, { value: "student", label: "Student" }];
-const YEAR_OPTIONS = [{ value: "", label: "Select year…" }, { value: "1st Year", label: "1st Year" }, { value: "2nd Year", label: "2nd Year" }, { value: "3rd Year", label: "3rd Year" }, { value: "4th Year", label: "4th Year" }, { value: "5th Year", label: "5th Year" }];
-const COLLEGE_OPTIONS = [{ value: "", label: "Select college…" }, { value: "CS", label: "College of Science (CS)" }, { value: "CAC", label: "College of Arts and Communications (CAC)" }, { value: "CSS", label: "College of Social Sciences (CSS)" }];
-const SEX_OPTIONS = [{ value: "", label: "Select…" }, { value: "Male", label: "Male" }, { value: "Female", label: "Female" }, { value: "Intersex", label: "Intersex" }, { value: "Prefer not to say", label: "Prefer not to say" }];
-const GENDER_OPTIONS = [{ value: "", label: "Select…" }, { value: "Man", label: "Man" }, { value: "Woman", label: "Woman" }, { value: "Non-binary", label: "Non-binary" }, { value: "Genderqueer", label: "Genderqueer" }, { value: "Genderfluid", label: "Genderfluid" }, { value: "Prefer not to say", label: "Prefer not to say" }];
+import { 
+  ROLE_OPTIONS, YEAR_OPTIONS, COLLEGE_OPTIONS, 
+  SEX_OPTIONS, GENDER_OPTIONS, UPB_PROGRAMS, PRONOUNS 
+} from "@/lib/constants";
 
-const UPB_PROGRAMS: Record<string, { value: string; label: string }[]> = {
-  CS: [
-    { value: "BS Biology", label: "BS Biology" },
-    { value: "BS Computer Science", label: "BS Computer Science" },
-    { value: "BS Mathematics", label: "BS Mathematics" },
-    { value: "BS Physics", label: "BS Physics" },
-    { value: "MS Conservation and Restoration Ecology", label: "MS Conservation and Restoration Ecology" },
-    { value: "MS Mathematics", label: "MS Mathematics" },
-    { value: "Doctor of Philosophy in Mathematics", label: "Doctor of Philosophy in Mathematics" },
-  ],
-  CAC: [
-    { value: "BA Communication", label: "BA Communication" },
-    { value: "BA Fine Arts", label: "BA Fine Arts" },
-    { value: "BA Language and Literature", label: "BA Language and Literature" },
-    { value: "Certificate in Fine Arts", label: "Certificate in Fine Arts" },
-    { value: "MA Language and Literature", label: "MA Language and Literature" },
-  ],
-  CSS: [
-    { value: "BA Social Sciences (History)", label: "BA Social Sciences (History)" },
-    { value: "BA Social Sciences (Economics)", label: "BA Social Sciences (Economics)" },
-    { value: "BA Social Sciences (Anthropology)", label: "BA Social Sciences (Anthropology)" },
-    { value: "BS Management Economics", label: "BS Management Economics" },
-    { value: "MA History (Ethnohistory and Local History)", label: "MA History (Ethnohistory and Local History)" },
-    { value: "MA Social and Development Studies", label: "MA Social and Development Studies" },
-    { value: "Master of Management", label: "Master of Management" },
-    { value: "Doctor of Philosophy in Indigenous Studies", label: "Doctor of Philosophy in Indigenous Studies" },
-  ],
-};
 
-const PRONOUNS = [
-  { value: "he/him", label: "he/him" },
-  { value: "she/her", label: "she/her" },
-  { value: "they/them", label: "they/them" },
-  { value: "he/they", label: "he/they" },
-  { value: "she/they", label: "she/they" },
-  { value: "any/all", label: "any/all" },
-  { value: "Prefer not to say", label: "Prefer not to say" },
-];
 
 // section label for modal view
 function SectionLabel({ children }: { children: React.ReactNode }) {
@@ -241,7 +203,7 @@ export default function UserForm({ initialData, onSuccess, layout = "modal" }: U
               <Input label="Full Name" required prefixIcon={<User size={15} />} maxLength={64} placeholder="e.g. Maria Santos" value={full_name} onChange={(e) => setFullName(e.target.value)} />
               <Input label="Email" type="email" required prefixIcon={<Mail size={15} />} placeholder="m@up.edu.ph" value={email} onChange={(e) => setEmail(e.target.value)} />
               <Input label={isEdit ? "Password (leave blank to keep)" : "Password"} type="password" required={!isEdit} maxLength={128} prefixIcon={<Lock size={15} />} placeholder={isEdit ? "Leave blank to keep current" : "Min. 8 characters"} value={password} onChange={(e) => setPassword(e.target.value)} />
-              <Select label="Role" required value={role} onChange={(e) => setRole(e.target.value)} options={ROLE_OPTIONS} />
+              <Select label="Role" required value={role} onChange={(e) => setRole(e.target.value)} options={[{ value: "", label: "Select role…" }, ...ROLE_OPTIONS]} />
             </div>
 
             <hr className="border-gray-100 my-2" />
@@ -250,8 +212,8 @@ export default function UserForm({ initialData, onSuccess, layout = "modal" }: U
               <Input label="Display Name" placeholder="Nickname or preferred name" value={display_name} onChange={(e) => setDisplayName(e.target.value)} maxLength={32} />
               <Input label="Contact Number" prefixIcon={<Phone size={15} />} maxLength={11} placeholder="e.g. 09123456789" value={contact_num} onChange={handleContactNumChange} />
               {(role === "student" || !role) && <Input label="Student Number" prefixIcon={<Hash size={15} />} placeholder="e.g. 2021-12345" value={student_num} onChange={handleStudentNumChange} />}
-              {(role === "student" || !role) && <Select label="Year Level" value={year_level} onChange={(e) => setYearLevel(e.target.value)} options={YEAR_OPTIONS} />}
-              {(role === "student" || role === "faculty" || !role) && <Select label="College" value={college} onChange={(e) => setCollege(e.target.value)} options={COLLEGE_OPTIONS} />}
+              {(role === "student" || !role) && <Select label="Year Level" value={year_level} onChange={(e) => setYearLevel(e.target.value)} options={[{ value: "", label: "Select year…" }, ...YEAR_OPTIONS]} />}
+              {(role === "student" || role === "faculty" || !role) && <Select label="College" value={college} onChange={(e) => setCollege(e.target.value)} options={[{ value: "", label: "Select college…" }, ...COLLEGE_OPTIONS]} />}
               {(role === "student" || !role) && <Select label="Program" value={program} onChange={(e) => setProgram(e.target.value)} options={college && UPB_PROGRAMS[college] ? [{ value: "", label: "Select program" }, ...UPB_PROGRAMS[college]] : [{ value: "", label: "Select a college first" }]}/>}
               {role === "faculty" && <Input label="Department" prefixIcon={<Building2 size={15} />} placeholder="e.g. Dept. of Math and Computer Science" value={department} onChange={(e) => setDepartment(e.target.value)} maxLength={64} />}
               {role === "admin" && <Input label="Office / Unit" prefixIcon={<Building2 size={15} />} placeholder="e.g. Office of the Chancellor" value={office} onChange={(e) => setOffice(e.target.value)} maxLength={64} />}
@@ -267,8 +229,8 @@ export default function UserForm({ initialData, onSuccess, layout = "modal" }: U
               <h2 className="text-xl font-bold mb-1" style={{ color: "var(--primary-dark)" }}>Profile Details</h2>
 
               <Input label="Pronouns" placeholder="e.g. she/her, they/them" value={pronouns} onChange={(e) => setPronouns(e.target.value)} />
-              <Select label="Sex at Birth" value={sex_at_birth} onChange={(e) => setSexAtBirth(e.target.value)} options={SEX_OPTIONS} />
-              <Select label="Gender Identity" value={gender_identity} onChange={(e) => setGenderIdentity(e.target.value)} options={GENDER_OPTIONS} />
+              <Select label="Sex at Birth" value={sex_at_birth} onChange={(e) => setSexAtBirth(e.target.value)} options={[{ value: "", label: "Select…" }, ...SEX_OPTIONS]} />
+              <Select label="Gender Identity" value={gender_identity} onChange={(e) => setGenderIdentity(e.target.value)} options={[{ value: "", label: "Select…" }, ...GENDER_OPTIONS]} />
               {(role === "student" || role === "faculty" || !role) && <Input label="GSO Sessions Attended" maxLength={1} placeholder="0" value={gso_attended.toString()} onChange={(e) => setGsoAttended(e.target.value)} />}
               {(role === "student" || role === "faculty" || !role) && <Input label="ASHO Sessions Attended" maxLength={1} placeholder="0" value={asho_attended.toString()} onChange={(e) => setAshoAttended(e.target.value)} />}
 
@@ -307,7 +269,7 @@ export default function UserForm({ initialData, onSuccess, layout = "modal" }: U
         <Input label="Full Name" required prefixIcon={<User size={15} />} maxLength={64} placeholder="e.g. Maria Santos" value={full_name} onChange={(e) => setFullName(e.target.value)} />
         <Input label="Email" type="email" required prefixIcon={<Mail size={15} />} placeholder="m@up.edu.ph" value={email} onChange={(e) => setEmail(e.target.value)} />
         <Input label={isEdit ? "Password (leave blank to keep)" : "Password"} type="password" required={!isEdit} maxLength={128} prefixIcon={<Lock size={15} />} placeholder={isEdit ? "Leave blank to keep current" : "Min. 8 characters"} value={password} onChange={(e) => setPassword(e.target.value)} />
-        <Select label="Role" required value={role} onChange={(e) => setRole(e.target.value)} options={ROLE_OPTIONS} />
+        <Select label="Role" required value={role} onChange={(e) => setRole(e.target.value)} options={[{ value: "", label: "Select role…" }, ...ROLE_OPTIONS]} />
       </div>
 
     {/* profile details */}
@@ -315,17 +277,17 @@ export default function UserForm({ initialData, onSuccess, layout = "modal" }: U
         <SectionLabel>Profile Details</SectionLabel>
         <Input label="Display Name" placeholder="Nickname or preferred name" value={display_name} onChange={(e) => setDisplayName(e.target.value)} maxLength={32} />
         {(role === "student" || !role) && <Input label="Student Number" prefixIcon={<Hash size={15} />} placeholder="e.g. 2021-12345" value={student_num} onChange={handleStudentNumChange} />}
-        {(role === "student" || !role) && <Select label="Year Level" value={year_level} onChange={(e) => setYearLevel(e.target.value)} options={YEAR_OPTIONS} />}
-        {(role === "student" || role === "faculty" || !role) && <Select label="College" value={college} onChange={(e) => setCollege(e.target.value)} options={COLLEGE_OPTIONS} />}
+        {(role === "student" || !role) && <Select label="Year Level" value={year_level} onChange={(e) => setYearLevel(e.target.value)} options={[{ value: "", label: "Select year…" }, ...YEAR_OPTIONS]} />}
+        {(role === "student" || role === "faculty" || !role) && <Select label="College" value={college} onChange={(e) => setCollege(e.target.value)} options={[{ value: "", label: "Select college…" }, ...COLLEGE_OPTIONS]} />}
         {(role === "student" || !role) && <Select label="Program" value={program} onChange={(e) => setProgram(e.target.value)} options={college && UPB_PROGRAMS[college] ? [{ value: "", label: "Select program" }, ...UPB_PROGRAMS[college]] : [{ value: "", label: "Select a college first" }]}/>}
         {role === "faculty" && <Input label="Department" prefixIcon={<Building2 size={15} />} placeholder="e.g. Dept. of Math and Computer Science" value={department} onChange={(e) => setDepartment(e.target.value)} maxLength={64} />}
         {role === "admin" && <Input label="Office / Unit" prefixIcon={<Building2 size={15} />} placeholder="e.g. Office of the Chancellor" value={office} onChange={(e) => setOffice(e.target.value)} maxLength={64} />}
         {role === "staff" && <Input label="Office / Unit" prefixIcon={<Building2 size={15} />} placeholder="e.g. Office of the Chancellor" value={office} onChange={(e) => setOffice(e.target.value)} maxLength={64} />}
         <Input label="Contact Number" prefixIcon={<Phone size={15} />} maxLength={11} placeholder="e.g. 09123456789" value={contact_num} onChange={handleContactNumChange} />
         <Input label="Address" prefixIcon={<MapPin size={15} />} placeholder="City, Province" value={address} onChange={(e) => setAddress(e.target.value)} />
-        <Select label="Pronouns" value={pronouns} onChange={(e) => setPronouns(e.target.value)} options={PRONOUNS} />
-        <Select label="Sex at Birth" value={sex_at_birth} onChange={(e) => setSexAtBirth(e.target.value)} options={SEX_OPTIONS} />
-        <Select label="Gender Identity" value={gender_identity} onChange={(e) => setGenderIdentity(e.target.value)} options={GENDER_OPTIONS} />
+        <Select label="Pronouns" value={pronouns} onChange={(e) => setPronouns(e.target.value)} options={[{ value: "", label: "Select pronouns…" }, ...PRONOUNS]} />
+        <Select label="Sex at Birth" value={sex_at_birth} onChange={(e) => setSexAtBirth(e.target.value)} options={[{ value: "", label: "Select…" }, ...SEX_OPTIONS]} />
+        <Select label="Gender Identity" value={gender_identity} onChange={(e) => setGenderIdentity(e.target.value)} options={[{ value: "", label: "Select…" }, ...GENDER_OPTIONS]} />
         {(role === "student" || !role) && <Input label="GSO Sessions Attended" type="number" min="0" max="5" step="1" placeholder="0" value={gso_attended.toString()} onChange={(e) => setGsoAttended(e.target.value)} />}
         {(role === "faculty" || !role) && <Input label="GSO Sessions Attended" type="number" min="0" max="5" step="1" placeholder="0" value={gso_attended.toString()} onChange={(e) => setGsoAttended(e.target.value)} />}
         {(role === "student" || !role) && <Input label="ASHO Sessions Attended" type="number" min="0" max="5" step="1" placeholder="0" value={asho_attended.toString()} onChange={(e) => setAshoAttended(e.target.value)} />}
