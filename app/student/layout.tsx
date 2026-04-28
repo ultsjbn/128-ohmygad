@@ -38,7 +38,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
             <Suspense fallback={<div style={{ display:'flex', alignItems:'center', justifyContent:'center', height:'100%', color:'var(--gray)', fontSize:14 }}>Loading…</div>}>
               <StudentAuthGuard>{children}</StudentAuthGuard>
             </Suspense>
-            <footer className="static bottom-0 mt-6 mb-3 flex flex-wrap items-center justify-between gap-2 text-[10px] text-[var(--gray)]/60 border-t border-black/[0.05] pt-3">
+            <footer className="hidden static bottom-0 mt-10 md:flex flex-wrap items-center justify-between text-[10px] text-[var(--gray)]/60 border-t border-black/[0.05] py-3 px-4">
               <span className="flex flex-wrap items-center gap-x-1.5">
                 <strong className="font-semibold text-[var(--primary-dark)]/60">Kasarian / Gender Studies UP Baguio</strong>
                 <span className="opacity-30">·</span>
@@ -52,6 +52,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
               </span>
             </footer>
           </main>
+            
         </div>
       </div>
     </div>
