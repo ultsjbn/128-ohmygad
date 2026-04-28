@@ -14,8 +14,8 @@ const supabase = createBrowserClient(
 );
 
 export default function UserMenu() {
-  const [role, setRole]     = useState<Role | null>(null);
-  const [initials, setInitials] = useState("·");
+  const [role, setRole]         = useState<Role | null>(null);
+  const [displayName, setDisplayName] = useState("");
   const router = useRouter();
 
   useEffect(() => {
@@ -30,13 +30,7 @@ export default function UserMenu() {
         .single();
 
       if (profile?.role) setRole(profile.role as Role);
-
-      const fullName = (profile?.full_name ?? "").trim();
-      const parts = fullName.split(/\s+/).filter(Boolean);
-      const derived = parts.length >= 2
-        ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
-        : fullName.slice(0, 2).toUpperCase();
-      if (derived) setInitials(derived);
+      if (profile?.full_name) setDisplayName(profile.full_name.trim());
     }
     fetchUser();
   }, []);
@@ -54,8 +48,16 @@ export default function UserMenu() {
       trigger={
         <button
           aria-label="User menu"
-          className="w-9 h-9 bg-[var(--primary-dark)] rounded-full flex items-center justify-center cursor-pointer transition-all duration-150 border-none text-white text-[13px] font-bold tracking-tight select-none hover:opacity-80 shrink-0">
-          {initials}
+          className="flex items-center gap-2 cursor-pointer border-none bg-transparent select-none hover:opacity-80 transition-opacity duration-150"
+        >
+          <div className="w-9 h-9 bg-[var(--primary-dark)] rounded-full flex items-center justify-center shrink-0 text-white">
+            <User size={17} />
+          </div>
+          {displayName && (
+            <span className="text-md font-semibold truncate">
+              {displayName}
+            </span>
+          )}
         </button>
       }
     >
