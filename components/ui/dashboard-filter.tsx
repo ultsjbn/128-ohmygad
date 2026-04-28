@@ -59,138 +59,164 @@ interface DashboardFilterProps {
   options: FilterOptions;
 }
 
-export function DashboardFilter({ value, onChange, options }: DashboardFilterProps) {
-  const count = countActiveFilters(value);
+export function DashboardFilter({
+	value,
+	onChange,
+	options,
+}: DashboardFilterProps) {
+	const count = countActiveFilters(value);
 
-  const chips = [
-    ...ROW1_KEYS,
-    { key: "degreeProgram" as keyof DashboardFilters, label: "Degree Program", icon: <BookOpen size={15} /> },
-    { key: "role"          as keyof DashboardFilters, label: "Role",           icon: <User size={15} /> },
-  ].flatMap(({ key }) => value[key].map((val) => ({ key, val })));
+	const chips = [
+		...ROW1_KEYS,
+		{
+			key: "degreeProgram" as keyof DashboardFilters,
+			label: "Degree Program",
+			icon: <BookOpen size={15} />,
+		},
+		{
+			key: "role" as keyof DashboardFilters,
+			label: "Role",
+			icon: <User size={15} />,
+		},
+	].flatMap(({ key }) => value[key].map((val) => ({ key, val })));
 
-  function toggle(key: keyof DashboardFilters, val: string) {
-    const cur = value[key];
-    const next = cur.includes(val) ? cur.filter((v) => v !== val) : [...cur, val];
-    onChange({ ...value, [key]: next });
-  }
+	function toggle(key: keyof DashboardFilters, val: string) {
+		const cur = value[key];
+		const next = cur.includes(val)
+			? cur.filter((v) => v !== val)
+			: [...cur, val];
+		onChange({ ...value, [key]: next });
+	}
 
-  function remove(key: keyof DashboardFilters, val: string) {
-    onChange({ ...value, [key]: value[key].filter((v) => v !== val) });
-  }
+	function remove(key: keyof DashboardFilters, val: string) {
+		onChange({ ...value, [key]: value[key].filter((v) => v !== val) });
+	}
 
-  const filterButton = (
-    <Dropdown
-      menuStyle={{ width: 750, overflowX: "auto" }}
-      trigger={
-        <Button type="button" variant={count > 0 ? "pink" : "ghost"} size="sm">
-          <SlidersHorizontal size={13} />
-          Filters
-          {count > 0 && (
-            <span className="inline-flex items-center justify-center min-w-[20px] h-5 rounded-full px-1 text-[11px] font-bold text-white bg-[var(--primary-dark)] ml-0.5">
-              {count}
-            </span>
-          )}
-        </Button>
-      }
-    >
-      {/* row 1: year level, college, sex at birth, gender identity */}
-      <div className="p-2 grid grid-cols-4 gap-2">
-        {ROW1_KEYS.map(({ key, label, icon }) => {
-          const opts = options[key];
-          if (!opts?.length) return null;
-          return (
-            <div key={key}>
-              <p className="flex items-center gap-1 label mb-2">
-                <span className="text-[var(--periwinkle)]">{icon}</span>
-                {label}
-              </p>
-              <div className="flex flex-col gap-1">
-                {opts.map((opt) => (
-                  <Checkbox
-                    key={opt}
-                    label={opt}
-                    checked={value[key].includes(opt)}
-                    onChange={() => toggle(key, opt)}
-                  />
-                ))}
-              </div>
-            </div>
-          );
-        })}
-      </div>
+	const filterButton = (
+		<Dropdown
+			menuStyle={{ width: 750, overflowX: "auto" }}
+			trigger={
+				<Button
+					type="button"
+					variant={count > 0 ? "pink" : "ghost"}
+					size="sm"
+				>
+					<SlidersHorizontal size={13} />
+					Filters
+					{count > 0 && (
+						<span className="inline-flex items-center justify-center min-w-[20px] h-5 rounded-full px-1 text-[11px] font-bold text-white bg-[var(--primary-dark)] ml-0.5">
+							{count}
+						</span>
+					)}
+				</Button>
+			}
+		>
+			{/* row 1: year level, college, sex at birth, gender identity */}
+			<div className="p-2 grid grid-cols-4 gap-2">
+				{ROW1_KEYS.map(({ key, label, icon }) => {
+					const opts = options[key];
+					if (!opts?.length) return null;
+					return (
+						<div key={key}>
+							<p className="flex items-center gap-1 label mb-2">
+								<span className="text-[var(--periwinkle)]">
+									{icon}
+								</span>
+								{label}
+							</p>
+							<div className="flex flex-col gap-1">
+								{opts.map((opt) => (
+									<Checkbox
+										key={opt}
+										label={opt}
+										checked={value[key].includes(opt)}
+										onChange={() => toggle(key, opt)}
+									/>
+								))}
+							</div>
+						</div>
+					);
+				})}
+			</div>
 
-      <DropdownDivider />
+			<DropdownDivider />
 
-      {/* row 2: degree program */}
-      {options.degreeProgram?.length > 0 && (
-        <div className="p-2">
-          <p className="flex items-center gap-1 label mb-2">
-            <span className="text-[var(--periwinkle)]"><BookOpen size={15} /></span>
-            Degree Program
-          </p>
-          <div className="grid grid-cols-4 grid-rows-5 grid-flow-col">
-            {options.degreeProgram.map((opt) => (
-              <Checkbox
-                key={opt}
-                label={opt}
-                checked={value.degreeProgram.includes(opt)}
-                onChange={() => toggle("degreeProgram", opt)}
-              />
-            ))}
-          </div>
-        </div>
-      )}
+			{/* row 2: degree program */}
+			{options.degreeProgram?.length > 0 && (
+				<div className="p-2">
+					<p className="flex items-center gap-1 label mb-2">
+						<span className="text-[var(--periwinkle)]">
+							<BookOpen size={15} />
+						</span>
+						Degree Program
+					</p>
+					<div className="grid grid-cols-4 grid-rows-5 grid-flow-col">
+						{options.degreeProgram.map((opt) => (
+							<Checkbox
+								key={opt}
+								label={opt}
+								checked={value.degreeProgram.includes(opt)}
+								onChange={() => toggle("degreeProgram", opt)}
+							/>
+						))}
+					</div>
+				</div>
+			)}
 
-      <DropdownDivider />
+			<DropdownDivider />
 
-      {/* row 3: role options in a single horizontal row */}
-      {options.role?.length > 0 && (
-        <div className="p-2 flex flex-row gap-4">
-          <p className="flex items-center gap-1 label">
-            <span className="text-[var(--periwinkle)]"><User size={15} /></span>
-            Role
-          </p>
-          <div className="flex gap-4">
-            {options.role.map((opt) => (
-              <Checkbox
-                key={opt}
-                label={opt}
-                checked={value.role.includes(opt)}
-                onChange={() => toggle("role", opt)}
-              />
-            ))}
-          </div>
-        </div>
-      )}
-    </Dropdown>
-  );
+			{/* row 3: role options in a single horizontal row */}
+			{options.role?.length > 0 && (
+				<div className="p-2 flex flex-row gap-4">
+					<p className="flex items-center gap-1 label">
+						<span className="text-[var(--periwinkle)]">
+							<User size={15} />
+						</span>
+						Role
+					</p>
+					<div className="flex gap-4">
+						{options.role.map((opt) => (
+							<Checkbox
+								key={opt}
+								label={opt}
+								checked={value.role.includes(opt)}
+								onChange={() => toggle("role", opt)}
+							/>
+						))}
+					</div>
+				</div>
+			)}
+		</Dropdown>
+	);
 
-  return (
-    <div className="flex flex-wrap items-center gap-2 shrink-0">
-      {chips.length > 0 ? (
-        <>
-          <span className="caption">Active filters:</span>
-          {chips.map(({ key, val }) => (
-            <Badge key={`${key}-${val}`} variant="periwinkle">
-              {val}
-              <button
-                type="button"
-                onClick={() => remove(key, val)}
-                className="ml-1.5"
-                aria-label={`Remove ${val} filter`}
-              >
-                ×
-              </button>
-            </Badge>
-          ))}
-          <Button variant="soft" size="sm" onClick={() => onChange(EmptyFilters)}>
-            Clear all
-          </Button>
-          {filterButton}
-        </>
-      ) : (
-        filterButton
-      )}
-    </div>
-  );
+
+	return (
+		<div className="flex flex-wrap items-center gap-2 shrink-0">
+			{chips.length > 0 && (
+				<>
+					<span className="caption">Active filters:</span>
+					{chips.map(({ key, val }) => (
+						<Badge key={`${key}-${val}`} variant="periwinkle">
+							{val}
+							<button
+								type="button"
+								onClick={() => remove(key, val)}
+								className="ml-1.5"
+							>
+								×
+							</button>
+						</Badge>
+					))}
+					<Button
+						variant="soft"
+						size="sm"
+						onClick={() => onChange(EmptyFilters)}
+					>
+						Clear all
+					</Button>
+				</>
+			)}
+			{filterButton}
+		</div>
+	);
 }
