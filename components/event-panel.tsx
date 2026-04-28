@@ -27,25 +27,11 @@ interface EventGroup {
   events: EventData[];
 }
 
-//  helpers 
-
-const CATEGORY_GRADIENT: Record<string, string> = {
-  Orientation: "linear-gradient(135deg, #F4A7B9 0%, #B8B5E8 100%)",
-  Forum:       "linear-gradient(135deg, #F4A7B9 0%, #FAF8FF 100%)",
-  Research:    "linear-gradient(135deg, #B8B5E8 0%, #FAF8FF 100%)",
-  Training:    "linear-gradient(135deg, #6DC5A0 0%, #FAF8FF 100%)",
-  Workshop:    "linear-gradient(135deg, #2D2A4A 0%, #FAF8FF 100%)",
-};
-const DEFAULT_GRADIENT = "linear-gradient(135deg, #B8B5E8 0%, #2D2A4A 100%)";
-
-type BadgeVariant = "pink-light" | "periwinkle" | "dark" | "success" | "warning" | "error";
-const REG_STATUS_VARIANT: Record<string, BadgeVariant> = {
-  registered: "periwinkle",
-  attended:   "success",
-  cancelled:  "error",
-  pending:    "warning",
-  invited:    "pink-light",
-};
+import { 
+  CATEGORY_GRADIENT, 
+  DEFAULT_GRADIENT, 
+  REG_STATUS_VARIANT 
+} from "@/lib/constants";
 
 const formatDateLabel = (s: string) =>
   new Date(s).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });

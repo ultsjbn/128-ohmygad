@@ -30,19 +30,7 @@ type EventFormProps = {
   onCancel?: () => void;
 };
 
-const CATEGORY_OPTIONS = [
-  { value: "Orientation", label: "Orientation" },
-  { value: "Forum", label: "Forum" },
-  { value: "Research", label: "Research" },
-  { value: "Training", label: "Training" },
-  { value: "Workshop", label: "Workshop" },
-];
-
-const STATUS_OPTIONS = [
-  { value: "upcoming", label: "Upcoming" },
-  { value: "past", label: "Past" },
-  { value: "today", label: "Today" },
-];
+import { EVENT_CATEGORY_OPTIONS, EVENT_STATUS_OPTIONS } from "@/lib/constants";
 
 export const deriveStatus = (start: string, end: string): string => {
   if (!start) return "";
@@ -362,7 +350,7 @@ export default function EventForm({ initialData, mode, onSuccess, onCancel }: Ev
                 <Select
                   label="Category *"
                   required
-                  options={[{ value: "", label: "Select category" }, ...CATEGORY_OPTIONS]}
+                  options={[{ value: "", label: "Select category" }, ...EVENT_CATEGORY_OPTIONS]}
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
                 />
@@ -375,7 +363,7 @@ export default function EventForm({ initialData, mode, onSuccess, onCancel }: Ev
                         ${status === "upcoming" ? "" :
                           status === "today"    ? "" :
                                                   ""}`}>
-                        {STATUS_OPTIONS.find(o => o.value === status)?.label ?? status}
+                        {EVENT_STATUS_OPTIONS.find(o => o.value === status)?.label ?? status}
                       </span>
                     ) : (
                       <span className="caption text-[var(--gray)]">Set a start date to determine status</span>

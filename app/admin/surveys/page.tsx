@@ -24,8 +24,10 @@ import {
   Toast,
 } from "@/components/ui";
 
+import { SURVEY_STATUS_OPTIONS, SURVEY_STATUS_VARIANT as STATUS_VARIANT } from "@/lib/constants";
+
 // constants
-const STATUSES = ["open", "closed"];
+const STATUSES = SURVEY_STATUS_OPTIONS.map((s) => s.value);
 type SortField = "title" | "status" | "open_at";
 
 const SORT_OPTIONS: { label: string; field: SortField }[] = [
@@ -33,12 +35,6 @@ const SORT_OPTIONS: { label: string; field: SortField }[] = [
   { label: "Status", field: "status" },
   { label: "Date", field: "open_at" },
 ];
-type BadgeVariant = "pink-light" | "periwinkle" | "dark" | "success" | "warning" | "error";
-
-const STATUS_VARIANT: Record<string, BadgeVariant> = {
-  open: "success",
-  closed: "periwinkle",
-};
 
 // checkbox item
 function CheckItem({

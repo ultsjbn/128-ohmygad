@@ -44,31 +44,12 @@ const SORT_OPTIONS: { label: string; field: SortField }[] = [
   { label: "Location", field: "location" },
 ];
 
-// category for gradient map since no images pa
-const CATEGORY_GRADIENT: Record<string, string> = {
-  Orientation: "linear-gradient(135deg, #F4C97A 0%, #FAF8FF 100%)",
-  Forum: "linear-gradient(135deg, #F4A7B9 0%, #FAF8FF 100%)",
-  Research: "linear-gradient(135deg, #B8B5E8 0%, #FAF8FF 100%)",
-  Training: "linear-gradient(135deg, #6DC5A0 0%, #FAF8FF 100%)",
-  Workshop: "linear-gradient(135deg, #2D2A4A 0%, #FAF8FF 100%)",
-};
-const DEFAULT_GRADIENT = "linear-gradient(135deg, #B8B5E8 0%, #2D2A4A 100%)";
-
-// status badge variants
-type BadgeVariant = "pink-light" | "periwinkle" | "dark" | "success" | "warning" | "error";
-const STATUS_VARIANT: Record<string, BadgeVariant> = {
-  upcoming: "pink-light",
-  past: "periwinkle",
-  today: "success", 
-};
-
-const CATEGORY_VARIANT: Record<string, BadgeVariant> = {
-  Orientation: "pink-light",
-  Forum: "periwinkle",
-  Research: "error",
-  Training: "success",
-  Workshop: "warning",
-};
+import { 
+  CATEGORY_GRADIENT, 
+  DEFAULT_GRADIENT, 
+  EVENT_STATUS_VARIANT as STATUS_VARIANT, 
+  CATEGORY_VARIANT 
+} from "@/lib/constants";
 
 // checkbox item used inside filter dropdown (multi-select)
 function CheckItem({

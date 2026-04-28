@@ -27,17 +27,7 @@ export type SurveyQuestion = {
   order_index: number;
 };
 
-const QUESTION_TYPE_OPTIONS = [
-  { value: "text",            label: "Text (open-ended)" },
-  { value: "multiple_choice", label: "Multiple Choice"   },
-  { value: "rating",          label: "Likert Scale (1–5)"},
-  { value: "yes_no",          label: "Yes / No"          },
-];
-
-const STATUS_OPTIONS = [
-  { value: "open",   label: "Open"   },
-  { value: "closed", label: "Closed" },
-];
+import { QUESTION_TYPE_OPTIONS, SURVEY_STATUS_OPTIONS as STATUS_OPTIONS } from "@/lib/constants";
 
 type SurveyFormProps = {
   mode: "create" | "edit";

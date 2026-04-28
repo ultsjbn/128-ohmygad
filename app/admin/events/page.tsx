@@ -41,9 +41,17 @@ import {
   Toast,
 } from "@/components/ui";
 
+import { 
+  EVENT_CATEGORY_OPTIONS, 
+  EVENT_STATUS_OPTIONS, 
+  EVENT_STATUS_VARIANT as STATUS_VARIANT,
+  CATEGORY_GRADIENT,
+  DEFAULT_GRADIENT
+} from "@/lib/constants";
+
 // constants
-const CATEGORIES = ["Orientation", "Forum", "Research", "Training", "Workshop"];
-const STATUSES = ["upcoming", "past", "today"];
+const CATEGORIES = EVENT_CATEGORY_OPTIONS.map((c) => c.value);
+const STATUSES = EVENT_STATUS_OPTIONS.map((s) => s.value);
 type SortField = "title" | "category" | "status" | "start_date";
 
 const SORT_OPTIONS: { label: string; field: SortField }[] = [
@@ -61,20 +69,7 @@ type BadgeVariant =
   | "error"
   | "ghost";
 
-const STATUS_VARIANT: Record<string, BadgeVariant> = {
-  upcoming: "pink-light",
-  past: "periwinkle",
-  today: "success",
-};
 
-const CATEGORY_GRADIENT: Record<string, string> = {
-  Orientation: "linear-gradient(135deg, #F4C97A 0%, #FAF8FF 100%)",
-  Forum: "linear-gradient(135deg, #F4A7B9 0%, #FAF8FF 100%)",
-  Research: "linear-gradient(135deg, #B8B5E8 0%, #FAF8FF 100%)",
-  Training: "linear-gradient(135deg, #6DC5A0 0%, #FAF8FF 100%)",
-  Workshop: "linear-gradient(135deg, #2D2A4A 0%, #FAF8FF 100%)",
-};
-const DEFAULT_GRADIENT = "linear-gradient(135deg, #B8B5E8 0%, #2D2A4A 100%)";
 
 type RegisteredUser = {
   registration_id: string;

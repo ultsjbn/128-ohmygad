@@ -75,3 +75,68 @@ export const YEAR_OPTIONS = [
   { value: "5th Year", label: "5th Year" },
   { value: "Extendee", label: "Extendee" },
 ];
+
+export const EVENT_CATEGORY_OPTIONS = [
+  { value: "Orientation", label: "Orientation" },
+  { value: "Forum", label: "Forum" },
+  { value: "Research", label: "Research" },
+  { value: "Training", label: "Training" },
+  { value: "Workshop", label: "Workshop" },
+];
+
+export const EVENT_STATUS_OPTIONS = [
+  { value: "upcoming", label: "Upcoming" },
+  { value: "past", label: "Past" },
+  { value: "today", label: "Today" },
+];
+
+export const SURVEY_STATUS_OPTIONS = [
+  { value: "open",   label: "Open"   },
+  { value: "closed", label: "Closed" },
+];
+
+export const QUESTION_TYPE_OPTIONS = [
+  { value: "text",            label: "Text (open-ended)" },
+  { value: "multiple_choice", label: "Multiple Choice"   },
+  { value: "rating",          label: "Likert Scale (1–5)"},
+  { value: "yes_no",          label: "Yes / No"          },
+];
+
+export const CATEGORY_GRADIENT: Record<string, string> = {
+  Orientation: "linear-gradient(135deg, #F4C97A 0%, #FAF8FF 100%)",
+  Forum:       "linear-gradient(135deg, #F4A7B9 0%, #FAF8FF 100%)",
+  Research:    "linear-gradient(135deg, #B8B5E8 0%, #FAF8FF 100%)",
+  Training:    "linear-gradient(135deg, #6DC5A0 0%, #FAF8FF 100%)",
+  Workshop:    "linear-gradient(135deg, #2D2A4A 0%, #FAF8FF 100%)",
+};
+export const DEFAULT_GRADIENT = "linear-gradient(135deg, #B8B5E8 0%, #2D2A4A 100%)";
+
+type BadgeVariant = "pink-light" | "periwinkle" | "dark" | "success" | "warning" | "error";
+
+export const EVENT_STATUS_VARIANT: Record<string, BadgeVariant> = {
+  upcoming: "pink-light",
+  past: "periwinkle",
+  today: "success", 
+};
+
+export const CATEGORY_VARIANT: Record<string, BadgeVariant> = {
+  Orientation: "pink-light",
+  Forum: "periwinkle",
+  Research: "error",
+  Training: "success",
+  Workshop: "warning",
+};
+
+export const REG_STATUS_VARIANT: Record<string, BadgeVariant> = {
+  registered: "periwinkle",
+  attended:   "success",
+  cancelled:  "error",
+  pending:    "warning",
+  invited:    "pink-light",
+};
+
+export const SURVEY_STATUS_VARIANT: Record<string, BadgeVariant> = {
+  open: "success",
+  closed: "periwinkle",
+};
+
