@@ -31,8 +31,9 @@ interface UsersClientProps {
   fetchError: string | null;
 }
 
-const ROLE_VARIANT: Record<string, "pink-light" | "periwinkle" | "success"> = {
+const ROLE_VARIANT: Record<string, "pink-light" | "periwinkle" | "success" | "warning"> = {
   admin: "success",
+  staff: "warning",
   faculty: "periwinkle",
   student: "pink-light",
 };
@@ -42,7 +43,7 @@ const GSO_VARIANT: Record<string, "warning" | "success"> = {
   pending: "warning",
 };
 
-const ROLES = ["student", "faculty", "admin"];
+const ROLES = ["student", "staff", "faculty", "admin"];
 const GSO_STATUSES = ["attended", "pending"];
 
 function CheckItem({
