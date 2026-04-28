@@ -93,7 +93,7 @@ export function Modal({ open, onClose, title, subtitle, children, footer, modalS
       >
         {!hideCloseButton && (
           <button className="modal-close" onClick={onClose}>
-            <X size={14} />
+            <X size={15} />
           </button>
         )}
  
