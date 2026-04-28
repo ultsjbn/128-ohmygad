@@ -651,10 +651,10 @@ export default function DashboardPage() {
 					{/* survey completion analytics ------------------------------------------------ */}
 					<div>
 						<Card variant="no-hover" className="flex flex-col p-5 min-h-[320px]" >
-							<div className="flex flex-wrap items-center justify-between gap-3 mb-6">
+							<div className="flex flex-wrap items-center justify-between gap-3 mb-4">
 								<div>
-									<h2 className="heading-md"> Response Rate by Survey </h2>
-									<p className="caption mt-0.5"> Completed vs incomplete response percentage per survey </p>
+									<h2 className="heading-md mb-0.5">Response Rate by Survey</h2>
+									<p className="caption">Completed vs incomplete response percentage per survey</p>
 								</div>
 								<SearchBar
 									placeholder="Search all surveys…"
@@ -665,7 +665,7 @@ export default function DashboardPage() {
 									className="min-w-[220px] max-w-full"
 								/>
 							</div>
-							<div className="flex-1 w-full min-h-[220px] cursor-default select-none mt-4">
+							<div className="w-full min-h-[220px] cursor-default select-none mt-2">
 								{surveyCompletionLoading ? (
 									<div className="flex items-center justify-center h-full">
 										<span className="caption animate-pulse"> Loading survey data… </span>
@@ -681,17 +681,17 @@ export default function DashboardPage() {
 									</div>
 								) : (
 									<>
-										<ResponsiveContainer width="100%" height={300} >
+										<ResponsiveContainer width="100%" height={320} >
 											<BarChart
 												layout="vertical"
 												data={surveyCompletionChartData}
 												margin={{
-													top: 8,
+													top: 24,
 													right: 16,
 													left: 40,
 													bottom: 5,
 												}}
-												barCategoryGap="24%"
+												barCategoryGap="30%"
 											>
 												<CartesianGrid
 													strokeDasharray="3 3"
@@ -724,6 +724,7 @@ export default function DashboardPage() {
 													axisLine={false}
 													width={175}
 													interval={0}
+													tickMargin={20}
 												/>
 												<Tooltip
 													content={<CustomTooltip />}
@@ -736,9 +737,12 @@ export default function DashboardPage() {
 													verticalAlign="top"
 													align="right"
 													wrapperStyle={{
-														paddingBottom: 10,
+														paddingBottom: 20,
 													}}
 													iconType="circle"
+													formatter={(v) => (
+														<span className="caption tracking-wider">{v}</span>
+													)}
 												/>
 												<Bar
 													dataKey="completedPct"
@@ -752,7 +756,7 @@ export default function DashboardPage() {
 												>
 													<LabelList
 														dataKey="completedPct"
-														position="insideRight"
+														position="right"
 														formatter={(value) =>
 															`${value}%`
 														}

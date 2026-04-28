@@ -692,8 +692,8 @@ export default function DashboardPage() {
 						<Card variant="no-hover" className="flex flex-col p-5 min-h-[320px]" >
 							<div className="flex flex-wrap items-center justify-between gap-3 mb-4">
 								<div>
-									<h2 className="heading-md"> Response Rate by Survey </h2>
-									<p className="caption mt-0.5"> Completed vs incomplete response percentage per survey </p>
+									<h2 className="heading-md mb-0.5">Response Rate by Survey</h2>
+									<p className="caption">Completed vs incomplete response percentage per survey</p>
 								</div>
 								<SearchBar
 									placeholder="Search all surveys…"
@@ -780,6 +780,9 @@ export default function DashboardPage() {
 														paddingBottom: 20,
 													}}
 													iconType="circle"
+													formatter={(v) => (
+														<span className="caption tracking-wider">{v}</span>
+													)}
 												/>
 												<Bar
 													dataKey="completedPct"
