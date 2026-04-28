@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "./ui";
 
 export function LoginForm({
   className,
@@ -22,64 +23,76 @@ export function LoginForm({
   const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const supabase = createClient();
-    setIsLoading(true);
-    setError(null);
+		e.preventDefault();
+		const supabase = createClient();
+		setIsLoading(true);
+		setError(null);
 
-    try {
-      const { data: authData, error: authError } =
-        await supabase.auth.signInWithPassword({ email, password });
+		// ----------- TO ADD IN DEPLOYMENT -----------
+		// if (!email.endsWith("@up.edu.ph")) {
+		// 	setError("Please use your UP Mail (@up.edu.ph) to sign in.");
+		// 	setIsLoading(false);
+		// 	return;
+		// }
 
-      console.log("Auth data:", authData);
-      console.log("Auth error:", authError);
+		try {
+			const { data: authData, error: authError } =
+				await supabase.auth.signInWithPassword({ email, password });
 
-      if (authError) throw authError;
+			console.log("Auth data:", authData);
+			console.log("Auth error:", authError);
 
-      console.log("User ID:", authData.user.id);
+			if (authError) throw authError;
 
-      const { data: profile, error: profileError } = await supabase
-        .from("profile")
-        .select("role, is_onboarded")
-        .eq("id", authData.user.id)
-        .single();
+			console.log("User ID:", authData.user.id);
 
-      console.log("Profile data:", profile);
-      console.log("Profile error:", profileError);
+			const { data: profile, error: profileError } = await supabase
+				.from("profile")
+				.select("role, is_onboarded")
+				.eq("id", authData.user.id)
+				.single();
 
-      if (profileError || !profile) {
-        await supabase.auth.signOut();
-        throw new Error("No profile found for this account. Please contact the administrator.");
-      }
+			console.log("Profile data:", profile);
+			console.log("Profile error:", profileError);
 
-      if (!profile.is_onboarded) {
-        router.push("/auth/onboarding");
-        return;
-      }
+			if (profileError || !profile) {
+				await supabase.auth.signOut();
+				throw new Error(
+					"No profile found for this account. Please contact the administrator.",
+				);
+			}
 
-      switch (profile.role) {
-        case "admin":
-          router.push("/admin");
-          break;
-        case "staff":
-          router.push("/staff");
-          break;
-        case "faculty":
-          router.push("/faculty");
-          break;
-        case "student":
-          router.push("/student");
-          break;
-        default:
-          await supabase.auth.signOut();
-          throw new Error("Your account role is not recognized. Please contact the administrator.");
-      }
+			if (!profile.is_onboarded) {
+				router.push("/auth/onboarding");
+				return;
+			}
 
-    } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : "An error occurred");
-    } finally {
-      setIsLoading(false);
-    }
+			switch (profile.role) {
+				case "admin":
+					router.push("/admin");
+					break;
+				case "staff":
+					router.push("/staff");
+					break;
+				case "faculty":
+					router.push("/faculty");
+					break;
+				case "student":
+					router.push("/student");
+					break;
+				default:
+					await supabase.auth.signOut();
+					throw new Error(
+						"Your account role is not recognized. Please contact the administrator.",
+					);
+			}
+		} catch (error: unknown) {
+			setError(
+				error instanceof Error ? error.message : "An error occurred",
+			);
+		} finally {
+			setIsLoading(false);
+		}
   };
 
   return (
@@ -93,10 +106,10 @@ export function LoginForm({
         
         {/* Email Input */}
         <div className="input-wrap">
-          <label htmlFor="email" className="label">Email</label>
+          <label htmlFor="email" className="label">UP Mail</label>
           <div className="input-icon-wrap">
             <Mail className="input-prefix-icon w-4 h-4" />
-            <input
+            <Input
               id="email"
               type="email"
               placeholder="jmdelacruz@up.edu.ph"
@@ -113,7 +126,7 @@ export function LoginForm({
           <label htmlFor="password" className="label">Password</label>
           <div className="input-icon-wrap">
             <Lock className="input-prefix-icon w-4 h-4" />
-            <input
+            <Input
               id="password"
               type={showPassword ? "text" : "password"}
             //   required
@@ -149,13 +162,14 @@ export function LoginForm({
         )}
 
         {/* Submit Button */}
-        <button
+        <Button
           type="submit"
-          disabled={isLoading}
-          className="btn btn-primary w-full justify-center mt-2"
+          disabled={!email || !password || isLoading}
+          variant="primary"
+          className="mt-2"
         >
           {isLoading ? "Logging in..." : "Login"}
-        </button>
+        </Button>
 
       </form>
 
@@ -171,7 +185,7 @@ export function LoginForm({
                   <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path>
                   <path fill="none" d="M0 0h48v48H0z"></path>
               </svg>
-          Sign in with Google
+          Sign in with UP Mail
         </Button>
       </form>
 

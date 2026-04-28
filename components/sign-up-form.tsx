@@ -9,6 +9,7 @@ import { useState } from "react";
 import { Mail, Lock, User, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { validateFullName, validatePassword } from "@/lib/validation";
+import { Input } from "./ui";
 
 export function SignUpForm({
   className,
@@ -25,51 +26,60 @@ export function SignUpForm({
   const router = useRouter();
 
   const handleSignUp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const supabase = createClient();
-    setIsLoading(true);
-    setError(null);
+		e.preventDefault();
+		const supabase = createClient();
+		setIsLoading(true);
+		setError(null);
 
-    if (password !== repeatPassword) {
-      setError("Passwords do not match");
-      setIsLoading(false);
-      return;
-    }
+		// ----------- TO ADD IN DEPLOYMENT -----------
+		// if(!email.endsWith("@up.edu.ph")) {
+		//   setError("Please use your UP Mail (@up.edu.ph) to sign up.");
+		//   setIsLoading(false);
+		//   return;
+		// }
 
-    if (full_name) {
-      const nameErr = validateFullName(full_name);
-      if (nameErr) {
-        setError(nameErr);
-        setIsLoading(false);
-        return;
-      }
-    }
+		if (password !== repeatPassword) {
+			setError("Passwords do not match");
+			setIsLoading(false);
+			return;
+		}
 
-    const pwErr = validatePassword(password);
-    if (pwErr) {
-      setError(pwErr);
-      setIsLoading(false);
-      return;
-    }
+		if (full_name) {
+			const nameErr = validateFullName(full_name);
+			if (nameErr) {
+				setError(nameErr);
+				setIsLoading(false);
+				return;
+			}
+		}
 
-    try {
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/auth/onboarding`,  // redirect to onboarding after email confirm
-          data: {
-            full_name,  // passed to trigger via raw_user_meta_data
-          },
-        },
-      });
-      if (error) throw error;
-      router.push("/auth/sign-up-success");
-    } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : "An error occurred");
-    } finally {
-      setIsLoading(false);
-    }
+		const pwErr = validatePassword(password);
+		if (pwErr) {
+			setError(pwErr);
+			setIsLoading(false);
+			return;
+		}
+
+		try {
+			const { error } = await supabase.auth.signUp({
+				email,
+				password,
+				options: {
+					emailRedirectTo: `${window.location.origin}/auth/onboarding`, // redirect to onboarding after email confirm
+					data: {
+						full_name, // passed to trigger via raw_user_meta_data
+					},
+				},
+			});
+			if (error) throw error;
+			router.push("/auth/sign-up-success");
+		} catch (error: unknown) {
+			setError(
+				error instanceof Error ? error.message : "An error occurred",
+			);
+		} finally {
+			setIsLoading(false);
+		}
   };
 
   return (
@@ -86,7 +96,7 @@ export function SignUpForm({
           <label htmlFor="full_name" className="label">Full Name</label>
           <div className="input-icon-wrap">
             <User className="input-prefix-icon w-4 h-4" />
-            <input
+            <Input
               id="full_name"
               type="text"
               required
@@ -100,10 +110,10 @@ export function SignUpForm({
 
         {/* Email Input */}
         <div className="input-wrap">
-          <label htmlFor="email" className="label">Email</label>
+          <label htmlFor="email" className="label">UP Mail</label>
           <div className="input-icon-wrap">
             <Mail className="input-prefix-icon w-4 h-4" />
-            <input
+            <Input
               id="email"
               type="email"
               placeholder="jmdelacruz@up.edu.ph"
@@ -120,7 +130,7 @@ export function SignUpForm({
           <label htmlFor="password" className="label">Password</label>
           <div className="input-icon-wrap">
             <Lock className="input-prefix-icon w-4 h-4" />
-            <input
+            <Input
               id="password"
               type={showPassword ? "text" : "password"}
               required
@@ -145,7 +155,7 @@ export function SignUpForm({
           <label htmlFor="repeat-password" className="label">Repeat Password</label>
           <div className="input-icon-wrap">
             <Lock className="input-prefix-icon w-4 h-4" />
-            <input
+            <Input
               id="repeat-password"
               type={showRepeatPassword ? "text" : "password"}
               required
@@ -176,13 +186,14 @@ export function SignUpForm({
         )}
 
         {/* Submit Button */}
-        <button
+        <Button
           type="submit"
-          disabled={isLoading}
-          className="btn btn-pink w-full justify-center mt-2"
+          disabled={!email || !password || !repeatPassword || isLoading}
+          variant="primary"
+          className="mt-2"
         >
           {isLoading ? "Creating an account..." : "Sign up"}
-        </button>
+        </Button>
 
         {/* Footer Link */}
         <div className="mt-2 text-center">
@@ -210,7 +221,7 @@ export function SignUpForm({
                     <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path>
                     <path fill="none" d="M0 0h48v48H0z"></path>
                 </svg>
-            Sign Up with Google
+            Sign up with UP Mail
             </Button>
         </form>
     </div>
