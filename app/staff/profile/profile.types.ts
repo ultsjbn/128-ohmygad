@@ -24,6 +24,7 @@ export type Profile = {
   sex_at_birth: string;
   gender_identity: string;
   gso_attended: number | null;
+  asho_attended: number | null;
   avatar_url?: string | null;
 };
 

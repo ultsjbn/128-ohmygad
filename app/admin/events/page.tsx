@@ -73,6 +73,7 @@ type BadgeVariant =
 
 type RegisteredUser = {
   registration_id: string;
+  user_id: string;
   display_name: string | null;
   full_name: string | null;
   email: string | null;
@@ -157,6 +158,7 @@ export default function EventsPage() {
 	  .select(
 		`
 		id,
+		user_id,
 		registration_date,
 		attended,
 		profile:user_id (
@@ -172,6 +174,7 @@ export default function EventsPage() {
 	  setRegistrations(
 		data.map((r: any) => ({
 		  registration_id: r.id,
+		  user_id: r.user_id,
 		  display_name: r.profile?.display_name ?? null,
 		  full_name: r.profile?.full_name ?? null,
 		  email: r.profile?.email ?? null,
@@ -198,11 +201,26 @@ export default function EventsPage() {
 	const supabase = createClient();
 
 	try {
-	  const { data, error } = await supabase
+	  const { error } = await supabase
 		.from("event_registration")
 		.update({ attended: newValue })
 		.eq("id", registrationId)
 		.select();
+
+	  if (error) throw error;
+
+	  // If this is a GSO or ASHO event, recalculate the user's session count via server API
+	  const eventCategory = detailEvent?.category;
+	  if (eventCategory === "GSO" || eventCategory === "ASHO") {
+		const reg = registrations.find((r) => r.registration_id === registrationId);
+		if (reg?.user_id) {
+		  await fetch("/api/admin/sync-session-count", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({ userId: reg.user_id, category: eventCategory }),
+		  });
+		}
+	  }
 	} catch (err: any) {
 	  console.error("Attendance update failed:", err.message);
 

@@ -27,6 +27,7 @@ type Profile = {
   sex_at_birth: string;
   gender_identity: string;
   gso_attended: number | null;
+  asho_attended: number | null;
 };
 
 type ToastState = { type: "success" | "error"; message: string } | null;
@@ -45,7 +46,7 @@ export default function StudentProfilePage() {
     id: "", full_name: "", display_name: "", year_level: "",
     email: "", contact_num: "", address: "", student_num: "",
     pronouns: "", role: "student", program: "", college: "",
-    sex_at_birth: "", gender_identity: "", gso_attended: null,
+    sex_at_birth: "", gender_identity: "", gso_attended: null, asho_attended: null,
   });
 
   const [initialProfile, setInitialProfile] = useState<Profile | null>(null);
@@ -198,10 +199,10 @@ export default function StudentProfilePage() {
             {/* asho progress bar */}
             <div className="w-full text-left pt-3 border-t border-[rgba(45,42,74,0.08)]">
               <ProgressBar
-                value={profile.gso_attended === 2 ? 100 : profile.gso_attended === 1 ? 50 : 0}
+                value={profile.asho_attended === 2 ? 100 : profile.asho_attended === 1 ? 50 : 0}
                 variant="dark"
                 label="ASHO Attendance"
-                sublabel={`${profile.gso_attended ?? 0} / 2 completed`}
+                sublabel={`${profile.asho_attended ?? 0} / 2 completed`}
               />
             </div>
             {/* forums progress bar */}
