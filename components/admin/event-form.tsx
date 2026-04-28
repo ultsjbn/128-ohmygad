@@ -206,7 +206,7 @@ export default function EventForm({ initialData, mode, onSuccess, onCancel }: Ev
     <form onSubmit={handleSubmit} className="flex flex-col h-full lg:h-auto w-full min-h-0 relative">
 
       {/* scrollable wrapper for mobile, fully expanded on desktop */}
-      <div className="flex-1 overflow-y-auto custom-scrollbar pr-1 pb-4 min-h-0">
+      <div className="flex-1 overflow-y-auto custom-scrollbar pl-1 pt-1 pr-1 pb-4 min-h-0">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
           {/* left column: basic information */}

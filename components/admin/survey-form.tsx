@@ -255,7 +255,7 @@ export default function SurveyForm({ mode, initialData, initialQuestions = [], o
     <form onSubmit={handleSubmit} className="flex h-full lg:h-auto w-full min-h-0 relative justify-center">
 
       {/* scrollable on mobile, expanded on desktop */}
-      <div className="flex-1 overflow-y-auto lg:overflow-visible custom-scrollbar pr-1 lg:pr-0 pb-4 lg:pb-0 min-h-0 max-w-3xl mx-auto w-full">
+      <div className="flex-1 overflow-y-auto lg:overflow-visible custom-scrollbar pl-1 pt-1 pr-1 lg:pr-0 pb-4 lg:pb-0 min-h-0 max-w-3xl mx-auto w-full">
 
         <div className="w-full mx-auto flex-1 min-h-0 flex flex-col gap-3 md:gap-6">
           <div className="flex flex-col gap-2">
