@@ -592,7 +592,7 @@ export default function SurveysPage() {
 
       {/* floating toast notification */}
       {toast && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[9999]">
+        <div className="absolute left-1/2 -translate-x-1/2 bottom-6 z-[9999] animate-in fade-in-50">
           <Toast
             variant={toast.variant}
             title={toast.title}

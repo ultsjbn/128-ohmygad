@@ -380,7 +380,7 @@ export default function StaffProfilePage() {
 
       {/* fixed toast notification */}
       {toast && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[9999] animate-in slide-in-from-bottom-5">
+        <div className="absolute left-1/2 -translate-x-1/2 bottom-6 z-[9999] animate-in fade-in-50">
           <Toast variant={toast.type} title={toast.message} />
         </div>
       )}

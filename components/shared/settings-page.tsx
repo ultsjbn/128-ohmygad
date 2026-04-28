@@ -286,7 +286,7 @@ export default function SharedSettingsPage() {
 
       {/* fixed toast notification */}
       {toast && (
-        <div className="fixed bottom-10 md:bottom-10 left-1/2 -translate-x-1/2 z-[9999] w-max max-w-[90vw]">
+        <div className="absolute left-1/2 -translate-x-1/2 bottom-6 z-[9999] animate-in fade-in-50">
           <Toast variant={toast.type === "info" ? "warning" : toast.type} title={toast.message} />
         </div>
       )}

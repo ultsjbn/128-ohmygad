@@ -756,7 +756,11 @@ export default function EventsPage() {
 
 					{/* Status pills */}
 					{[...statusFilters].map((s) => (
-						<Badge key={s} variant={STATUS_VARIANT[s] ?? "dark"} dot >
+						<Badge
+							key={s}
+							variant={STATUS_VARIANT[s] ?? "dark"}
+							dot
+						>
 							<span className="capitalize">{s}</span>
 							<button
 								onClick={() => toggleStatus(s)}
@@ -927,14 +931,24 @@ export default function EventsPage() {
 								</h2>
 								{/* category and status badges moved below */}
 								<div className="flex gap-2 items-center">
-									<Badge variant="ghost"> {detailEvent.category ?? "Uncategorized"} </Badge>
+									<Badge variant="ghost">
+										{" "}
+										{detailEvent.category ??
+											"Uncategorized"}{" "}
+									</Badge>
 									{(() => {
 										const computedStatus = deriveStatus(
 											detailEvent.start_date ?? "",
 											detailEvent.end_date ?? "",
 										);
 										return computedStatus ? (
-											<Badge variant={ STATUS_VARIANT[ computedStatus ] ?? "dark" } >
+											<Badge
+												variant={
+													STATUS_VARIANT[
+														computedStatus
+													] ?? "dark"
+												}
+											>
 												<span className="capitalize">
 													{computedStatus}
 												</span>
@@ -945,21 +959,84 @@ export default function EventsPage() {
 
 								<div className="flex flex-col gap-3">
 									<div className="flex items-start gap-3 caption sm:text-sm text-[var(--gray)]">
-										<CalendarDays size={15} className="shrink-0 mt-0.5" />
+										<CalendarDays
+											size={15}
+											className="shrink-0 mt-0.5"
+										/>
 										<span>
-											{detailEvent.start_date ? new Date( detailEvent.start_date, ).toLocaleDateString( "en-PH", { month: "long", day: "numeric", year: "numeric", }, ) : "—"}
-											{detailEvent.end_date && detailEvent.end_date !== detailEvent.start_date && ( <> {" "} —{" "} {new Date( detailEvent.end_date, ).toLocaleDateString( "en-PH", { month: "long", day: "numeric", year: "numeric", }, )} </> )}
+											{detailEvent.start_date
+												? new Date(
+														detailEvent.start_date,
+													).toLocaleDateString(
+														"en-PH",
+														{
+															month: "long",
+															day: "numeric",
+															year: "numeric",
+														},
+													)
+												: "—"}
+											{detailEvent.end_date &&
+												detailEvent.end_date !==
+													detailEvent.start_date && (
+													<>
+														{" "}
+														—{" "}
+														{new Date(
+															detailEvent.end_date,
+														).toLocaleDateString(
+															"en-PH",
+															{
+																month: "long",
+																day: "numeric",
+																year: "numeric",
+															},
+														)}{" "}
+													</>
+												)}
 										</span>
 									</div>
 									<div className="flex items-start gap-3 caption sm:text-sm text-[var(--gray)]">
-										<Clock size={15} className="shrink-0 mt-0.5" />
+										<Clock
+											size={15}
+											className="shrink-0 mt-0.5"
+										/>
 										<span>
-											{detailEvent.start_date ? new Date( detailEvent.start_date, ).toLocaleTimeString( "en-PH", { hour: "numeric", minute: "2-digit", }, ) : "—"}
-											{detailEvent.end_date && detailEvent.end_date !== detailEvent.start_date && ( <> {" "} —{" "} {new Date( detailEvent.end_date, ).toLocaleTimeString( "en-PH", { hour: "numeric", minute: "2-digit", }, )} </> )}
+											{detailEvent.start_date
+												? new Date(
+														detailEvent.start_date,
+													).toLocaleTimeString(
+														"en-PH",
+														{
+															hour: "numeric",
+															minute: "2-digit",
+														},
+													)
+												: "—"}
+											{detailEvent.end_date &&
+												detailEvent.end_date !==
+													detailEvent.start_date && (
+													<>
+														{" "}
+														—{" "}
+														{new Date(
+															detailEvent.end_date,
+														).toLocaleTimeString(
+															"en-PH",
+															{
+																hour: "numeric",
+																minute: "2-digit",
+															},
+														)}{" "}
+													</>
+												)}
 										</span>
 									</div>
 									<div className="flex items-center gap-3 caption sm:text-sm text-[var(--gray)]">
-										<MapPin size={15} className="shrink-0" />
+										<MapPin
+											size={15}
+											className="shrink-0"
+										/>
 										<span>
 											{detailEvent.location ?? "—"}
 										</span>
@@ -974,12 +1051,35 @@ export default function EventsPage() {
 									{(detailEvent.registration_open ||
 										detailEvent.registration_close) && (
 										<div className="flex items-center gap-3 caption sm:text-sm text-[var(--gray)]">
-											<ClipboardList size={15} className="shrink-0" />
+											<ClipboardList
+												size={15}
+												className="shrink-0"
+											/>
 											<span>
 												Registration:&nbsp;
-												{detailEvent.registration_open ? new Date( detailEvent.registration_open, ).toLocaleDateString( "en-PH", { month: "long", day: "numeric", }, ) : "?"}
+												{detailEvent.registration_open
+													? new Date(
+															detailEvent.registration_open,
+														).toLocaleDateString(
+															"en-PH",
+															{
+																month: "long",
+																day: "numeric",
+															},
+														)
+													: "?"}
 												&nbsp;—&nbsp;
-												{detailEvent.registration_close ? new Date( detailEvent.registration_close, ).toLocaleDateString( "en-PH", { month: "long", day: "numeric", }, ) : "?"}
+												{detailEvent.registration_close
+													? new Date(
+															detailEvent.registration_close,
+														).toLocaleDateString(
+															"en-PH",
+															{
+																month: "long",
+																day: "numeric",
+															},
+														)
+													: "?"}
 											</span>
 										</div>
 									)}
@@ -1020,33 +1120,48 @@ export default function EventsPage() {
 									className="w-fit"
 								/>
 
-                                {/* search attendees */}
-                                <SearchBar
-                                    placeholder={
-                                        detailTab === "registrations"
-                                            ? "Search registered users…"
-                                            : "Search attendees…"
-                                    }
-                                    value={registrantSearch}
-                                    onChange={(e) =>
-                                        setRegistrantSearch(e.target.value)
-                                    }
-                                    containerStyle={{ width: "100%" }}
-                                />
+								{/* search attendees */}
+								<SearchBar
+									placeholder={
+										detailTab === "registrations"
+											? "Search registered users…"
+											: "Search attendees…"
+									}
+									value={registrantSearch}
+									onChange={(e) =>
+										setRegistrantSearch(e.target.value)
+									}
+									containerStyle={{ width: "100%" }}
+								/>
 
 								{/* registrations panel */}
 								{detailTab === "registrations" && (
 									<div className="flex flex-col gap-3">
-
-                                        {/* users count and copy emails button */}
+										{/* users count and copy emails button */}
 										<div className="flex items-center justify-between gap-3">
 											<div className="flex items-center gap-2">
-												<Users size={15} className="text-[var(--gray)]" />
+												<Users
+													size={15}
+													className="text-[var(--gray)]"
+												/>
 												{loadingRegs ? (
-													<span className="caption text-[var(--gray)]"> Loading… </span>
+													<span className="caption text-[var(--gray)]">
+														{" "}
+														Loading…{" "}
+													</span>
 												) : (
 													<span className="caption">
-														<strong> { registrations.length } </strong>{" "} registered user{registrations.length !== 1 ? "s" : ""}
+														<strong>
+															{" "}
+															{
+																registrations.length
+															}{" "}
+														</strong>{" "}
+														registered user
+														{registrations.length !==
+														1
+															? "s"
+															: ""}
 													</span>
 												)}
 											</div>
@@ -1055,33 +1170,73 @@ export default function EventsPage() {
 													<Button
 														variant="soft"
 														size="sm"
-														onClick={() => handleCopyEmails( registrations, ) }
+														onClick={() =>
+															handleCopyEmails(
+																registrations,
+															)
+														}
 														title="Copy all emails to clipboard"
 													>
-														{copied ? ( <> <Check size={13} />{" "} Copied! </> )
-                                                        : ( <> <Copy size={13} />{" "} Copy emails </> )}
+														{copied ? (
+															<>
+																{" "}
+																<Check
+																	size={13}
+																/>{" "}
+																Copied!{" "}
+															</>
+														) : (
+															<>
+																{" "}
+																<Copy
+																	size={13}
+																/>{" "}
+																Copy emails{" "}
+															</>
+														)}
 													</Button>
 												)}
 										</div>
 
 										{loadingRegs ? (
 											<div className="flex items-center justify-center gap-2 py-8 text-[var(--gray)]">
-												<Loader2 size={18} className="animate-spin" />
-												<span className="caption"> Loading registrations… </span>
+												<Loader2
+													size={18}
+													className="animate-spin"
+												/>
+												<span className="caption">
+													{" "}
+													Loading registrations…{" "}
+												</span>
 											</div>
-										) : filteredRegistrations.length === 0 ? (
+										) : filteredRegistrations.length ===
+										  0 ? (
 											<div className="flex flex-col items-center justify-center gap-2 py-8 rounded-xl border border-dashed border-[rgba(45,42,74,0.12)]">
-												<Users size={24} className="text-[var(--gray)] opacity-40" />
+												<Users
+													size={24}
+													className="text-[var(--gray)] opacity-40"
+												/>
 												<p className="caption text-[var(--gray)] py-2 text-center">
-                                                    {registrantSearch ? "No results match your search." : "No registrations yet."}
-                                                </p>
+													{registrantSearch
+														? "No results match your search."
+														: "No registrations yet."}
+												</p>
 											</div>
 										) : (
 											<div className="flex flex-col max-h-[420px] overflow-y-auto pr-1">
 												<div className="grid grid-cols-[1fr_1fr_44px] gap-3 px-3 sticky top-0 bg-white">
-													<span className="label"> Name </span>
-													<span className="label"> Email </span>
-													<span className="label text-center"> Present </span>
+													<span className="label">
+														{" "}
+														Name{" "}
+													</span>
+													<span className="label">
+														{" "}
+														Email{" "}
+													</span>
+													<span className="label text-center">
+														{" "}
+														Present{" "}
+													</span>
 												</div>
 												<div className="divider my-0" />
 												{filteredRegistrations.map(
@@ -1106,12 +1261,31 @@ export default function EventsPage() {
 									<div className="flex flex-col gap-3">
 										<div className="flex items-center justify-between gap-3">
 											<div className="flex items-center gap-2">
-												<ClipboardCheck size={15} className="text-[var(--gray)]" />
+												<ClipboardCheck
+													size={15}
+													className="text-[var(--gray)]"
+												/>
 												{loadingRegs ? (
-													<span className="caption text-[var(--gray)]"> Loading… </span>
+													<span className="caption text-[var(--gray)]">
+														{" "}
+														Loading…{" "}
+													</span>
 												) : (
 													<span className="caption">
-														<strong> {attendanceCount} </strong>{" "} attended out of{" "} <strong> { registrations.length } </strong>{" "} registered
+														<strong>
+															{" "}
+															{
+																attendanceCount
+															}{" "}
+														</strong>{" "}
+														attended out of{" "}
+														<strong>
+															{" "}
+															{
+																registrations.length
+															}{" "}
+														</strong>{" "}
+														registered
 													</span>
 												)}
 											</div>
@@ -1120,37 +1294,82 @@ export default function EventsPage() {
 													<Button
 														variant="soft"
 														size="sm"
-														onClick={() => handleCopyEmails( attendedUsers, ) }
+														onClick={() =>
+															handleCopyEmails(
+																attendedUsers,
+															)
+														}
 														title="Copy emails to clipboard"
 													>
-														{copied ? ( <> <Check size={13} />{" "} Copied! </> )
-                                                        : ( <> <Copy size={13} />{" "} Copy emails </> )}
+														{copied ? (
+															<>
+																{" "}
+																<Check
+																	size={13}
+																/>{" "}
+																Copied!{" "}
+															</>
+														) : (
+															<>
+																{" "}
+																<Copy
+																	size={13}
+																/>{" "}
+																Copy emails{" "}
+															</>
+														)}
 													</Button>
 												)}
 										</div>
 
 										{loadingRegs ? (
 											<div className="flex items-center justify-center gap-2 py-8 text-[var(--gray)]">
-												<Loader2 size={18} className="animate-spin" />
-												<span className="caption"> Loading… </span>
+												<Loader2
+													size={18}
+													className="animate-spin"
+												/>
+												<span className="caption">
+													{" "}
+													Loading…{" "}
+												</span>
 											</div>
 										) : attendedUsers.length === 0 ? (
 											<div className="flex flex-col items-center justify-center gap-2 py-8 rounded-xl border border-dashed border-[rgba(45,42,74,0.12)]">
-												<ClipboardCheck size={24} className="text-[var(--gray)] opacity-40" />
-												<p className="caption"> No attendees marked yet. </p>
-												<p className="caption text-center max-w-[250px]"> Mark attendance in the Registrations tab using the checkboxes. </p>
+												<ClipboardCheck
+													size={24}
+													className="text-[var(--gray)] opacity-40"
+												/>
+												<p className="caption">
+													{" "}
+													No attendees marked
+													yet.{" "}
+												</p>
+												<p className="caption text-center max-w-[250px]">
+													{" "}
+													Mark attendance in the
+													Registrations tab using the
+													checkboxes.{" "}
+												</p>
 											</div>
 										) : (
 											<div className="flex flex-col max-h-[420px] overflow-y-auto pr-1">
 												<div className="grid grid-cols-[1fr_1fr] gap-3 px-3 sticky top-0 bg-white">
-													<span className="label"> Name </span>
-													<span className="label"> Email </span>
+													<span className="label">
+														{" "}
+														Name{" "}
+													</span>
+													<span className="label">
+														{" "}
+														Email{" "}
+													</span>
 												</div>
 												<div className="divider my-0" />
 												{filteredAttended.map(
 													(user, i) => (
 														<UserRow
-															key={ user.registration_id }
+															key={
+																user.registration_id
+															}
 															user={user}
 															i={i}
 															showCheckbox={false}
@@ -1247,7 +1466,7 @@ export default function EventsPage() {
 
 			{/* floating toast notification */}
 			{toast && (
-				<div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[9999]">
+				<div className="absolute left-1/2 -translate-x-1/2 bottom-6 z-[9999] animate-in fade-in-50]">
 					<Toast
 						variant={toast.variant}
 						title={toast.title}
