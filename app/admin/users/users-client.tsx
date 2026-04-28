@@ -24,6 +24,7 @@ import {
   DropdownDivider,
   Modal,
   Toast,
+  Checkbox,
 } from "@/components/ui";
 
 interface UsersClientProps {
@@ -46,29 +47,6 @@ const GSO_VARIANT: Record<string, "warning" | "success"> = {
 const ROLES = ["student", "staff", "faculty", "admin"];
 const GSO_STATUSES = ["attended", "pending"];
 
-function CheckItem({
-  label, active, onToggle, capitalize = false,
-}: { label: string; active: boolean; onToggle: () => void; capitalize?: boolean; }) {
-  return (
-    <DropdownItem onClick={onToggle}>
-      <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
-        <span style={{
-          width: 14, height: 14, borderRadius: 4, flexShrink: 0,
-          border: `1.5px solid ${active ? "var(--primary-dark)" : "rgba(45,42,74,0.20)"}`,
-          background: active ? "var(--primary-dark)" : "transparent",
-          display: "inline-flex", alignItems: "center", justifyContent: "center",
-        }}>
-          {active && (
-            <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
-              <path d="M1 4l2 2 4-4" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          )}
-        </span>
-        <span className={capitalize ? "capitalize" : ""}>{active ? <strong>{label}</strong> : label}</span>
-      </span>
-    </DropdownItem>
-  );
-}
 
 export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) => {
   const router = useRouter();
@@ -404,13 +382,13 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
               </p>
             </div>
             {ROLES.map((r) => (
-              <CheckItem
-                key={r}
-                label={r}
-                active={roleFilters.has(r)}
-                onToggle={() => toggleRole(r)}
-                capitalize
-              />
+              <DropdownItem key={r}>
+                <Checkbox
+                  label={r.charAt(0).toUpperCase() + r.slice(1)}
+                  checked={roleFilters.has(r)}
+                  onChange={() => toggleRole(r)}
+                />
+              </DropdownItem>
             ))}
 
             <DropdownDivider />
@@ -421,12 +399,13 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
               </p>
             </div>
             {GSO_STATUSES.map((g) => (
-              <CheckItem
-                key={g}
-                label={g === "attended" ? "Attended" : "Pending"}
-                active={gsoFilters.has(g)}
-                onToggle={() => toggleGso(g)}
-              />
+              <DropdownItem key={g}>
+                <Checkbox
+                  label={g === "attended" ? "Attended" : "Pending"}
+                  checked={gsoFilters.has(g)}
+                  onChange={() => toggleGso(g)}
+                />
+              </DropdownItem>
             ))}
 
             <DropdownDivider />

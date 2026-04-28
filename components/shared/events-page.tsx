@@ -17,6 +17,7 @@ import {
   Dropdown,
   DropdownItem,
   DropdownDivider,
+  Checkbox,
 } from "@/components/ui";
 import { useSearchParams } from "next/navigation";
 
@@ -51,34 +52,6 @@ import {
   CATEGORY_VARIANT 
 } from "@/lib/constants";
 
-// checkbox item used inside filter dropdown (multi-select)
-function CheckItem({
-  label,
-  active,
-  onToggle,
-  capitalize = false,
-}: {
-  label: string;
-  active: boolean;
-  onToggle: () => void;
-  capitalize?: boolean;
-}) {
-  return (
-    <DropdownItem onClick={onToggle}>
-      <span className="flex items-center gap-2">
-        {/* mini checkbox */}
-        <span className={`w-[14px] h-[14px] rounded shrink-0 border-[1.5px] inline-flex items-center justify-center ${active ? "border-[var(--primary-dark)] bg-[var(--primary-dark)]" : "border-[rgba(45,42,74,0.20)] bg-transparent"}`}>
-          {active && (
-            <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
-              <path d="M1 4l2 2 4-4" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          )}
-        </span>
-        <span className={capitalize ? "capitalize" : ""}>{active ? <strong>{label}</strong> : label}</span>
-      </span>
-    </DropdownItem>
-  );
-}
 
 // events page
 export default function EventsPage() {
@@ -438,13 +411,13 @@ export default function EventsPage() {
                     <p className="label mb-1">Status</p>
                   </div>
                   {statuses.map((s) => (
-                    <CheckItem
-                      key={s}
-                      label={s}
-                      active={filters.status.has(s)}
-                      onToggle={() => toggleFilter("status", s)}
-                      capitalize
-                    />
+                    <DropdownItem key={s}>
+                      <Checkbox
+                        label={s.charAt(0).toUpperCase() + s.slice(1)}
+                        checked={filters.status.has(s)}
+                        onChange={() => toggleFilter("status", s)}
+                      />
+                    </DropdownItem>
                   ))}
                   <DropdownDivider />
                 </>
@@ -456,12 +429,13 @@ export default function EventsPage() {
                     <p className="label mb-1">Category</p>
                   </div>
                   {categories.map((cat) => (
-                    <CheckItem
-                      key={cat}
-                      label={cat}
-                      active={filters.category.has(cat)}
-                      onToggle={() => toggleFilter("category", cat)}
-                    />
+                    <DropdownItem key={cat}>
+                      <Checkbox
+                        label={cat}
+                        checked={filters.category.has(cat)}
+                        onChange={() => toggleFilter("category", cat)}
+                      />
+                    </DropdownItem>
                   ))}
                   <DropdownDivider />
                 </>
