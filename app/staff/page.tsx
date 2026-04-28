@@ -6,7 +6,7 @@ import {
 } from "lucide-react";
 import {
   Card, StatCard, Button, MiniCalendar, TodayTimeline, DateRangePicker,
-  DashboardFilter, EmptyFilters , Modal,
+  DashboardFilter, EmptyFilters, Modal,
 } from "@/components/ui";
 import type { DateRange, DashboardFilters } from "@/components/ui";
 import {
@@ -68,7 +68,7 @@ export default function DashboardPage() {
         const iso   = (d: Date) => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
         return { from: iso(start), to: iso(now) };
     });
-    const [filters, setFilters] = useState<DashboardFilters>(EmptyFilters );
+    const [filters, setFilters] = useState<DashboardFilters>(EmptyFilters);
 
     // quick action modals
     const [activeModal, setActiveModal]             = useState<"event" | "survey" | null>(null);
