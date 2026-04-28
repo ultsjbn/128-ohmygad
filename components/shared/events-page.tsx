@@ -277,7 +277,26 @@ export default function EventsPage() {
   const sortEvents = (eventsToSort: EventFormData[], sortState: SortState): EventFormData[] => {
     const { field, direction } = sortState;
     const sorted = [...eventsToSort];
+    const now = new Date();
+
+    const isRegClosed = (event: EventFormData) => {
+      const regOpen  = event.registration_open  ? new Date(event.registration_open)  : null;
+      const regClose = event.registration_close ? new Date(event.registration_close) : null;
+      return event.status === "past" || (regClose && now > regClose) || (regOpen && now < regOpen);
+    };
+
     sorted.sort((a, b) => {
+      // Secondary sort for Today events: open registration first
+      const aIsToday = a.status?.toLowerCase().trim() === "today";
+      const bIsToday = b.status?.toLowerCase().trim() === "today";
+
+      if (aIsToday && bIsToday) {
+        const aClosed = isRegClosed(a);
+        const bClosed = isRegClosed(b);
+        if (aClosed && !bClosed) return 1;
+        if (!aClosed && bClosed) return -1;
+      }
+
       let aVal: any = a[field as keyof EventFormData];
       let bVal: any = b[field as keyof EventFormData];
       if (aVal == null && bVal == null) return 0;
