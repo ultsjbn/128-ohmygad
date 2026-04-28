@@ -18,6 +18,7 @@ function TextQuestion({
   value: Answer;
   onChange: (val: Answer) => void;
 }) {
+  const currentLength = (value as string)?.length || 0;
   return (
     <div className="input-wrap">
       <textarea
@@ -26,7 +27,13 @@ function TextQuestion({
         placeholder="Type your answer here…"
         value={(value as string) ?? ""}
         onChange={(e) => onChange(e.target.value)}
+        maxLength={500}
       />
+      <div className="flex justify-end mt-1">
+        <span className="caption text-[var(--gray)]">
+          {currentLength} / 500
+        </span>
+      </div>
     </div>
   );
 }

@@ -283,6 +283,7 @@ export default function EventForm({ initialData, mode, onSuccess, onCancel }: Ev
                 prefixIcon={<Type size={15} />}
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
+                maxLength={100}
               />
 
               <div className="input-wrap">
@@ -296,6 +297,7 @@ export default function EventForm({ initialData, mode, onSuccess, onCancel }: Ev
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     className="input pl-[42px] py-3 resize-y"
+                    maxLength={250}
                   />
                 </div>
               </div>
@@ -307,6 +309,7 @@ export default function EventForm({ initialData, mode, onSuccess, onCancel }: Ev
                 prefixIcon={<MapPin size={15} />}
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
+                maxLength={250}
               />
 
               {/* banner image */}
@@ -349,9 +352,6 @@ export default function EventForm({ initialData, mode, onSuccess, onCancel }: Ev
                 <Input
                   label="Capacity *"
                   type="number"
-                  // min={1}
-                  // max={300}
-                  // maxLength={3}
                   placeholder="e.g. 30"
                   required
                   prefixIcon={<Users size={15} />}
