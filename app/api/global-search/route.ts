@@ -29,16 +29,21 @@ export async function GET(request: Request) {
       .ilike("title", `%${query}%`)
       .limit(limitAmount);
 
+    const today = new Date();
+    const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+
     const { data: events } = await supabaseAdmin
       .from("event")
       .select("id, title")
       .ilike("title", `%${query}%`)
+      .or(`end_date.gte.${todayStr},and(end_date.is.null,start_date.gte.${todayStr})`)
       .limit(limitAmount);
 
     const { data: surveys } = await supabaseAdmin
       .from("survey")
       .select("id, title")
       .ilike("title", `%${query}%`)
+      .eq("status", "open")
       .limit(limitAmount);
       
     let users: any[] = [];
