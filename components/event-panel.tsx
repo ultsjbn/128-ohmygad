@@ -5,7 +5,7 @@ import { Calendar, MapPin, Clock } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { Badge, Button, Card, Tabs } from "@/components/ui";
 
-//  types 
+//  types
 interface EventData {
   id: string;
   title: string;
@@ -26,10 +26,10 @@ interface EventGroup {
   events: EventData[];
 }
 
-import { 
-  CATEGORY_GRADIENT, 
-  DEFAULT_GRADIENT, 
-  REG_STATUS_VARIANT 
+import {
+  CATEGORY_GRADIENT,
+  DEFAULT_GRADIENT,
+  REG_STATUS_VARIANT
 } from "@/lib/constants";
 
 const formatDateLabel = (s: string) =>
@@ -65,7 +65,6 @@ export const EventPanel = (): JSX.Element => {
       const { data: { user }, error: userError } = await supabase.auth.getUser();
       if (userError || !user) { setLoading(false); return; }
 
-      // query from event_registration so we only get events the user registered for
       const { data, error } = await supabase
         .from("event_registration")
         .select(`
@@ -105,7 +104,6 @@ export const EventPanel = (): JSX.Element => {
     fetchEvents();
   }, []);
 
-  // fallback to rawStartDate if end_date is null so the filter doesn't break
   const filteredEvents = events.filter((e) => {
     const compareDate = e.rawEndDate || e.rawStartDate;
     const isPast = new Date(compareDate) < new Date();
@@ -116,51 +114,44 @@ export const EventPanel = (): JSX.Element => {
 
   const groups = groupByDate(filteredEvents);
 
-  const [detailTab, setDetailTab] = useState<"upcoming" | "today" | "past">(
-		"today",
-  );
+  const [detailTab, setDetailTab] = useState<"upcoming" | "today" | "past">("today");
 
-  // render 
+  // render
   return (
-    <div className="flex flex-col h-full gap-1 md:gap-2">
+    <div className="flex flex-col h-full gap-2 md:gap-4">
         {/*  header  */}
-        <div className="md:flex items-center gap-2 justify-between md:shrink-0 md:min-w-0 md:w-full">
-            <h2 className="heading-lg mb-3">Events</h2>
-            <div className="flex gap-1">
-                <Tabs
-                    tabs={["Today", "Upcoming", "Past"]}
-                    defaultTab={
+        <div className="flex items-center justify-between gap-4 shrink-0 flex-wrap">
+            <h2 className="heading-lg">Events</h2>
+            <Tabs
+                tabs={["Today", "Upcoming", "Past"]}
+                defaultTab={
                     detailTab === "upcoming"
                         ? "Upcoming"
                         : detailTab === "today"
                         ? "Today"
                         : "Past"
-                    }
-                    onChange={(tab) => {
-                        const key = tab === "Upcoming" ? "upcoming" : tab === "Today" ? "today" : "past";
-                        setFilter(key);
-                        setDetailTab(key);
-                    }}
-                    className="w-fit"
-                />
-            </div>
-            
+                }
+                onChange={(tab) => {
+                    const key = tab === "Upcoming" ? "upcoming" : tab === "Today" ? "today" : "past";
+                    setFilter(key);
+                    setDetailTab(key);
+                }}
+                className="w-fit"
+            />
         </div>
 
         {/*  scrollable timeline  */}
-        <div className="w-full pb-2 items-center">
+        <div className="flex flex-col flex-1 overflow-y-auto py-2">
 
             {/* loading skeletons */}
             {loading && (
             <div className="flex flex-col gap-6 animate-pulse">
                 {Array.from({ length: 3 }).map((_, i) => (
                 <div key={i}>
-                    {/* mobile skeleton: inline date row */}
                     <div className="flex md:hidden items-center gap-3 mb-3">
-                    <div className="w-2.5 h-2.5 rounded-full bg-[var(--lavender)] shrink-0" />
                     <div className="h-3 w-32 rounded-full bg-[var(--lavender)]" />
+                    <div className="h-2.5 w-16 rounded-full bg-[var(--lavender)]" />
                     </div>
-                    {/* desktop skeleton: 3 columns */}
                     <div className="hidden md:flex gap-4">
                     <div className="flex flex-col items-end gap-1 w-[110px] shrink-0 pt-4">
                         <div className="h-3 w-10 rounded-full bg-[var(--lavender)]" />
@@ -182,8 +173,7 @@ export const EventPanel = (): JSX.Element => {
                         </Card>
                     </div>
                     </div>
-                    {/* mobile skeleton: card */}
-                    <div className="md:hidden ml-5">
+                    <div className="md:hidden">
                     <Card variant="glass">
                         <div className="flex gap-3">
                         <div className="flex-1 flex flex-col gap-2 justify-center">
@@ -201,11 +191,11 @@ export const EventPanel = (): JSX.Element => {
 
             {/* empty state */}
             {!loading && groups.length === 0 && (
-            <Card variant="no-shadow" className="flex flex-col items-center justify-center text-center min-h-[220px] gap-3">
+            <Card variant="no-shadow" className="flex flex-col items-center justify-center text-center flex-1 gap-3">
                 <div className="w-14 h-14 rounded-full bg-[var(--lavender)] flex items-center justify-center">
                     <Calendar size={26} className="text-[var(--periwinkle)]" />
                 </div>
-                <div>
+                <div className="flex flex-col gap-1">
                     <p className="label text-[var(--primary-dark)]">No events found</p>
                     <p className="caption text-[var(--gray)] mt-0.5">
                         {filter === "upcoming"
@@ -225,63 +215,64 @@ export const EventPanel = (): JSX.Element => {
             </Card>
             )}
 
-            {/*  mobile timeline (< md devices)  border-left container, inline date row */}
             {!loading && groups.length > 0 && (
             <>
-                <div
-                className="md:hidden mx-1 mt-2"
-                style={{ borderLeft: "1.5px solid rgba(45,42,74,0.10)" }}
-                >
+                {/* mobile: left dot+line, right date+cards */}
+                <div className="md:hidden flex flex-col">
                 {groups.map((group, gi) => (
-                    <div key={group.dateLabel} className={gi > 0 ? "mt-6" : ""}>
+                    <div key={group.dateLabel} className="flex gap-3">
 
-                    {/* date row: dot sits on the border line */}
-                    <div className="flex items-center gap-3 -ml-[7px] mb-3">
+                    {/* dot + vertical line */}
+                    <div className="flex flex-col items-center w-3 shrink-0 pt-[3px]">
                         <div
-                        className="w-4 h-4 rounded-full shrink-0 ring-2 ring-white"
-                        style={{ background: "var(--soft-pink)" }}
+                            className="w-2 h-2 rounded-full shrink-0 ring-2 ring-white"
+                            style={{ background: "var(--soft-pink)" }}
                         />
-                        <span className="label text-[var(--primary-dark)]">{group.dateLabel}</span>
-                        <span className="caption text-[var(--gray)]">{group.dayOfWeek}</span>
+                        {gi < groups.length - 1 && (
+                            <div className="w-px flex-1 mt-1.5" style={{ background: "rgba(45,42,74,0.10)" }} />
+                        )}
                     </div>
 
-                    {/* cards */}
-                    <div className="flex flex-col gap-3 pl-3">
-                        {group.events.map((event) => {
-                        const cover = event.banner_url
-                            ? `url(${event.banner_url}) center/cover no-repeat`
-                            : CATEGORY_GRADIENT[event.category ?? ""] ?? DEFAULT_GRADIENT;
-                        return (
-                            <Card key={event.id} className="hover:shadow-[var(--shadow-soft)] transition-shadow cursor-pointer">
-                            <div className="flex gap-3 items-start">
-                                {/* content first */}
-                                <div className="flex flex-col gap-1 flex-1 min-w-0">
-                                <span className="caption text-[var(--gray)] flex items-center gap-1">
-                                    <Clock size={11} />{event.time}
-                                </span>
-                                <p className="label leading-snug m-0 line-clamp-2">{event.title}</p>
-                                <span className="caption text-[var(--gray)] flex items-center gap-1">
-                                    <MapPin size={11} />
-                                    <span className="truncate">{event.location}</span>
-                                </span>
-                                <div className="flex gap-1.5 flex-wrap mt-1">
-                                    {event.registrationStatus && (
-                                    <Badge variant={REG_STATUS_VARIANT[event.registrationStatus.toLowerCase()] ?? "dark"}>
-                                        <span className="capitalize">{event.registrationStatus}</span>
-                                    </Badge>
-                                    )}
-                                    {event.category && <Badge variant="periwinkle">{event.category}</Badge>}
-                                </div>
-                                </div>
-                                {/* thumbnail right */}
-                                <div
-                                className="w-[80px] h-[80px] rounded-[var(--radius-sm)] shrink-0"
-                                style={{ background: cover }}
-                                />
-                            </div>
-                            </Card>
-                        );
-                        })}
+                    {/* date label + cards */}
+                    <div className="flex-1 pb-5 min-w-0">
+                        <div className="flex items-center gap-2 mb-3">
+                            <p className="label leading-none">{group.dateLabel}</p>
+                            <p className="caption text-[var(--gray)] leading-none">{group.dayOfWeek}</p>
+                        </div>
+                        <div className="flex flex-col gap-2">
+                            {group.events.map((event) => {
+                                const cover = event.banner_url
+                                    ? `url(${event.banner_url}) center/cover no-repeat`
+                                    : CATEGORY_GRADIENT[event.category ?? ""] ?? DEFAULT_GRADIENT;
+                                return (
+                                    <Card key={event.id} className="transition-shadow cursor-pointer">
+                                    <div className="flex gap-3 items-center">
+                                        <div className="flex flex-col gap-1 flex-1 min-w-0">
+                                            <div>
+                                                {event.category && <Badge variant="ghost">{event.category}</Badge>}
+                                            </div>
+                                            <span className="caption text-[var(--gray)] flex items-center gap-1">
+                                                <Clock size={11} />{event.time}
+                                            </span>
+                                            <h3 className="heading-sm leading-snug m-0 line-clamp-2 truncate">{event.title}</h3>
+                                            <span className="caption text-[var(--gray)] flex items-center gap-1">
+                                                <MapPin size={11} />
+                                                <span className="truncate">{event.location}</span>
+                                            </span>
+                                            <div>
+                                                {event.registrationStatus && (
+                                                    <Badge variant={REG_STATUS_VARIANT[event.registrationStatus.toLowerCase()] ?? "dark"} className="mt-1">
+                                                        <span className="capitalize">{event.registrationStatus}</span>
+                                                    </Badge>
+                                                )}
+                                            </div>
+                                        </div>
+                                        <div className="w-[100px] h-[100px] rounded-[var(--radius-sm)] shrink-0" style={{ background: cover }} />
+                                    </div>
+                                    </Card>
+                                );
+                            })}
+                        </div>
                     </div>
 
                     </div>
@@ -318,30 +309,26 @@ export const EventPanel = (): JSX.Element => {
                             : CATEGORY_GRADIENT[event.category ?? ""] ?? DEFAULT_GRADIENT;
                         return (
                             <Card variant="glass" key={event.id} className="hover:shadow-[var(--shadow-soft)] transition-shadow cursor-pointer">
-                            <div className="flex gap-3 items-start">
-                                {/* thumbnail left on desktop */}
-                                <div
-                                className="w-[100px] h-[100px] rounded-[var(--radius-sm)] shrink-0"
-                                style={{ background: cover }}
-                                />
-                                <div className="flex flex-col gap-1.5 flex-1 min-w-0">
-                                <span className="caption text-[var(--gray)] flex items-center gap-1">
-                                    <Clock size={11} />{event.time}
-                                </span>
-                                <p className="label leading-snug line-clamp-2 m-0">{event.title}</p>
-                                <span className="caption text-[var(--gray)] flex items-center gap-1">
-                                    <MapPin size={11} />{event.location}
-                                </span>
-                                <div className="flex gap-1.5 flex-wrap mt-0.5">
-                                    {event.registrationStatus && (
-                                    <Badge variant={REG_STATUS_VARIANT[event.registrationStatus.toLowerCase()] ?? "dark"}>
-                                        <span className="capitalize">{event.registrationStatus}</span>
-                                    </Badge>
-                                    )}
-                                    {event.category && <Badge variant="periwinkle">{event.category}</Badge>}
+                                <div className="flex gap-4 items-center">
+                                    <div className="flex flex-col gap-1.5 flex-1 min-w-0">
+                                        <span className="caption flex items-center gap-1">
+                                            <Clock size={11} />{event.time}
+                                        </span>
+                                        <h3 className="heading-sm leading-snug m-0 line-clamp-2">{event.title}</h3>
+                                        <span className="caption flex items-center gap-1">
+                                            <MapPin size={11} />{event.location}
+                                        </span>
+                                        <div className="flex gap-2 flex-wrap mt-0.5">
+                                            {event.registrationStatus && (
+                                            <Badge variant={REG_STATUS_VARIANT[event.registrationStatus.toLowerCase()] ?? "dark"}>
+                                                <span className="capitalize">{event.registrationStatus}</span>
+                                            </Badge>
+                                            )}
+                                            {event.category && <Badge variant="ghost">{event.category}</Badge>}
+                                        </div>
+                                    </div>
+                                    <div className="w-[100px] h-[100px] rounded-[var(--radius-sm)] shrink-0" style={{ background: cover }} />
                                 </div>
-                                </div>
-                            </div>
                             </Card>
                         );
                         })}
