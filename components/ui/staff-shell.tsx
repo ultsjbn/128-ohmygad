@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard, Calendar, BookOpen, ClipboardList,
@@ -42,12 +42,22 @@ export default function StaffShell({ children }: { children: React.ReactNode }) 
   const pathname = usePathname();
 
   const [open, setOpen] = useState(true);
+  const [scrolled, setScrolled] = useState(false);
+  const headerRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const check = () => { if (window.innerWidth < 768) setOpen(false); };
     check();
     window.addEventListener("resize", check);
     return () => window.removeEventListener("resize", check);
+  }, []);
+
+  useEffect(() => {
+    const scroller = headerRef.current?.nextElementSibling as HTMLElement | null;
+    if (!scroller) return;
+    const onScroll = () => setScrolled(scroller.scrollTop > 8);
+    scroller.addEventListener("scroll", onScroll, { passive: true });
+    return () => scroller.removeEventListener("scroll", onScroll);
   }, []);
 
   const activeId = pathnameToNavId(pathname);
@@ -199,25 +209,29 @@ export default function StaffShell({ children }: { children: React.ReactNode }) 
           <div className="pointer-events-none absolute -bottom-16 left-20 w-[320px] h-[320px] rounded-full blur-[56px] opacity-[0.13] bg-[var(--periwinkle)] z-0" />
 
           {/* page header ------------------------------------------------ */}
-          <header
-            className="shrink-0 flex items-center justify-between gap-3 px-3 md:px-5 pt-4 pb-0.5"
-            style={{ position: "relative", zIndex: 10 }}
-          >
-            <div className="flex items-center gap-2 min-w-0">
-              {!isDashboard && (
-                <Button
-                  size="sm"
-                  variant="icon"
-                  onClick={() => router.back()}
-                  aria-label="Go back"
-                >
-                  <ArrowLeft size={15} />
-                </Button>
-              )}
-              <h1 className="heading-lg truncate">{pageLabel}</h1>
-            </div>
-            <div className="flex items-center gap-2 shrink-0">
-              <UserMenu />
+          <header ref={headerRef} className="relative shrink-0">
+            <div
+              aria-hidden
+              className="absolute inset-0 pointer-events-none"
+              style={{
+                backgroundColor: scrolled ? "rgba(255,255,255,0.80)" : "rgba(255,255,255,0)",
+                backdropFilter:  scrolled ? "blur(12px)" : "blur(0px)",
+                borderBottom:    scrolled ? "1px solid rgba(0,0,0,0.06)" : "1px solid transparent",
+                transition: "background-color 0.2s ease, backdrop-filter 0.2s ease, border-color 0.2s ease",
+              }}
+            />
+            <div className="relative z-10 flex items-center justify-between gap-3 px-3 md:px-5 pt-4 pb-0.5">
+              <div className="flex items-center gap-2 min-w-0">
+                {!isDashboard && (
+                  <Button size="sm" variant="icon" onClick={() => router.back()} aria-label="Go back">
+                    <ArrowLeft size={15} />
+                  </Button>
+                )}
+                <h1 className="heading-lg truncate">{pageLabel}</h1>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <UserMenu />
+              </div>
             </div>
           </header>
 
@@ -228,7 +242,7 @@ export default function StaffShell({ children }: { children: React.ReactNode }) 
           >
             {children}
             <footer
-              className={`${pathname === "/staff" ? "static" : "fixed"} bottom-0 mt-8 mb-3 flex flex-wrap items-center justify-between gap-2 text-[10px] text-[var(--gray)]/60 border-t border-black/[0.05] pt-3`}
+              className="hidden static bottom-0 mt-6 mb-3 md:flex flex-wrap items-center justify-between gap-2 text-[10px] text-[var(--gray)]/60 border-t border-black/[0.05] pt-3"
             >
               <span className="flex flex-wrap items-center gap-x-1.5">
                 <strong className="font-semibold text-[var(--primary-dark)]/60">
