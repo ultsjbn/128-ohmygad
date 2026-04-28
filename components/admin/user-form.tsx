@@ -43,8 +43,6 @@ import {
   SEX_OPTIONS, GENDER_OPTIONS, UPB_PROGRAMS, PRONOUNS 
 } from "@/lib/constants";
 
-
-
 // section label for modal view
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
@@ -73,7 +71,9 @@ export default function UserForm({ initialData, onSuccess, layout = "modal" }: U
   const [gender_identity, setGenderIdentity] = useState(initialData?.gender_identity ?? "");
   const [college, setCollege] = useState(initialData?.college ?? "");
   const [program, setProgram] = useState(initialData?.program ?? "");
-  const [student_num, setStudentNum] = useState(initialData?.student_num ?? "");
+    const [student_num, setStudentNum] = useState(
+        initialData?.student_num != null ? String(initialData.student_num) : ""
+    );
   const [year_level, setYearLevel] = useState(initialData?.year_level ?? "");
   const [gso_attended, setGsoAttended] = useState<string | number>(initialData?.gso_attended ?? "");
   const [asho_attended, setAshoAttended] = useState<string | number>(initialData?.asho_attended ?? "");
