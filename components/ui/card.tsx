@@ -82,7 +82,7 @@ export function EventCard({
   return (
     <div className="event-card">
       <div className="event-cover" style={{ background: gradient }}>
-        <span className="badge" style={{ background: "rgba(255,255,255,0.9)", color: "var(--primary-dark)" }}>
+        <span className="badge badge-ghost">
           {category}
         </span>
       </div>

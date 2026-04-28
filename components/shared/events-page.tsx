@@ -473,7 +473,7 @@ export default function EventsPage() {
             </Badge>
           ))}
           {[...filters.category].map((cat) => (
-            <Badge key={cat} variant={CATEGORY_VARIANT[cat] ?? "dark"} dot>
+            <Badge key={cat} variant="ghost" dot>
               {cat}
               <button
                 onClick={() => {
@@ -696,11 +696,7 @@ export default function EventsPage() {
               <h2 className="heading-md m-0">{detailEvent.title}</h2>
               {/* category and status badges moved below */}
               <div className="flex gap-2 items-center">
-                <Badge
-                  variant={
-                    CATEGORY_VARIANT[detailEvent.category ?? ""] ?? "dark"
-                  }
-                >
+                <Badge variant="ghost" >
                   {detailEvent.category ?? "Uncategorized"}
                 </Badge>
                 {detailEvent.status && (
