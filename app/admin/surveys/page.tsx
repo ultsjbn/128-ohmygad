@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Plus, ArrowUpDown, SlidersHorizontal, Pencil, Trash2, Loader2, BarChart3 } from "lucide-react";
 import SurveyAnalyticsModal from "@/components/admin/survey-analytics-modal";
-import SurveyForm, { type SurveyFormData, type SurveyQuestion } from "@/components/admin/survey-form";
+import SurveyForm, { type SurveyFormData, type SurveyQuestion, deriveStatus } from "@/components/admin/survey-form";
 import { paginate, totalPages, PER_PAGE } from "@/lib/pagination.utils";
 import { Pagination } from "@/components/pagination";
 
@@ -136,7 +136,7 @@ export default function SurveysPage() {
     );
 
     if (statusFilters.size > 0)
-      result = result.filter((s) => statusFilters.has(s.status ?? ""));
+      result = result.filter((s) => statusFilters.has(deriveStatus(s.open_at, s.close_at)));
 
     // sorting
     result = result.sort((a, b) => {
@@ -275,11 +275,14 @@ export default function SurveysPage() {
       key: "status",
       header: "Status",
       width: "15%",
-      render: (survey) => (
-        <Badge variant={STATUS_VARIANT[survey.status ?? ""] ?? "dark"}>
-          <span className="capitalize">{survey.status || "—"}</span>
-        </Badge>
-      ),
+      render: (survey) => {
+        const computedStatus = deriveStatus(survey.open_at, survey.close_at);
+        return (
+          <Badge variant={STATUS_VARIANT[computedStatus] ?? "dark"}>
+            <span className="capitalize">{computedStatus || "—"}</span>
+          </Badge>
+        );
+      },
     },
     {
       key: "open_at",

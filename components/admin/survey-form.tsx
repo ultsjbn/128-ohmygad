@@ -29,6 +29,17 @@ export type SurveyQuestion = {
 
 import { QUESTION_TYPE_OPTIONS, SURVEY_STATUS_OPTIONS as STATUS_OPTIONS } from "@/lib/constants";
 
+export const deriveStatus = (open_at?: string | null, close_at?: string | null): string => {
+  if (!open_at) return "";
+  const now = new Date();
+  const open = new Date(open_at);
+  const close = close_at ? new Date(close_at) : null;
+
+  if (now < open) return "upcoming";
+  if (close && now > close) return "closed";
+  return "open";
+};
+
 type SurveyFormProps = {
   mode: "create" | "edit";
   initialData?: SurveyFormData;
@@ -58,17 +69,18 @@ export default function SurveyForm({ mode, initialData, initialQuestions = [], o
   // ── Survey fields ──
   const [title,       setTitle]       = useState(initialData?.title             ?? "");
   const [description, setDescription] = useState(initialData?.description       ?? "");
-  const [status,      setStatus]      = useState(initialData?.status            ?? "");
   const [event_id,    setEventId]     = useState(initialData?.event_id          ?? "");
   const [open_at,     setOpenAt]      = useState(initialData?.open_at?.slice(0, 16) ?? "");
   const [close_at,    setCloseAt]     = useState(initialData?.close_at?.slice(0, 16) ?? "");
+
+  // Derived — recomputed on every render from open_at / close_at
+  const status = deriveStatus(open_at, close_at);
 
   // ── Sync when initialData arrives async (edit mode) ──
   useEffect(() => {
     if (!initialData) return;
     setTitle(initialData.title ?? "");
     setDescription(initialData.description ?? "");
-    setStatus(initialData.status ?? "");       
     setEventId(initialData.event_id ?? ""); 
     setOpenAt(initialData.open_at?.slice(0, 16) ?? "");
     setCloseAt(initialData.close_at?.slice(0, 16) ?? "");
@@ -151,7 +163,6 @@ export default function SurveyForm({ mode, initialData, initialQuestions = [], o
     setError(null);
 
     if (!title.trim()) { setError("Title is required."); setIsLoading(false); return; }
-    if (!status)        { setError("Please select a status."); setIsLoading(false); return; }
 
     for (let i = 0; i < questions.length; i++) {
       const q = questions[i];
@@ -289,13 +300,21 @@ export default function SurveyForm({ mode, initialData, initialQuestions = [], o
                 onChange={(e) => setEventId(e.target.value)}
               />
 
-              <Select
-                label="Status *"
-                required
-                options={[{ value: "", label: "Select status" }, ...STATUS_OPTIONS]}
-                value={status}
-                onChange={(e) => setStatus(e.target.value)}
-              />
+              <div className="input-wrap">
+                <label className="label">Status</label>
+                <div className="input flex items-center gap-2 bg-[rgba(45,42,74,0.04)] cursor-default select-none">
+                  {status ? (
+                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium
+                      ${status === "open"     ? "bg-green-100 text-green-700" :
+                        status === "upcoming" ? "bg-blue-100 text-blue-700"  :
+                                                "bg-gray-100 text-gray-500"}`}>
+                      {status.charAt(0).toUpperCase() + status.slice(1)}
+                    </span>
+                  ) : (
+                    <span className="caption text-[var(--gray)]">Set open/close times to determine status</span>
+                  )}
+                </div>
+              </div>
           </div>
 
           <div className="flex flex-col gap-2">
