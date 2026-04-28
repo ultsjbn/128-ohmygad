@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 
 import { Card, Input, Select, Button, Badge, Tabs, ProgressBar, Toast } from "@/components/ui";
-import { validateFullName, validateDisplayName, validateContactNum, validateAddress, validateDepartment } from "@/lib/validation";
+import { validateFullName, validateDisplayName, validateContactNum, validateAddress, validateDepartment, validateOffice } from "@/lib/validation";
 
 type Profile = {
   id: string;
@@ -22,6 +22,7 @@ type Profile = {
   role: string;
   college: string;
   department: string;
+  office: string;
   sex_at_birth: string;
   gender_identity: string;
   gso_attended: number | null;
@@ -43,7 +44,7 @@ export default function FacultyProfilePage() {
   const [profile, setProfile] = useState<Profile>({
     id: "", full_name: "", display_name: "", email: "",
     contact_num: "", address: "", pronouns: "", role: "faculty",
-    college: "", department: "",
+    college: "", department: "", office: "",
     sex_at_birth: "", gender_identity: "", gso_attended: null, asho_attended: null
   });
 
@@ -131,6 +132,13 @@ export default function FacultyProfilePage() {
       return;
     }
 
+    const officeErr = validateOffice(profile.office);
+    if (officeErr) {
+      setToast({ type: "error", message: officeErr });
+      setSaving(false);
+      return;
+    }
+
     try {
       const { error } = await supabase
         .from("profile")
@@ -180,6 +188,11 @@ export default function FacultyProfilePage() {
             <div className="flex flex-wrap justify-center gap-2 mb-6">
               <Badge variant="periwinkle" dot>Faculty</Badge>
               {profile.college && <Badge variant="dark">{profile.college}</Badge>}
+              {profile.office && (
+                <Badge variant="pink-light" className="whitespace-normal break-all h-auto py-1.5 px-3 text-center leading-tight max-w-[200px]">
+                  {profile.office}
+                </Badge>
+              )}
             </div>
 
             {/* gso progress bar */}
@@ -320,6 +333,14 @@ export default function FacultyProfilePage() {
                     placeholder="e.g. Dept. of Math and Computer Science"
                     value={profile.department}
                     onChange={set("department")}
+                    maxLength={64}
+                  />
+                  <Input
+                    label="Office"
+                    prefixIcon={<Building2 size={15} />}
+                    placeholder="e.g. Room 301, CAS Building"
+                    value={profile.office}
+                    onChange={set("office")}
                     maxLength={64}
                   />
                 </div>
