@@ -55,7 +55,7 @@ export default function UserMenu() {
           </div>
           {displayName && (
             <span className="hidden sm:block text-md font-semibold truncate max-w-[150px]">
-              {displayName}
+              {displayName.split(" ")[0]}
             </span>
           )}
         </button>
