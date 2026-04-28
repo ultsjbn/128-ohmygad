@@ -41,4 +41,3 @@ app/admin/users/users-client.tsx  (Pagination component total)
 */
 export const totalPages = (total: number, perPage: number) =>
   Math.max(1, Math.ceil(total / perPage));
-pl
