@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 export interface SurveyCompletionDatum {
   id: string;
   title: string;
+  eventTitle?: string;
   completedPct: number;
   incompletePct: number;
   completedCount: number;
@@ -51,9 +52,27 @@ export function useSurveyCompletionRates() {
           responsesBySurvey[row.survey_id].add(row.response_token);
         });
 
-        const eventIds = (surveys ?? [])
-          .map((survey: any) => survey.event_id)
-          .filter((eventId) => eventId !== null && eventId !== undefined);
+        const eventIds = Array.from(
+          new Set(
+            (surveys ?? [])
+              .map((survey: any) => survey.event_id)
+              .filter((eventId) => eventId !== null && eventId !== undefined),
+          ),
+        ) as string[];
+
+        const eventTitlesById: Record<string, string> = {};
+        if (eventIds.length > 0) {
+          const { data: events, error: eventError } = await supabase
+            .from("event")
+            .select("id, title")
+            .in("id", eventIds);
+
+          if (eventError) throw eventError;
+          (events ?? []).forEach((row: any) => {
+            if (!row?.id || row?.title == null) return;
+            eventTitlesById[row.id] = row.title;
+          });
+        }
 
         const registrationsByEvent: Record<string, Set<string>> = {};
         if (eventIds.length > 0) {
@@ -88,6 +107,9 @@ export function useSurveyCompletionRates() {
             return {
               id: survey.id,
               title: survey.title ?? "Untitled Survey",
+              eventTitle: survey.event_id
+                ? eventTitlesById[survey.event_id] ?? "Unknown event"
+                : undefined,
               completedPct,
               incompletePct: attendeeCount > 0 ? Math.max(0, 100 - completedPct) : 0,
               completedCount,
