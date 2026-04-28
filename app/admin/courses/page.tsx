@@ -169,6 +169,10 @@ const confirmDelete = async () => {
   } else {
     setCourses((prev) => prev.filter((e) => e.id !== deleteTarget.id));
     showToast("success", "Course deleted successfully");
+
+    setDeleteTarget(null);
+    setDeletePassword("");
+    setDeleteError(null);
   }
 
   setDeletingId(null);
