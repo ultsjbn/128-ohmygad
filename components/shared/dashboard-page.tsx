@@ -34,42 +34,46 @@ export default function DashboardPage({ role = "student", rightPanel }: Dashboar
   }, []);
 
   return (
-    <div className="w-full flex flex-col gap-3 md:gap-4 animate-in fade-in duration-500">
-      {/* dashboard header */}
-        <div className="shrink-0 animate-in slide-in-from-bottom-2 duration-500 w-full flex justify-center">
-            <div className="flex flex-col gap-1 md:gap-2 w-full max-w-[1700px]">
-                <p className="heading-md">Good day, {displayName}!</p>
-                <div>
-                    <GlobalSearch role={role} placeholder="Search events, courses, surveys..." />
-                </div>
-            </div>
-        </div>
+		<div className="w-full flex flex-col gap-4 md:gap-6 animate-in fade-in duration-500">
+			{/* dashboard header */}
+			<div className="shrink-0 animate-in slide-in-from-bottom-2 duration-500 w-full flex justify-center">
+				<div className="flex flex-col gap-2 md:gap-4 w-full max-w-[1700px]">
+					<p className="heading-md">Good day, {displayName}!</p>
+					<div>
+						<GlobalSearch
+							role={role}
+							placeholder="Search events, courses, surveys..."
+						/>
+					</div>
+				</div>
+			</div>
 
-      {/* main grid: events panel left, right panel right on lg+ devices */}
-        <div className="flex gap-4 md:gap-6 md:mb-2 flex-1 min-h-10 justify-center">
+			{/* main grid: events panel left, right panel right on lg+ devices */}
+			<div className="flex gap-4 md:gap-6 md:mb-2 flex-1 min-h-10 justify-center">
+				{/* centered inner wrapper */}
+				<div className="flex gap-4 md:gap-6 flex-1 w-full max-w-[1700px]">
+					<Card
+						variant="no-hover"
+						className="flex flex-col overflow-y-auto min-h-0 flex-1 min-w-0"
+					>
+						<EventPanel />
+					</Card>
 
-            {/* centered inner wrapper */}
-            <div className="flex gap-4 md:gap-6 flex-1 w-full max-w-[1700px]">
+					{rightPanel && (
+						<div className="hidden lg:flex flex-col gap-4 min-h-0 overflow-y-scroll w-[340px] shrink-0">
+							{rightPanel}
+						</div>
+					)}
+				</div>
+			</div>
+			{rightPanel && (
+				<div className="flex lg:hidden flex-col gap-4 md:px-10">
+					{rightPanel}
+				</div>
+			)}
 
-                <Card variant="no-hover" className="flex flex-col overflow-y-auto min-h-0 flex-1 min-w-0">
-                    <EventPanel />  
-                </Card>
-
-                {rightPanel && (
-                    <div className="hidden lg:flex flex-col gap-4 min-h-0 overflow-y-scroll w-[340px] shrink-0">
-                    {rightPanel}
-                    </div>
-                )}
-            </div>
-        </div>
-            {rightPanel && (
-            <div className="flex lg:hidden flex-col gap-4 md:px-10">
-                {rightPanel}
-            </div>
-        )}
-
-    {/* scroll to top */}
-    <ScrollToTop/>
-    </div>
+			{/* scroll to top */}
+			<ScrollToTop />
+		</div>
   );
 }

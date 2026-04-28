@@ -89,13 +89,13 @@ export function EventCard({
         <div className="event-title">{title}</div>
         <div className="event-meta" style={{ marginBottom: 12 }}>
           <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
-            <CalendarDays size={12} color="var(--gray)" /> {date}
+            <CalendarDays size={12} color="var(--primary-dark)" className="opacity-70" /> {date}
           </span>
           <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
-            <Clock size={12} color="var(--gray)" /> {time}
+            <Clock size={12} color="var(--primary-dark)" className="opacity-70" /> {time}
           </span>
           <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
-            <MapPin size={12} color="var(--gray)" /> {location}
+            <MapPin size={12} color="var(--primary-dark)" className="opacity-70" /> {location}
           </span>
         </div>
         <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 10 }}>
