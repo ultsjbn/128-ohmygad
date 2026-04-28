@@ -108,11 +108,24 @@ export const EventPanel = (): JSX.Element => {
   }, []);
 
   const filteredEvents = events.filter((e) => {
-    const compareDate = e.rawEndDate || e.rawStartDate;
-    const isPast = new Date(compareDate) < new Date();
-    const isToday = new Date(compareDate).toDateString() === new Date().toDateString();
-    if (filter === "today") return isToday;
-    return filter === "upcoming" ? !isPast : isPast;
+    const now = new Date();
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const startOfTomorrow = new Date(startOfToday);
+    startOfTomorrow.setDate(startOfTomorrow.getDate() + 1);
+
+    const start = new Date(e.rawStartDate);
+    const end = new Date(e.rawEndDate || e.rawStartDate);
+
+    if (filter === "today") {
+      // Event spans today if it started before tomorrow AND ends on or after today
+      return start < startOfTomorrow && end >= startOfToday;
+    }
+    if (filter === "upcoming") {
+      // Upcoming: starts after today (not yet started)
+      return start >= startOfTomorrow;
+    }
+    // Past: ended before today
+    return end < startOfToday;
   });
 
   const groups = groupByDate(filteredEvents);

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { SlidersHorizontal, Loader2, CalendarDays, MapPin, Users, Clock, X, ArrowUpDown, ClipboardList } from "lucide-react";
-import type { EventFormData } from "@/components/admin/event-form";
+import { type EventFormData, deriveStatus } from "@/components/admin/event-form";
 import ScrollToTop from "@/components/ui/scroll-to-top";
 import { Toast, ProgressBar } from "@/components/ui";
 
@@ -100,8 +100,8 @@ export default function EventsPage() {
     setTimeout(() => setToast(null), 3500);
   };
 
-  // filter options
-  const statuses = Array.from(new Set(events.map((e) => e.status?.toLowerCase().trim()).filter(Boolean))) as string[];
+  // filter options — compute status client-side so multi-day events spanning today appear correctly
+  const statuses = Array.from(new Set(events.map((e) => deriveStatus(e.start_date ?? "", e.end_date ?? "")).filter(Boolean))) as string[];
   const categories = Array.from(new Set(events.map((e) => e.category).filter(Boolean))) as string[];
   const hasActiveFilters = filters.status.size > 0 || filters.category.size > 0;
   const activeFilterCount = filters.status.size + filters.category.size;
@@ -255,13 +255,14 @@ export default function EventsPage() {
     const isRegClosed = (event: EventFormData) => {
       const regOpen  = event.registration_open  ? new Date(event.registration_open)  : null;
       const regClose = event.registration_close ? new Date(event.registration_close) : null;
-      return event.status === "past" || (regClose && now > regClose) || (regOpen && now < regOpen);
+      const computedStatus = deriveStatus(event.start_date ?? "", event.end_date ?? "");
+      return computedStatus === "past" || (regClose && now > regClose) || (regOpen && now < regOpen);
     };
 
     sorted.sort((a, b) => {
       // Secondary sort for Today events: open registration first
-      const aIsToday = a.status?.toLowerCase().trim() === "today";
-      const bIsToday = b.status?.toLowerCase().trim() === "today";
+      const aIsToday = deriveStatus(a.start_date ?? "", a.end_date ?? "") === "today";
+      const bIsToday = deriveStatus(b.start_date ?? "", b.end_date ?? "") === "today";
 
       if (aIsToday && bIsToday) {
         const aClosed = isRegClosed(a);
@@ -315,11 +316,15 @@ export default function EventsPage() {
   const filtered = sortEvents(
     events
       .filter((e) => `${e.title} ${e.category || ""} ${e.location || ""}`.toLowerCase().includes(search.toLowerCase()))
-      .filter((e) => filters.status.size === 0 || filters.status.has(e.status?.toLowerCase().trim() ?? ""))
+      .filter((e) => {
+        const computedStatus = deriveStatus(e.start_date ?? "", e.end_date ?? "");
+        return filters.status.size === 0 || filters.status.has(computedStatus);
+      })
       .filter((e) => filters.category.size === 0 || filters.category.has(e.category ?? ""))
       .filter((e) => {
         // Only allow Past events if the user has already attended them
-        if (e.status?.toLowerCase().trim() === "past") {
+        const computedStatus = deriveStatus(e.start_date ?? "", e.end_date ?? "");
+        if (computedStatus === "past") {
           return attendedIds.has(e.id!);
         }
         return true;
@@ -544,8 +549,9 @@ export default function EventsPage() {
             const now = new Date();
             const regOpen  = event.registration_open  ? new Date(event.registration_open)  : null;
             const regClose = event.registration_close ? new Date(event.registration_close) : null;
+            const computedStatus = deriveStatus(event.start_date ?? "", event.end_date ?? "");
             const isRegClosed =
-              event.status === "past" ||                          // event already past
+              computedStatus === "past" ||                        // event already past
               (regClose && now > regClose) ||                     // registration window closed
               (regOpen  && now < regOpen);                        // registration not yet open
               
@@ -559,15 +565,15 @@ export default function EventsPage() {
                 }}
               >
                 {/* status badge overlaid top-right of the cover */}
-                {event.status && (
+                {computedStatus && (
                   <div className="absolute top-3 right-3 z-[2]">
                     <Badge
                       variant={
-                        STATUS_VARIANT[event.status.toLowerCase().trim()] ??
+                        STATUS_VARIANT[computedStatus] ??
                         "dark"
                       }
                     >
-                      <span className="capitalize">{event.status}</span>
+                      <span className="capitalize">{computedStatus}</span>
                     </Badge>
                   </div>
                 )}
@@ -632,8 +638,9 @@ export default function EventsPage() {
         footer={
           detailEvent && (() => {
             const now = new Date();
+            const detailComputedStatus = deriveStatus(detailEvent.start_date ?? "", detailEvent.end_date ?? "");
             const detailRegClosed =
-              detailEvent.status === "past" ||
+              detailComputedStatus === "past" ||
               (detailEvent.registration_close && now > new Date(detailEvent.registration_close)) ||
               (detailEvent.registration_open  && now < new Date(detailEvent.registration_open));
 
@@ -692,16 +699,19 @@ export default function EventsPage() {
                 <Badge variant="ghost" >
                   {detailEvent.category ?? "Uncategorized"}
                 </Badge>
-                {detailEvent.status && (
-                  <Badge
-                    variant={
-                      STATUS_VARIANT[detailEvent.status.toLowerCase().trim()] ??
-                      "dark"
-                    }
-                  >
-                    <span className="capitalize">{detailEvent.status}</span>
-                  </Badge>
-                )}
+                {(() => {
+                  const detailStatus = deriveStatus(detailEvent.start_date ?? "", detailEvent.end_date ?? "");
+                  return detailStatus ? (
+                    <Badge
+                      variant={
+                        STATUS_VARIANT[detailStatus] ??
+                        "dark"
+                      }
+                    >
+                      <span className="capitalize">{detailStatus}</span>
+                    </Badge>
+                  ) : null;
+                })()}
               </div>
 
               {/* details row */}
