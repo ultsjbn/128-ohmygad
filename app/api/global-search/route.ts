@@ -39,12 +39,18 @@ export async function GET(request: Request) {
       .or(`end_date.gte.${todayStr},and(end_date.is.null,start_date.gte.${todayStr})`)
       .limit(limitAmount);
 
-    const { data: surveys } = await supabaseAdmin
+    let surveyQuery = supabaseAdmin
       .from("survey")
       .select("id, title")
-      .ilike("title", `%${query}%`)
-      .eq("status", "open")
-      .limit(limitAmount);
+      .ilike("title", `%${query}%`);
+
+    if (role !== "admin") {
+      surveyQuery = surveyQuery
+        .eq("status", "open")
+        .or(`close_at.gte.${todayStr},close_at.is.null`);
+    }
+
+    const { data: surveys } = await surveyQuery.limit(limitAmount);
       
     let users: any[] = [];
     if (role === "admin") {
