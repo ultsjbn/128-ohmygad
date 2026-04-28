@@ -205,7 +205,7 @@ export default function AdminProfilePage() {
             <div className="w-full text-left pt-3 border-t border-[rgba(45,42,74,0.08)]">
               <ProgressBar
                 value={profile.gso_attended === 2 ? 100 : profile.gso_attended === 1 ? 50 : 0}
-                variant="dark"
+                variant="gradient"
                 label="GSO Attendance"
                 sublabel={`${profile.gso_attended ?? 0} / 2 completed`}
               />
@@ -214,7 +214,7 @@ export default function AdminProfilePage() {
             <div className="w-full text-left pt-3 border-t border-[rgba(45,42,74,0.08)]">
               <ProgressBar
                 value={profile.asho_attended === 2 ? 100 : profile.asho_attended === 1 ? 50 : 0}
-                variant="dark"
+                variant="gradient"
                 label="ASHO Attendance"
                 sublabel={`${profile.asho_attended ?? 0} / 2 completed`}
               />
@@ -223,7 +223,7 @@ export default function AdminProfilePage() {
             <div className="w-full text-left pt-3 border-t border-[rgba(45,42,74,0.08)]">
               <ProgressBar
                 value={categoryCounts["Forum"] ? Math.min((categoryCounts["Forum"] / 2) * 100, 100) : 0}
-                variant="dark"
+                variant="periwinkle"
                 label="Forums Attended"
                 sublabel={`${categoryCounts["Forum"] ?? 0} attended`}
               />
@@ -232,7 +232,7 @@ export default function AdminProfilePage() {
             <div className="w-full text-left pt-3 border-t border-[rgba(45,42,74,0.08)]">
               <ProgressBar
                 value={categoryCounts["Research"] ? Math.min((categoryCounts["Research"] / 2) * 100, 100) : 0}
-                variant="dark"
+                variant="periwinkle"
                 label="Research Attended"
                 sublabel={`${categoryCounts["Research"] ?? 0} attended`}
               />
@@ -241,7 +241,7 @@ export default function AdminProfilePage() {
             <div className="w-full text-left pt-3 border-t border-[rgba(45,42,74,0.08)]">
               <ProgressBar
                 value={categoryCounts["Training"] ? Math.min((categoryCounts["Training"] / 2) * 100, 100) : 0}
-                variant="dark"
+                variant="periwinkle"
                 label="Trainings Attended"
                 sublabel={`${categoryCounts["Training"] ?? 0} attended`}
               />
@@ -250,7 +250,7 @@ export default function AdminProfilePage() {
             <div className="w-full text-left pt-3 border-t border-[rgba(45,42,74,0.08)]">
               <ProgressBar
                 value={categoryCounts["Workshop"] ? Math.min((categoryCounts["Workshop"] / 2) * 100, 100) : 0}
-                variant="dark"
+                variant="periwinkle"
                 label="Workshops Attended"
                 sublabel={`${categoryCounts["Workshop"] ?? 0} attended`}
               />
