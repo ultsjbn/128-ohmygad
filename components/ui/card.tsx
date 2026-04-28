@@ -87,7 +87,7 @@ export function EventCard({
         </span>
       </div>
       <div className="event-info">
-        <div className="event-title">{title}</div>
+        <div className="event-title truncate" title={title}>{title}</div>
         <div className="event-meta" style={{ marginBottom: 12 }}>
           <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
             <CalendarDays size={12} color="var(--primary-dark)" className="opacity-70" /> {date}
