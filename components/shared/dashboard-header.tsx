@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
 import { ArrowLeft } from "lucide-react";
@@ -24,8 +25,28 @@ export default function DashboardHeader({ basePath, pageLabels }: DashboardHeade
   const isDashboard = activeId === "dashboard";
   const pageLabel   = pageLabels[activeId] ?? activeId.charAt(0).toUpperCase() + activeId.slice(1);
 
+  const [scrolled, setScrolled] = useState(false);
+  const headerRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const scroller = headerRef.current?.nextElementSibling as HTMLElement | null;
+    if (!scroller) return;
+    const onScroll = () => setScrolled(scroller.scrollTop > 8);
+    scroller.addEventListener("scroll", onScroll, { passive: true });
+    return () => scroller.removeEventListener("scroll", onScroll);
+  }, []);
+
   return (
-    <header className=" shrink-0 flex flex-col md:flex-row md:items-center md:justify-between md:gap-3 p-3 md:px-5 md:pt-4 md:pb-2">
+    <header
+      ref={headerRef}
+      className="shrink-0 flex flex-col md:flex-row md:items-center md:justify-between md:gap-3 p-3 md:px-5 md:pt-4 md:pb-2"
+      style={{
+        backgroundColor: scrolled ? "rgba(255,255,255,0.80)" : "rgba(255,255,255,0)",
+        backdropFilter:  scrolled ? "blur(12px)" : "blur(0px)",
+        borderBottom:    scrolled ? "1px solid rgba(0,0,0,0.06)" : "0px solid transparent",
+        transition: "background-color 0.2s ease, backdrop-filter 0.2s ease, border-color 0.2s ease",
+      }}
+    >
       {/* row 1: logo (mobile) + title (desktop) on left, UserMenu on right */}
       <div className="flex items-center justify-between md:flex-1 min-w-0">
         <div className="flex items-center gap-2 min-w-0">
