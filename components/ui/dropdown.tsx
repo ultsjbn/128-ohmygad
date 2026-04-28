@@ -59,6 +59,7 @@ SAMPLE USAGE
 
 import { useState } from "react";
 import React from "react";
+import { usePathname } from "next/navigation";
 
 //  DropdownItem 
 interface DropdownItemProps {
@@ -92,6 +93,9 @@ export function Dropdown({ trigger, children, menuStyle }: DropdownProps) {
   const [open, setOpen] = useState(false);
   const [pos, setPos] = React.useState<{ top: number; right: number; maxWidth: number } | null>(null);
   const ref = React.useRef<HTMLDivElement>(null);
+  const pathname = usePathname();
+
+  React.useEffect(() => { setOpen(false); }, [pathname]);
 
   React.useEffect(() => {
     function handleOutside(e: MouseEvent) {

@@ -556,6 +556,7 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
             onSuccess={() => {
               closeEditModal();
               router.refresh();
+              showToast("success", "User updated successfully");
             }}
           />
         ) : null}
@@ -587,15 +588,7 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
               disabled={isDeleting || !deletePassword.trim()}
               onClick={handleDelete}
             >
-              {isDeleting ? (
-                <>
-                  <Loader2 size={14} className="animate-spin mr-2" /> Deleting…
-                </>
-              ) : (
-                <>
-                  <Trash2 size={14} className="mr-2" /> Delete User
-                </>
-              )}
+              {isDeleting ? "Deleting..." : "Yes, Delete"}
             </Button>
           </div>
         }

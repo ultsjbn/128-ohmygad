@@ -9,7 +9,7 @@ app/admin/users/users-client.tsx  (user list pagination)
 */
 
 /* Number of rows shown per page in admin list views. */
-export const PER_PAGE = 8;
+export const PER_PAGE = 10;
 
 /*
 Return a single page slice from an array of items.
