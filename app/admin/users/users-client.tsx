@@ -86,7 +86,7 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
     setSearch(urlSearch);
   }
 
-  const [sort, setSort] = useState<SortState>({ field: "created_at", direction: "desc" });
+  const [sort, setSort] = useState<SortState>({ field: "full_name", direction: "asc" });
 
   // Filters
   const [roleFilters, setRoleFilters] = useState<Set<string>>(new Set());
@@ -334,10 +334,9 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
     { label: "Full name", field: "full_name" },
     { label: "Email", field: "email" },
     { label: "Role", field: "role" },
-    { label: "Date joined", field: "created_at" },
   ];
 
-  const sortLabel = `${SORT_OPTIONS.find((o) => o.field === sort.field)?.label ?? "Date joined"} ${sort.direction === "asc" ? "↑" : "↓"}`;
+  const sortLabel = `${SORT_OPTIONS.find((o) => o.field === sort.field)?.label ?? "Full name"} ${sort.direction === "asc" ? "↑" : "↓"}`;
 
   return (
     <div className="flex flex-col gap-3">
@@ -376,7 +375,7 @@ export const UsersClient = ({ initialProfiles, fetchError }: UsersClientProps) =
             <DropdownDivider />
             <DropdownItem
               onClick={() => {
-                setSort({ field: "created_at", direction: "desc" });
+                setSort({ field: "full_name", direction: "asc" });
                 setPage(1);
               }}
             >
