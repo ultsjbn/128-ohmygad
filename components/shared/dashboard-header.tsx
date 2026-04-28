@@ -37,56 +37,57 @@ export default function DashboardHeader({ basePath, pageLabels }: DashboardHeade
   }, []);
 
   return (
-    <header
-      ref={headerRef}
-      className="shrink-0 flex flex-col md:flex-row md:items-center md:justify-between md:gap-3 p-3 md:px-5 md:pt-4 md:pb-2"
-      style={{
-        backgroundColor: scrolled ? "rgba(255,255,255,0.80)" : "rgba(255,255,255,0)",
-        backdropFilter:  scrolled ? "blur(12px)" : "blur(0px)",
-        borderBottom:    scrolled ? "1px solid rgba(0,0,0,0.06)" : "0px solid transparent",
-        transition: "background-color 0.2s ease, backdrop-filter 0.2s ease, border-color 0.2s ease",
-      }}
-    >
-      {/* row 1: logo (mobile) + title (desktop) on left, UserMenu on right */}
-      <div className="flex items-center justify-between md:flex-1 min-w-0">
-        <div className="flex items-center gap-2 min-w-0">
-          <div className="flex md:hidden items-center gap-1.5 shrink-0">
-            <Image
-              src="/kasarian-upb-logo.svg"
-              alt="UPB Kasarian"
-              width={38}
-              height={38}
-            />
-            <div className="flex flex-col justify-center">
-              <span className="caption">UP BAGUIO</span>
-              <span className="heading-sm uppercase">Kasarian</span>
-            </div>
-          </div>
-          {!isDashboard && (
-            <div className="hidden md:flex">
-              <Button
-                size="sm"
-                variant="icon"
-                onClick={() => router.back()}
-                aria-label="Go back"
-              >
-                <ArrowLeft size={15} />
-              </Button>
-            </div>
-          )}
-          <h1 className="heading-lg truncate hidden md:block">{pageLabel}</h1>
-        </div>
-        <div className="flex items-center gap-2 shrink-0">
-          <UserMenu />
-        </div>
-      </div>
+    <header ref={headerRef} className="relative shrink-0">
+      {/* backdrop */}
+      <div
+        aria-hidden
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          backgroundColor: scrolled ? "rgba(255,255,255,0.80)" : "rgba(255,255,255,0)",
+          backdropFilter:  scrolled ? "blur(12px)" : "blur(0px)",
+          borderBottom:    scrolled ? "1px solid rgba(0,0,0,0.06)" : "1px solid transparent",
+          transition: "background-color 0.2s ease, backdrop-filter 0.2s ease, border-color 0.2s ease",
+        }}
+      />
 
-      {/* row 2 (mobile only): page title for non-dashboard pages */}
-      {!isDashboard && (
-        <div className="flex md:hidden items-center gap-1.5 mt-2 mx-1">
-          <h1 className="heading-md">{pageLabel}</h1>
+      {/* content relative z-10 above the backdrop */}
+      <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between md:gap-3 p-3 md:px-5 md:pt-4 md:pb-2">
+        {/* row 1: logo (mobile) + title (desktop) on left, UserMenu on right */}
+        <div className="flex items-center justify-between md:flex-1 min-w-0">
+          <div className="flex items-center gap-2 min-w-0">
+            <div className="flex md:hidden items-center gap-1.5 shrink-0">
+              <Image
+                src="/kasarian-upb-logo.svg"
+                alt="UPB Kasarian"
+                width={38}
+                height={38}
+              />
+              <div className="flex flex-col justify-center">
+                <span className="caption">UP BAGUIO</span>
+                <span className="heading-sm uppercase">Kasarian</span>
+              </div>
+            </div>
+            {!isDashboard && (
+              <div className="hidden md:flex">
+                <Button size="sm" variant="icon" onClick={() => router.back()} aria-label="Go back">
+                  <ArrowLeft size={15} />
+                </Button>
+              </div>
+            )}
+            <h1 className="heading-lg truncate hidden md:block">{pageLabel}</h1>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <UserMenu />
+          </div>
         </div>
-      )}
+
+        {/* row 2 (mobile only): page title for non-dashboard pages */}
+        {!isDashboard && (
+          <div className="flex md:hidden items-center gap-1.5 mt-2 mx-1">
+            <h1 className="heading-md">{pageLabel}</h1>
+          </div>
+        )}
+      </div>
     </header>
   );
 }
