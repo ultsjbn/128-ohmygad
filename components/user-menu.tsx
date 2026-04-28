@@ -54,7 +54,7 @@ export default function UserMenu() {
             <User size={17} />
           </div>
           {displayName && (
-            <span className="text-md font-semibold truncate">
+            <span className="hidden sm:block text-md font-semibold truncate max-w-[150px]">
               {displayName}
             </span>
           )}
