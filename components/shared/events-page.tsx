@@ -629,7 +629,6 @@ export default function EventsPage() {
 
       {/* when opened the event */}
       <Modal
-      
         open={!!detailEvent}
         onClose={() => {
           setDetailEvent(null);

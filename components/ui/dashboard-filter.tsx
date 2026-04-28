@@ -18,7 +18,7 @@ export interface DashboardFilters {
   sexAtBirth: string[];
 }
 
-export const EMPTY_FILTERS: DashboardFilters = {
+export const EmptyFilters: DashboardFilters = {
   college: [],
   genderIdentity: [],
   yearLevel: [],
@@ -183,7 +183,7 @@ export function DashboardFilter({ value, onChange, options }: DashboardFilterPro
               </button>
             </Badge>
           ))}
-          <Button variant="soft" size="sm" onClick={() => onChange(EMPTY_FILTERS)}>
+          <Button variant="soft" size="sm" onClick={() => onChange(EmptyFilters)}>
             Clear all
           </Button>
           {filterButton}
