@@ -77,7 +77,8 @@ export const YEAR_OPTIONS = [
 ];
 
 export const EVENT_CATEGORY_OPTIONS = [
-  { value: "Orientation", label: "Orientation" },
+  { value: "GSO", label: "GSO" },
+  { value: "ASHO", label: "ASHO" },
   { value: "Forum", label: "Forum" },
   { value: "Research", label: "Research" },
   { value: "Training", label: "Training" },

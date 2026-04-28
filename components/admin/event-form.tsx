@@ -146,54 +146,6 @@ export default function EventForm({ initialData, mode, onSuccess, onCancel }: Ev
     const regOpen = new Date(registration_open);
     const regClose = new Date(registration_close);
 
-    // Get the start of today for comparison
-    const nowLocal = new Date();
-    const startOfToday = new Date(nowLocal.getFullYear(), nowLocal.getMonth(), nowLocal.getDate());
-
-    if (status === "upcoming") {
-      if (start < startOfToday) {
-        setError("Upcoming events cannot have a start date in the past.");
-        setIsLoading(false);
-        return;
-      }
-      if (end && end < startOfToday) {
-        setError("Upcoming events cannot have an end date in the past.");
-        setIsLoading(false);
-        return;
-      }
-      if (regOpen < startOfToday) {
-        setError("Upcoming events cannot have registration open in the past.");
-        setIsLoading(false);
-        return;
-      }
-      if (regClose < startOfToday) {
-        setError("Upcoming events cannot have registration close in the past.");
-        setIsLoading(false);
-        return;
-      }
-    } else if (status === "past") {
-      if (start >= startOfToday) {
-        setError("Past events cannot have a start date of today or in the future.");
-        setIsLoading(false);
-        return;
-      }
-      if (end && end >= startOfToday) {
-        setError("Past events cannot have an end date of today or in the future.");
-        setIsLoading(false);
-        return;
-      }
-      if (regOpen >= startOfToday) {
-        setError("Past events cannot have registration open of today or in the future.");
-        setIsLoading(false);
-        return;
-      }
-      if (regClose >= startOfToday) {
-        setError("Past events cannot have registration close of today or in the future.");
-        setIsLoading(false);
-        return;
-      }
-    }
-
     if (end && start >= end) {
       setError("End date must be after the start date.");
       setIsLoading(false);
