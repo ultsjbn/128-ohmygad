@@ -99,7 +99,10 @@ export default function EventsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [sort, setSort] = useState<SortState>({ field: "start_date", direction: "asc" });
-  const [filters, setFilters] = useState<FilterState>({ status: new Set(["upcoming"]), category: new Set() });
+  const [filters, setFilters] = useState<FilterState>({ 
+    status: searchParams.get("search") ? new Set() : new Set(["upcoming"]), 
+    category: new Set() 
+  });
   const [activeChip, setActiveChip] = useState("All");
 
   // event detail modal

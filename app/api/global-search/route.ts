@@ -45,9 +45,23 @@ export async function GET(request: Request) {
       .ilike("title", `%${query}%`);
 
     if (role !== "admin") {
+      const { data: attended } = await supabaseAdmin
+        .from("event_registration")
+        .select("event_id")
+        .eq("user_id", authResult.user!.id)
+        .eq("attended", true);
+
+      const attendedEventIds = (attended || []).map((r) => r.event_id);
+
       surveyQuery = surveyQuery
         .eq("status", "open")
         .or(`close_at.gte.${todayStr},close_at.is.null`);
+
+      if (attendedEventIds.length > 0) {
+        surveyQuery = surveyQuery.in("event_id", attendedEventIds);
+      } else {
+        surveyQuery = surveyQuery.in("event_id", ["00000000-0000-0000-0000-000000000000"]);
+      }
     }
 
     const { data: surveys } = await surveyQuery.limit(limitAmount);
