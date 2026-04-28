@@ -175,6 +175,16 @@ export default function EventsPage() {
     fetchData();
   }, []);
 
+
+    useEffect(() => {
+        if (!events.length) return;
+        const targetId = searchParams.get("event");
+        if (!targetId) return;
+        const match = events.find((e) => e.id === targetId);
+        if (match) setDetailEvent(match);
+    }, [events, searchParams]);   // runs once events are populated
+
+
   // handle registrations
   const handleRegister = async (eventId: string, e?: React.MouseEvent) => {
     e?.stopPropagation();

@@ -1,14 +1,15 @@
 "use client";
 
 import { JSX, useEffect, useState } from "react";
-import { Calendar, MapPin, Clock } from "lucide-react";
+import { Calendar, MapPin, Clock, X } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
-import { Badge, Button, Card, Tabs } from "@/components/ui";
+import { Badge, Button, Card, Tabs, Modal } from "@/components/ui";
 
 //  types
 interface EventData {
   id: string;
   title: string;
+  description?: string;
   location: string;
   date: string;
   dayOfWeek: string;
@@ -31,6 +32,7 @@ import {
   DEFAULT_GRADIENT,
   REG_STATUS_VARIANT
 } from "@/lib/constants";
+
 
 const formatDateLabel = (s: string) =>
   new Date(s).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
@@ -56,6 +58,7 @@ function groupByDate(events: EventData[]): EventGroup[] {
 export const EventPanel = (): JSX.Element => {
   const supabase = createClient();
   const [events, setEvents]   = useState<EventData[]>([]);
+  const [detailEvent, setDetailEvent] = useState<EventData | null>(null);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter]   = useState<"upcoming" | "today" | "past">("today");
 
@@ -70,7 +73,7 @@ export const EventPanel = (): JSX.Element => {
         .select(`
           status,
           event (
-            id, title, location, start_date, end_date, banner_url, category
+            id, title, location, start_date, end_date, banner_url, category, description
           )
         `)
         .eq("user_id", user.id)
@@ -245,31 +248,67 @@ export const EventPanel = (): JSX.Element => {
                                     ? `url(${event.banner_url}) center/cover no-repeat`
                                     : CATEGORY_GRADIENT[event.category ?? ""] ?? DEFAULT_GRADIENT;
                                 return (
-                                    <Card key={event.id} className="transition-shadow cursor-pointer">
-                                    <div className="flex gap-3 items-center">
-                                        <div className="flex flex-col gap-1 flex-1 min-w-0">
-                                            <div>
-                                                {event.category && <Badge variant="ghost">{event.category}</Badge>}
+                                    <div
+                                        key={event.id}
+                                        className="cursor-pointer transition-shadow"
+                                        onClick={() => {
+                                            const base =
+                                                window.location.pathname
+                                                    .split("/")
+                                                    .slice(0, 2)
+                                                    .join("/");
+                                            window.location.href = `${base}/events?event=${event.id}`;
+                                        }}
+                                    >
+                                        <Card key={event.id} className="transition-shadow">
+                                            <div className="flex gap-3 items-center">
+                                                <div className="flex flex-col gap-1 flex-1 min-w-0">
+                                                    <div>
+                                                        {event.category && (
+                                                            <Badge variant="ghost">
+                                                                {event.category}
+                                                            </Badge>
+                                                        )}
+                                                    </div>
+                                                    <span className="caption text-[var(--gray)] flex items-center gap-1">
+                                                        <Clock size={11} />
+                                                        {event.time}
+                                                    </span>
+                                                    <h3 className="heading-sm leading-snug m-0 line-clamp-2 truncate">
+                                                        {event.title}
+                                                    </h3>
+                                                    <span className="caption text-[var(--gray)] flex items-center gap-1">
+                                                        <MapPin size={11} />
+                                                        <span className="truncate">
+                                                            {event.location}
+                                                        </span>
+                                                    </span>
+                                                    <div>
+                                                        {event.registrationStatus && (
+                                                            <Badge
+                                                                variant={
+                                                                    REG_STATUS_VARIANT[
+                                                                        event.registrationStatus.toLowerCase()
+                                                                    ] ?? "dark"
+                                                                }
+                                                                className="mt-1"
+                                                            >
+                                                                <span className="capitalize">
+                                                                    {
+                                                                        event.registrationStatus
+                                                                    }
+                                                                </span>
+                                                            </Badge>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                                <div
+                                                    className="w-[100px] h-[100px] rounded-[var(--radius-sm)] shrink-0"
+                                                    style={{ background: cover }}
+                                                />
                                             </div>
-                                            <span className="caption text-[var(--gray)] flex items-center gap-1">
-                                                <Clock size={11} />{event.time}
-                                            </span>
-                                            <h3 className="heading-sm leading-snug m-0 line-clamp-2 truncate">{event.title}</h3>
-                                            <span className="caption text-[var(--gray)] flex items-center gap-1">
-                                                <MapPin size={11} />
-                                                <span className="truncate">{event.location}</span>
-                                            </span>
-                                            <div>
-                                                {event.registrationStatus && (
-                                                    <Badge variant={REG_STATUS_VARIANT[event.registrationStatus.toLowerCase()] ?? "dark"} className="mt-1">
-                                                        <span className="capitalize">{event.registrationStatus}</span>
-                                                    </Badge>
-                                                )}
-                                            </div>
-                                        </div>
-                                        <div className="w-[100px] h-[100px] rounded-[var(--radius-sm)] shrink-0" style={{ background: cover }} />
+                                        </Card>
                                     </div>
-                                    </Card>
                                 );
                             })}
                         </div>
@@ -308,28 +347,37 @@ export const EventPanel = (): JSX.Element => {
                             ? `url(${event.banner_url}) center/cover no-repeat`
                             : CATEGORY_GRADIENT[event.category ?? ""] ?? DEFAULT_GRADIENT;
                         return (
-                            <Card variant="ghost" key={event.id} className="hover:shadow-[var(--shadow-soft)] transition-shadow cursor-pointer">
-                                <div className="flex gap-4 items-center">
-                                    <div className="flex flex-col gap-1.5 flex-1 min-w-0">
-                                        <span className="caption flex items-center gap-1">
-                                            <Clock size={11} />{event.time}
-                                        </span>
-                                        <h3 className="heading-sm leading-snug m-0 line-clamp-2">{event.title}</h3>
-                                        <span className="caption flex items-center gap-1">
-                                            <MapPin size={11} />{event.location}
-                                        </span>
-                                        <div className="flex gap-2 flex-wrap mt-0.5">
-                                            {event.registrationStatus && (
-                                            <Badge variant={REG_STATUS_VARIANT[event.registrationStatus.toLowerCase()] ?? "dark"}>
-                                                <span className="capitalize">{event.registrationStatus}</span>
-                                            </Badge>
-                                            )}
-                                            {event.category && <Badge variant="ghost">{event.category}</Badge>}
+                            <div
+                                key={event.id}
+                                className="cursor-pointer transition-shadow"
+                                onClick={() => {
+                                    const base = window.location.pathname.split("/").slice(0, 2).join("/");
+                                    window.location.href = `${base}/events?event=${event.id}`;
+                                }}
+                            >
+                                <Card variant="ghost" key={event.id} className="hover:shadow-[var(--shadow-soft)] transition-shadow">
+                                    <div className="flex gap-4 items-center">
+                                        <div className="flex flex-col gap-1.5 flex-1 min-w-0">
+                                            <span className="caption flex items-center gap-1">
+                                                <Clock size={11} />{event.time}
+                                            </span>
+                                            <h3 className="heading-sm leading-snug m-0 line-clamp-2">{event.title}</h3>
+                                            <span className="caption flex items-center gap-1">
+                                                <MapPin size={11} />{event.location}
+                                            </span>
+                                            <div className="flex gap-2 flex-wrap mt-0.5">
+                                                {event.registrationStatus && (
+                                                <Badge variant={REG_STATUS_VARIANT[event.registrationStatus.toLowerCase()] ?? "dark"}>
+                                                    <span className="capitalize">{event.registrationStatus}</span>
+                                                </Badge>
+                                                )}
+                                                {event.category && <Badge variant="ghost">{event.category}</Badge>}
+                                            </div>
                                         </div>
+                                        <div className="w-[150px] h-[100px] rounded-[var(--radius-sm)] shrink-0" style={{ background: cover }} />
                                     </div>
-                                    <div className="w-[150px] h-[100px] rounded-[var(--radius-sm)] shrink-0" style={{ background: cover }} />
-                                </div>
-                            </Card>
+                                </Card>
+                            </div>
                         );
                         })}
                     </div>
@@ -341,6 +389,53 @@ export const EventPanel = (): JSX.Element => {
             )}
 
         </div>
+        <Modal open={!!detailEvent} onClose={() => setDetailEvent(null)} hideCloseButton>
+            {detailEvent && (() => {
+                const cover = detailEvent.banner_url
+                ? `url(${detailEvent.banner_url}) center/cover no-repeat`
+                : CATEGORY_GRADIENT[detailEvent.category ?? ""] ?? DEFAULT_GRADIENT;
+                return (
+                <div className="flex flex-col min-h-0">
+                    {/* cover */}
+                    <div className="h-[160px] relative shrink-0 rounded-t-[var(--radius-xl)]"
+                    style={{ background: cover }}>
+                    <button
+                        onClick={() => setDetailEvent(null)}
+                        className="absolute top-3 right-3 w-6 h-6 rounded-full bg-white/80 flex items-center justify-center cursor-pointer"
+                    >
+                        <X size={14} />
+                    </button>
+                    {detailEvent.category && (
+                        <div className="absolute bottom-3 left-3">
+                        <Badge variant="ghost">{detailEvent.category}</Badge>
+                        </div>
+                    )}
+                    </div>
+
+                    {/* body */}
+                    <div className="flex flex-col gap-3 p-4">
+                    <h2 className="heading-md m-0">{detailEvent.title}</h2>
+                    <div className="flex flex-col gap-1.5">
+                        <span className="caption text-[var(--gray)] flex items-center gap-2">
+                        <Clock size={13} />{detailEvent.date} · {detailEvent.time}
+                        </span>
+                        <span className="caption text-[var(--gray)] flex items-center gap-2">
+                        <MapPin size={13} />{detailEvent.location}
+                        </span>
+                    </div>
+                    {detailEvent.registrationStatus && (
+                        <Badge variant={REG_STATUS_VARIANT[detailEvent.registrationStatus.toLowerCase()] ?? "dark"}>
+                        <span className="capitalize">{detailEvent.registrationStatus}</span>
+                        </Badge>
+                    )}
+                    </div>
+                </div>
+                );
+            })()}
+        </Modal>
+
     </div>
+
+    
   );
 };
