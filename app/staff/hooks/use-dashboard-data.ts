@@ -233,23 +233,28 @@ export function useDashboardData(dateRange?: DateRange, filters?: DashboardFilte
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const applyIds = (q: any) => filteredIds !== null ? q.in("id", filteredIds) : q;
+        // only exclude admin by default when no role filter is active — if the user
+        // explicitly filtered by role, respect whatever they selected
+        const roleFilterActive = filters && filters.role.length > 0;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const base = (q: any) => applyIds(roleFilterActive ? q : q.neq("role", "admin"));
 
         const [
           { count: totalCount,     error: e1 },
           { count: onboardedCount, error: e2 },
         ] = await Promise.all([
-          applyIds(supabase.from("profile").select("id", { count: "exact", head: true }).neq("role", "admin")),
-          applyIds(supabase.from("profile").select("id", { count: "exact", head: true }).neq("role", "admin").eq("is_onboarded", true)),
+          base(supabase.from("profile").select("id", { count: "exact", head: true })),
+          base(supabase.from("profile").select("id", { count: "exact", head: true }).eq("is_onboarded", true)),
         ]);
         if (e1) throw e1;
         if (e2) throw e2;
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { data: sexRows,     error: e4 } = await applyIds(supabase.from("profile").select("sex_at_birth").neq("role", "admin").not("sex_at_birth", "is", null)) as any;
+        const { data: sexRows,     error: e4 } = await base(supabase.from("profile").select("sex_at_birth").not("sex_at_birth", "is", null)) as any;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { data: genderRows,  error: e5 } = await applyIds(supabase.from("profile").select("gender_identity").neq("role", "admin").not("gender_identity", "is", null)) as any;
+        const { data: genderRows,  error: e5 } = await base(supabase.from("profile").select("gender_identity").not("gender_identity", "is", null)) as any;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { data: collegeRows, error: e6 } = await applyIds(supabase.from("profile").select("college").neq("role", "admin").not("college", "is", null)) as any;
+        const { data: collegeRows, error: e6 } = await base(supabase.from("profile").select("college").not("college", "is", null)) as any;
         if (e4) throw e4;
         if (e5) throw e5;
         if (e6) throw e6;

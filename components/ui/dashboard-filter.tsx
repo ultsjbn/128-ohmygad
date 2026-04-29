@@ -59,6 +59,8 @@ interface DashboardFilterProps {
   options: FilterOptions;
 }
 
+const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+
 export function DashboardFilter({
 	value,
 	onChange,
@@ -178,7 +180,7 @@ export function DashboardFilter({
 						{options.role.map((opt) => (
 							<Checkbox
 								key={opt}
-								label={opt}
+								label={capitalize(opt)}
 								checked={value.role.includes(opt)}
 								onChange={() => toggle("role", opt)}
 							/>
@@ -197,7 +199,7 @@ export function DashboardFilter({
 					<span className="caption">Active filters:</span>
 					{chips.map(({ key, val }) => (
 						<Badge key={`${key}-${val}`} variant="periwinkle">
-							{val}
+							{key === "role" ? capitalize(val) : val}
 							<button
 								type="button"
 								onClick={() => remove(key, val)}
